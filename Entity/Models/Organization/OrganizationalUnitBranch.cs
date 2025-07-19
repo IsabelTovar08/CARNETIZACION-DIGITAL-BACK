@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using Entity.Models.Base;
 
-namespace Entity.Models.ModelSecurity
+namespace Entity.Models.Organization
 {
-    class OrganizationUnitBranch
+    public class OrganizationalUnitBranch : GenericModel
     {
+        // Foreign Keys
+        public int BranchId { get; set; }
+        public int OrganizationUnitId { get; set; }
+
+        // Navigation Properties
+        public Branch Branch { get; set; }
+        public OrganizationalUnit OrganizationUnit { get; set; }
     }
 }

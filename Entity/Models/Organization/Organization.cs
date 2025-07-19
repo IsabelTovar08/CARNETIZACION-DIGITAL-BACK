@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entity.Models.Base;
 
-namespace Entity.Models.ModelSecurity
+namespace Entity.Models.Organization
 {
-    class Organization
+    public class Organization : GenericModel
     {
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public string Login { get; set; }
     }
 }

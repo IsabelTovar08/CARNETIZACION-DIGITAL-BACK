@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entity.Models.Base;
+using Entity.Models.Notifications;
 
-namespace Entity.Models.ModelSecurity
+namespace Entity.Models.Organization
 {
-    class Branch
+    public class Branch : GenericModel
     {
+        public string Name { get; set; }
+        public string Location { get; set; }
+        public int CityId { get; set; }
+        public City City { get; set; }
+        public int OrganizationId { get; set; }
+        public Organization Organization { get; set; }
     }
 }
