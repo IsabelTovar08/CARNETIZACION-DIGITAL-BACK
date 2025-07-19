@@ -5,6 +5,8 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="74" >
+
+
         <EntityTypeShape EntityType="DbModel.Role" Width="1.5" PointX="4.375" PointY="10.125" FillColor="128, 128, 255" />
         <EntityTypeShape EntityType="DbModel.User" Width="1.5" PointX="9.5" PointY="10" IsExpanded="true" FillColor="128, 128, 255" />
         <EntityTypeShape EntityType="DbModel.Person" Width="2.125" PointX="12.625" PointY="10.5" FillColor="192, 192, 255" />
