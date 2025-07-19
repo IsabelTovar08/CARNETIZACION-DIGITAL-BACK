@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="74" >
+      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="61" >
 
 
         <EntityTypeShape EntityType="DbModel.Role" Width="1.5" PointX="4.375" PointY="10.125" FillColor="128, 128, 255" />
@@ -62,12 +62,12 @@
         <AssociationConnector Association="DbModel.PersonDivisionProfilePerson" />
         <AssociationConnector Association="DbModel.PersonDivisionProfileCard" />
         <AssociationConnector Association="DbModel.PersonDivisionProfileProfile" />
-        <EntityTypeShape EntityType="DbModel.NotificationType" Width="1.5" PointX="10.625" PointY="19" FillColor="192, 255, 255" />
+        <EntityTypeShape EntityType="DbModel.NotificationType" Width="1.875" PointX="10.625" PointY="19" FillColor="192, 255, 255" />
         <EntityTypeShape EntityType="DbModel.Notification" Width="1.5" PointX="8.75" PointY="19" FillColor="192, 255, 255" />
         <AssociationConnector Association="DbModel.NotificationNotificationType" />
-        <EntityTypeShape EntityType="DbModel.NotificationReceived" Width="1.5" PointX="6.5" PointY="19" FillColor="192, 255, 255" />
+        <EntityTypeShape EntityType="DbModel.NotificationReceived" Width="1.875" PointX="6.125" PointY="19" FillColor="192, 255, 255" />
         <AssociationConnector Association="DbModel.NotificationReceivedNotification" />
-        <EntityTypeShape EntityType="DbModel.Estatus" Width="1.5" PointX="16.5" PointY="21" />
+        <EntityTypeShape EntityType="DbModel.Estatus" Width="1.5" PointX="17.625" PointY="20.25" />
         <AssociationConnector Association="DbModel.NotificationReceivedUser" />
         <EntityTypeShape EntityType="DbModel.Shedule" Width="1.5" PointX="23.75" PointY="9.875" />
         <AssociationConnector Association="DbModel.SheduleOrganization" />
