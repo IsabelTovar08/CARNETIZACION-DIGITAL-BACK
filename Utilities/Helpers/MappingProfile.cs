@@ -2,6 +2,7 @@
 using Entity.DTOs;
 using Entity.DTOs.Create;
 using Entity.Models;
+using Entity.Models.Organization;
 
 namespace Utilities.Helper
 {

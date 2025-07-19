@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.Models.ModelSecurity
+namespace Entity.Models.Organization
 {
-    class EventProfile
+    class Department
     {
     }
 }
