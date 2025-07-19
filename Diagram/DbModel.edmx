@@ -651,37 +651,6 @@
           </AssociationSet>
           <EntitySet Name="Profiles" EntityType="DbModel.Profile" />
           <EntitySet Name="PersonDivisionProfiles" EntityType="DbModel.PersonDivisionProfile" />
-          <AssociationSet Name="PersonDivisionProfilePerson1" Association="DbModel.PersonDivisionProfilePerson1">
-            <End Role="PersonDivisionProfile" EntitySet="PersonDivisionProfiles" />
-            <End Role="Person" EntitySet="People" />
-          </AssociationSet>
-          <EntitySet Name="EventOrganizationalUnits" EntityType="DbModel.EventOrganizationalUnit" />
-          <EntitySet Name="EventInternalDivissions" EntityType="DbModel.EventInternalDivission" />
-          <EntitySet Name="EventProfiles" EntityType="DbModel.EventProfile" />
-          <AssociationSet Name="EventProfileEvent" Association="DbModel.EventProfileEvent">
-            <End Role="EventProfile" EntitySet="EventProfiles" />
-            <End Role="Event" EntitySet="Events" />
-          </AssociationSet>
-          <AssociationSet Name="EventProfileProfile" Association="DbModel.EventProfileProfile">
-            <End Role="EventProfile" EntitySet="EventProfiles" />
-            <End Role="Profile" EntitySet="Profiles" />
-          </AssociationSet>
-          <AssociationSet Name="EventDivissionEvent" Association="DbModel.EventDivissionEvent">
-            <End Role="EventDivission" EntitySet="EventOrganizationalUnits" />
-            <End Role="Event" EntitySet="Events" />
-          </AssociationSet>
-          <AssociationSet Name="EventOrganizationalUnitOrganizationalUnit" Association="DbModel.EventOrganizationalUnitOrganizationalUnit">
-            <End Role="EventOrganizationalUnit" EntitySet="EventOrganizationalUnits" />
-            <End Role="OrganizationalUnit" EntitySet="OrganizationalUnits" />
-          </AssociationSet>
-          <AssociationSet Name="EventInternalDivissionEvent" Association="DbModel.EventInternalDivissionEvent">
-            <End Role="EventInternalDivission" EntitySet="EventInternalDivissions" />
-            <End Role="Event" EntitySet="Events" />
-          </AssociationSet>
-          <AssociationSet Name="EventInternalDivissionInternalDivision" Association="DbModel.EventInternalDivissionInternalDivision">
-            <End Role="EventInternalDivission" EntitySet="EventInternalDivissions" />
-            <End Role="InternalDivision" EntitySet="InternalDivisions" />
-          </AssociationSet>
           <AssociationSet Name="CityDepartment" Association="DbModel.CityDepartment">
             <End Role="City" EntitySet="Citys" />
             <End Role="Department" EntitySet="Departments" />
@@ -704,6 +673,30 @@
           </AssociationSet>
           <EntitySet Name="NotificationTypes" EntityType="DbModel.NotificationType" />
           <EntitySet Name="Notifications" EntityType="DbModel.Notification" />
+          <AssociationSet Name="NotificationNotificationType" Association="DbModel.NotificationNotificationType">
+            <End Role="Notification" EntitySet="Notifications" />
+            <End Role="NotificationType" EntitySet="NotificationTypes" />
+          </AssociationSet>
+          <EntitySet Name="NotificationRecibeds" EntityType="DbModel.NotificationReceived" />
+          <AssociationSet Name="NotificationReceivedNotification" Association="DbModel.NotificationReceivedNotification">
+            <End Role="NotificationReceived" EntitySet="NotificationRecibeds" />
+            <End Role="Notification" EntitySet="Notifications" />
+          </AssociationSet>
+          <EntitySet Name="Estatus" EntityType="DbModel.Estatus" />
+          <AssociationSet Name="NotificationReceivedUser" Association="DbModel.NotificationReceivedUser">
+            <End Role="NotificationReceived" EntitySet="NotificationRecibeds" />
+            <End Role="User" EntitySet="Users" />
+          </AssociationSet>
+          <EntitySet Name="Shedules" EntityType="DbModel.Shedule" />
+          <AssociationSet Name="SheduleOrganization" Association="DbModel.SheduleOrganization">
+            <End Role="Shedule" EntitySet="Shedules" />
+            <End Role="Organization" EntitySet="Organizations" />
+          </AssociationSet>
+          <EntitySet Name="EventTargetAudiences" EntityType="DbModel.EventTargetAudience" />
+          <AssociationSet Name="EventTargetAudienceEvent" Association="DbModel.EventTargetAudienceEvent">
+            <End Role="EventTargetAudience" EntitySet="EventTargetAudiences" />
+            <End Role="Event" EntitySet="Events" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Role">
           <Key>
@@ -727,6 +720,7 @@
           <NavigationProperty Name="UserRole" Relationship="DbModel.UserRoleUser" FromRole="User" ToRole="UserRole" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <Property Name="ActivationCode" Type="String" Nullable="false" />
+          <NavigationProperty Name="NotificationReceived" Relationship="DbModel.NotificationReceivedUser" FromRole="User" ToRole="NotificationReceived" />
         </EntityType>
         <EntityType Name="Person">
           <Key>
@@ -750,7 +744,6 @@
           <NavigationProperty Name="Attendances" Relationship="DbModel.AttendancePerson" FromRole="Person" ToRole="Attendance" />
           <Property Name="AttendanceId" Type="Int32" Nullable="false" />
           <Property Name="PersonDivisionProfileId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="PersonDivisionProfile1" Relationship="DbModel.PersonDivisionProfilePerson1" FromRole="Person" ToRole="PersonDivisionProfile" />
           <NavigationProperty Name="PersonDivisionProfile" Relationship="DbModel.PersonDivisionProfilePerson" FromRole="Person" ToRole="PersonDivisionProfile" />
         </EntityType>
         <EntityType Name="Form">
@@ -886,6 +879,7 @@
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <Property Name="Logo" Type="String" Nullable="false" />
+          <NavigationProperty Name="Shedule" Relationship="DbModel.SheduleOrganization" FromRole="Organization" ToRole="Shedule" />
         </EntityType>
         <EntityType Name="OrganizationalUnit">
           <Key>
@@ -896,7 +890,6 @@
           <NavigationProperty Name="InternalDivision" Relationship="DbModel.AssignmentOrganizationDivision" FromRole="OrganizationDivision" ToRole="Assignment" />
           <NavigationProperty Name="OrganizationalUnitBranch" Relationship="DbModel.DivisionBranchDivision" FromRole="Division" ToRole="DivisionBranch" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="EventOrganizationalUnit" Relationship="DbModel.EventOrganizationalUnitOrganizationalUnit" FromRole="OrganizationalUnit" ToRole="EventOrganizationalUnit" />
         </EntityType>
         <EntityType Name="InternalDivision">
           <Key>
@@ -906,7 +899,6 @@
           <Property Name="Name" Type="String" Nullable="false" />
           <NavigationProperty Name="OrganizationalUnitId" Relationship="DbModel.AssignmentOrganizationDivision" FromRole="Assignment" ToRole="OrganizationDivision" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="EventInternalDivission" Relationship="DbModel.EventInternalDivissionInternalDivision" FromRole="InternalDivision" ToRole="EventInternalDivission" />
         </EntityType>
         <Association Name="AssignmentOrganizationDivision">
           <End Type="DbModel.InternalDivision" Role="Assignment" Multiplicity="*" />
@@ -966,15 +958,13 @@
           <NavigationProperty Name="EventTypeId" Relationship="DbModel.EventEventType" FromRole="Event" ToRole="EventType" />
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="EventProfile" Relationship="DbModel.EventProfileEvent" FromRole="Event" ToRole="EventProfile" />
-          <NavigationProperty Name="EventDivission" Relationship="DbModel.EventDivissionEvent" FromRole="Event" ToRole="EventDivission" />
-          <NavigationProperty Name="EventInternalDivission" Relationship="DbModel.EventInternalDivissionEvent" FromRole="Event" ToRole="EventInternalDivission" />
           <Property Name="Code" Type="String" Nullable="false" />
           <Property Name="SheduleDate" Type="String" Nullable="false" />
           <Property Name="SheduleTime" Type="String" Nullable="false" />
           <Property Name="EventStart" Type="String" Nullable="false" />
           <Property Name="EvendEnd" Type="String" Nullable="false" />
           <Property Name="IsPublic" Type="String" Nullable="false" />
+          <NavigationProperty Name="EventTargetAudience" Relationship="DbModel.EventTargetAudienceEvent" FromRole="Event" ToRole="EventTargetAudience" />
         </EntityType>
         <EntityType Name="EventType">
           <Key>
@@ -1045,7 +1035,6 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" Nullable="false" />
-          <NavigationProperty Name="EventProfile" Relationship="DbModel.EventProfileProfile" FromRole="Profile" ToRole="EventProfile" />
           <NavigationProperty Name="PersonDivisionProfile" Relationship="DbModel.PersonDivisionProfileProfile" FromRole="Profile" ToRole="PersonDivisionProfile" />
         </EntityType>
         <EntityType Name="PersonDivisionProfile">
@@ -1056,59 +1045,8 @@
           <NavigationProperty Name="PersonId" Relationship="DbModel.PersonDivisionProfilePerson" FromRole="PersonDivisionProfile" ToRole="Person" />
           <NavigationProperty Name="CardId" Relationship="DbModel.PersonDivisionProfileCard" FromRole="PersonDivisionProfile" ToRole="Card" />
           <NavigationProperty Name="ProfileId" Relationship="DbModel.PersonDivisionProfileProfile" FromRole="PersonDivisionProfile" ToRole="Profile" />
+          <Property Name="PersonExternalInfoId1" Type="Int32" Nullable="false" />
         </EntityType>
-        <Association Name="PersonDivisionProfilePerson1">
-          <End Type="DbModel.PersonDivisionProfile" Role="PersonDivisionProfile" Multiplicity="*" />
-          <End Type="DbModel.Person" Role="Person" Multiplicity="1" />
-        </Association>
-        <EntityType Name="EventOrganizationalUnit">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="EventId" Relationship="DbModel.EventDivissionEvent" FromRole="EventDivission" ToRole="Event" />
-          <NavigationProperty Name="OrganizationalUnitId" Relationship="DbModel.EventOrganizationalUnitOrganizationalUnit" FromRole="EventOrganizationalUnit" ToRole="OrganizationalUnit" />
-        </EntityType>
-        <EntityType Name="EventInternalDivission">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="EventId" Relationship="DbModel.EventInternalDivissionEvent" FromRole="EventInternalDivission" ToRole="Event" />
-          <NavigationProperty Name="InternalDivisionId" Relationship="DbModel.EventInternalDivissionInternalDivision" FromRole="EventInternalDivission" ToRole="InternalDivision" />
-        </EntityType>
-        <EntityType Name="EventProfile">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="EventId" Relationship="DbModel.EventProfileEvent" FromRole="EventProfile" ToRole="Event" />
-          <NavigationProperty Name="ProfileId" Relationship="DbModel.EventProfileProfile" FromRole="EventProfile" ToRole="Profile" />
-        </EntityType>
-        <Association Name="EventProfileEvent">
-          <End Type="DbModel.EventProfile" Role="EventProfile" Multiplicity="*" />
-          <End Type="DbModel.Event" Role="Event" Multiplicity="0..1" />
-        </Association>
-        <Association Name="EventProfileProfile">
-          <End Type="DbModel.EventProfile" Role="EventProfile" Multiplicity="*" />
-          <End Type="DbModel.Profile" Role="Profile" Multiplicity="1" />
-        </Association>
-        <Association Name="EventDivissionEvent">
-          <End Type="DbModel.EventOrganizationalUnit" Role="EventDivission" Multiplicity="*" />
-          <End Type="DbModel.Event" Role="Event" Multiplicity="0..1" />
-        </Association>
-        <Association Name="EventOrganizationalUnitOrganizationalUnit">
-          <End Type="DbModel.EventOrganizationalUnit" Role="EventOrganizationalUnit" Multiplicity="*" />
-          <End Type="DbModel.OrganizationalUnit" Role="OrganizationalUnit" Multiplicity="1" />
-        </Association>
-        <Association Name="EventInternalDivissionEvent">
-          <End Type="DbModel.EventInternalDivission" Role="EventInternalDivission" Multiplicity="*" />
-          <End Type="DbModel.Event" Role="Event" Multiplicity="0..1" />
-        </Association>
-        <Association Name="EventInternalDivissionInternalDivision">
-          <End Type="DbModel.EventInternalDivission" Role="EventInternalDivission" Multiplicity="*" />
-          <End Type="DbModel.InternalDivision" Role="InternalDivision" Multiplicity="1" />
-        </Association>
         <Association Name="CityDepartment">
           <End Type="DbModel.City" Role="City" Multiplicity="*" />
           <End Type="DbModel.Department" Role="Department" Multiplicity="1" />
@@ -1137,6 +1075,7 @@
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="Description" Type="String" Nullable="false" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Notification" Relationship="DbModel.NotificationNotificationType" FromRole="NotificationType" ToRole="Notification" />
         </EntityType>
         <EntityType Name="Notification">
           <Key>
@@ -1145,7 +1084,71 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Tittle" Type="String" Nullable="false" />
           <Property Name="Message" Type="String" Nullable="false" />
+          <NavigationProperty Name="NotificationTypeId" Relationship="DbModel.NotificationNotificationType" FromRole="Notification" ToRole="NotificationType" />
+          <NavigationProperty Name="NotificationReceived" Relationship="DbModel.NotificationReceivedNotification" FromRole="Notification" ToRole="NotificationReceived" />
+          <Property Name="CreateDate" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
         </EntityType>
+        <Association Name="NotificationNotificationType">
+          <End Type="DbModel.Notification" Role="Notification" Multiplicity="*" />
+          <End Type="DbModel.NotificationType" Role="NotificationType" Multiplicity="1" />
+        </Association>
+        <EntityType Name="NotificationReceived">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="NotificationId" Relationship="DbModel.NotificationReceivedNotification" FromRole="NotificationReceived" ToRole="Notification" />
+          <Property Name="Status" Type="String" Nullable="false" />
+          <Property Name="SendDate" Type="String" Nullable="false" />
+          <Property Name="ReadDate" Type="String" Nullable="false" />
+          <Property Name="ExpirationDate" Type="String" Nullable="false" />
+          <NavigationProperty Name="UserId" Relationship="DbModel.NotificationReceivedUser" FromRole="NotificationReceived" ToRole="User" />
+        </EntityType>
+        <Association Name="NotificationReceivedNotification">
+          <End Type="DbModel.NotificationReceived" Role="NotificationReceived" Multiplicity="1" />
+          <End Type="DbModel.Notification" Role="Notification" Multiplicity="1" />
+        </Association>
+        <EntityType Name="Estatus">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="NotificationReceivedUser">
+          <End Type="DbModel.NotificationReceived" Role="NotificationReceived" Multiplicity="*" />
+          <End Type="DbModel.User" Role="User" Multiplicity="1" />
+        </Association>
+        <EntityType Name="Shedule">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StartTime" Type="String" Nullable="false" />
+          <Property Name="EndTime" Type="String" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <NavigationProperty Name="OrganizationId" Relationship="DbModel.SheduleOrganization" FromRole="Shedule" ToRole="Organization" />
+        </EntityType>
+        <Association Name="SheduleOrganization">
+          <End Type="DbModel.Shedule" Role="Shedule" Multiplicity="*" />
+          <End Type="DbModel.Organization" Role="Organization" Multiplicity="1" />
+        </Association>
+        <EntityType Name="EventTargetAudience">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="EventId" Relationship="DbModel.EventTargetAudienceEvent" FromRole="EventTargetAudience" ToRole="Event" />
+          <Property Name="Type" Type="String" Nullable="false" />
+          <Property Name="ReferenceId" Type="Int16" Nullable="false" />
+        </EntityType>
+        <Association Name="EventTargetAudienceEvent">
+          <End Type="DbModel.EventTargetAudience" Role="EventTargetAudience" Multiplicity="*" />
+          <End Type="DbModel.Event" Role="Event" Multiplicity="1" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
