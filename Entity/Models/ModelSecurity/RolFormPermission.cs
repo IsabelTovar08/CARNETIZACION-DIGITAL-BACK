@@ -2,7 +2,7 @@
 
 namespace Entity.Models
 {
-    public class RolFormPermission : BaseModel
+    public class RolFormPermission : GenericModel
     {
         public int RolId { get; set; }
         public int FormId { get; set; }

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entity.Models.Base;
 
-namespace Entity.Models.Organization
+namespace Entity.Models
 {
-    class Department
+    public class Department : GenericModel
     {
+        public string Name { get; set; }
+        public int CityId { get; set; }
+        public City City { get; set; }
     }
 }

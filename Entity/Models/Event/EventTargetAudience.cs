@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entity.Models.Base;
 
-namespace Entity.Models.ModelSecurity
+namespace Entity.Models.Event
 {
-    class EventTargetAudience
+    public class EventTargetAudience : GenericModel
     {
+        public string Type { get; set; }
+        public string ReferenceId { get; set; }
+
+        public int EventId { get; set; }
+        public Event Event { get; set; }
     }
 }

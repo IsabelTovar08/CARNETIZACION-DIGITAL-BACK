@@ -1,12 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Entity.Models.Base;
+using Entity.Models.Organization;
 
-namespace Entity.Models.ModelSecurity
+namespace Entity.Models.Event
 {
-    class Attendance
+    public class Attendance : GenericModel
     {
+        public DateTime TimeOfEntry { get; set; }
+        public DateTime TimeOfExit { get; set; }
+        public string PointOfEntryAccess { get; set; }
+        public string PointOfExitAccess { get; set; }
+
+        public int AccessPointId { get; set; }
+        public AccessPoint AccessPoint { get; set; }
+
+        public int PersonId { get; set; }
+        public Person Person { get; set; }
     }
 }

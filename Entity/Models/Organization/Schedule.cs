@@ -1,12 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Entity.Models.Base;
 
-namespace Entity.Models.ModelSecurity
+namespace Entity.Models.Organization
 {
-    class Schedule
+    public class Schedule : BaseModel
     {
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public string Name { get; set; }
+
+        public int OrganizationId { get; set; }
+        public Organization Organization { get; set; }
     }
 }
