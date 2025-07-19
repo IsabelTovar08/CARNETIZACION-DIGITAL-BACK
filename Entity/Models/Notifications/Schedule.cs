@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entity.Models.ModelSecurity
 {
-    class EventOrganizationUnit
+    class Schedule
     {
     }
 }
