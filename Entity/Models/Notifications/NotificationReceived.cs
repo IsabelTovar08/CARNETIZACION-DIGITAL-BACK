@@ -1,11 +1,12 @@
 ﻿using System;
 using Entity.Models.Base;
+using Entity.Models.Others;
 
 namespace Entity.Models.Notifications
 {
-    public class NotificationReceiver : BaseModel
+    public class NotificationReceived : BaseModel
     {
-        public string Status { get; set; }
+        public int StatusId { get; set; }
         public DateTime SendDate { get; set; }
         public DateTime? ReadDate { get; set; }
         public DateTime? ExpirationDate { get; set; }
@@ -16,5 +17,7 @@ namespace Entity.Models.Notifications
 
         public int UserId { get; set; }
         public User User { get; set; }
+
+        public Status Status { get; set; }
     }
 }

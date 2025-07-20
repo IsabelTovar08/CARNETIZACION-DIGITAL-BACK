@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using Entity.DTOs;
-using Entity.DTOs.Create;
 using Entity.Models;
-using Entity.Models.Organization;
-
+using Entity.Models.ModelSecurity;
 namespace Utilities.Helper
 {
-    public class MappingProfile : Profile
+    public class MappingProfile : AutoMapper.Profile
     {
         public MappingProfile()
         {
@@ -49,7 +47,6 @@ namespace Utilities.Helper
              .ForMember(dest => dest.FormName, opt => opt.MapFrom(src => src.Form.Name))
              .ForMember(dest => dest.PermissionName, opt => opt.MapFrom(src => src.Permission.Name))
              .ReverseMap();
-            CreateMap<RolFormPermission, RolFormPermissionCreateDto>().ReverseMap();
         }
     }
 }

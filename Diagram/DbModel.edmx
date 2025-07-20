@@ -697,6 +697,10 @@
             <End Role="EventTargetAudience" EntitySet="EventTargetAudiences" />
             <End Role="Event" EntitySet="Events" />
           </AssociationSet>
+          <AssociationSet Name="PersonDivisionProfileInternalDivision" Association="DbModel.PersonDivisionProfileInternalDivision">
+            <End Role="PersonDivisionProfile" EntitySet="PersonDivisionProfiles" />
+            <End Role="InternalDivision" EntitySet="InternalDivisions" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Role">
           <Key>
@@ -716,7 +720,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Username" Type="String" Nullable="false" />
           <Property Name="Password" Type="String" Nullable="false" />
-          <NavigationProperty Name="PersonId" Relationship="DbModel.UserPerson" FromRole="User" ToRole="Person" />
+          <NavigationProperty Name="Person" Relationship="DbModel.UserPerson" FromRole="User" ToRole="Person" />
           <NavigationProperty Name="UserRole" Relationship="DbModel.UserRoleUser" FromRole="User" ToRole="UserRole" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <Property Name="ActivationCode" Type="String" Nullable="false" />
@@ -730,7 +734,7 @@
           <Property Name="FirstName" Type="String" Nullable="false" />
           <Property Name="MiddleName" Type="String" Nullable="false" />
           <Property Name="LastName" Type="String" Nullable="false" />
-          <NavigationProperty Name="User" Relationship="DbModel.UserPerson" FromRole="Person" ToRole="User" />
+          <NavigationProperty Name="UserId" Relationship="DbModel.UserPerson" FromRole="Person" ToRole="User" />
           <Property Name="SecondLastName" Type="String" Nullable="false" />
           <Property Name="Email" Type="String" Nullable="false" />
           <Property Name="DocumentNumber" Type="String" Nullable="false" />
@@ -768,7 +772,7 @@
           <Property Name="IsDeleted" Type="String" Nullable="false" />
         </EntityType>
         <Association Name="UserPerson">
-          <End Type="DbModel.User" Role="User" Multiplicity="*" />
+          <End Type="DbModel.User" Role="User" Multiplicity="1" />
           <End Type="DbModel.Person" Role="Person" Multiplicity="1" />
         </Association>
         <EntityType Name="UserRole">
@@ -868,8 +872,7 @@
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <Property Name="ExpirationDate" Type="DateTime" Nullable="false" />
           <Property Name="CreationDate" Type="DateTime" Nullable="false" />
-          <Property Name="AttendanceId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="PersonDivisionProfile" Relationship="DbModel.PersonDivisionProfileCard" FromRole="Card" ToRole="PersonDivisionProfile" />
+          <NavigationProperty Name="PersonDivisionProfileId" Relationship="DbModel.PersonDivisionProfileCard" FromRole="Card" ToRole="PersonDivisionProfile" />
         </EntityType>
         <EntityType Name="Organization">
           <Key>
@@ -899,6 +902,7 @@
           <Property Name="Name" Type="String" Nullable="false" />
           <NavigationProperty Name="OrganizationalUnitId" Relationship="DbModel.AssignmentOrganizationDivision" FromRole="Assignment" ToRole="OrganizationDivision" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="PersonDivisionProfile" Relationship="DbModel.PersonDivisionProfileInternalDivision" FromRole="InternalDivision" ToRole="PersonDivisionProfile" />
         </EntityType>
         <Association Name="AssignmentOrganizationDivision">
           <End Type="DbModel.InternalDivision" Role="Assignment" Multiplicity="*" />
@@ -1043,9 +1047,9 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <NavigationProperty Name="PersonId" Relationship="DbModel.PersonDivisionProfilePerson" FromRole="PersonDivisionProfile" ToRole="Person" />
-          <NavigationProperty Name="CardId" Relationship="DbModel.PersonDivisionProfileCard" FromRole="PersonDivisionProfile" ToRole="Card" />
+          <NavigationProperty Name="Card" Relationship="DbModel.PersonDivisionProfileCard" FromRole="PersonDivisionProfile" ToRole="Card" />
           <NavigationProperty Name="ProfileId" Relationship="DbModel.PersonDivisionProfileProfile" FromRole="PersonDivisionProfile" ToRole="Profile" />
-          <Property Name="PersonExternalInfoId1" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="InternalDivisionId" Relationship="DbModel.PersonDivisionProfileInternalDivision" FromRole="PersonDivisionProfile" ToRole="InternalDivision" />
         </EntityType>
         <Association Name="CityDepartment">
           <End Type="DbModel.City" Role="City" Multiplicity="*" />
@@ -1060,7 +1064,7 @@
           <End Type="DbModel.Person" Role="Person" Multiplicity="1" />
         </Association>
         <Association Name="PersonDivisionProfileCard">
-          <End Type="DbModel.PersonDivisionProfile" Role="PersonDivisionProfile" Multiplicity="*" />
+          <End Type="DbModel.PersonDivisionProfile" Role="PersonDivisionProfile" Multiplicity="1" />
           <End Type="DbModel.Card" Role="Card" Multiplicity="1" />
         </Association>
         <Association Name="PersonDivisionProfileProfile">
@@ -1148,6 +1152,10 @@
         <Association Name="EventTargetAudienceEvent">
           <End Type="DbModel.EventTargetAudience" Role="EventTargetAudience" Multiplicity="*" />
           <End Type="DbModel.Event" Role="Event" Multiplicity="1" />
+        </Association>
+        <Association Name="PersonDivisionProfileInternalDivision">
+          <End Type="DbModel.PersonDivisionProfile" Role="PersonDivisionProfile" Multiplicity="*" />
+          <End Type="DbModel.InternalDivision" Role="InternalDivision" Multiplicity="1" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -1274,7 +1282,6 @@
           <ScalarProperty Name="IsDeleted" ColumnName="Status" />
           <ScalarProperty Name="ExpirationDate" ColumnName="ExpirationDate" />
           <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
-          <ScalarProperty Name="AttendanceId" ColumnName="AttendanceId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

@@ -2,7 +2,7 @@
 
 namespace Entity.Models
 {
-    public class UserRoles : GenericModel
+    public class UserRoles : BaseModel
     {
         public int UserId { get; set; }
         public int RolId { get; set; }

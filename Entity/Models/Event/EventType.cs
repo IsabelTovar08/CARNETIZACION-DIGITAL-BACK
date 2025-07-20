@@ -5,9 +5,8 @@ namespace Entity.Models.Event
 {
     public class EventType : GenericModel
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public ICollection<Event> Events { get; set; }
+        public List<Event>? Events { get; set; }
     }
 }

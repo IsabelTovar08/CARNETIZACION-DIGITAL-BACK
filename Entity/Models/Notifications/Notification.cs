@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Entity.Models.Base;
+using Entity.Models.Others;
 
 namespace Entity.Models.Notifications
 {
@@ -12,7 +13,7 @@ namespace Entity.Models.Notifications
 
         // Relaciones
         public int NotificationTypeId { get; set; }
-        public NotificationType NotificationType { get; set; }
+        public CustomType NotificationType { get; set; }
         public List<NotificationReceived> NotificationReceiveds { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace Entity.DTOs.Base
 {
     public class GenericBaseDto : BaseDTO
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

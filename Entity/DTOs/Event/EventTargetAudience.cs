@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Event
 {
-    public class EventTargetAudience : GenericBaseDto
+    public class EventTargetAudience : BaseDTO
     {
-        public Enum Type { get; set; }
+        public string Type { get; set; }
         public  int ReferenceId { get; set; }
+        public int EventId { get; set; }
+        public string EventName { get; set; }
     }
 }

@@ -7,7 +7,7 @@ using Entity.Models.Base;
 
 namespace Entity.Models
 {
-    public class ModuleForm : GenericModel
+    public class ModuleForm : BaseModel
     {
         public int ModuleId { get; set; }
         public int FormId { get; set; }

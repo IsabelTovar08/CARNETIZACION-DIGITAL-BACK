@@ -7,6 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Entity.Models;
+using Entity.Models.Event;
+using Entity.Models.ModelSecurity;
+using Entity.Models.Notifications;
+using Entity.Models.Organizational;
+using Entity.Models.Others;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
@@ -37,16 +42,53 @@ namespace Entity.Context
         }
 
 
-       
-        DbSet<User> Users { get; set; }
-        DbSet<Person> People { get; set; }
-        DbSet<Role> Roles { get; set; }
-        DbSet<Form> Forms { get; set; }
-        DbSet<Models.Module> Modules { get; set; }
-        DbSet<Permission> Permissions { get; set; }
-        DbSet<UserRoles> UserRoles { get; set; }
-        DbSet<ModuleForm> ModuleForms { get; set; }
-        //DbSet<RolFormPermission> RoleFormPermissions { get; set; }
+        //Security  
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Form> Forms { get; set; }
+        public DbSet<Models.Module> Modules { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<UserRoles> UserRoles { get; set; }
+        public DbSet<ModuleForm> ModuleForms { get; set; }
+        public DbSet<RolFormPermission> RoleFormPermissions { get; set; }
+
+        public DbSet<Person> People { get; set; }
+
+
+        //Organizational 
+        public DbSet<Organization> Organizations { get; set; }
+        public DbSet<City> Cities { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Branch> Branches { get; set; }
+        public DbSet<OrganizationalUnit> OrganizationalUnits { get; set; }
+        public DbSet<OrganizationalUnitBranch> OrganizationalUnitBranches { get; set; }
+        public DbSet<InternalDivision> InternalDivisions { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+
+
+
+        public DbSet<Profile> Profiles { get; set; }
+        public DbSet<Card> Cards { get; set; }
+        public DbSet<PersonDivisionProfile> PersonDivisionProfiles { get; set; }
+
+
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<NotificationReceived> NotificationReceiveds { get; set; }
+
+
+
+        //Events
+        public DbSet<Event> Events { get; set; }
+        public DbSet<EventType> EventTypes { get; set; }
+        public DbSet<EventTargetAudience> EventTargetAudiences { get; set; }
+
+        public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<AccessPoint> AccessPoints { get; set; }
+
+        //Others
+        public DbSet<Status> Statuses { get; set; }
+        public DbSet<CustomType> CustomTypes { get; set; }
+        public DbSet<TypeCategory> TypeCategories { get; set; }
 
 
 
@@ -58,6 +100,24 @@ namespace Entity.Context
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            modelBuilder.Entity<Attendance>()
+    .HasOne(a => a.AccessPointEntry)
+    .WithMany(ap => ap.AttendancesEntry)
+    .HasForeignKey(a => a.AccessPointOfEntry)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Attendance>()
+                .HasOne(a => a.AccessPointExit)
+                .WithMany(ap => ap.AttendancesExit)
+                .HasForeignKey(a => a.AccessPointOfExit)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PersonDivisionProfile>()
+    .HasOne(p => p.Card)
+    .WithOne(c => c.PersonDivisionProfile)
+    .HasForeignKey<Card>(c => c.PersonDivissionProfileId)
+    .OnDelete(DeleteBehavior.Cascade); // O Restrict si no quieres que se eliminen en cascada
+
 
         }
 

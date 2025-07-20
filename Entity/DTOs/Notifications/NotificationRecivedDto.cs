@@ -9,7 +9,7 @@ namespace Entity.DTOs.Notifications
 {
     internal class NotificationRecivedDto : GenericBaseDto
     {
-        public Enum Status { get; set; }
+        public string Status { get; set; }
         public DateTime SendDate { get; set; }
         public DateTime ReadDate { get; set; }
         public DateTime ExpireDate { get; set; }

@@ -9,8 +9,11 @@ namespace Entity.DTOs.Event
 {
     public class AccessPoint : GenericBaseDto
     {
-        public Enum Type { get; set; }
-        public string Description { get; set; }
+        public string Type { get; set; }
+        public string? Description { get; set; }
+
+        public int EventId { get; set; }
+        public string? EventName { get; set; }
 
     }
 }
