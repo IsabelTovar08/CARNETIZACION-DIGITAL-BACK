@@ -22,6 +22,220 @@ namespace Entity.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Entity.DTOs.Event.AccessPoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CustomTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EventName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomTypeId");
+
+                    b.ToTable("AccessPoint");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.AccessPoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccessPointTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessPointTypeId");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("AccessPoints");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.Attendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AccessPointOfEntry")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AccessPointOfExit")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeOfEntry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TimeOfExit")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessPointOfEntry");
+
+                    b.HasIndex("AccessPointOfExit");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Attendances");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EventEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EventStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EventTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ScheduleDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("ScheduleTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventTypeId");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.EventTargetAudience", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ReferenceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("EventTargetAudiences");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.EventType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EventTypes");
+                });
+
             modelBuilder.Entity("Entity.Models.Form", b =>
                 {
                     b.Property<int>("Id")
@@ -85,6 +299,105 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             Name = "Control de Asistencia",
                             Url = "/formulario"
+                        });
+                });
+
+            modelBuilder.Entity("Entity.Models.ModelSecurity.Person", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BlodType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DocumenTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DocumentNumber")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MiddleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Photo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecondLastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("DocumenTypeId");
+
+                    b.HasIndex("DocumentNumber")
+                        .IsUnique()
+                        .HasFilter("[DocumentNumber] IS NOT NULL");
+
+                    b.ToTable("People", "ModelSecurity");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DocumentNumber = "1234567890",
+                            FirstName = "Carlos",
+                            IsDeleted = false,
+                            LastName = "Funcionario",
+                            Phone = "3200001111"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DocumentNumber = "9876543210",
+                            FirstName = "Laura",
+                            IsDeleted = false,
+                            LastName = "Estudiante",
+                            Phone = "3100002222"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DocumentNumber = "1122334455",
+                            FirstName = "Ana",
+                            IsDeleted = false,
+                            LastName = "Administrador",
+                            Phone = "3001234567"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DocumentNumber = "9988776655",
+                            FirstName = "José",
+                            IsDeleted = false,
+                            LastName = "Usuario",
+                            Phone = "3151234567"
                         });
                 });
 
@@ -198,6 +511,482 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NotificationTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NotificationTypeId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("Entity.Models.Notifications.NotificationReceived", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReadDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SendDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NotificationId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("NotificationReceiveds");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Branch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.ToTable("Branches");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Card", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PersonDivissionProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QRCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonDivissionProfileId")
+                        .IsUnique();
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("Cards");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DeparmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("Cities");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Department", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Departments");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.InternalDivision", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationalUnitId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("OrganizationalUnitId");
+
+                    b.ToTable("InternalDivisions");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Organization", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Logo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizaionTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizaionTypeId");
+
+                    b.ToTable("Organizations");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.OrganizationalUnit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.ToTable("OrganizationalUnits");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.OrganizationalUnitBranch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrganizationUnitId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("OrganizationUnitId");
+
+                    b.ToTable("OrganizationalUnitBranches");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.PersonDivisionProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("InternalDivisionId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCurrentlySelected")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InternalDivisionId");
+
+                    b.HasIndex("PersonId")
+                        .IsUnique();
+
+                    b.HasIndex("ProfileId")
+                        .IsUnique();
+
+                    b.ToTable("PersonDivisionProfiles");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Profile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Profiles");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Schedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.ToTable("Schedules");
+                });
+
+            modelBuilder.Entity("Entity.Models.Others.CustomType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TypeCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeCategoryId");
+
+                    b.ToTable("CustomTypes");
+                });
+
+            modelBuilder.Entity("Entity.Models.Others.Status", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Statuses");
+                });
+
+            modelBuilder.Entity("Entity.Models.Others.TypeCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TypeCategories");
+                });
+
             modelBuilder.Entity("Entity.Models.Permission", b =>
                 {
                     b.Property<int>("Id")
@@ -246,84 +1035,6 @@ namespace Entity.Migrations
                             Description = "Puede validar datos (correo, QR)",
                             IsDeleted = false,
                             Name = "validar"
-                        });
-                });
-
-            modelBuilder.Entity("Entity.Models.Person", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Identification")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MiddleName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SecondLastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Identification")
-                        .IsUnique()
-                        .HasFilter("[Identification] IS NOT NULL");
-
-                    b.ToTable("People", "ModelSecurity");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FirstName = "Carlos",
-                            Identification = "1234567890",
-                            IsDeleted = false,
-                            LastName = "Funcionario",
-                            Phone = "3200001111"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FirstName = "Laura",
-                            Identification = "9876543210",
-                            IsDeleted = false,
-                            LastName = "Estudiante",
-                            Phone = "3100002222"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FirstName = "Ana",
-                            Identification = "1122334455",
-                            IsDeleted = false,
-                            LastName = "Administrador",
-                            Phone = "3001234567"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            FirstName = "José",
-                            Identification = "9988776655",
-                            IsDeleted = false,
-                            LastName = "Usuario",
-                            Phone = "3151234567"
                         });
                 });
 
@@ -466,8 +1177,20 @@ namespace Entity.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PersonId")
+                    b.Property<int?>("PersonId")
                         .HasColumnType("int");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ResetCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResetCodeExpiration")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
@@ -477,7 +1200,9 @@ namespace Entity.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("PersonId");
+                    b.HasIndex("PersonId")
+                        .IsUnique()
+                        .HasFilter("[PersonId] IS NOT NULL");
 
                     b.ToTable("Users", "ModelSecurity");
 
@@ -578,6 +1303,102 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.DTOs.Event.AccessPoint", b =>
+                {
+                    b.HasOne("Entity.Models.Others.CustomType", null)
+                        .WithMany("accessPoints")
+                        .HasForeignKey("CustomTypeId");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.AccessPoint", b =>
+                {
+                    b.HasOne("Entity.Models.Others.CustomType", "AccessPointType")
+                        .WithMany()
+                        .HasForeignKey("AccessPointTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Event.Event", "Event")
+                        .WithMany("AccessPoints")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AccessPointType");
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.Attendance", b =>
+                {
+                    b.HasOne("Entity.Models.Event.AccessPoint", "AccessPointEntry")
+                        .WithMany("AttendancesEntry")
+                        .HasForeignKey("AccessPointOfEntry")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Entity.Models.Event.AccessPoint", "AccessPointExit")
+                        .WithMany("AttendancesExit")
+                        .HasForeignKey("AccessPointOfExit")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
+                        .WithMany("Attendances")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AccessPointEntry");
+
+                    b.Navigation("AccessPointExit");
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.Event", b =>
+                {
+                    b.HasOne("Entity.Models.Event.EventType", "EventType")
+                        .WithMany("Events")
+                        .HasForeignKey("EventTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Others.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventType");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.EventTargetAudience", b =>
+                {
+                    b.HasOne("Entity.Models.Event.Event", "Event")
+                        .WithMany("EventTargetAudiences")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Entity.Models.ModelSecurity.Person", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
+                    b.HasOne("Entity.Models.Others.CustomType", "DocumenType")
+                        .WithMany("PersonsDocumentType")
+                        .HasForeignKey("DocumenTypeId");
+
+                    b.Navigation("City");
+
+                    b.Navigation("DocumenType");
+                });
+
             modelBuilder.Entity("Entity.Models.ModuleForm", b =>
                 {
                     b.HasOne("Entity.Models.Form", "Form")
@@ -595,6 +1416,194 @@ namespace Entity.Migrations
                     b.Navigation("Form");
 
                     b.Navigation("Module");
+                });
+
+            modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>
+                {
+                    b.HasOne("Entity.Models.Others.CustomType", "NotificationType")
+                        .WithMany("Notifications")
+                        .HasForeignKey("NotificationTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("NotificationType");
+                });
+
+            modelBuilder.Entity("Entity.Models.Notifications.NotificationReceived", b =>
+                {
+                    b.HasOne("Entity.Models.Notifications.Notification", "Notification")
+                        .WithMany("NotificationReceiveds")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Others.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Notification");
+
+                    b.Navigation("Status");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Branch", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.City", "City")
+                        .WithMany("Branches")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Organizational.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Card", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.PersonDivisionProfile", "PersonDivisionProfile")
+                        .WithOne("Card")
+                        .HasForeignKey("Entity.Models.Organizational.Card", "PersonDivissionProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Others.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PersonDivisionProfile");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.City", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.Department", "Department")
+                        .WithMany("Cities")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.InternalDivision", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.Branch", null)
+                        .WithMany("InternalDivisions")
+                        .HasForeignKey("BranchId");
+
+                    b.HasOne("Entity.Models.Organizational.OrganizationalUnit", "OrganizationalUnit")
+                        .WithMany("InternalDivissions")
+                        .HasForeignKey("OrganizationalUnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrganizationalUnit");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Organization", b =>
+                {
+                    b.HasOne("Entity.Models.Others.CustomType", "OrganizaionType")
+                        .WithMany("Organization")
+                        .HasForeignKey("OrganizaionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrganizaionType");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.OrganizationalUnit", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.Branch", null)
+                        .WithMany("OrganizationalUnits")
+                        .HasForeignKey("BranchId");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.OrganizationalUnitBranch", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Organizational.OrganizationalUnit", "OrganizationUnit")
+                        .WithMany("OrganizationalUnitBranches")
+                        .HasForeignKey("OrganizationUnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("OrganizationUnit");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.PersonDivisionProfile", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.InternalDivision", "InternalDivision")
+                        .WithMany()
+                        .HasForeignKey("InternalDivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
+                        .WithOne("PersonDivisionProfile")
+                        .HasForeignKey("Entity.Models.Organizational.PersonDivisionProfile", "PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Organizational.Profile", "Profile")
+                        .WithOne("PersonDivisionProfile")
+                        .HasForeignKey("Entity.Models.Organizational.PersonDivisionProfile", "ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InternalDivision");
+
+                    b.Navigation("Person");
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Schedule", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Entity.Models.Others.CustomType", b =>
+                {
+                    b.HasOne("Entity.Models.Others.TypeCategory", "TypeCategory")
+                        .WithMany("Types")
+                        .HasForeignKey("TypeCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TypeCategory");
                 });
 
             modelBuilder.Entity("Entity.Models.RolFormPermission", b =>
@@ -626,11 +1635,10 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.User", b =>
                 {
-                    b.HasOne("Entity.Models.Person", "Person")
-                        .WithMany("Users")
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
+                        .WithOne("User")
+                        .HasForeignKey("Entity.Models.User", "PersonId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Person");
                 });
@@ -654,6 +1662,25 @@ namespace Entity.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Entity.Models.Event.AccessPoint", b =>
+                {
+                    b.Navigation("AttendancesEntry");
+
+                    b.Navigation("AttendancesExit");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.Event", b =>
+                {
+                    b.Navigation("AccessPoints");
+
+                    b.Navigation("EventTargetAudiences");
+                });
+
+            modelBuilder.Entity("Entity.Models.Event.EventType", b =>
+                {
+                    b.Navigation("Events");
+                });
+
             modelBuilder.Entity("Entity.Models.Form", b =>
                 {
                     b.Navigation("ModuleForm");
@@ -661,19 +1688,79 @@ namespace Entity.Migrations
                     b.Navigation("RolFormPermissions");
                 });
 
+            modelBuilder.Entity("Entity.Models.ModelSecurity.Person", b =>
+                {
+                    b.Navigation("Attendances");
+
+                    b.Navigation("PersonDivisionProfile");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Entity.Models.Module", b =>
                 {
                     b.Navigation("ModuleForm");
                 });
 
+            modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>
+                {
+                    b.Navigation("NotificationReceiveds");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Branch", b =>
+                {
+                    b.Navigation("InternalDivisions");
+
+                    b.Navigation("OrganizationalUnits");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.City", b =>
+                {
+                    b.Navigation("Branches");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Department", b =>
+                {
+                    b.Navigation("Cities");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.OrganizationalUnit", b =>
+                {
+                    b.Navigation("InternalDivissions");
+
+                    b.Navigation("OrganizationalUnitBranches");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.PersonDivisionProfile", b =>
+                {
+                    b.Navigation("Card")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Profile", b =>
+                {
+                    b.Navigation("PersonDivisionProfile");
+                });
+
+            modelBuilder.Entity("Entity.Models.Others.CustomType", b =>
+                {
+                    b.Navigation("Notifications");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("PersonsDocumentType");
+
+                    b.Navigation("accessPoints");
+                });
+
+            modelBuilder.Entity("Entity.Models.Others.TypeCategory", b =>
+                {
+                    b.Navigation("Types");
+                });
+
             modelBuilder.Entity("Entity.Models.Permission", b =>
                 {
                     b.Navigation("RolFormPermissions");
-                });
-
-            modelBuilder.Entity("Entity.Models.Person", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Entity.Models.Role", b =>

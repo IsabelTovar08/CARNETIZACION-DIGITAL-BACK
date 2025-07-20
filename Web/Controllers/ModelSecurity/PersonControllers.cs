@@ -1,8 +1,8 @@
 ﻿using Business.Classes;
 using Business.Interfases;
 using Entity.DTOs;
-using Entity.DTOs.Create;
 using Entity.Models;
+using Entity.Models.ModelSecurity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Exeptions;

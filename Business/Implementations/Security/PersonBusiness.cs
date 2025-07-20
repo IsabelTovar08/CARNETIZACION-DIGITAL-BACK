@@ -5,8 +5,8 @@ using Business.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Entity.DTOs;
-using Entity.DTOs.Create;
 using Entity.Models;
+using Entity.Models.ModelSecurity;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
@@ -24,7 +24,7 @@ namespace Business.Classes
             _notificationSender = messageSender;
         }
 
-        protected  void Validate(PersonCreate person)
+        protected  void Validate(PersonDto person)
         {
             if (person == null)
                 throw new ValidationException("la persona no puede ser nula.");

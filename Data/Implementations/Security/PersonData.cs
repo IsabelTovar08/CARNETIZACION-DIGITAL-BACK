@@ -1,6 +1,7 @@
 ﻿using Data.Classes.Base;
 using Entity.Context;
 using Entity.Models;
+using Entity.Models.ModelSecurity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 namespace Data.Classes.Specifics
@@ -14,7 +15,7 @@ namespace Data.Classes.Specifics
 
         public async Task<Person?> FindByIdentification(string identification)
         {
-            return await _context.Set<Person>().Where(u => !u.IsDeleted).FirstOrDefaultAsync(p => p.Identification == identification);
+            return await _context.Set<Person>().Where(u => !u.IsDeleted).FirstOrDefaultAsync(p => p.DocumentNumber == identification);
         }
     }
 }
