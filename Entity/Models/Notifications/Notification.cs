@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Entity.Models.Base;
-using Entity.Models.Others;
+using Entity.Models.Parameter;
 
 namespace Entity.Models.Notifications
 {
@@ -9,7 +9,7 @@ namespace Entity.Models.Notifications
     {
         public string Title { get; set; }
         public string Message { get; set; }
-        public DateTime CreateDate { get; set; }
+        public DateTime? CreateDate { get; set; }
 
         // Relaciones
         public int NotificationTypeId { get; set; }

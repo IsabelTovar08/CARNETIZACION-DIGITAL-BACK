@@ -1,13 +1,13 @@
 ﻿using System;
 using Entity.Models.Base;
-using Entity.Models.Others;
+using Entity.Models.Parameter;
 
 namespace Entity.Models.Notifications
 {
     public class NotificationReceived : BaseModel
     {
         public int StatusId { get; set; }
-        public DateTime SendDate { get; set; }
+        public DateTime? SendDate { get; set; }
         public DateTime? ReadDate { get; set; }
         public DateTime? ExpirationDate { get; set; }
 

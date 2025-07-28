@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using Entity.Models.Base;
-using Entity.Models.Event;
 using Entity.Models.Organizational;
-using Entity.Models.Others;
+using Entity.Models.Organizational.Assignment;
+using Entity.Models.Organizational.Location;
+using Entity.Models.Parameter;
 
 namespace Entity.Models.ModelSecurity
 {
@@ -15,9 +16,9 @@ namespace Entity.Models.ModelSecurity
         public string? DocumentNumber { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
-        public int? DocumenTypeId { get; set; }
+        public int? DocumentTypeId { get; set; }
 
-        public string? BlodType { get; set; }
+        public int? BloodTypeId { get; set; }
         public string? Photo { get; set; }
 
        
@@ -28,6 +29,7 @@ namespace Entity.Models.ModelSecurity
 
         public List<Attendance>? Attendances { get; set; }
         public PersonDivisionProfile? PersonDivisionProfile { get; set; }
-        public CustomType? DocumenType { get; set; }
+        public CustomType? DocumentType { get; set; }
+        public CustomType? BloodType { get; set; }
     }
 }
