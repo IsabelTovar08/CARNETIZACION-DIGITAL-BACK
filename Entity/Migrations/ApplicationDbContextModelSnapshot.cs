@@ -1435,7 +1435,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 4,
-                            BranchId = 3,
+                            BranchId = 2,
                             IsDeleted = false,
                             OrganizationUnitId = 3
                         });

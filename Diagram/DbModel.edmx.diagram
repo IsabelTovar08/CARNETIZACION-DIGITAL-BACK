@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="101" >
+      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="65" >
 
 
         <EntityTypeShape EntityType="DbModel.Role" Width="1.5" PointX="4.375" PointY="10.125" FillColor="128, 128, 255" />
@@ -70,6 +70,8 @@
         <EntityTypeShape EntityType="DbModel.EventTargetAudience" Width="1.875" PointX="28.625" PointY="15" FillColor="255, 192, 192" />
         <AssociationConnector Association="DbModel.EventTargetAudienceEvent" />
         <AssociationConnector Association="DbModel.PersonDivisionProfileInternalDivision" />
+        <EntityTypeShape EntityType="DbModel.AreaCategory" Width="1.5" PointX="28.375" PointY="9.375" />
+        <AssociationConnector Association="DbModel.InternalDivisionAreaCategory" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

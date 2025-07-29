@@ -18,18 +18,21 @@ namespace Entity.DataInit.Organizational
                 {
                     Id = 1,
                     Name = "Facultad de Ingeniería",
+                    Description = null,
                     IsDeleted = false
                 },
                 new OrganizationalUnit
                 {
                     Id = 2,
                     Name = "Facultad de Ciencias Económicas",
+                    Description = null,
                     IsDeleted = false
                 },
                 new OrganizationalUnit
                 {
                     Id = 3,
                     Name = "Facultad de Artes",
+                    Description = null,
                     IsDeleted = false
                 }
             );

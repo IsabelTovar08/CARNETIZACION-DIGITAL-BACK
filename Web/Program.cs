@@ -1,5 +1,5 @@
 
-using Entity.Models.Notifications;
+using Entity.DTOs.Notifications;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Extensions;

@@ -17,7 +17,7 @@ namespace Entity.DataInit.Organizational
                 new OrganizationalUnitBranch { Id = 1, BranchId = 1, OrganizationUnitId = 1, IsDeleted = false }, // Ej: Ingeniería - Sede Medellín
                 new OrganizationalUnitBranch { Id = 2, BranchId = 2, OrganizationUnitId = 1, IsDeleted = false }, // Ingeniería - Sede Bogotá
                 new OrganizationalUnitBranch { Id = 3, BranchId = 1, OrganizationUnitId = 2, IsDeleted = false }, // Medicina - Sede Medellín
-                new OrganizationalUnitBranch { Id = 4, BranchId = 3, OrganizationUnitId = 3, IsDeleted = false }  // Derecho - Sede Cali
+                new OrganizationalUnitBranch { Id = 4, BranchId = 2, OrganizationUnitId = 3, IsDeleted = false }  // Derecho - Sede Cali
             );
 
             builder.Property(x => x.IsDeleted)

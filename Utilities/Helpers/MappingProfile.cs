@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Entity.DTOs;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 namespace Utilities.Helper
@@ -9,25 +11,38 @@ namespace Utilities.Helper
         public MappingProfile()
         {
             //Mapeo de la entidad Person 
-            CreateMap<Person, PersonDto>().ReverseMap();
+            CreateMap<Person, PersonDto>()
+                .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
+
+                .ReverseMap();
+            CreateMap<Person, PersonDtoRequest>().ReverseMap();
+
 
             //Mapeo de la entidad Rol 
             CreateMap<Role, RolDto>().ReverseMap();
+            CreateMap<Role, RoleDtoRequest>().ReverseMap();
+
 
             //Mapeo de la entidad Form 
             CreateMap<Form, FormDto>().ReverseMap();
+            CreateMap<Form, FormDtoRequest>().ReverseMap();
+
 
             //Mapeo de la entidad Module 
             CreateMap<Module, ModuleDto>().ReverseMap();
+            CreateMap<Module, ModuleDtoRequest>().ReverseMap();
+
 
             //Mapeo de la entidad ModuleForm 
-            CreateMap<ModuleForm, ModuleFormDto>()
+            CreateMap<ModuleForm,ModuleFormDto>()
              .ForMember(dest => dest.NameForm, opt => opt.MapFrom(src => src.Form.Name))
              .ForMember(dest => dest.NameModule, opt => opt.MapFrom(src => src.Module.Name))
              .ReverseMap();
 
             //Mapeo de la entidad permission
             CreateMap<Permission, PermissionDto>().ReverseMap();
+            CreateMap<Permission, PermissionDtoRequest>().ReverseMap();
+
 
             //Mapeo de la entidad User
             CreateMap<User, UserDTO>()

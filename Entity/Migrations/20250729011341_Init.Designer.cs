@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250728040634_InitCarnet")]
-    partial class InitCarnet
+    [Migration("20250729011341_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1438,7 +1438,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 4,
-                            BranchId = 3,
+                            BranchId = 2,
                             IsDeleted = false,
                             OrganizationUnitId = 3
                         });

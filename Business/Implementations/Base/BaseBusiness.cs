@@ -15,7 +15,7 @@ using Utilities.Exeptions;
 
 namespace Business.Classes.Base
 {
-    public class BaseBusiness<T, D> : ABaseBusiness<T, D> where T : BaseModel where D  : BaseDTO
+    public class BaseBusiness<T, DCreate, D> : ABaseBusiness<T, DCreate, D> where T : BaseModel where D  : BaseDTO
     {
         protected readonly ICrudBase<T> _data;
         protected readonly ILogger<T> _logger;
@@ -30,7 +30,7 @@ namespace Business.Classes.Base
         /// <summary>
         /// Crea una nueva entidad.
         /// </summary>
-        public override async Task<D> Save(D entity)
+        public override async Task<D> Save(DCreate entity)
         {
             try
             {
@@ -145,7 +145,7 @@ namespace Business.Classes.Base
         /// <summary>
         /// Actualiza una nueva entidad.
         /// </summary>
-        public override async Task<bool> Update(D entity)
+        public override async Task<bool> Update(DCreate entity)
         {
             try
             {

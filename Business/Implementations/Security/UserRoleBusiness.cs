@@ -3,13 +3,15 @@ using Business.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Entity.DTOs;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
 
 namespace Business.Classes
 {
-    public class UserRoleBusiness : BaseBusiness<UserRoles, UserRolDto>
+    public class UserRoleBusiness : BaseBusiness<UserRoles, UserRoleDtoRequest, UserRolDto>
     {
         private readonly UserRoleData _dataUserRol;
         public UserRoleBusiness
@@ -18,7 +20,7 @@ namespace Business.Classes
             _dataUserRol = dataUserRol;
         }
 
-        protected void Validate(UserRolDto userRolDto)
+        protected void Validate(UserRoleDtoRequest userRolDto)
         {
             if (userRolDto == null)
                 throw new ValidationException("El Rol del usuario no puede ser nulo.");

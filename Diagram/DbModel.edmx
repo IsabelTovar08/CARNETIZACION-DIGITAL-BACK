@@ -701,6 +701,11 @@
             <End Role="PersonDivisionProfile" EntitySet="PersonDivisionProfiles" />
             <End Role="InternalDivision" EntitySet="InternalDivisions" />
           </AssociationSet>
+          <EntitySet Name="AreaCategorys" EntityType="DbModel.AreaCategory" />
+          <AssociationSet Name="InternalDivisionAreaCategory" Association="DbModel.InternalDivisionAreaCategory">
+            <End Role="InternalDivision" EntitySet="InternalDivisions" />
+            <End Role="AreaCategory" EntitySet="AreaCategorys" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Role">
           <Key>
@@ -903,6 +908,7 @@
           <NavigationProperty Name="OrganizationalUnitId" Relationship="DbModel.AssignmentOrganizationDivision" FromRole="Assignment" ToRole="OrganizationDivision" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="PersonDivisionProfile" Relationship="DbModel.PersonDivisionProfileInternalDivision" FromRole="InternalDivision" ToRole="PersonDivisionProfile" />
+          <NavigationProperty Name="AreaCategoryId" Relationship="DbModel.InternalDivisionAreaCategory" FromRole="InternalDivision" ToRole="AreaCategory" />
         </EntityType>
         <Association Name="AssignmentOrganizationDivision">
           <End Type="DbModel.InternalDivision" Role="Assignment" Multiplicity="*" />
@@ -1156,6 +1162,20 @@
         <Association Name="PersonDivisionProfileInternalDivision">
           <End Type="DbModel.PersonDivisionProfile" Role="PersonDivisionProfile" Multiplicity="*" />
           <End Type="DbModel.InternalDivision" Role="InternalDivision" Multiplicity="1" />
+        </Association>
+        <EntityType Name="AreaCategory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <NavigationProperty Name="InternalDivision" Relationship="DbModel.InternalDivisionAreaCategory" FromRole="AreaCategory" ToRole="InternalDivision" />
+        </EntityType>
+        <Association Name="InternalDivisionAreaCategory">
+          <End Type="DbModel.InternalDivision" Role="InternalDivision" Multiplicity="*" />
+          <End Type="DbModel.AreaCategory" Role="AreaCategory" Multiplicity="1" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>

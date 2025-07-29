@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class InitCarnet : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1109,12 +1109,6 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.InsertData(
-                schema: "Organizational",
-                table: "OrganizationalUnitBranches",
-                columns: new[] { "Id", "BranchId", "OrganizationUnitId" },
-                values: new object[] { 4, 3, 3 });
-
-            migrationBuilder.InsertData(
                 schema: "ModelSecurity",
                 table: "RolFormPermissions",
                 columns: new[] { "Id", "FormId", "PermissionId", "RolId" },
@@ -1259,7 +1253,8 @@ namespace Entity.Migrations
                 {
                     { 1, 1, 1 },
                     { 2, 2, 1 },
-                    { 3, 1, 2 }
+                    { 3, 1, 2 },
+                    { 4, 2, 3 }
                 });
 
             migrationBuilder.CreateIndex(

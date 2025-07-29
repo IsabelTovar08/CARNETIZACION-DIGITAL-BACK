@@ -5,6 +5,8 @@ using Business.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Entity.DTOs;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Infrastructure.Notifications.Interfases;
@@ -14,7 +16,7 @@ using ValidationException = Utilities.Exeptions.ValidationException;
 
 namespace Business.Classes
 {
-    public class PersonBusiness : BaseBusiness<Person, PersonDto>
+    public class PersonBusiness : BaseBusiness<Person, PersonDtoRequest, PersonDto>
     {
         public readonly PersonData _personData;
         private readonly INotify _notificationSender;
@@ -24,7 +26,7 @@ namespace Business.Classes
             _notificationSender = messageSender;
         }
 
-        protected  void Validate(PersonDto person)
+        protected  void Validate(PersonDtoRequest person)
         {
             if (person == null)
                 throw new ValidationException("la persona no puede ser nula.");
@@ -40,7 +42,7 @@ namespace Business.Classes
         /// <summary>
         /// Crea una nueva entidad.
         /// </summary>
-        public override async Task<PersonDto> Save(PersonDto personDTO)
+        public override async Task<PersonDto> Save(PersonDtoRequest personDTO)
         {
             try
             {
