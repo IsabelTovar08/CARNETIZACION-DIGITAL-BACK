@@ -3,6 +3,7 @@ using Business.Classes.Base;
 using Business.Interfases;
 using Business.Services.Auth;
 using Business.Services.JWT;
+using Data.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Entity.DTOs;
@@ -32,8 +33,8 @@ namespace Web.Extensions
             services.AddScoped<PersonBusiness>();
 
             //Rol 
-            services.AddScoped<ICrudBase<Role>, RoleData>();
-            services.AddScoped<RoleBusiness>();
+            //services.AddScoped<ICrudBase<Role>, RoleData>();
+            //services.AddScoped<RoleBusiness>();
 
             //Form 
             services.AddScoped<ICrudBase<Form>, FormData>();
@@ -62,7 +63,7 @@ namespace Web.Extensions
             services.AddScoped<UserBusiness>();
             services.AddScoped<UserRoleBusiness>();
 
-
+            services.AddScoped(typeof(ICrudBase<>), typeof(BaseData<>));
             services.AddScoped(typeof(IBaseBusiness<,,>), typeof(BaseBusiness<,,>));
 
 

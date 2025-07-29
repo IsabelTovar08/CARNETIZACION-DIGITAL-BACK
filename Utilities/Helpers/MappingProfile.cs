@@ -13,7 +13,8 @@ namespace Utilities.Helper
             //Mapeo de la entidad Person 
             CreateMap<Person, PersonDto>()
                 .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
-
+                .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType.Name))
+                .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
                 .ReverseMap();
             CreateMap<Person, PersonDtoRequest>().ReverseMap();
 
