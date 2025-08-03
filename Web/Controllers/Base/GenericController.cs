@@ -7,12 +7,12 @@ namespace Web.Controllers.Base
     [Route("api/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    public class GenericController<TEntity, TDto> : ControllerBase
+    public class GenericController<T, DRequest, D> : ControllerBase
     {
-        protected readonly IBaseBusiness<TEntity, TDto> _business;
+        protected readonly IBaseBusiness<T, DRequest, D> _business;
         protected readonly ILogger _logger;
 
-        public GenericController(IBaseBusiness<TEntity, TDto> business, ILogger logger)
+        public GenericController(IBaseBusiness<T,DRequest, D> business, ILogger logger)
         {
             _business = business;
             _logger = logger;
@@ -63,7 +63,7 @@ namespace Web.Controllers.Base
         }
 
         [HttpPost]
-        public virtual async Task<IActionResult> Create([FromBody] TDto dto)
+        public virtual async Task<IActionResult> Create([FromBody] DRequest dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -85,7 +85,7 @@ namespace Web.Controllers.Base
         }
 
         [HttpPut("update")]
-        public virtual async Task<IActionResult> Update([FromBody] TDto dto)
+        public virtual async Task<IActionResult> Update([FromBody] DRequest dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

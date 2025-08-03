@@ -5,6 +5,8 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using Entity.Models;
+using Entity.Models.ModelSecurity;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -26,11 +28,13 @@ namespace Entity.DataInit.Security
            .HasIndex(f => f.Email)
            .IsUnique();
 
-            builder.ToTable("Users", schema: "ModelSecurity"); 
+            builder.ToTable("Users", schema: "ModelSecurity");
 
-            builder.HasOne(e => e.Person)
-               .WithMany(c => c.Users)
-               .HasForeignKey(e => e.PersonId);
+            builder
+              .HasOne(u => u.Person)
+              .WithOne(p => p.User)
+              .HasForeignKey<User>(u => u.PersonId)
+              .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

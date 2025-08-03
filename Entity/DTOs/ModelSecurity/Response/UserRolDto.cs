@@ -2,7 +2,7 @@
 
 using Entity.DTOs.Base;
 
-namespace Entity.DTOs
+namespace Entity.DTOs.ModelSecurity.Response
 {
     public class UserRolDto : BaseDTO
     {

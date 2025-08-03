@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Entity.Models.Notifications;
+using Entity.DTOs.Notifications;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.Extensions.Options;
 using Twilio;

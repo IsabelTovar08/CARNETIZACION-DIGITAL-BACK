@@ -3,14 +3,15 @@ using Business.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Entity.DTOs;
-using Entity.DTOs.Create;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
 
 namespace Business.Classes
 {
-    public class ModuleFormBusiness : BaseBusiness<ModuleForm, ModuleFormDto>
+    public class ModuleFormBusiness : BaseBusiness<ModuleForm, ModuleFormDtoRequest, ModuleFormDto>
     {
         public ModuleFormBusiness
             (ICrudBase<ModuleForm> data, ILogger<ModuleForm> logger, IMapper mapper) : base(data, logger, mapper)
@@ -19,7 +20,7 @@ namespace Business.Classes
         }
 
 
-        protected void Validate(ModuleFormDto moduleFormDto)
+        protected void Validate(ModuleFormDtoRequest moduleFormDto)
         {
             if (moduleFormDto == null)
                 throw new ValidationException("El múdulo del formulario no puede ser nulo.");

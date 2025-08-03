@@ -2,7 +2,7 @@
 
 using Entity.DTOs.Base;
 
-namespace Entity.DTOs
+namespace Entity.DTOs.ModelSecurity.Response
 {
     public class UserDTO : BaseDTO
     {
@@ -11,6 +11,8 @@ namespace Entity.DTOs
         public string Password { get; set; }
         public string NamePerson { get; set; }
         public int PersonId { get; set; }
+         
+        public List<string>? Roles { get; set; }
 
     }
 }

@@ -2,14 +2,15 @@
 using Business.Classes.Base;
 using Data.Interfases;
 using Entity.DTOs;
-using Entity.DTOs.Create;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
 
 namespace Business.Classes
 {
-    public class ModuleBusiness : BaseBusiness<Module, ModuleDto>
+    public class ModuleBusiness : BaseBusiness<Module, ModuleDtoRequest, ModuleDto>
     {
         public ModuleBusiness
             (ICrudBase<Module> data, ILogger<Module> logger, IMapper mapper) : base(data, logger, mapper)
@@ -17,7 +18,7 @@ namespace Business.Classes
 
         }
 
-        protected void Validate(ModuleDto moduleDto)
+        protected void Validate(ModuleDtoRequest moduleDto)
         {
             if (moduleDto == null)
                 throw new ValidationException("El módulo no puede ser nulo.");

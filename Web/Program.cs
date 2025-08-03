@@ -1,5 +1,5 @@
 
-using Entity.Models.Notifications;
+using Entity.DTOs.Notifications;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Extensions;
@@ -57,8 +57,10 @@ namespace Web
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseCors();
 
+            app.UseAuthorization();
+            app.UseAuthentication();
 
             app.MapControllers();
 

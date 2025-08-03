@@ -4,7 +4,8 @@ using Business.Services.Auth;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Entity.DTOs;
-using Entity.DTOs.Create;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
@@ -12,7 +13,7 @@ using static Utilities.Helper.EncryptedPassword;
 
 namespace Business.Classes
 {
-    public class UserBusiness : BaseBusiness<User, UserDTO>
+    public class UserBusiness : BaseBusiness<User, UserDtoRequest, UserDTO>
     {
         private readonly UserService _userService;
         public readonly UserData _userData;
@@ -28,7 +29,7 @@ namespace Business.Classes
         }
 
         // Validación del DTO
-        protected void Validate(UserDTO userDTO)
+        protected void Validate(UserDtoRequest userDTO)
         {
             var errors = new List<string>();
 
@@ -54,7 +55,7 @@ namespace Business.Classes
         /// <summary>
         /// Crea una nueva entidad.
         /// </summary>
-        public override async Task<UserDTO> Save(UserDTO userDTO)
+        public override async Task<UserDTO> Save(UserDtoRequest userDTO)
         {
             try
             {
@@ -108,7 +109,7 @@ namespace Business.Classes
             try
             {
                 Console.WriteLine("Inicar a asignar rol.");
-                UserRolDto userRol = new UserRolDto()
+                UserRoleDtoRequest userRol = new UserRoleDtoRequest()
                 {
                     Id = 0,
                     UserId = userId,

@@ -1,7 +1,8 @@
 ﻿using Business.Classes;
 using Business.Interfases;
 using Entity.DTOs;
-using Entity.DTOs.Create;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +11,9 @@ using Web.Controllers.Base;
 
 namespace Web.Controllers.ModelSecurity
 {
-    public class UserController : GenericController<User, UserDTO>
+    public class UserController : GenericController<User, UserDtoRequest, UserDTO>
     {
-        public UserController(IBaseBusiness<User, UserDTO> business, ILogger<UserController> logger) : base(business, logger)
+        public UserController(IBaseBusiness<User, UserDtoRequest, UserDTO> business, ILogger<UserController> logger) : base(business, logger)
         {
         }
     }

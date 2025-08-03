@@ -3,11 +3,14 @@ using Business.Classes.Base;
 using Business.Interfases;
 using Business.Services.Auth;
 using Business.Services.JWT;
+using Data.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Entity.DTOs;
-using Entity.DTOs.Create;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
+using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
 using Infrastructure.Notifications.Interfases;
 using Utilities.Notifications.Implementations;
@@ -30,8 +33,8 @@ namespace Web.Extensions
             services.AddScoped<PersonBusiness>();
 
             //Rol 
-            services.AddScoped<ICrudBase<Role>, RoleData>();
-            services.AddScoped<RoleBusiness>();
+            //services.AddScoped<ICrudBase<Role>, RoleData>();
+            //services.AddScoped<RoleBusiness>();
 
             //Form 
             services.AddScoped<ICrudBase<Form>, FormData>();
@@ -60,19 +63,18 @@ namespace Web.Extensions
             services.AddScoped<UserBusiness>();
             services.AddScoped<UserRoleBusiness>();
 
+            services.AddScoped(typeof(ICrudBase<>), typeof(BaseData<>));
+            services.AddScoped(typeof(IBaseBusiness<,,>), typeof(BaseBusiness<,,>));
 
-            //services.AddScoped(typeof(IBaseBusiness<,,>), typeof(BaseBusiness<,,>));
 
-            //services.AddScoped<IBaseBusiness<Rol, RolDto, RolCreate>, RolBusiness>();
-
-            services.AddScoped<IBaseBusiness<UserRoles, UserRolDto>, UserRoleBusiness>();
-            services.AddScoped<IBaseBusiness<User, UserDTO>, UserBusiness>();
-            services.AddScoped<IBaseBusiness<Person, PersonDto>, PersonBusiness>();
-            services.AddScoped<IBaseBusiness<Form, FormDto>, FormBusiness>();
-            services.AddScoped<IBaseBusiness<Module, ModuleDto>, ModuleBusiness>();
-            services.AddScoped<IBaseBusiness<ModuleForm, ModuleFormDto>, ModuleFormBusiness>();
-            services.AddScoped<IBaseBusiness<Permission, PermissionDto>, PermissionBusiness>();
-            services.AddScoped<IBaseBusiness<RolFormPermission, RolFormPermissionDto>, RolFormPermissionBusiness>();
+            services.AddScoped<IBaseBusiness<UserRoles, UserRoleDtoRequest, UserRolDto>, UserRoleBusiness>();
+            services.AddScoped<IBaseBusiness<User, UserDtoRequest, UserDTO>, UserBusiness>();
+            services.AddScoped<IBaseBusiness<Person, PersonDtoRequest , PersonDto>, PersonBusiness>();
+            services.AddScoped<IBaseBusiness<Form, FormDtoRequest, FormDto>, FormBusiness>();
+            services.AddScoped<IBaseBusiness<Module, ModuleDtoRequest, ModuleDto>, ModuleBusiness>();
+            services.AddScoped<IBaseBusiness<ModuleForm,ModuleFormDtoRequest, ModuleFormDto>, ModuleFormBusiness>();
+            services.AddScoped<IBaseBusiness<Permission, PermissionDtoRequest, PermissionDto>, PermissionBusiness>();
+            services.AddScoped<IBaseBusiness<RolFormPermission, RolFormPermissionDtoRequest, RolFormPermissionDto>, RolFormPermissionBusiness>();
 
             //Auth 
             services.AddScoped<UserService>();

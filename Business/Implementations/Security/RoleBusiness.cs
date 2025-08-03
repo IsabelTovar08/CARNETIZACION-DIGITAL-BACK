@@ -2,21 +2,22 @@
 using Business.Classes.Base;
 using Data.Interfases;
 using Entity.DTOs;
-using Entity.DTOs.Create;
+using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
 
 namespace Business.Classes
 {
-    public class RoleBusiness : BaseBusiness<Role, RolDto>
+    public class RoleBusiness : BaseBusiness<Role, RoleDtoRequest, RolDto>
     {
         public RoleBusiness(ICrudBase<Role> data, ILogger<Role> logger, IMapper mapper) : base(data, logger, mapper)
         {
 
         }
 
-        protected void Validate(RolDto rol)
+        protected void Validate(RoleDtoRequest rol)
         {
             if (rol == null)
                 throw new ValidationException("El rol no puede ser nulo.");

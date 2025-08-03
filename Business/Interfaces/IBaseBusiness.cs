@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Business.Interfases
 {
-    public interface IBaseBusiness<T, D>
+    public interface IBaseBusiness<T, DCreate, D>
     {
         Task<IEnumerable<D>> GetAll();
 
         Task<D?> GetById(int id);
-        Task<D> Save(D entity);
-        Task<bool> Update(D entity);
+        Task<D> Save(DCreate entity);
+        Task<bool> Update(DCreate entity);
         Task<bool> Delete(int id);
         Task<bool> ToggleActiveAsync(int id);
     }
