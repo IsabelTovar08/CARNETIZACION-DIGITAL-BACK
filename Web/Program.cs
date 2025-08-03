@@ -57,8 +57,10 @@ namespace Web
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseCors();
 
+            app.UseAuthorization();
+            app.UseAuthentication();
 
             app.MapControllers();
 

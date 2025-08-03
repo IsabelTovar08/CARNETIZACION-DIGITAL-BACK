@@ -11,6 +11,8 @@ namespace Entity.DTOs.ModelSecurity.Response
         public string Password { get; set; }
         public string NamePerson { get; set; }
         public int PersonId { get; set; }
+         
+        public List<string>? Roles { get; set; }
 
     }
 }

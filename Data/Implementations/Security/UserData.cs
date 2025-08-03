@@ -14,9 +14,11 @@ namespace Data.Classes.Specifics
 
         public async override Task<IEnumerable<User>> GetAllAsync()
         {
-            return await _context.Set<User>().
-                Include(u => u.Person).
-                ToListAsync();
+            return await _context.Set<User>()
+                .Include(u => u.Person)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Rol)
+                .ToListAsync();
         }
 
         public async Task<List<string>> GetUserRolesByIdAsync(int userId)

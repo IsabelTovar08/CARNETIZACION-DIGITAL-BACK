@@ -48,13 +48,18 @@ namespace Utilities.Helper
             //Mapeo de la entidad User
             CreateMap<User, UserDTO>()
              .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
+             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(ur => ur.Rol.Name).ToList()))
             .ReverseMap();
+            CreateMap<User, UserDtoRequest>().ReverseMap();
+
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()
              .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Email))
              .ForMember(dest => dest.RolName, opt => opt.MapFrom(src => src.Rol.Name))
              .ReverseMap();
+            CreateMap<UserRoles, UserRoleDtoRequest>().ReverseMap();
+
 
             //Mapeo de la entidad RolFormPermission
             CreateMap<RolFormPermission, RolFormPermissionDto>()
