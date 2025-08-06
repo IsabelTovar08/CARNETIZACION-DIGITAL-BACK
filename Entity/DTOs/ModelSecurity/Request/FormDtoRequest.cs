@@ -11,5 +11,7 @@ namespace Entity.DTOs.ModelSecurity.Request
     public class FormDtoRequest : GenericBaseDto
     {
         public string? Description { get; set; }
+        public string Url { get; set; }
+        public int ModuleId { get; set; }
     }
 }

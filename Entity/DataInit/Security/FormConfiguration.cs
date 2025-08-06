@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Entity.Models;
@@ -26,6 +27,11 @@ namespace Entity.DataInit.Security
 
             builder.Property(x => x.IsDeleted)
             .HasDefaultValue(false);
+            //builder
+            //    .HasOne(f => f.Module)
+            //    .WithMany(m => m.Forms)
+            //    .HasForeignKey(f => f.ModuleId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             builder.ToTable("Forms", schema: "ModelSecurity");
 

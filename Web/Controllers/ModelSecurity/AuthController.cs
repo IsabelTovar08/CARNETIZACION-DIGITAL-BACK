@@ -32,7 +32,7 @@ namespace Web.Controllers.ModelSecurity
             }
 
             var roles = await _userRolBusiness.GetRolesByUserId(user.Id);
-            var token = _jwtService.GenerateToken(user.Id.ToString(), user.Email, roles);
+            var token = _jwtService.GenerateToken(user.Id.ToString(), user.UserName, roles);
 
             return Ok(new { token });
         }

@@ -39,8 +39,6 @@ namespace Business.Classes
             }
             if (string.IsNullOrWhiteSpace(userDTO.UserName))
                 errors.Add("El Nombre del Usuario es obligatorio.");
-            if (string.IsNullOrWhiteSpace(userDTO.Email))
-                errors.Add("El Email del Usuario es obligatorio.");
             if (string.IsNullOrWhiteSpace(userDTO.Password))
                 errors.Add("La contraseña del Usuario es obligatoria.");
 
@@ -60,7 +58,6 @@ namespace Business.Classes
             try
             {
                 Validate(userDTO);
-                await EnsureEmailIsUnique(userDTO.Email);
 
                 var user = _mapper.Map<User>(userDTO);
                 user.Password = EncryptPassword(userDTO.Password);

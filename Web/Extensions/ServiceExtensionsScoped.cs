@@ -44,9 +44,6 @@ namespace Web.Extensions
             services.AddScoped<ICrudBase<Module>, ModuleData>();
             services.AddScoped<ModuleBusiness>();
 
-            //ModuleForm 
-            services.AddScoped<ICrudBase<ModuleForm>, ModuleFormData>();
-            services.AddScoped<ModuleFormBusiness>();
 
             //Permission 
             services.AddScoped<ICrudBase<Permission>, PermissionData>();
@@ -72,7 +69,6 @@ namespace Web.Extensions
             services.AddScoped<IBaseBusiness<Person, PersonDtoRequest , PersonDto>, PersonBusiness>();
             services.AddScoped<IBaseBusiness<Form, FormDtoRequest, FormDto>, FormBusiness>();
             services.AddScoped<IBaseBusiness<Module, ModuleDtoRequest, ModuleDto>, ModuleBusiness>();
-            services.AddScoped<IBaseBusiness<ModuleForm,ModuleFormDtoRequest, ModuleFormDto>, ModuleFormBusiness>();
             services.AddScoped<IBaseBusiness<Permission, PermissionDtoRequest, PermissionDto>, PermissionBusiness>();
             services.AddScoped<IBaseBusiness<RolFormPermission, RolFormPermissionDtoRequest, RolFormPermissionDto>, RolFormPermissionBusiness>();
 

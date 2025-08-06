@@ -2,8 +2,10 @@
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Parameter;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
+using Entity.Models.Parameter;
 namespace Utilities.Helper
 {
     public class MappingProfile : AutoMapper.Profile
@@ -34,12 +36,6 @@ namespace Utilities.Helper
             CreateMap<Module, ModuleDtoRequest>().ReverseMap();
 
 
-            //Mapeo de la entidad ModuleForm 
-            CreateMap<ModuleForm,ModuleFormDto>()
-             .ForMember(dest => dest.NameForm, opt => opt.MapFrom(src => src.Form.Name))
-             .ForMember(dest => dest.NameModule, opt => opt.MapFrom(src => src.Module.Name))
-             .ReverseMap();
-
             //Mapeo de la entidad permission
             CreateMap<Permission, PermissionDto>().ReverseMap();
             CreateMap<Permission, PermissionDtoRequest>().ReverseMap();
@@ -48,6 +44,7 @@ namespace Utilities.Helper
             //Mapeo de la entidad User
             CreateMap<User, UserDTO>()
              .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
+             .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src => src.Person.Email + " " + src.Person.Email))
              .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(ur => ur.Rol.Name).ToList()))
             .ReverseMap();
             CreateMap<User, UserDtoRequest>().ReverseMap();
@@ -55,7 +52,6 @@ namespace Utilities.Helper
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()
-             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Email))
              .ForMember(dest => dest.RolName, opt => opt.MapFrom(src => src.Rol.Name))
              .ReverseMap();
             CreateMap<UserRoles, UserRoleDtoRequest>().ReverseMap();
@@ -67,6 +63,18 @@ namespace Utilities.Helper
              .ForMember(dest => dest.RolDescription, opt => opt.MapFrom(src => src.Rol.Description))
              .ForMember(dest => dest.FormName, opt => opt.MapFrom(src => src.Form.Name))
              .ForMember(dest => dest.PermissionName, opt => opt.MapFrom(src => src.Permission.Name))
+             .ReverseMap();
+
+
+            //Parameter
+            CreateMap<Status, StatusDto>()
+             .ReverseMap();
+
+            CreateMap<CustomType, CustomTypeDto>()
+             .ForMember(dest => dest.TypeCategoryName, opt => opt.MapFrom(src => src.TypeCategory.Name))
+             .ReverseMap();
+
+            CreateMap<TypeCategory, TypeCategoryDto>()
              .ReverseMap();
         }
     }

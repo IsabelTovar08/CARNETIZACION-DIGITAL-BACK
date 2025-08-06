@@ -52,7 +52,6 @@ namespace Entity.Context
         public DbSet<Models.Module> Modules { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
-        public DbSet<ModuleForm> ModuleForms { get; set; }
         public DbSet<RolFormPermission> RoleFormPermissions { get; set; }
 
         public DbSet<Person> People { get; set; }

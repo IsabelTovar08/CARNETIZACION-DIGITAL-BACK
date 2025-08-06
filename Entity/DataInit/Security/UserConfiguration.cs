@@ -18,14 +18,14 @@ namespace Entity.DataInit.Security
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasData(
-                new User { Id = 1, UserName = "admin", Email = "funcionario@carnet.edu", Password = "123", PersonId = 1 },
-                new User { Id = 2, Email = "laura.estudiante@correo.com", Password = "L4d!Estudiante2025", PersonId = 2 },
-                new User { Id = 3, Email = "admin@carnet.edu", Password = "Adm!nCarnet2025", PersonId = 3 },
-                new User { Id = 4, Email = "usuario@carnet.edu", Password = "Usr!Carnet2025", PersonId = 4 }
+                new User { Id = 1, UserName = "admin", Password = "123", PersonId = 1 },
+                new User { Id = 2, Password = "L4d!Estudiante2025", PersonId = 2 },
+                new User { Id = 3, Password = "Adm!nCarnet2025", PersonId = 3 },
+                new User { Id = 4, Password = "Usr!Carnet2025", PersonId = 4 }
             );
 
             builder
-           .HasIndex(f => f.Email)
+           .HasIndex(f => f.UserName)
            .IsUnique();
 
             builder.ToTable("Users", schema: "ModelSecurity");

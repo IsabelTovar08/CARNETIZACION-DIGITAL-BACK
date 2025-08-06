@@ -15,7 +15,7 @@ using Utilities.Exeptions;
 
 namespace Business.Classes.Base
 {
-    public class BaseBusiness<T, DCreate, D> : ABaseBusiness<T, DCreate, D> where T : BaseModel where D  : BaseDTO
+    public class BaseBusiness<T, DCreate, D> : ABaseBusiness<T, DCreate, D> where T : BaseModel where D  : class
     {
         protected readonly ICrudBase<T> _data;
         protected readonly ILogger<T> _logger;
@@ -42,11 +42,7 @@ namespace Business.Classes.Base
             {
                 throw;
             }
-            catch (DbUpdateException dbEx)
-            {
-                var mensaje = ParseUniqueConstraintError(dbEx);
-                throw new ValidationException(mensaje);
-            }
+
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al crear {typeof(T).Name}");
@@ -157,11 +153,7 @@ namespace Business.Classes.Base
             {
                 throw;
             }
-            catch (DbUpdateException dbEx)
-            {
-                var mensaje = ParseUniqueConstraintError(dbEx);
-                throw new ValidationException(mensaje);
-            }
+           
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al actualizar {typeof(T).Name}");
@@ -170,22 +162,7 @@ namespace Business.Classes.Base
         }
 
 
-        private string ParseUniqueConstraintError(Exception ex)
-        {
-            var message = ex.InnerException?.Message ?? ex.Message;
-
-            if (message.Contains("IX_Users_Email"))
-                return "Este correo electrónico ya está registrado.";
-            if (message.Contains("IX_ModuleForms_ModuleId_FormId"))
-                return "Este formulario ya ha sido asignado al módulo.";
-            if (message.Contains("IX_UserRoles_UserId_RoleId"))
-                return "Este rol ya ha sido asignado al usuario.";
-            if (message.Contains("IX_RolFormPermissions_RolId_FormId_PermissionId"))
-                return "Ya se ha asignado este permiso para el rol y formulario seleccionados.";
-
-            // Fallback general pero entendible
-            return "Ya existe un registro con esta combinación de datos. Verifica la información.";
-        }
+       
 
 
     }

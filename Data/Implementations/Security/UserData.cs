@@ -34,7 +34,9 @@ namespace Data.Classes.Specifics
 
         public async Task<User?> FindByEmail(string email)
         {
-            return await _context.Set<User>().Where(u => !u.IsDeleted).FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.Set<User>().Where(u => !u.IsDeleted)
+                .Include(u => u.Person)
+               .FirstOrDefaultAsync(u => u.Person.Email == email);
         }
 
     }

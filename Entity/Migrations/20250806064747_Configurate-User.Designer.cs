@@ -4,6 +4,7 @@ using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250806064747_Configurate-User")]
+    partial class ConfigurateUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,6 +252,65 @@ namespace Entity.Migrations
                             Description = "Módulo para control de asistencia en eventos/clases",
                             IsDeleted = false,
                             Name = "Asistencia"
+                        });
+                });
+
+            modelBuilder.Entity("Entity.Models.ModuleForm", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FormId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FormId");
+
+                    b.HasIndex("ModuleId", "FormId")
+                        .IsUnique();
+
+                    b.ToTable("ModuleForms", "ModelSecurity");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FormId = 1,
+                            IsDeleted = false,
+                            ModuleId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FormId = 2,
+                            IsDeleted = false,
+                            ModuleId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            FormId = 3,
+                            IsDeleted = false,
+                            ModuleId = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            FormId = 4,
+                            IsDeleted = false,
+                            ModuleId = 3
                         });
                 });
 
@@ -2218,6 +2280,25 @@ namespace Entity.Migrations
                     b.Navigation("City");
 
                     b.Navigation("DocumentType");
+                });
+
+            modelBuilder.Entity("Entity.Models.ModuleForm", b =>
+                {
+                    b.HasOne("Entity.Models.Form", "Form")
+                        .WithMany()
+                        .HasForeignKey("FormId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Module", "Module")
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Form");
+
+                    b.Navigation("Module");
                 });
 
             modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>
