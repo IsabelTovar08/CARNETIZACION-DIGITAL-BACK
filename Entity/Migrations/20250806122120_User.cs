@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class User : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -73,23 +73,6 @@ namespace Entity.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EventTypes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Forms",
-                schema: "ModelSecurity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Forms", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -210,31 +193,50 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ModuleForms",
+                name: "Forms",
                 schema: "ModelSecurity",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ModuleId = table.Column<int>(type: "int", nullable: false),
-                    FormId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ModuleForms", x => x.Id);
+                    table.PrimaryKey("PK_Forms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ModuleForms_Forms_FormId",
-                        column: x => x.FormId,
-                        principalSchema: "ModelSecurity",
-                        principalTable: "Forms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ModuleForms_Modules_ModuleId",
+                        name: "FK_Forms_Modules_ModuleId",
                         column: x => x.ModuleId,
                         principalSchema: "ModelSecurity",
                         principalTable: "Modules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomTypes",
+                schema: "Parameter",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    TypeCategoryId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomTypes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CustomTypes_TypeCategories_TypeCategoryId",
+                        column: x => x.TypeCategoryId,
+                        principalSchema: "Parameter",
+                        principalTable: "TypeCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -273,30 +275,6 @@ namespace Entity.Migrations
                         column: x => x.RolId,
                         principalSchema: "ModelSecurity",
                         principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CustomTypes",
-                schema: "Parameter",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    TypeCategoryId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomTypes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CustomTypes_TypeCategories_TypeCategoryId",
-                        column: x => x.TypeCategoryId,
-                        principalSchema: "Parameter",
-                        principalTable: "TypeCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -363,6 +341,7 @@ namespace Entity.Migrations
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SecondLastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DocumentNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DocumentTypeId = table.Column<int>(type: "int", nullable: true),
@@ -463,10 +442,9 @@ namespace Entity.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PersonId = table.Column<int>(type: "int", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -483,7 +461,7 @@ namespace Entity.Migrations
                         principalSchema: "ModelSecurity",
                         principalTable: "People",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -921,18 +899,6 @@ namespace Entity.Migrations
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
-                table: "Forms",
-                columns: new[] { "Id", "Description", "Name", "Url" },
-                values: new object[,]
-                {
-                    { 1, "Formulario para generar un nuevo carnet digital", "Crear Carnet", "/formulario" },
-                    { 2, "Formulario para validar el correo del usuario", "Validar Correo", "/formulario" },
-                    { 3, "Formulario donde se visualiza el carnet", "Ver Carnet", "/formulario" },
-                    { 4, "Formulario para registrar y consultar asistencia", "Control de Asistencia", "/formulario" }
-                });
-
-            migrationBuilder.InsertData(
-                schema: "ModelSecurity",
                 table: "Modules",
                 columns: new[] { "Id", "Description", "Name" },
                 values: new object[,]
@@ -956,13 +922,13 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
                 table: "People",
-                columns: new[] { "Id", "Address", "BloodTypeId", "CityId", "DocumentNumber", "DocumentTypeId", "FirstName", "LastName", "MiddleName", "Phone", "Photo", "SecondLastName" },
+                columns: new[] { "Id", "Address", "BloodTypeId", "CityId", "DocumentNumber", "DocumentTypeId", "Email", "FirstName", "LastName", "MiddleName", "Phone", "Photo", "SecondLastName" },
                 values: new object[,]
                 {
-                    { 1, null, null, null, "1234567890", null, "Carlos", "Funcionario", null, "3200001111", null, null },
-                    { 2, null, null, null, "9876543210", null, "Laura", "Estudiante", null, "3100002222", null, null },
-                    { 3, null, null, null, "1122334455", null, "Ana", "Administrador", null, "3001234567", null, null },
-                    { 4, null, null, null, "9988776655", null, "José", "Usuario", null, "3151234567", null, null }
+                    { 1, null, null, null, "1234567890", null, null, "Carlos", "Funcionario", null, "3200001111", null, null },
+                    { 2, null, null, null, "9876543210", null, null, "Laura", "Estudiante", null, "3100002222", null, null },
+                    { 3, null, null, null, "1122334455", null, null, "Ana", "Administrador", null, "3001234567", null, null },
+                    { 4, null, null, null, "9988776655", null, null, "José", "Usuario", null, "3151234567", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -1084,6 +1050,18 @@ namespace Entity.Migrations
                 values: new object[] { 2, "SALUD2025", null, new DateTime(2023, 8, 5, 12, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 8, 5, 9, 0, 0, 0, DateTimeKind.Unspecified), 2, "Charla de Salud", new DateTime(2023, 8, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1900, 1, 1, 9, 0, 0, 0, DateTimeKind.Unspecified), null, 1 });
 
             migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "Forms",
+                columns: new[] { "Id", "Description", "ModuleId", "Name", "Url" },
+                values: new object[,]
+                {
+                    { 1, "Formulario para generar un nuevo carnet digital", 1, "Crear Carnet", "/formulario" },
+                    { 2, "Formulario para validar el correo del usuario", 2, "Validar Correo", "/formulario" },
+                    { 3, "Formulario donde se visualiza el carnet", 1, "Ver Carnet", "/formulario" },
+                    { 4, "Formulario para registrar y consultar asistencia", 2, "Control de Asistencia", "/formulario" }
+                });
+
+            migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "InternalDivisions",
                 columns: new[] { "Id", "AreaCategoryId", "BranchId", "Description", "Name", "OrganizationalUnitId" },
@@ -1098,37 +1076,14 @@ namespace Entity.Migrations
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
-                table: "ModuleForms",
-                columns: new[] { "Id", "FormId", "ModuleId" },
-                values: new object[,]
-                {
-                    { 1, 1, 1 },
-                    { 2, 2, 2 },
-                    { 3, 3, 3 },
-                    { 4, 4, 3 }
-                });
-
-            migrationBuilder.InsertData(
-                schema: "ModelSecurity",
-                table: "RolFormPermissions",
-                columns: new[] { "Id", "FormId", "PermissionId", "RolId" },
-                values: new object[,]
-                {
-                    { 1, 1, 1, 3 },
-                    { 2, 2, 3, 3 },
-                    { 3, 3, 2, 3 }
-                });
-
-            migrationBuilder.InsertData(
-                schema: "ModelSecurity",
                 table: "Users",
-                columns: new[] { "Id", "DateCreated", "Email", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "UserName" },
+                columns: new[] { "Id", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "UserName" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "funcionario@carnet.edu", false, "123", 1, null, null, null, null, "admin" },
-                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "laura.estudiante@correo.com", false, "L4d!Estudiante2025", 2, null, null, null, null, null },
-                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@carnet.edu", false, "Adm!nCarnet2025", 3, null, null, null, null, null },
-                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "usuario@carnet.edu", false, "Usr!Carnet2025", 4, null, null, null, null, null }
+                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "123", 1, null, null, null, null, "admin" },
+                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "L4d!Estudiante2025", 2, null, null, null, null, null },
+                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Adm!nCarnet2025", 3, null, null, null, null, null },
+                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Usr!Carnet2025", 4, null, null, null, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -1185,6 +1140,17 @@ namespace Entity.Migrations
                 table: "PersonDivisionProfiles",
                 columns: new[] { "Id", "InternalDivisionId", "IsCurrentlySelected", "PersonId", "ProfileId" },
                 values: new object[] { 2, 1, true, 2, 2 });
+
+            migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "RolFormPermissions",
+                columns: new[] { "Id", "FormId", "PermissionId", "RolId" },
+                values: new object[,]
+                {
+                    { 1, 1, 1, 3 },
+                    { 2, 2, 3, 3 },
+                    { 3, 3, 2, 3 }
+                });
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
@@ -1383,6 +1349,12 @@ namespace Entity.Migrations
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Forms_ModuleId",
+                schema: "ModelSecurity",
+                table: "Forms",
+                column: "ModuleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Forms_Name",
                 schema: "ModelSecurity",
                 table: "Forms",
@@ -1413,19 +1385,6 @@ namespace Entity.Migrations
                 schema: "Organizational",
                 table: "InternalDivisions",
                 column: "OrganizationalUnitId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ModuleForms_FormId",
-                schema: "ModelSecurity",
-                table: "ModuleForms",
-                column: "FormId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ModuleForms_ModuleId_FormId",
-                schema: "ModelSecurity",
-                table: "ModuleForms",
-                columns: new[] { "ModuleId", "FormId" },
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Modules_Name",
@@ -1622,19 +1581,19 @@ namespace Entity.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
-                schema: "ModelSecurity",
-                table: "Users",
-                column: "Email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_PersonId",
                 schema: "ModelSecurity",
                 table: "Users",
                 column: "PersonId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserName",
+                schema: "ModelSecurity",
+                table: "Users",
+                column: "UserName",
                 unique: true,
-                filter: "[PersonId] IS NOT NULL");
+                filter: "[UserName] IS NOT NULL");
         }
 
         /// <inheritdoc />
@@ -1651,10 +1610,6 @@ namespace Entity.Migrations
             migrationBuilder.DropTable(
                 name: "EventTargetAudience",
                 schema: "Organizational");
-
-            migrationBuilder.DropTable(
-                name: "ModuleForms",
-                schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
                 name: "NotificationReceived",
@@ -1679,10 +1634,6 @@ namespace Entity.Migrations
             migrationBuilder.DropTable(
                 name: "PersonDivisionProfiles",
                 schema: "Organizational");
-
-            migrationBuilder.DropTable(
-                name: "Modules",
-                schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
                 name: "Notification",
@@ -1715,6 +1666,10 @@ namespace Entity.Migrations
             migrationBuilder.DropTable(
                 name: "Profiles",
                 schema: "Organizational");
+
+            migrationBuilder.DropTable(
+                name: "Modules",
+                schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
                 name: "People",

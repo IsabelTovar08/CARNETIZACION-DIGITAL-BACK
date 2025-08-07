@@ -1,17 +1,22 @@
 ﻿using Business.Classes;
 using Business.Classes.Base;
+using Business.Implementations.Parameters;
+using Business.Interfaces;
 using Business.Interfases;
 using Business.Services.Auth;
 using Business.Services.JWT;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
+using Data.Implementations.Parameters;
 using Data.Interfases;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Parameter;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
+using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
 using Utilities.Notifications.Implementations;
 
@@ -53,12 +58,21 @@ namespace Web.Extensions
             services.AddScoped<ICrudBase<RolFormPermission>, RolFormPermissionData>();
             services.AddScoped<RolFormPermissionBusiness>();
 
+            services.AddScoped<IRolFormPermissionData, RolFormPermissionData>();
+            services.AddScoped<IRolFormPermissionBusiness, RolFormPermissionBusiness>();
+
+
             //UserRol 
             services.AddScoped<UserRoleData>();
             services.AddScoped<ICrudBase<UserRoles>, UserRoleData>();
 
+            //User 
             services.AddScoped<UserBusiness>();
             services.AddScoped<UserRoleBusiness>();
+
+            //CustomType 
+            services.AddScoped<CustomTypeData>();
+            services.AddScoped<ICrudBase<CustomType>, CustomTypeData>();
 
             services.AddScoped(typeof(ICrudBase<>), typeof(BaseData<>));
             services.AddScoped(typeof(IBaseBusiness<,,>), typeof(BaseBusiness<,,>));
@@ -71,6 +85,9 @@ namespace Web.Extensions
             services.AddScoped<IBaseBusiness<Module, ModuleDtoRequest, ModuleDto>, ModuleBusiness>();
             services.AddScoped<IBaseBusiness<Permission, PermissionDtoRequest, PermissionDto>, PermissionBusiness>();
             services.AddScoped<IBaseBusiness<RolFormPermission, RolFormPermissionDtoRequest, RolFormPermissionDto>, RolFormPermissionBusiness>();
+
+            services.AddScoped<IBaseBusiness<CustomType, CustomTypeDto, CustomTypeDto>, CustomTypeBusiness>();
+
 
             //Auth 
             services.AddScoped<UserService>();

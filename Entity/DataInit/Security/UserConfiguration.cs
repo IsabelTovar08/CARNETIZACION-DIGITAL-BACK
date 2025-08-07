@@ -32,9 +32,9 @@ namespace Entity.DataInit.Security
 
             builder
               .HasOne(u => u.Person)
-              .WithOne(p => p.User)
-              .HasForeignKey<User>(u => u.PersonId)
-              .OnDelete(DeleteBehavior.SetNull);
+                .WithOne(p => p.User)
+                .HasForeignKey<User>(u => u.PersonId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

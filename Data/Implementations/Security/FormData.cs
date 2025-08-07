@@ -12,5 +12,19 @@ namespace Data.Classes.Specifics
         {
 
         }
+
+        public override async Task<IEnumerable<Form>> GetAllAsync()
+        {
+            return await _context.Set<Form>()
+                .Include(f => f.Module)
+                .ToListAsync();
+        }
+
+        public override async Task<Form?> GetByIdAsync(int id)
+        {
+            return await _context.Set<Form>()
+                .Include(f => f.Module)
+                .FirstOrDefaultAsync(f => f.Id == id);
+        }
     }
 }

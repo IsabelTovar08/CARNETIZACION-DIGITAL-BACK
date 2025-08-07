@@ -64,7 +64,7 @@ namespace Entity.Migrations
                             Id = 1,
                             Description = "Formulario para generar un nuevo carnet digital",
                             IsDeleted = false,
-                            ModuleId = 0,
+                            ModuleId = 1,
                             Name = "Crear Carnet",
                             Url = "/formulario"
                         },
@@ -73,7 +73,7 @@ namespace Entity.Migrations
                             Id = 2,
                             Description = "Formulario para validar el correo del usuario",
                             IsDeleted = false,
-                            ModuleId = 0,
+                            ModuleId = 2,
                             Name = "Validar Correo",
                             Url = "/formulario"
                         },
@@ -82,7 +82,7 @@ namespace Entity.Migrations
                             Id = 3,
                             Description = "Formulario donde se visualiza el carnet",
                             IsDeleted = false,
-                            ModuleId = 0,
+                            ModuleId = 1,
                             Name = "Ver Carnet",
                             Url = "/formulario"
                         },
@@ -91,7 +91,7 @@ namespace Entity.Migrations
                             Id = 4,
                             Description = "Formulario para registrar y consultar asistencia",
                             IsDeleted = false,
-                            ModuleId = 0,
+                            ModuleId = 2,
                             Name = "Control de Asistencia",
                             Url = "/formulario"
                         });
@@ -2191,7 +2191,7 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Models.Module", "Module")
                         .WithMany("Forms")
                         .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Module");
@@ -2534,7 +2534,7 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithOne("User")
                         .HasForeignKey("Entity.Models.User", "PersonId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Person");

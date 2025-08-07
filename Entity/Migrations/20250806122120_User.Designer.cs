@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250806065434_Configurate-Forma")]
-    partial class ConfigurateForma
+    [Migration("20250806122120_User")]
+    partial class User
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,7 +67,7 @@ namespace Entity.Migrations
                             Id = 1,
                             Description = "Formulario para generar un nuevo carnet digital",
                             IsDeleted = false,
-                            ModuleId = 0,
+                            ModuleId = 1,
                             Name = "Crear Carnet",
                             Url = "/formulario"
                         },
@@ -76,7 +76,7 @@ namespace Entity.Migrations
                             Id = 2,
                             Description = "Formulario para validar el correo del usuario",
                             IsDeleted = false,
-                            ModuleId = 0,
+                            ModuleId = 2,
                             Name = "Validar Correo",
                             Url = "/formulario"
                         },
@@ -85,7 +85,7 @@ namespace Entity.Migrations
                             Id = 3,
                             Description = "Formulario donde se visualiza el carnet",
                             IsDeleted = false,
-                            ModuleId = 0,
+                            ModuleId = 1,
                             Name = "Ver Carnet",
                             Url = "/formulario"
                         },
@@ -94,7 +94,7 @@ namespace Entity.Migrations
                             Id = 4,
                             Description = "Formulario para registrar y consultar asistencia",
                             IsDeleted = false,
-                            ModuleId = 0,
+                            ModuleId = 2,
                             Name = "Control de Asistencia",
                             Url = "/formulario"
                         });
@@ -252,65 +252,6 @@ namespace Entity.Migrations
                             Description = "Módulo para control de asistencia en eventos/clases",
                             IsDeleted = false,
                             Name = "Asistencia"
-                        });
-                });
-
-            modelBuilder.Entity("Entity.Models.ModuleForm", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("FormId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<int>("ModuleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FormId");
-
-                    b.HasIndex("ModuleId", "FormId")
-                        .IsUnique();
-
-                    b.ToTable("ModuleForms", "ModelSecurity");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FormId = 1,
-                            IsDeleted = false,
-                            ModuleId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FormId = 2,
-                            IsDeleted = false,
-                            ModuleId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FormId = 3,
-                            IsDeleted = false,
-                            ModuleId = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            FormId = 4,
-                            IsDeleted = false,
-                            ModuleId = 3
                         });
                 });
 
@@ -2282,25 +2223,6 @@ namespace Entity.Migrations
                     b.Navigation("DocumentType");
                 });
 
-            modelBuilder.Entity("Entity.Models.ModuleForm", b =>
-                {
-                    b.HasOne("Entity.Models.Form", "Form")
-                        .WithMany()
-                        .HasForeignKey("FormId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entity.Models.Module", "Module")
-                        .WithMany()
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Form");
-
-                    b.Navigation("Module");
-                });
-
             modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>
                 {
                     b.HasOne("Entity.Models.Parameter.CustomType", "NotificationType")
@@ -2615,7 +2537,7 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithOne("User")
                         .HasForeignKey("Entity.Models.User", "PersonId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Person");

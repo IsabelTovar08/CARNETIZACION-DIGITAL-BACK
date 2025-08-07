@@ -27,7 +27,9 @@ namespace Utilities.Helper
 
 
             //Mapeo de la entidad Form 
-            CreateMap<Form, FormDto>().ReverseMap();
+            CreateMap<Form, FormDto>()
+                .ForMember(dest => dest.ModuleName, opt => opt.MapFrom(src => src.Module.Name))
+                .ReverseMap();
             CreateMap<Form, FormDtoRequest>().ReverseMap();
 
 
@@ -64,6 +66,7 @@ namespace Utilities.Helper
              .ForMember(dest => dest.FormName, opt => opt.MapFrom(src => src.Form.Name))
              .ForMember(dest => dest.PermissionName, opt => opt.MapFrom(src => src.Permission.Name))
              .ReverseMap();
+            CreateMap<RolFormPermission, RolFormPermissionDtoRequest>().ReverseMap();
 
 
             //Parameter

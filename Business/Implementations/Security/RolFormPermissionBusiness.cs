@@ -1,8 +1,11 @@
 ﻿using System.Dynamic;
 using AutoMapper;
 using Business.Classes.Base;
+using Business.Interfaces;
 using Data.Interfases;
+using Entity.Context;
 using Entity.DTOs;
+using Entity.DTOs.ModelSecurity;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
@@ -11,12 +14,13 @@ using Utilities.Exeptions;
 
 namespace Business.Classes
 {
-    public class RolFormPermissionBusiness : BaseBusiness<RolFormPermission, RolFormPermissionDtoRequest, RolFormPermissionDto>
+    public class RolFormPermissionBusiness : BaseBusiness<RolFormPermission, RolFormPermissionDtoRequest, RolFormPermissionDto>, IRolFormPermissionBusiness
     {
+        private readonly IRolFormPermissionData _rolFormPermissionData;
         public RolFormPermissionBusiness
-            (ICrudBase<RolFormPermission> data, ILogger<RolFormPermission> logger, IMapper mapper) : base(data, logger, mapper)
+            (IRolFormPermissionData rolFormPermissionData, ILogger<RolFormPermission> logger, IMapper mapper, ApplicationDbContext context) : base(rolFormPermissionData, logger, mapper)
         {
-
+            _rolFormPermissionData = rolFormPermissionData;
         }
 
         protected void Validate(RolFormPermissionDtoRequest rolFormPermissionDto)
@@ -32,6 +36,9 @@ namespace Business.Classes
                 throw new ValidationException("El Permiso es obligatorio.");
         }
 
-       
+        public async Task<List<RolFormPermissionsCompletedDto>> GetAllRolFormPermissionsAsync()
+        {
+            return await _rolFormPermissionData.GetAllRolFormPermissionsAsync();
+        }
     }
 }

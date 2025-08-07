@@ -1,12 +1,15 @@
-﻿using Entity.Models;
+﻿using Data.Classes.Base;
+using Data.Interfases;
+using Entity.Context;
+using Entity.DTOs.ModelSecurity;
+using Entity.DTOs.ModelSecurity.Response;
+using Entity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Data.Classes.Base;
-using Entity.Context;
 
 namespace Data.Classes.Specifics
 {
-    public class RolFormPermissionData : BaseData<RolFormPermission>
+    public class RolFormPermissionData : BaseData<RolFormPermission>, IRolFormPermissionData
     {
         private ApplicationDbContext context;
         private ILogger<RolFormPermissionData> _logger;
@@ -48,6 +51,44 @@ namespace Data.Classes.Specifics
                 throw;
             }
         }
+
+        public async Task<List<RolFormPermissionsCompletedDto>> GetAllRolFormPermissionsAsync()
+        {
+            var result = await context.Set<RolFormPermission>()
+                .Include(rfp => rfp.Rol)
+                .Include(rfp => rfp.Form)
+                .Include(rfp => rfp.Permission)
+                .ToListAsync();
+
+            var agrupado = result
+                .GroupBy(rfp => new
+                {
+                    rfp.RolId,
+                    RolName = rfp.Rol.Name,
+                    rfp.FormId,
+                    FormName = rfp.Form.Name
+                })
+                .Select(g => new RolFormPermissionsCompletedDto
+                {
+                    RolId = g.Key.RolId,
+                    RolName = g.Key.RolName,
+                    FormId = g.Key.FormId,
+                    FormName = g.Key.FormName,
+                    Permissions = g
+                        .Select(x => new PermissionDto
+                        {
+                            Id = x.Permission.Id,
+                            Name = x.Permission.Name,
+                            Description = x.Permission.Description
+                        })
+                        .DistinctBy(p => p.Id)
+                        .ToList()
+                })
+                .ToList();
+
+            return agrupado;
+        }
+
 
 
 
