@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Organizational.Location
+namespace Entity.DTOs.Organizational.Response.Location
 {
     public class CityDto : GenericBaseDto
     {

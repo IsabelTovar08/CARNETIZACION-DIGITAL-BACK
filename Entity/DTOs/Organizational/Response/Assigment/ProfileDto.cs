@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Organizational.Location
+namespace Entity.DTOs.Organizational.Response.Assigment
 {
-    public class DepartmentDto : GenericBaseDto
+    public class ProfileDto : GenericBaseDto
     {
+        public string? Description { get; set; }
     }
 }

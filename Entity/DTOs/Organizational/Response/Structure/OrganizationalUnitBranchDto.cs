@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Organizational.Structure
+namespace Entity.DTOs.Organizational.Response.Structure
 {
     public  class OrganizationalUnitBranchDto : BaseModel
     {

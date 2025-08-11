@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Organization
+namespace Entity.DTOs.Organizational.Response.Structure
 {
     public  class OrganizationDto : GenericBaseDto
     {

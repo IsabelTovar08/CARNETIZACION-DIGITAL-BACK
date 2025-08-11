@@ -5,13 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Organizational.Structure
+namespace Entity.DTOs.Organizational.Response.Structure
 {
     public class OrganizationalUnitDto : GenericBaseDto
     {
         public string? Description { get; set; }
+        public int DivisionsCount { get; set; }
+        public int BranchesCount { get; set; }
 
-       
-        
+
+
+
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Organizational.Assigment
+namespace Entity.DTOs.Organizational.Response.Assigment
 {
     public class PersonDivisionProfileDto : BaseDTO
     {
