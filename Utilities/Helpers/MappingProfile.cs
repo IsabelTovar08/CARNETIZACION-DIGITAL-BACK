@@ -2,12 +2,15 @@
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Organizational.Request.Structure;
+using Entity.DTOs.Organizational.Response.Structure;
 using Entity.DTOs.Organizational.Location;
 using Entity.DTOs.Parameter;
 using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Organizational.Location;
+using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 namespace Utilities.Helper
 {
@@ -102,6 +105,16 @@ namespace Utilities.Helper
             //Deparments
             CreateMap<Department, DepartmentDto>()
             .ReverseMap();
+
+            //Mapeo de la entidad de organization Unit con sus divisiones
+            CreateMap<OrganizationalUnit, OrganizationalUnitDto>()
+                .ForMember(d => d.DivisionsCount,
+                    m => m.MapFrom(s => s.InternalDivissions.Count))
+                //Mapeo de la entidad de organization Unit con sus branchs
+                .ForMember(d => d.BranchesCount,
+                    m => m.MapFrom(s => s.OrganizationalUnitBranches.Count));
+            CreateMap<OrganizationalUnitDtoRequest, OrganizationalUnit>();
+              
         }
     }
 }

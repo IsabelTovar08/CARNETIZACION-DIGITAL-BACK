@@ -1,13 +1,13 @@
-﻿using Entity.DTOs.Base;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entity.DTOs.Base;
 
-namespace Entity.DTOs.Organization
+namespace Entity.DTOs.Organizational.Response.Structure
 {
-    public class ProfileDto : GenericBaseDto
+    public class AreaCategoryDto : GenericBaseDto
     {
         public string? Description { get; set; }
     }
