@@ -8,6 +8,6 @@ namespace Data.Interfases
 {
     public interface IUpdate<T> where T : class
     {
-        Task<bool> UpdateAsync(T entity);
+        Task<T?> UpdateAsync(T entity);
     }
 }

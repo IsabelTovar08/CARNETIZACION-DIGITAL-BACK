@@ -1,18 +1,28 @@
 ﻿using Business.Classes;
 using Business.Classes.Base;
+using Business.Implementations.Organizational.Location;
 using Business.Implementations.Parameters;
-using Business.Interfaces;
+using Business.Interfaces.ApiColombia;
+using Business.Interfaces.Parameters;
+using Business.Interfaces.Security;
 using Business.Interfases;
+using Business.Interfases.Organizational.Location;
+using Business.Services.ApiColombia;
 using Business.Services.Auth;
 using Business.Services.JWT;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
+using Data.Implementations.Organizational.Location;
 using Data.Implementations.Parameters;
 using Data.Interfases;
+using Data.Interfases.Organizational.Location;
+using Data.Interfases.Parameters;
+using Data.Interfases.Security;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
-using Entity.DTOs.Parameter;
+using Entity.DTOs.Parameter.Request;
+using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
@@ -28,14 +38,13 @@ namespace Web.Extensions
         {
             //User 
             services.AddScoped<UserData>();
-            services.AddScoped<ICrudBase<User>, UserData>();
-            services.AddScoped<UserBusiness>();
+            services.AddScoped<IUserData, UserData>();
+            services.AddScoped<IUserBusiness, UserBusiness>();
 
             //Person 
             services.AddScoped<PersonData>();
-
-            services.AddScoped<ICrudBase<Person>, PersonData>();
-            services.AddScoped<PersonBusiness>();
+            services.AddScoped<IPersonData, PersonData>();
+            services.AddScoped<IPersonBusiness, PersonBusiness>();
 
             //Rol 
             //services.AddScoped<ICrudBase<Role>, RoleData>();
@@ -55,24 +64,25 @@ namespace Web.Extensions
             services.AddScoped<PermissionBusiness>();
 
             //RolFormPermission 
-            services.AddScoped<ICrudBase<RolFormPermission>, RolFormPermissionData>();
-            services.AddScoped<RolFormPermissionBusiness>();
-
             services.AddScoped<IRolFormPermissionData, RolFormPermissionData>();
             services.AddScoped<IRolFormPermissionBusiness, RolFormPermissionBusiness>();
 
 
             //UserRol 
-            services.AddScoped<UserRoleData>();
-            services.AddScoped<ICrudBase<UserRoles>, UserRoleData>();
+            services.AddScoped<IUserRoleData, UserRolesData>();
+            services.AddScoped<IUserRoleBusiness, UserRoleBusiness>();
 
-            //User 
-            services.AddScoped<UserBusiness>();
-            services.AddScoped<UserRoleBusiness>();
 
             //CustomType 
             services.AddScoped<CustomTypeData>();
             services.AddScoped<ICrudBase<CustomType>, CustomTypeData>();
+
+            services.AddScoped<ICustomTypeData, CustomTypeData>();
+            services.AddScoped<ICustomTypeBusiness, CustomTypeBusiness>();
+
+            //City 
+            services.AddScoped<ICityData, CityData>();
+            services.AddScoped<ICityBusiness, CityBusiness>();
 
             services.AddScoped(typeof(ICrudBase<>), typeof(BaseData<>));
             services.AddScoped(typeof(IBaseBusiness<,,>), typeof(BaseBusiness<,,>));
@@ -86,7 +96,11 @@ namespace Web.Extensions
             services.AddScoped<IBaseBusiness<Permission, PermissionDtoRequest, PermissionDto>, PermissionBusiness>();
             services.AddScoped<IBaseBusiness<RolFormPermission, RolFormPermissionDtoRequest, RolFormPermissionDto>, RolFormPermissionBusiness>();
 
-            services.AddScoped<IBaseBusiness<CustomType, CustomTypeDto, CustomTypeDto>, CustomTypeBusiness>();
+            services.AddScoped<IBaseBusiness<CustomType, CustomTypeRequest, CustomTypeDto>, CustomTypeBusiness>();
+
+            // Service Api Colombia
+            services.AddHttpClient<IColombiaApiService, ApiColombiaService>();
+
 
 
             //Auth 

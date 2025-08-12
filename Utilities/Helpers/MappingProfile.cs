@@ -2,9 +2,12 @@
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Organizational.Location;
 using Entity.DTOs.Parameter;
+using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
+using Entity.Models.Organizational.Location;
 using Entity.Models.Parameter;
 namespace Utilities.Helper
 {
@@ -45,10 +48,16 @@ namespace Utilities.Helper
 
             //Mapeo de la entidad User
             CreateMap<User, UserDTO>()
-             .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
-             .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src => src.Person.Email + " " + src.Person.Email))
-             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(ur => ur.Rol.Name).ToList()))
-            .ReverseMap();
+             .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src =>
+                 (src.Person != null ? (src.Person.FirstName + " " + src.Person.LastName) : string.Empty)))
+
+             .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src =>
+                 src.Person != null ? src.Person.Email : string.Empty))
+
+             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src =>
+                 src.UserRoles != null ? src.UserRoles.Select(ur => ur.Rol != null ? ur.Rol.Name : string.Empty).ToList() : new List<string>()))
+             .ReverseMap();
+
             CreateMap<User, UserDtoRequest>().ReverseMap();
 
 
@@ -77,8 +86,22 @@ namespace Utilities.Helper
              .ForMember(dest => dest.TypeCategoryName, opt => opt.MapFrom(src => src.TypeCategory.Name))
              .ReverseMap();
 
+            CreateMap<CustomType, CustomTypeSpecific>()
+             .ReverseMap();
+
             CreateMap<TypeCategory, TypeCategoryDto>()
              .ReverseMap();
+
+            //Organizational
+
+            //City
+            CreateMap<City, CityDto>()
+             .ForMember(dest => dest.DeparmentName, opt => opt.MapFrom(src => src.Department.Name))
+            .ReverseMap();
+
+            //Deparments
+            CreateMap<Department, DepartmentDto>()
+            .ReverseMap();
         }
     }
 }

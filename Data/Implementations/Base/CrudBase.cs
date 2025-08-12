@@ -94,7 +94,7 @@ namespace Data.Classes.Base
             }
         }
 
-        public virtual async Task<bool> UpdateAsync(T entity)
+        public virtual async Task<T?> UpdateAsync(T entity)
         {
             int id = (int)(entity.GetType().GetProperty("Id")?.GetValue(entity)
                 ?? throw new Exception("La entidad no tiene un Id válido."));
@@ -102,12 +102,12 @@ namespace Data.Classes.Base
             try
             {
                 var entityExisting = await GetByIdAsync(id);
-                if (entityExisting == null) return false;
+                if (entityExisting == null) return null;
 
                 _context.Entry(entityExisting).CurrentValues.SetValues(entity);
                 await _context.SaveChangesAsync();
 
-                return true;
+                return entity;
             }
             catch (Exception ex)
             {

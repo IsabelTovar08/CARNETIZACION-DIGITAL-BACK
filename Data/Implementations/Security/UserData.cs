@@ -1,4 +1,6 @@
 ﻿using Data.Classes.Base;
+using Data.Interfases;
+using Data.Interfases.Security;
 using Entity.Context;
 using Entity.Models;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Classes.Specifics
 {
-    public class UserData : BaseData<User>
+    public class UserData : BaseData<User>, IUserData
     {
         public UserData(ApplicationDbContext context, ILogger<User> logger) : base(context, logger)
         {
@@ -20,6 +22,7 @@ namespace Data.Classes.Specifics
                     .ThenInclude(ur => ur.Rol)
                 .ToListAsync();
         }
+
 
         public async Task<List<string>> GetUserRolesByIdAsync(int userId)
         {

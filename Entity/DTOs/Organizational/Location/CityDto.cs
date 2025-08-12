@@ -11,6 +11,5 @@ namespace Entity.DTOs.Organizational.Location
     {
         public int DeparmentId { get; set; }
         public string? DeparmentName { get; set; }
-
     }
 }

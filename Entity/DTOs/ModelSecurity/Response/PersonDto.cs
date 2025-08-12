@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Entity.DTOs.Base;
+using Entity.Models.ModelSecurity;
 
 namespace Entity.DTOs.ModelSecurity.Response
 {
