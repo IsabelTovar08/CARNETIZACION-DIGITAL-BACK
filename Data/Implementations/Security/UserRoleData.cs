@@ -97,24 +97,32 @@ namespace Data.Classes.Specifics
 
             try
             {
-                foreach (var roleId in request.RolesId.Distinct())
+                // Obtener roles actuales del usuario
+                var currentRoles = await _context.Set<UserRoles>()
+                    .Where(r => r.UserId == request.UserId)
+                    .ToListAsync();
+
+                var rolesToAdd = request.RolesId.Except(currentRoles.Select(r => r.RolId)).Distinct();
+                var rolesToRemove = currentRoles.Select(r => r.RolId).Except(request.RolesId).ToList();
+
+                // Agregar los roles que faltan
+                foreach (var roleId in rolesToAdd)
                 {
-                    var exists = await _context.Set<UserRoles>()
-                        .AnyAsync(p => p.UserId == request.UserId &&
-                                       p.RolId == roleId);
-
-                    if (!exists)
+                    await SaveAsync(new UserRoles
                     {
-                        var permisionSave = new UserRoles
-                        {
-                            UserId = request.UserId,
-                            RolId = roleId
-                        };
-
-                        await SaveAsync(permisionSave);
-                    }
+                        UserId = request.UserId,
+                        RolId = roleId
+                    });
                 }
 
+                // Eliminar los roles que ya no están
+                foreach (var roleId in rolesToRemove)
+                {
+                    var userRole = currentRoles.First(r => r.RolId == roleId);
+                    _context.Set<UserRoles>().Remove(userRole);
+                }
+
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return true;
             }
@@ -125,6 +133,7 @@ namespace Data.Classes.Specifics
                 return false;
             }
         }
+
     }
 }
 
