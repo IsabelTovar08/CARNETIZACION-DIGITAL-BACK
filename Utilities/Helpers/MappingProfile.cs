@@ -2,8 +2,16 @@
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Organizational.Request.Structure;
+using Entity.DTOs.Organizational.Response.Location;
+using Entity.DTOs.Organizational.Response.Structure;
+using Entity.DTOs.Parameter;
+using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
+using Entity.Models.Organizational.Location;
+using Entity.Models.Organizational.Structure;
+using Entity.Models.Parameter;
 namespace Utilities.Helper
 {
     public class MappingProfile : AutoMapper.Profile
@@ -25,7 +33,9 @@ namespace Utilities.Helper
 
 
             //Mapeo de la entidad Form 
-            CreateMap<Form, FormDto>().ReverseMap();
+            CreateMap<Form, FormDto>()
+                .ForMember(dest => dest.ModuleName, opt => opt.MapFrom(src => src.Module.Name))
+                .ReverseMap();
             CreateMap<Form, FormDtoRequest>().ReverseMap();
 
 
@@ -34,12 +44,6 @@ namespace Utilities.Helper
             CreateMap<Module, ModuleDtoRequest>().ReverseMap();
 
 
-            //Mapeo de la entidad ModuleForm 
-            CreateMap<ModuleForm,ModuleFormDto>()
-             .ForMember(dest => dest.NameForm, opt => opt.MapFrom(src => src.Form.Name))
-             .ForMember(dest => dest.NameModule, opt => opt.MapFrom(src => src.Module.Name))
-             .ReverseMap();
-
             //Mapeo de la entidad permission
             CreateMap<Permission, PermissionDto>().ReverseMap();
             CreateMap<Permission, PermissionDtoRequest>().ReverseMap();
@@ -47,15 +51,20 @@ namespace Utilities.Helper
 
             //Mapeo de la entidad User
             CreateMap<User, UserDTO>()
-             .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
-             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(ur => ur.Rol.Name).ToList()))
-            .ReverseMap();
+             .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src =>
+                 (src.Person != null ? (src.Person.FirstName + " " + src.Person.LastName) : string.Empty)))
+
+             .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src =>
+                 src.Person != null ? src.Person.Email : string.Empty))
+
+             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(R => R.Rol)))
+             .ReverseMap();
+
             CreateMap<User, UserDtoRequest>().ReverseMap();
 
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()
-             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Email))
              .ForMember(dest => dest.RolName, opt => opt.MapFrom(src => src.Rol.Name))
              .ReverseMap();
             CreateMap<UserRoles, UserRoleDtoRequest>().ReverseMap();
@@ -68,6 +77,43 @@ namespace Utilities.Helper
              .ForMember(dest => dest.FormName, opt => opt.MapFrom(src => src.Form.Name))
              .ForMember(dest => dest.PermissionName, opt => opt.MapFrom(src => src.Permission.Name))
              .ReverseMap();
+            CreateMap<RolFormPermission, RolFormPermissionDtoRequest>().ReverseMap();
+
+
+            //Parameter
+            CreateMap<Status, StatusDto>()
+             .ReverseMap();
+
+            CreateMap<CustomType, CustomTypeDto>()
+             .ForMember(dest => dest.TypeCategoryName, opt => opt.MapFrom(src => src.TypeCategory.Name))
+             .ReverseMap();
+
+            CreateMap<CustomType, CustomTypeSpecific>()
+             .ReverseMap();
+
+            CreateMap<TypeCategory, TypeCategoryDto>()
+             .ReverseMap();
+
+            //Organizational
+
+            //City
+            CreateMap<City, CityDto>()
+             .ForMember(dest => dest.DeparmentName, opt => opt.MapFrom(src => src.Department.Name))
+            .ReverseMap();
+
+            //Deparments
+            CreateMap<Department, DepartmentDto>()
+            .ReverseMap();
+
+            //Mapeo de la entidad de organization Unit con sus divisiones
+            CreateMap<OrganizationalUnit, OrganizationalUnitDto>()
+                .ForMember(d => d.DivisionsCount,
+                    m => m.MapFrom(s => s.InternalDivissions.Count))
+                //Mapeo de la entidad de organization Unit con sus branchs
+                .ForMember(d => d.BranchesCount,
+                    m => m.MapFrom(s => s.OrganizationalUnitBranches.Count));
+            CreateMap<OrganizationalUnitDtoRequest, OrganizationalUnit>();
+              
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Business.Classes;
+using Business.Interfaces.Security;
 using Business.Interfases;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
@@ -15,8 +16,17 @@ namespace Web.Controllers.ModelSecurity
 {
     public class PersonController : GenericController<Person, PersonDtoRequest, PersonDto>
     {
-        public PersonController(IBaseBusiness<Person,PersonDtoRequest, PersonDto> business, ILogger<PersonController> logger) : base(business, logger)
+        protected readonly IPersonBusiness _personBusiness;
+        public PersonController(IBaseBusiness<Person,PersonDtoRequest, PersonDto> business, ILogger<PersonController> logger, IPersonBusiness personBusiness) : base(business, logger)
         {
+            _personBusiness = personBusiness;
+        }
+
+        [HttpPost("save-person-with-user")]
+        public async Task<IActionResult> SavePersonAndUser([FromBody] PersonRegistrer person)
+        {
+            var result = await _personBusiness.SavePersonAndUser(person);
+            return Ok(result);
         }
     }
 }

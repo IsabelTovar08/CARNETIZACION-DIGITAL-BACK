@@ -38,6 +38,9 @@ namespace Entity.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -47,6 +50,8 @@ namespace Entity.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ModuleId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -59,6 +64,7 @@ namespace Entity.Migrations
                             Id = 1,
                             Description = "Formulario para generar un nuevo carnet digital",
                             IsDeleted = false,
+                            ModuleId = 1,
                             Name = "Crear Carnet",
                             Url = "/formulario"
                         },
@@ -67,6 +73,7 @@ namespace Entity.Migrations
                             Id = 2,
                             Description = "Formulario para validar el correo del usuario",
                             IsDeleted = false,
+                            ModuleId = 2,
                             Name = "Validar Correo",
                             Url = "/formulario"
                         },
@@ -75,6 +82,7 @@ namespace Entity.Migrations
                             Id = 3,
                             Description = "Formulario donde se visualiza el carnet",
                             IsDeleted = false,
+                            ModuleId = 1,
                             Name = "Ver Carnet",
                             Url = "/formulario"
                         },
@@ -83,6 +91,7 @@ namespace Entity.Migrations
                             Id = 4,
                             Description = "Formulario para registrar y consultar asistencia",
                             IsDeleted = false,
+                            ModuleId = 2,
                             Name = "Control de Asistencia",
                             Url = "/formulario"
                         });
@@ -110,6 +119,9 @@ namespace Entity.Migrations
 
                     b.Property<int?>("DocumentTypeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -237,65 +249,6 @@ namespace Entity.Migrations
                             Description = "Módulo para control de asistencia en eventos/clases",
                             IsDeleted = false,
                             Name = "Asistencia"
-                        });
-                });
-
-            modelBuilder.Entity("Entity.Models.ModuleForm", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("FormId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<int>("ModuleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FormId");
-
-                    b.HasIndex("ModuleId", "FormId")
-                        .IsUnique();
-
-                    b.ToTable("ModuleForms", "ModelSecurity");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FormId = 1,
-                            IsDeleted = false,
-                            ModuleId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FormId = 2,
-                            IsDeleted = false,
-                            ModuleId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FormId = 3,
-                            IsDeleted = false,
-                            ModuleId = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            FormId = 4,
-                            IsDeleted = false,
-                            ModuleId = 3
                         });
                 });
 
@@ -2105,17 +2058,13 @@ namespace Entity.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PersonId")
+                    b.Property<int>("PersonId")
                         .HasColumnType("int");
 
                     b.Property<string>("RefreshToken")
@@ -2131,16 +2080,16 @@ namespace Entity.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
+                    b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.HasIndex("PersonId")
+                    b.HasIndex("UserName")
                         .IsUnique()
-                        .HasFilter("[PersonId] IS NOT NULL");
+                        .HasFilter("[UserName] IS NOT NULL");
 
                     b.ToTable("Users", "ModelSecurity");
 
@@ -2149,7 +2098,6 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "funcionario@carnet.edu",
                             IsDeleted = false,
                             Password = "123",
                             PersonId = 1,
@@ -2159,7 +2107,6 @@ namespace Entity.Migrations
                         {
                             Id = 2,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "laura.estudiante@correo.com",
                             IsDeleted = false,
                             Password = "L4d!Estudiante2025",
                             PersonId = 2
@@ -2168,7 +2115,6 @@ namespace Entity.Migrations
                         {
                             Id = 3,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "admin@carnet.edu",
                             IsDeleted = false,
                             Password = "Adm!nCarnet2025",
                             PersonId = 3
@@ -2177,7 +2123,6 @@ namespace Entity.Migrations
                         {
                             Id = 4,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "usuario@carnet.edu",
                             IsDeleted = false,
                             Password = "Usr!Carnet2025",
                             PersonId = 4
@@ -2241,6 +2186,17 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Models.Form", b =>
+                {
+                    b.HasOne("Entity.Models.Module", "Module")
+                        .WithMany("Forms")
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Module");
+                });
+
             modelBuilder.Entity("Entity.Models.ModelSecurity.Person", b =>
                 {
                     b.HasOne("Entity.Models.Parameter.CustomType", "BloodType")
@@ -2262,25 +2218,6 @@ namespace Entity.Migrations
                     b.Navigation("City");
 
                     b.Navigation("DocumentType");
-                });
-
-            modelBuilder.Entity("Entity.Models.ModuleForm", b =>
-                {
-                    b.HasOne("Entity.Models.Form", "Form")
-                        .WithMany("ModuleForm")
-                        .HasForeignKey("FormId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entity.Models.Module", "Module")
-                        .WithMany("ModuleForm")
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Form");
-
-                    b.Navigation("Module");
                 });
 
             modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>
@@ -2597,7 +2534,8 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithOne("User")
                         .HasForeignKey("Entity.Models.User", "PersonId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Person");
                 });
@@ -2623,8 +2561,6 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Form", b =>
                 {
-                    b.Navigation("ModuleForm");
-
                     b.Navigation("RolFormPermissions");
                 });
 
@@ -2639,7 +2575,7 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Module", b =>
                 {
-                    b.Navigation("ModuleForm");
+                    b.Navigation("Forms");
                 });
 
             modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>

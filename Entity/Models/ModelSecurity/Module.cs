@@ -6,6 +6,6 @@ namespace Entity.Models
     {
         public string? Description { get; set; }
 
-        public List<ModuleForm> ModuleForm { get; set; } 
+        public List<Form> Forms { get; set; } 
     }
 }

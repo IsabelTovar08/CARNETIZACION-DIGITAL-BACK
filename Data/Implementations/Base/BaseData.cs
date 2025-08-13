@@ -63,7 +63,7 @@ namespace Data.Classes.Base
                 throw;
             }
         }
-        public override async Task<bool> UpdateAsync(T entity)
+        public override async Task<T?> UpdateAsync(T entity)
         {
 
             try
@@ -85,7 +85,7 @@ namespace Data.Classes.Base
 
                 // Guarda los cambios
                 await _context.SaveChangesAsync();
-                return true;
+                return entity;
             }
             catch (Exception ex)
             {

@@ -15,7 +15,7 @@ namespace Entity.DTOs.ModelSecurity.Request
         public string? SecondLastName { get; set; }
         public int? DocumentTypeId { get; set; }
 
-        public string Identification { get; set; }
+        public string? DocumentNumber { get; set; }
         public int? BloodTypeId { get; set; }
 
         public string? Phone { get; set; }

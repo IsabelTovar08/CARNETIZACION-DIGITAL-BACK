@@ -31,8 +31,8 @@ namespace Web.Controllers.ModelSecurity
                 return Unauthorized("Credenciales inválidas.");
             }
 
-            var roles = await _userRolBusiness.GetRolesByUserId(user.Id);
-            var token = _jwtService.GenerateToken(user.Id.ToString(), user.Email, roles);
+            var roles = await _userRolBusiness.GetRolesByUserIdAsync(user.Id);
+            var token = _jwtService.GenerateToken(user.Id.ToString(), user.UserName, roles);
 
             return Ok(new { token });
         }

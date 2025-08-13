@@ -1,19 +1,40 @@
 ﻿using Business.Classes;
 using Business.Classes.Base;
+using Business.Implementations.Organizational.Location;
+using Business.Implementations.Organization;
+using Business.Implementations.Parameters;
+using Business.Interfaces.ApiColombia;
+using Business.Interfaces.Parameters;
+using Business.Interfaces.Security;
 using Business.Interfases;
+using Business.Interfases.Organizational.Location;
+using Business.Services.ApiColombia;
 using Business.Services.Auth;
 using Business.Services.JWT;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
+using Data.Implementations.Organization;
+using Data.Implementations.Organizational.Location;
+using Data.Implementations.Parameters;
 using Data.Interfases;
+using Data.Interfases.Organizational.Location;
+using Data.Interfases.Parameters;
+using Data.Interfases.Security;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Organizational.Request.Structure;
+using Entity.DTOs.Organizational.Response.Structure;
+using Entity.DTOs.Parameter;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
+using Entity.Models.Organizational.Structure;
+using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
 using Utilities.Notifications.Implementations;
+using Entity.DTOs.Parameter.Request;
+using Entity.DTOs.Parameter.Response;
 
 namespace Web.Extensions
 {
@@ -23,14 +44,13 @@ namespace Web.Extensions
         {
             //User 
             services.AddScoped<UserData>();
-            services.AddScoped<ICrudBase<User>, UserData>();
-            services.AddScoped<UserBusiness>();
+            services.AddScoped<IUserData, UserData>();
+            services.AddScoped<IUserBusiness, UserBusiness>();
 
             //Person 
             services.AddScoped<PersonData>();
-
-            services.AddScoped<ICrudBase<Person>, PersonData>();
-            services.AddScoped<PersonBusiness>();
+            services.AddScoped<IPersonData, PersonData>();
+            services.AddScoped<IPersonBusiness, PersonBusiness>();
 
             //Rol 
             //services.AddScoped<ICrudBase<Role>, RoleData>();
@@ -44,24 +64,31 @@ namespace Web.Extensions
             services.AddScoped<ICrudBase<Module>, ModuleData>();
             services.AddScoped<ModuleBusiness>();
 
-            //ModuleForm 
-            services.AddScoped<ICrudBase<ModuleForm>, ModuleFormData>();
-            services.AddScoped<ModuleFormBusiness>();
 
             //Permission 
             services.AddScoped<ICrudBase<Permission>, PermissionData>();
             services.AddScoped<PermissionBusiness>();
 
             //RolFormPermission 
-            services.AddScoped<ICrudBase<RolFormPermission>, RolFormPermissionData>();
-            services.AddScoped<RolFormPermissionBusiness>();
+            services.AddScoped<IRolFormPermissionData, RolFormPermissionData>();
+            services.AddScoped<IRolFormPermissionBusiness, RolFormPermissionBusiness>();
+
 
             //UserRol 
-            services.AddScoped<UserRoleData>();
-            services.AddScoped<ICrudBase<UserRoles>, UserRoleData>();
+            services.AddScoped<IUserRoleData, UserRolesData>();
+            services.AddScoped<IUserRoleBusiness, UserRoleBusiness>();
 
-            services.AddScoped<UserBusiness>();
-            services.AddScoped<UserRoleBusiness>();
+
+            //CustomType 
+            services.AddScoped<CustomTypeData>();
+            services.AddScoped<ICrudBase<CustomType>, CustomTypeData>();
+
+            services.AddScoped<ICustomTypeData, CustomTypeData>();
+            services.AddScoped<ICustomTypeBusiness, CustomTypeBusiness>();
+
+            //City 
+            services.AddScoped<ICityData, CityData>();
+            services.AddScoped<ICityBusiness, CityBusiness>();
 
             services.AddScoped(typeof(ICrudBase<>), typeof(BaseData<>));
             services.AddScoped(typeof(IBaseBusiness<,,>), typeof(BaseBusiness<,,>));
@@ -72,9 +99,15 @@ namespace Web.Extensions
             services.AddScoped<IBaseBusiness<Person, PersonDtoRequest , PersonDto>, PersonBusiness>();
             services.AddScoped<IBaseBusiness<Form, FormDtoRequest, FormDto>, FormBusiness>();
             services.AddScoped<IBaseBusiness<Module, ModuleDtoRequest, ModuleDto>, ModuleBusiness>();
-            services.AddScoped<IBaseBusiness<ModuleForm,ModuleFormDtoRequest, ModuleFormDto>, ModuleFormBusiness>();
             services.AddScoped<IBaseBusiness<Permission, PermissionDtoRequest, PermissionDto>, PermissionBusiness>();
             services.AddScoped<IBaseBusiness<RolFormPermission, RolFormPermissionDtoRequest, RolFormPermissionDto>, RolFormPermissionBusiness>();
+
+            services.AddScoped<IBaseBusiness<CustomType, CustomTypeRequest, CustomTypeDto>, CustomTypeBusiness>();
+
+            // Service Api Colombia
+            services.AddHttpClient<IColombiaApiService, ApiColombiaService>();
+
+
 
             //Auth 
             services.AddScoped<UserService>();
@@ -91,7 +124,18 @@ namespace Web.Extensions
             services.AddScoped<INotify, Notifier>();
             services.AddScoped<IMessageSender, TelegramMessageSender>();
 
+            //InternaDivision
+            services.AddScoped<InternalDivisionData>();
+            services.AddScoped<OrganizationalUnitBusiness>();
+            services.AddScoped<IBaseBusiness<OrganizationalUnit, OrganizationalUnitDtoRequest, OrganizationalUnitDto>,
+            OrganizationalUnitBusiness>();
 
+
+            //Buscar La cantidad de branch que tienen una sola organizacion
+            services.AddScoped<OrganizationalUnitBranchData>();
+            
+            
+            
             return services;
         }
     }
