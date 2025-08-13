@@ -1,6 +1,6 @@
 ﻿using Business.Interfases;
 using Business.Interfases.Organizational.Location;
-using Entity.DTOs.Organizational.Location;
+using Entity.DTOs.Organizational.Response.Location;
 using Entity.Models.Organizational.Location;
 using Microsoft.AspNetCore.Mvc;
 using Web.Controllers.Base;

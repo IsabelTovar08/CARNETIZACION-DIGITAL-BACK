@@ -8,7 +8,7 @@ using Business.Classes.Base;
 using Business.Interfases.Organizational.Location;
 using Data.Interfases;
 using Data.Interfases.Organizational.Location;
-using Entity.DTOs.Organizational.Location;
+using Entity.DTOs.Organizational.Response.Location;
 using Entity.Models.Organizational.Location;
 using Microsoft.Extensions.Logging;
 

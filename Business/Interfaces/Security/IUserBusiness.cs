@@ -7,7 +7,7 @@ using Business.Classes.Base;
 using Business.Interfases;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
-using Entity.Migrations;
+using Entity.Models;
 
 namespace Business.Interfaces.Security
 {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Business.Interfaces.ApiColombia;
-using Entity.DTOs.Organizational.Location;
+using Entity.DTOs.Organizational.Response.Location;
 
 namespace Business.Services.ApiColombia
 {

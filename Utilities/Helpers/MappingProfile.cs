@@ -3,8 +3,8 @@ using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Organizational.Request.Structure;
+using Entity.DTOs.Organizational.Response.Location;
 using Entity.DTOs.Organizational.Response.Structure;
-using Entity.DTOs.Organizational.Location;
 using Entity.DTOs.Parameter;
 using Entity.DTOs.Parameter.Response;
 using Entity.Models;
@@ -57,8 +57,7 @@ namespace Utilities.Helper
              .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src =>
                  src.Person != null ? src.Person.Email : string.Empty))
 
-             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src =>
-                 src.UserRoles != null ? src.UserRoles.Select(ur => ur.Rol != null ? ur.Rol.Name : string.Empty).ToList() : new List<string>()))
+             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(R => R.Rol)))
              .ReverseMap();
 
             CreateMap<User, UserDtoRequest>().ReverseMap();

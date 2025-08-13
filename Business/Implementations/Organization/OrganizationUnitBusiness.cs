@@ -40,42 +40,42 @@ namespace Business.Implementations.Organization
                 throw new ValidationException(string.Join(" | ", errors));
         }
 
-        public override async Task<OrganizationalUnitDto> Save(OrganizationalUnitDtoRequest dto)
-        {
-            try
-            {
-                Validate(dto);
+        //public override async Task<OrganizationalUnitDto> Save(OrganizationalUnitDtoRequest dto)
+        //{
+        //    try
+        //    {
+        //        Validate(dto);
 
-                var entity = _mapper.Map<OrganizationalUnit>(dto);
-                var created = await _data.SaveAsync(entity);
+        //        var entity = _mapper.Map<OrganizationalUnit>(dto);
+        //        var created = await _data.SaveAsync(entity);
 
-                return _mapper.Map<OrganizationalUnitDto>(created);
-            }
-            catch (ValidationException) { throw; }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear OrganizationalUnit.");
-                throw new ExternalServiceException("Base de datos", "No se pudo crear la Unidad Organizativa.");
-            }
-        }
+        //        return _mapper.Map<OrganizationalUnitDto>(created);
+        //    }
+        //    catch (ValidationException) { throw; }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al crear OrganizationalUnit.");
+        //        throw new ExternalServiceException("Base de datos", "No se pudo crear la Unidad Organizativa.");
+        //    }
+        //}
 
-        public override async Task<bool> Update(OrganizationalUnitDtoRequest dto)
-        {
-            try
-            {
-                if (dto.Id <= 0) throw new ValidationException("Id inválido para actualizar.");
-                Validate(dto);
+        //public override async Task<bool> Update(OrganizationalUnitDtoRequest dto)
+        //{
+        //    try
+        //    {
+        //        if (dto.Id <= 0) throw new ValidationException("Id inválido para actualizar.");
+        //        Validate(dto);
 
-                var entity = _mapper.Map<OrganizationalUnit>(dto);
-                return await _data.UpdateAsync(entity);
-            }
-            catch (ValidationException) { throw; }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al actualizar OrganizationalUnit con Id {Id}.", dto.Id);
-                throw new ExternalServiceException("Base de datos", "No se pudo actualizar la Unidad Organizativa.");
-            }
-        }
+        //        var entity = _mapper.Map<OrganizationalUnit>(dto);
+        //        return await _data.UpdateAsync(entity);
+        //    }
+        //    catch (ValidationException) { throw; }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al actualizar OrganizationalUnit con Id {Id}.", dto.Id);
+        //        throw new ExternalServiceException("Base de datos", "No se pudo actualizar la Unidad Organizativa.");
+        //    }
+        //}
 
         // Conteo de divisiones
         public Task<int> CountDivisionAsync(int organizationalUnitId) =>

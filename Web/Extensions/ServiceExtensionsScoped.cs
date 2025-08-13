@@ -33,6 +33,8 @@ using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
 using Utilities.Notifications.Implementations;
+using Entity.DTOs.Parameter.Request;
+using Entity.DTOs.Parameter.Response;
 
 namespace Web.Extensions
 {

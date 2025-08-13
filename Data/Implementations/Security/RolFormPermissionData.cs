@@ -168,25 +168,43 @@ namespace Data.Classes.Specifics
 
             try
             {
-                // Eliminar todos los permisos existentes para ese rol y formulario
-                await _context.Set<RolFormPermission>()
-                    .Where(p => p.RolId == request.RoleId && p.FormId == request.FormId)
-                    .ExecuteDeleteAsync();
+                var newIds = request.PermissionsIds.Distinct().ToList();
 
-                // Crear lista de nuevas entidades para insertar
-                var nuevosPermisos = request.PermissionsIds
-                    .Distinct()
-                    .Select(pid => new RolFormPermission
+                var repo = _context.Set<RolFormPermission>();
+
+                // Obtener permisos actuales para el rol y formulario
+                var existing = await repo
+                    .Where(p => p.RolId == request.RoleId && p.FormId == request.FormId)
+                    .ToListAsync();
+
+                var existingIds = existing.Select(p => p.PermissionId).ToList();
+
+                // IDs que hay que insertar
+                var toInsert = newIds.Except(existingIds).ToList();
+                if (toInsert.Any())
+                {
+                    var nuevosPermisos = toInsert.Select(pid => new RolFormPermission
                     {
                         RolId = request.RoleId,
                         FormId = request.FormId,
                         PermissionId = pid
                     }).ToList();
 
-                // Insertar en bloque
-                await _context.Set<RolFormPermission>().AddRangeAsync(nuevosPermisos);
-                await _context.SaveChangesAsync();
+                    await repo.AddRangeAsync(nuevosPermisos);
+                }
 
+                // IDs que hay que eliminar
+                var toDelete = existingIds.Except(newIds).ToList();
+                if (toDelete.Any())
+                {
+                    await repo
+                        .Where(p => p.RolId == request.RoleId &&
+                                    p.FormId == request.FormId &&
+                                    toDelete.Contains(p.PermissionId))
+                        .ExecuteDeleteAsync();
+                }
+
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return true;
             }
@@ -197,6 +215,7 @@ namespace Data.Classes.Specifics
                 return false;
             }
         }
+
 
     }
 }
