@@ -6,6 +6,7 @@ using Entity.DTOs.Organizational.Request.Structure;
 using Entity.DTOs.Organizational.Response.Location;
 using Entity.DTOs.Organizational.Response.Structure;
 using Entity.DTOs.Parameter;
+using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
@@ -90,6 +91,8 @@ namespace Utilities.Helper
 
             CreateMap<CustomType, CustomTypeSpecific>()
              .ReverseMap();
+            CreateMap<CustomType, CustomTypeRequest>()
+            .ReverseMap();
 
             CreateMap<TypeCategory, TypeCategoryDto>()
              .ReverseMap();

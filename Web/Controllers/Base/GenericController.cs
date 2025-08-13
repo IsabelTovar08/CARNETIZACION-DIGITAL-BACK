@@ -135,6 +135,40 @@ namespace Web.Controllers.Base
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Patch para alternar el estado lógico (activo/inactivo) de una entidad por su Id.
+        /// </summary>
+        [HttpPatch("{id}/toggle-active")]
+        public async Task<IActionResult> ToggleActive(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("El id debe ser mayor que cero.");
+            }
+
+            try
+            {
+                var result = await _business.ToggleActiveAsync(id);
+
+                return Ok(new { Message = $"Estado lógico actualizado correctamente para Id {id}." });
+            }
+            catch (ValidationException vex)
+            {
+                _logger.LogWarning(vex, $"Validación fallida para ToggleActive con Id: {id}");
+                return BadRequest(vex.Message);
+            }
+            catch (ExternalServiceException esex)
+            {
+                _logger.LogError(esex, $"Error externo al actualizar estado lógico para Id: {id}");
+                return StatusCode(500, esex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error inesperado al actualizar estado lógico para Id: {id}");
+                return StatusCode(500, "Error interno en el servidor.");
+            }
+        }
     }
 
 }
