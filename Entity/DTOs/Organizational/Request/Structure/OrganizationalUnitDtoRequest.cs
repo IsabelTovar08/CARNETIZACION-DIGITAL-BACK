@@ -11,8 +11,6 @@ namespace Entity.DTOs.Organizational.Request.Structure
     {
         public string? Description { get; set; }
 
-        public int DivisionsCount { get; set; }
-
         public int BranchesCount { get; set; }
     }
 }

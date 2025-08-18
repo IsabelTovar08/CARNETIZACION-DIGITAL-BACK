@@ -13,7 +13,6 @@ using Business.Services.Auth;
 using Business.Services.JWT;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
-using Data.Implementations.Organization;
 using Data.Implementations.Organizational.Location;
 using Data.Implementations.Parameters;
 using Data.Interfases;
@@ -38,6 +37,7 @@ using Entity.DTOs.Parameter.Response;
 using Data.Implementations.Security;
 using Business.Implementations.Security;
 using Data.Interfaces.Security;
+using Data.Implementations.Organizational.Structure;
 
 namespace Web.Extensions
 {
