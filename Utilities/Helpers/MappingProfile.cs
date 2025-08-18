@@ -82,12 +82,10 @@ namespace Utilities.Helper
 
             //Menu
             CreateMap<MenuStructure, MenuStructureDto>()
-            .ForMember(d => d.Title, o => o.MapFrom(s =>
-                s.Form != null ? s.Form.Name :
-                s.Module != null ? s.Module.Name :
-                s.Type))
+            .ForMember(d => d.Title,
+                o => o.MapFrom(s => !string.IsNullOrWhiteSpace(s.Title) ? s.Title : (s.FormId != null ? s.Form.Name : s.Module.Name)))
             .ForMember(d => d.Url, o => o.MapFrom(s => s.Form != null ? s.Form.Url : null))
-            .ForMember(d => d.Icon, o => o.MapFrom(s => s.Form != null ? s.Form.Icon : null))
+            .ForMember(d => d.Icon, o => o.MapFrom(s => !string.IsNullOrWhiteSpace(s.Icon) ? s.Icon : (s.FormId != null ? s.Form.Icon : s.Module.Icon)))
             .ForMember(d => d.Classes, o => o.MapFrom(s => s.Type == "item" ? "nav-item" : null))
             .ForMember(d => d.Children, o => o.MapFrom(s => s.Children.OrderBy(c => c.OrderIndex)));
 

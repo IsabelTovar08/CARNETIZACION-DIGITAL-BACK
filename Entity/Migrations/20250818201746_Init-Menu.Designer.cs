@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:Entity/Migrations/20250816014823_Menu.Designer.cs
-    [Migration("20250816014823_Menu")]
-    partial class Menu
-========
-    [Migration("20250814133846_initial")]
-    partial class initial
->>>>>>>> d25e4eaa27668f31808988f0f5fa93d6f8933031:Entity/Migrations/20250814133846_initial.Designer.cs
+    [Migration("20250818201746_Init-Menu")]
+    partial class InitMenu
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,7 +108,7 @@ namespace Entity.Migrations
                             Description = "Vista general de la estructura",
                             Icon = "dashboard_customize",
                             IsDeleted = false,
-                            ModuleId = 3,
+                            ModuleId = 2,
                             Name = "Resumen",
                             Url = "/dashboard/organizational/structure"
                         },
@@ -123,7 +118,7 @@ namespace Entity.Migrations
                             Description = "Administración de sucursales",
                             Icon = "store",
                             IsDeleted = false,
-                            ModuleId = 3,
+                            ModuleId = 2,
                             Name = "Sucursales",
                             Url = "/dashboard/organizational/structure/branch"
                         },
@@ -133,7 +128,7 @@ namespace Entity.Migrations
                             Description = "Gestión de unidades organizativas",
                             Icon = "schema",
                             IsDeleted = false,
-                            ModuleId = 3,
+                            ModuleId = 2,
                             Name = "Unidades Organizativas",
                             Url = "/dashboard/organizational/structure/unit"
                         },
@@ -143,7 +138,7 @@ namespace Entity.Migrations
                             Description = "Administración de divisiones internas",
                             Icon = "account_tree",
                             IsDeleted = false,
-                            ModuleId = 3,
+                            ModuleId = 2,
                             Name = "Divisiones Internas",
                             Url = "/dashboard/organizational/structure/internal-division"
                         },
@@ -153,7 +148,7 @@ namespace Entity.Migrations
                             Description = "Perfiles de las personas en el sistema",
                             Icon = "badge",
                             IsDeleted = false,
-                            ModuleId = 3,
+                            ModuleId = 2,
                             Name = "Perfiles",
                             Url = "/dashboard/organizational/profile"
                         },
@@ -163,7 +158,7 @@ namespace Entity.Migrations
                             Description = "Configuración de horarios/jornadas",
                             Icon = "schedule",
                             IsDeleted = false,
-                            ModuleId = 3,
+                            ModuleId = 2,
                             Name = "Jornadas",
                             Url = "/dashboard/organizational/structure/schedule"
                         },
@@ -173,7 +168,7 @@ namespace Entity.Migrations
                             Description = "Gestión de eventos",
                             Icon = "event",
                             IsDeleted = false,
-                            ModuleId = 5,
+                            ModuleId = 3,
                             Name = "Eventos",
                             Url = "/dashboard/operational/events"
                         },
@@ -183,7 +178,7 @@ namespace Entity.Migrations
                             Description = "Catálogo de tipos de evento",
                             Icon = "category",
                             IsDeleted = false,
-                            ModuleId = 5,
+                            ModuleId = 3,
                             Name = "Tipos de Evento",
                             Url = "/dashboard/operational/event-types"
                         },
@@ -193,7 +188,7 @@ namespace Entity.Migrations
                             Description = "Segmentos de público objetivo",
                             Icon = "group",
                             IsDeleted = false,
-                            ModuleId = 5,
+                            ModuleId = 3,
                             Name = "Audiencias Objetivo",
                             Url = "/dashboard/operational/event-target-audience"
                         },
@@ -203,7 +198,7 @@ namespace Entity.Migrations
                             Description = "Administración de puntos de acceso",
                             Icon = "sensor_door",
                             IsDeleted = false,
-                            ModuleId = 5,
+                            ModuleId = 3,
                             Name = "Puntos de Acceso",
                             Url = "/dashboard/operational/access-points"
                         },
@@ -213,7 +208,7 @@ namespace Entity.Migrations
                             Description = "Registro y consulta de asistencias",
                             Icon = "how_to_reg",
                             IsDeleted = false,
-                            ModuleId = 5,
+                            ModuleId = 3,
                             Name = "Asistencias",
                             Url = "/dashboard/operational/attendance"
                         },
@@ -223,7 +218,7 @@ namespace Entity.Migrations
                             Description = "Estados del sistema",
                             Icon = "check_circle_unread",
                             IsDeleted = false,
-                            ModuleId = 7,
+                            ModuleId = 4,
                             Name = "Estados",
                             Url = "/dashboard/parametros/status"
                         },
@@ -233,7 +228,7 @@ namespace Entity.Migrations
                             Description = "Tipos y categorías del sistema",
                             Icon = "category",
                             IsDeleted = false,
-                            ModuleId = 7,
+                            ModuleId = 4,
                             Name = "Tipos y Categorías",
                             Url = "/dashboard/parametros/types-category"
                         },
@@ -243,7 +238,7 @@ namespace Entity.Migrations
                             Description = "Tipos definidos por el usuario",
                             Icon = "tune",
                             IsDeleted = false,
-                            ModuleId = 7,
+                            ModuleId = 4,
                             Name = "Tipos Personalizados",
                             Url = "/dashboard/parametros/custom-types"
                         },
@@ -253,7 +248,7 @@ namespace Entity.Migrations
                             Description = "Catálogo de departamentos",
                             Icon = "flag",
                             IsDeleted = false,
-                            ModuleId = 8,
+                            ModuleId = 4,
                             Name = "Departamentos",
                             Url = "/dashboard/organizational/location/department"
                         },
@@ -263,7 +258,7 @@ namespace Entity.Migrations
                             Description = "Catálogo de municipios",
                             Icon = "place",
                             IsDeleted = false,
-                            ModuleId = 8,
+                            ModuleId = 4,
                             Name = "Municipios",
                             Url = "/dashboard/organizational/location/municipality"
                         },
@@ -273,7 +268,7 @@ namespace Entity.Migrations
                             Description = "Gestión de personas",
                             Icon = "person_pin_circle",
                             IsDeleted = false,
-                            ModuleId = 10,
+                            ModuleId = 5,
                             Name = "Personas",
                             Url = "/dashboard/seguridad/people"
                         },
@@ -283,7 +278,7 @@ namespace Entity.Migrations
                             Description = "Gestión de usuarios",
                             Icon = "groups_2",
                             IsDeleted = false,
-                            ModuleId = 10,
+                            ModuleId = 5,
                             Name = "Usuarios",
                             Url = "/dashboard/seguridad/users"
                         },
@@ -293,7 +288,7 @@ namespace Entity.Migrations
                             Description = "Gestión de roles",
                             Icon = "add_moderator",
                             IsDeleted = false,
-                            ModuleId = 10,
+                            ModuleId = 5,
                             Name = "Roles",
                             Url = "/dashboard/seguridad/roles"
                         },
@@ -303,7 +298,7 @@ namespace Entity.Migrations
                             Description = "Permisos por formulario",
                             Icon = "folder_managed",
                             IsDeleted = false,
-                            ModuleId = 10,
+                            ModuleId = 5,
                             Name = "Gestión de Permisos",
                             Url = "/dashboard/seguridad/permission-forms"
                         },
@@ -313,7 +308,7 @@ namespace Entity.Migrations
                             Description = "Catálogo de permisos",
                             Icon = "lock_open_circle",
                             IsDeleted = false,
-                            ModuleId = 10,
+                            ModuleId = 5,
                             Name = "Permisos",
                             Url = "/dashboard/seguridad/permissions"
                         },
@@ -323,7 +318,7 @@ namespace Entity.Migrations
                             Description = "Catálogo de formularios",
                             Icon = "lists",
                             IsDeleted = false,
-                            ModuleId = 10,
+                            ModuleId = 5,
                             Name = "Formularios",
                             Url = "/dashboard/seguridad/forms"
                         },
@@ -333,7 +328,7 @@ namespace Entity.Migrations
                             Description = "Catálogo de módulos",
                             Icon = "dashboard_2",
                             IsDeleted = false,
-                            ModuleId = 10,
+                            ModuleId = 5,
                             Name = "Módulos",
                             Url = "/dashboard/seguridad/modules"
                         });
@@ -350,6 +345,12 @@ namespace Entity.Migrations
                     b.Property<int?>("FormId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("ModuleId")
                         .HasColumnType("int");
 
@@ -358,6 +359,9 @@ namespace Entity.Migrations
 
                     b.Property<int?>("ParentMenuId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -381,6 +385,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
+                            IsDeleted = false,
                             ModuleId = 1,
                             OrderIndex = 1,
                             Type = "group"
@@ -388,6 +393,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 2,
+                            IsDeleted = false,
                             ModuleId = 2,
                             OrderIndex = 2,
                             Type = "group"
@@ -395,21 +401,24 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 3,
-                            ModuleId = 4,
+                            IsDeleted = false,
+                            ModuleId = 3,
                             OrderIndex = 3,
                             Type = "group"
                         },
                         new
                         {
                             Id = 4,
-                            ModuleId = 6,
+                            IsDeleted = false,
+                            ModuleId = 3,
                             OrderIndex = 4,
                             Type = "group"
                         },
                         new
                         {
                             Id = 5,
-                            ModuleId = 9,
+                            IsDeleted = false,
+                            ModuleId = 4,
                             OrderIndex = 5,
                             Type = "group"
                         },
@@ -417,6 +426,7 @@ namespace Entity.Migrations
                         {
                             Id = 6,
                             FormId = 1,
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 1,
                             Type = "item"
@@ -425,6 +435,7 @@ namespace Entity.Migrations
                         {
                             Id = 7,
                             FormId = 2,
+                            IsDeleted = false,
                             OrderIndex = 2,
                             ParentMenuId = 1,
                             Type = "item"
@@ -433,6 +444,7 @@ namespace Entity.Migrations
                         {
                             Id = 8,
                             FormId = 3,
+                            IsDeleted = false,
                             OrderIndex = 3,
                             ParentMenuId = 1,
                             Type = "item"
@@ -440,15 +452,18 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 9,
-                            ModuleId = 3,
+                            Icon = "account_tree",
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 2,
+                            Title = "Estructura Organizativa",
                             Type = "collapse"
                         },
                         new
                         {
                             Id = 10,
                             FormId = 4,
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 9,
                             Type = "item"
@@ -457,6 +472,7 @@ namespace Entity.Migrations
                         {
                             Id = 11,
                             FormId = 5,
+                            IsDeleted = false,
                             OrderIndex = 2,
                             ParentMenuId = 9,
                             Type = "item"
@@ -465,6 +481,7 @@ namespace Entity.Migrations
                         {
                             Id = 12,
                             FormId = 6,
+                            IsDeleted = false,
                             OrderIndex = 3,
                             ParentMenuId = 9,
                             Type = "item"
@@ -473,6 +490,7 @@ namespace Entity.Migrations
                         {
                             Id = 13,
                             FormId = 7,
+                            IsDeleted = false,
                             OrderIndex = 4,
                             ParentMenuId = 9,
                             Type = "item"
@@ -481,6 +499,7 @@ namespace Entity.Migrations
                         {
                             Id = 14,
                             FormId = 8,
+                            IsDeleted = false,
                             OrderIndex = 5,
                             ParentMenuId = 9,
                             Type = "item"
@@ -489,6 +508,7 @@ namespace Entity.Migrations
                         {
                             Id = 15,
                             FormId = 9,
+                            IsDeleted = false,
                             OrderIndex = 6,
                             ParentMenuId = 9,
                             Type = "item"
@@ -496,15 +516,18 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 16,
-                            ModuleId = 5,
+                            Icon = "event_available",
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 3,
+                            Title = "Eventos y Control de Acceso",
                             Type = "collapse"
                         },
                         new
                         {
                             Id = 17,
                             FormId = 10,
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 16,
                             Type = "item"
@@ -513,6 +536,7 @@ namespace Entity.Migrations
                         {
                             Id = 18,
                             FormId = 11,
+                            IsDeleted = false,
                             OrderIndex = 2,
                             ParentMenuId = 16,
                             Type = "item"
@@ -521,6 +545,7 @@ namespace Entity.Migrations
                         {
                             Id = 19,
                             FormId = 12,
+                            IsDeleted = false,
                             OrderIndex = 3,
                             ParentMenuId = 16,
                             Type = "item"
@@ -529,6 +554,7 @@ namespace Entity.Migrations
                         {
                             Id = 20,
                             FormId = 13,
+                            IsDeleted = false,
                             OrderIndex = 4,
                             ParentMenuId = 16,
                             Type = "item"
@@ -537,6 +563,7 @@ namespace Entity.Migrations
                         {
                             Id = 21,
                             FormId = 14,
+                            IsDeleted = false,
                             OrderIndex = 5,
                             ParentMenuId = 16,
                             Type = "item"
@@ -544,23 +571,28 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 22,
-                            ModuleId = 7,
+                            Icon = "settings_applications",
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 4,
+                            Title = "Configuración General",
                             Type = "collapse"
                         },
                         new
                         {
                             Id = 23,
-                            ModuleId = 8,
+                            Icon = "location_on",
+                            IsDeleted = false,
                             OrderIndex = 2,
                             ParentMenuId = 4,
+                            Title = "Ubicación",
                             Type = "collapse"
                         },
                         new
                         {
                             Id = 24,
                             FormId = 15,
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 22,
                             Type = "item"
@@ -569,6 +601,7 @@ namespace Entity.Migrations
                         {
                             Id = 25,
                             FormId = 16,
+                            IsDeleted = false,
                             OrderIndex = 2,
                             ParentMenuId = 22,
                             Type = "item"
@@ -577,6 +610,7 @@ namespace Entity.Migrations
                         {
                             Id = 26,
                             FormId = 17,
+                            IsDeleted = false,
                             OrderIndex = 3,
                             ParentMenuId = 22,
                             Type = "item"
@@ -585,6 +619,7 @@ namespace Entity.Migrations
                         {
                             Id = 27,
                             FormId = 18,
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 23,
                             Type = "item"
@@ -593,6 +628,7 @@ namespace Entity.Migrations
                         {
                             Id = 28,
                             FormId = 19,
+                            IsDeleted = false,
                             OrderIndex = 2,
                             ParentMenuId = 23,
                             Type = "item"
@@ -600,15 +636,18 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 29,
-                            ModuleId = 10,
+                            Icon = "admin_panel_settings",
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 5,
+                            Title = "Gestión de Seguridad",
                             Type = "collapse"
                         },
                         new
                         {
                             Id = 30,
                             FormId = 20,
+                            IsDeleted = false,
                             OrderIndex = 1,
                             ParentMenuId = 29,
                             Type = "item"
@@ -617,6 +656,7 @@ namespace Entity.Migrations
                         {
                             Id = 31,
                             FormId = 21,
+                            IsDeleted = false,
                             OrderIndex = 2,
                             ParentMenuId = 29,
                             Type = "item"
@@ -625,6 +665,7 @@ namespace Entity.Migrations
                         {
                             Id = 32,
                             FormId = 22,
+                            IsDeleted = false,
                             OrderIndex = 3,
                             ParentMenuId = 29,
                             Type = "item"
@@ -633,6 +674,7 @@ namespace Entity.Migrations
                         {
                             Id = 33,
                             FormId = 23,
+                            IsDeleted = false,
                             OrderIndex = 4,
                             ParentMenuId = 29,
                             Type = "item"
@@ -641,6 +683,7 @@ namespace Entity.Migrations
                         {
                             Id = 34,
                             FormId = 24,
+                            IsDeleted = false,
                             OrderIndex = 5,
                             ParentMenuId = 29,
                             Type = "item"
@@ -649,6 +692,7 @@ namespace Entity.Migrations
                         {
                             Id = 35,
                             FormId = 25,
+                            IsDeleted = false,
                             OrderIndex = 6,
                             ParentMenuId = 29,
                             Type = "item"
@@ -657,6 +701,7 @@ namespace Entity.Migrations
                         {
                             Id = 36,
                             FormId = 26,
+                            IsDeleted = false,
                             OrderIndex = 7,
                             ParentMenuId = 29,
                             Type = "item"
@@ -819,7 +864,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 4,
+                            Id = 3,
                             Description = "Dominio Operacional",
                             Icon = "event_available",
                             IsDeleted = false,
@@ -827,7 +872,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 6,
+                            Id = 4,
                             Description = "Parámetros y configuración",
                             Icon = "settings_applications",
                             IsDeleted = false,
@@ -835,51 +880,11 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 9,
+                            Id = 5,
                             Description = "Dominio de seguridad",
                             Icon = "admin_panel_settings",
                             IsDeleted = false,
                             Name = "Seguridad"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Sección de estructura organizativa",
-                            Icon = "account_tree",
-                            IsDeleted = false,
-                            Name = "Estructura Organizativa"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Description = "Eventos, accesos y asistencia",
-                            Icon = "event_available",
-                            IsDeleted = false,
-                            Name = "Eventos y Control de Acceso"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Description = "Estados, tipos y categorías",
-                            Icon = "settings_applications",
-                            IsDeleted = false,
-                            Name = "Configuración General"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Description = "Departamentos y municipios",
-                            Icon = "location_on",
-                            IsDeleted = false,
-                            Name = "Ubicación"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Description = "Usuarios, roles y permisos",
-                            Icon = "admin_panel_settings",
-                            IsDeleted = false,
-                            Name = "Gestión de Seguridad"
                         });
                 });
 
@@ -2631,6 +2636,9 @@ namespace Entity.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasAllPermissions")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -2651,28 +2659,48 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Rol para personal autorizado a validar y emitir carnets",
+                            Description = "Acceso total al sistema.",
+                            HasAllPermissions = true,
                             IsDeleted = false,
-                            Name = "Funcionario"
+                            Name = "SuperAdmin"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Rol con permisos limitados a visualización de carnet y asistencia",
+                            Description = "Administra carnets y eventos de su organización.",
+                            HasAllPermissions = false,
+                            IsDeleted = false,
+                            Name = "OrgAdmin"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Gestiona únicamente los eventos (creación, control y reportes).",
+                            HasAllPermissions = false,
+                            IsDeleted = false,
+                            Name = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Funcionario (docentes, coordinadores, etc.) con visualización de su propio carnet.",
+                            HasAllPermissions = false,
+                            IsDeleted = false,
+                            Name = "Administrativo"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Consulta su propio carnet y asistencia.",
+                            HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "Estudiante"
                         },
                         new
                         {
-                            Id = 3,
-                            Description = "Acceso total al sistema de carnetización digital",
-                            IsDeleted = false,
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Acceso restringido, solo visualización",
+                            Id = 6,
+                            Description = "Acceso mínimo/público.",
+                            HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "Usuario"
                         });
