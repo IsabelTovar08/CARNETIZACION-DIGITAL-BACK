@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Menu : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -82,9 +82,10 @@ namespace Entity.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,11 +200,12 @@ namespace Entity.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     ModuleId = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -239,6 +241,46 @@ namespace Entity.Migrations
                         principalTable: "TypeCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MenuStructures",
+                schema: "ModelSecurity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ParentMenuId = table.Column<int>(type: "int", nullable: true),
+                    ModuleId = table.Column<int>(type: "int", nullable: true),
+                    FormId = table.Column<int>(type: "int", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuStructures", x => x.Id);
+                    table.CheckConstraint("CK_MenuStructures_Type", "[Type] IN ('group','collapse','item')");
+                    table.ForeignKey(
+                        name: "FK_MenuStructures_Forms_FormId",
+                        column: x => x.FormId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "Forms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MenuStructures_MenuStructures_ParentMenuId",
+                        column: x => x.ParentMenuId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "MenuStructures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MenuStructures_Modules_ModuleId",
+                        column: x => x.ModuleId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "Modules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -900,12 +942,19 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
                 table: "Modules",
-                columns: new[] { "Id", "Description", "Name" },
+                columns: new[] { "Id", "Description", "Icon", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Gestión y emisión de carnets digitales", "Carnetización" },
-                    { 2, "Validación de identidad y correos", "Validación" },
-                    { 3, "Módulo para control de asistencia en eventos/clases", "Asistencia" }
+                    { 1, "Grupo principal de navegación", "home", "Menú Principal" },
+                    { 2, "Dominio Organizacional", "apartment", "Organizacional" },
+                    { 3, "Sección de estructura organizativa", "account_tree", "Estructura Organizativa" },
+                    { 4, "Dominio Operacional", "event_available", "Operacional" },
+                    { 5, "Eventos, accesos y asistencia", "event_available", "Eventos y Control de Acceso" },
+                    { 6, "Parámetros y configuración", "settings_applications", "Parámetros" },
+                    { 7, "Estados, tipos y categorías", "settings_applications", "Configuración General" },
+                    { 8, "Departamentos y municipios", "location_on", "Ubicación" },
+                    { 9, "Dominio de seguridad", "admin_panel_settings", "Seguridad" },
+                    { 10, "Usuarios, roles y permisos", "admin_panel_settings", "Gestión de Seguridad" }
                 });
 
             migrationBuilder.InsertData(
@@ -1052,13 +1101,35 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
                 table: "Forms",
-                columns: new[] { "Id", "Description", "ModuleId", "Name", "Url" },
+                columns: new[] { "Id", "Description", "Icon", "ModuleId", "Name", "Url" },
                 values: new object[,]
                 {
-                    { 1, "Formulario para generar un nuevo carnet digital", 1, "Crear Carnet", "/formulario" },
-                    { 2, "Formulario para validar el correo del usuario", 2, "Validar Correo", "/formulario" },
-                    { 3, "Formulario donde se visualiza el carnet", 1, "Ver Carnet", "/formulario" },
-                    { 4, "Formulario para registrar y consultar asistencia", 2, "Control de Asistencia", "/formulario" }
+                    { 1, "Panel principal", "home", 1, "Inicio", "/dashboard" },
+                    { 2, "Centro de ayuda y documentación", "help", 1, "Ayuda", "/dashboard/ayuda" },
+                    { 3, "Cerrar sesión del sistema", "logout", 1, "Cerrar Sesión", "/auth/logout" },
+                    { 4, "Vista general de la estructura", "dashboard_customize", 3, "Resumen", "/dashboard/organizational/structure" },
+                    { 5, "Administración de sucursales", "store", 3, "Sucursales", "/dashboard/organizational/structure/branch" },
+                    { 6, "Gestión de unidades organizativas", "schema", 3, "Unidades Organizativas", "/dashboard/organizational/structure/unit" },
+                    { 7, "Administración de divisiones internas", "account_tree", 3, "Divisiones Internas", "/dashboard/organizational/structure/internal-division" },
+                    { 8, "Perfiles de las personas en el sistema", "badge", 3, "Perfiles", "/dashboard/organizational/profile" },
+                    { 9, "Configuración de horarios/jornadas", "schedule", 3, "Jornadas", "/dashboard/organizational/structure/schedule" },
+                    { 10, "Gestión de eventos", "event", 5, "Eventos", "/dashboard/operational/events" },
+                    { 11, "Catálogo de tipos de evento", "category", 5, "Tipos de Evento", "/dashboard/operational/event-types" },
+                    { 12, "Segmentos de público objetivo", "group", 5, "Audiencias Objetivo", "/dashboard/operational/event-target-audience" },
+                    { 13, "Administración de puntos de acceso", "sensor_door", 5, "Puntos de Acceso", "/dashboard/operational/access-points" },
+                    { 14, "Registro y consulta de asistencias", "how_to_reg", 5, "Asistencias", "/dashboard/operational/attendance" },
+                    { 15, "Estados del sistema", "check_circle_unread", 7, "Estados", "/dashboard/parametros/status" },
+                    { 16, "Tipos y categorías del sistema", "category", 7, "Tipos y Categorías", "/dashboard/parametros/types-category" },
+                    { 17, "Tipos definidos por el usuario", "tune", 7, "Tipos Personalizados", "/dashboard/parametros/custom-types" },
+                    { 18, "Catálogo de departamentos", "flag", 8, "Departamentos", "/dashboard/organizational/location/department" },
+                    { 19, "Catálogo de municipios", "place", 8, "Municipios", "/dashboard/organizational/location/municipality" },
+                    { 20, "Gestión de personas", "person_pin_circle", 10, "Personas", "/dashboard/seguridad/people" },
+                    { 21, "Gestión de usuarios", "groups_2", 10, "Usuarios", "/dashboard/seguridad/users" },
+                    { 22, "Gestión de roles", "add_moderator", 10, "Roles", "/dashboard/seguridad/roles" },
+                    { 23, "Permisos por formulario", "folder_managed", 10, "Gestión de Permisos", "/dashboard/seguridad/permission-forms" },
+                    { 24, "Catálogo de permisos", "lock_open_circle", 10, "Permisos", "/dashboard/seguridad/permissions" },
+                    { 25, "Catálogo de formularios", "lists", 10, "Formularios", "/dashboard/seguridad/forms" },
+                    { 26, "Catálogo de módulos", "dashboard_2", 10, "Módulos", "/dashboard/seguridad/modules" }
                 });
 
             migrationBuilder.InsertData(
@@ -1072,6 +1143,19 @@ namespace Entity.Migrations
                     { 3, 4, null, "Encargado de contabilidad, auditoría y normativas contables.", "Departamento de Contaduría", 2 },
                     { 4, 4, null, "Área enfocada en teoría económica, micro y macroeconomía.", "Departamento de Economía", 2 },
                     { 5, 2, null, "Formación profesional en teoría musical, instrumentos y composición.", "Escuela de Música", 3 }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "MenuStructures",
+                columns: new[] { "Id", "FormId", "ModuleId", "OrderIndex", "ParentMenuId", "Type" },
+                values: new object[,]
+                {
+                    { 1, null, 1, 1, null, "group" },
+                    { 2, null, 2, 2, null, "group" },
+                    { 3, null, 4, 3, null, "group" },
+                    { 4, null, 6, 4, null, "group" },
+                    { 5, null, 9, 5, null, "group" }
                 });
 
             migrationBuilder.InsertData(
@@ -1106,6 +1190,22 @@ namespace Entity.Migrations
                     { 1, 1, false, 1, 6 },
                     { 2, 1, false, 2, 6 },
                     { 3, 2, false, 3, 6 }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "MenuStructures",
+                columns: new[] { "Id", "FormId", "ModuleId", "OrderIndex", "ParentMenuId", "Type" },
+                values: new object[,]
+                {
+                    { 6, 1, null, 1, 1, "item" },
+                    { 7, 2, null, 2, 1, "item" },
+                    { 8, 3, null, 3, 1, "item" },
+                    { 9, null, 3, 1, 2, "collapse" },
+                    { 16, null, 5, 1, 3, "collapse" },
+                    { 22, null, 7, 1, 4, "collapse" },
+                    { 23, null, 8, 2, 4, "collapse" },
+                    { 29, null, 10, 1, 5, "collapse" }
                 });
 
             migrationBuilder.InsertData(
@@ -1189,6 +1289,37 @@ namespace Entity.Migrations
                 table: "Cards",
                 columns: new[] { "Id", "CreationDate", "ExpirationDate", "IsDeleted", "PersonDivissionProfileId", "QRCode", "StatusId" },
                 values: new object[] { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, "QR12345", 1 });
+
+            migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "MenuStructures",
+                columns: new[] { "Id", "FormId", "ModuleId", "OrderIndex", "ParentMenuId", "Type" },
+                values: new object[,]
+                {
+                    { 10, 4, null, 1, 9, "item" },
+                    { 11, 5, null, 2, 9, "item" },
+                    { 12, 6, null, 3, 9, "item" },
+                    { 13, 7, null, 4, 9, "item" },
+                    { 14, 8, null, 5, 9, "item" },
+                    { 15, 9, null, 6, 9, "item" },
+                    { 17, 10, null, 1, 16, "item" },
+                    { 18, 11, null, 2, 16, "item" },
+                    { 19, 12, null, 3, 16, "item" },
+                    { 20, 13, null, 4, 16, "item" },
+                    { 21, 14, null, 5, 16, "item" },
+                    { 24, 15, null, 1, 22, "item" },
+                    { 25, 16, null, 2, 22, "item" },
+                    { 26, 17, null, 3, 22, "item" },
+                    { 27, 18, null, 1, 23, "item" },
+                    { 28, 19, null, 2, 23, "item" },
+                    { 30, 20, null, 1, 29, "item" },
+                    { 31, 21, null, 2, 29, "item" },
+                    { 32, 22, null, 3, 29, "item" },
+                    { 33, 23, null, 4, 29, "item" },
+                    { 34, 24, null, 5, 29, "item" },
+                    { 35, 25, null, 6, 29, "item" },
+                    { 36, 26, null, 7, 29, "item" }
+                });
 
             migrationBuilder.InsertData(
                 schema: "Notifications",
@@ -1362,6 +1493,13 @@ namespace Entity.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Forms_Url",
+                schema: "ModelSecurity",
+                table: "Forms",
+                column: "Url",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InternalDivisions_AreaCategoryId",
                 schema: "Organizational",
                 table: "InternalDivisions",
@@ -1385,6 +1523,24 @@ namespace Entity.Migrations
                 schema: "Organizational",
                 table: "InternalDivisions",
                 column: "OrganizationalUnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuStructures_FormId",
+                schema: "ModelSecurity",
+                table: "MenuStructures",
+                column: "FormId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuStructures_ModuleId",
+                schema: "ModelSecurity",
+                table: "MenuStructures",
+                column: "ModuleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuStructures_ParentMenuId_OrderIndex",
+                schema: "ModelSecurity",
+                table: "MenuStructures",
+                columns: new[] { "ParentMenuId", "OrderIndex" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Modules_Name",
@@ -1610,6 +1766,10 @@ namespace Entity.Migrations
             migrationBuilder.DropTable(
                 name: "EventTargetAudience",
                 schema: "Organizational");
+
+            migrationBuilder.DropTable(
+                name: "MenuStructures",
+                schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
                 name: "NotificationReceived",

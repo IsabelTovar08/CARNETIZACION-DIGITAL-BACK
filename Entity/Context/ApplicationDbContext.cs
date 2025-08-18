@@ -56,6 +56,9 @@ namespace Entity.Context
 
         public DbSet<Person> People { get; set; }
 
+        public DbSet<MenuStructure> MenuStructure { get; set; }
+
+
 
         //Organizational 
         public DbSet<Organization> Organizations { get; set; }

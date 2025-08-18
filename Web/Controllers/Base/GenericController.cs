@@ -1,9 +1,18 @@
 ﻿using Business.Interfases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Exeptions;
 
 namespace Web.Controllers.Base
 {
+    /// <summary>
+    /// Controlador genérico que implementa operaciones CRUD y manejo de estado lógico
+    /// para cualquier entidad que implemente la capa de negocio <see cref="IBaseBusiness{T, DRequest, D}"/>.
+    /// </summary>
+    /// <typeparam name="T">Entidad principal</typeparam>
+    /// <typeparam name="DRequest">DTO de entrada para crear o actualizar</typeparam>
+    /// <typeparam name="D">DTO de salida o de respuesta</typeparam>
+    
     [Route("api/[controller]")]
     [ApiController]
     [Produces("application/json")]
@@ -12,16 +21,22 @@ namespace Web.Controllers.Base
         protected readonly IBaseBusiness<T, DRequest, D> _business;
         protected readonly ILogger _logger;
 
-        public GenericController(IBaseBusiness<T,DRequest, D> business, ILogger logger)
+        /// <summary>
+        /// Constructor del controlador genérico.
+        /// </summary>
+        /// <param name="business">Instancia de la capa de negocio que gestiona la entidad.</param>
+        /// <param name="logger">Instancia para registro de logs.</param>
+        public GenericController(IBaseBusiness<T, DRequest, D> business, ILogger logger)
         {
             _business = business;
             _logger = logger;
         }
 
-        public GenericController()
-        {
-        }
-
+        /// <summary>
+        /// Obtiene todas las entidades.
+        /// </summary>
+        /// <returns>Lista de entidades.</returns>
+        //[Authorize]
         [HttpGet]
         public virtual async Task<IActionResult> GetAll()
         {
@@ -37,6 +52,12 @@ namespace Web.Controllers.Base
             }
         }
 
+        /// <summary>
+        /// Obtiene una entidad específica por su ID.
+        /// </summary>
+        /// <param name="id">Identificador de la entidad.</param>
+        /// <returns>Entidad encontrada o error si no existe.</returns>
+        //[Authorize]
         [HttpGet("{id}")]
         public virtual async Task<IActionResult> GetById(int id)
         {
@@ -62,11 +83,18 @@ namespace Web.Controllers.Base
             }
         }
 
+        /// <summary>
+        /// Crea una nueva entidad.
+        /// </summary>
+        /// <param name="dto">Datos de la entidad a crear.</param>
+        /// <returns>Entidad creada con su nuevo ID.</returns>
+        //[Authorize]
         [HttpPost]
         public virtual async Task<IActionResult> Create([FromBody] DRequest dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             try
             {
                 var created = await _business.Save(dto);
@@ -84,11 +112,18 @@ namespace Web.Controllers.Base
             }
         }
 
+        /// <summary>
+        /// Actualiza una entidad existente.
+        /// </summary>
+        /// <param name="dto">Datos actualizados de la entidad.</param>
+        /// <returns>Entidad actualizada.</returns>
+        //[Authorize]
         [HttpPut("update")]
         public virtual async Task<IActionResult> Update([FromBody] DRequest dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             try
             {
                 var updated = await _business.Update(dto);
@@ -111,6 +146,12 @@ namespace Web.Controllers.Base
             }
         }
 
+        /// <summary>
+        /// Elimina una entidad por su ID.
+        /// </summary>
+        /// <param name="id">Identificador de la entidad.</param>
+        /// <returns>Código 200 si se elimina correctamente.</returns>
+        //[Authorize]
         [HttpDelete("{id}")]
         public virtual async Task<IActionResult> Delete(int id)
         {
@@ -137,8 +178,11 @@ namespace Web.Controllers.Base
         }
 
         /// <summary>
-        /// Patch para alternar el estado lógico (activo/inactivo) de una entidad por su Id.
+        /// Alterna el estado lógico (activo/inactivo) de una entidad.
         /// </summary>
+        /// <param name="id">Identificador de la entidad.</param>
+        /// <returns>Mensaje de confirmación.</returns>
+        //[Authorize]
         [HttpPatch("{id}/toggle-active")]
         public async Task<IActionResult> ToggleActive(int id)
         {
@@ -150,7 +194,6 @@ namespace Web.Controllers.Base
             try
             {
                 var result = await _business.ToggleActiveAsync(id);
-
                 return Ok(new { Message = $"Estado lógico actualizado correctamente para Id {id}." });
             }
             catch (ValidationException vex)
@@ -170,5 +213,4 @@ namespace Web.Controllers.Base
             }
         }
     }
-
 }

@@ -80,6 +80,19 @@ namespace Utilities.Helper
              .ReverseMap();
             CreateMap<RolFormPermission, RolFormPermissionDtoRequest>().ReverseMap();
 
+            //Menu
+            CreateMap<MenuStructure, MenuStructureDto>()
+            .ForMember(d => d.Title, o => o.MapFrom(s =>
+                s.Form != null ? s.Form.Name :
+                s.Module != null ? s.Module.Name :
+                s.Type))
+            .ForMember(d => d.Url, o => o.MapFrom(s => s.Form != null ? s.Form.Url : null))
+            .ForMember(d => d.Icon, o => o.MapFrom(s => s.Form != null ? s.Form.Icon : null))
+            .ForMember(d => d.Classes, o => o.MapFrom(s => s.Type == "item" ? "nav-item" : null))
+            .ForMember(d => d.Children, o => o.MapFrom(s => s.Children.OrderBy(c => c.OrderIndex)));
+
+            CreateMap<MenuStructure, MenuStructureRequest>().ReverseMap();
+
 
             //Parameter
             CreateMap<Status, StatusDto>()

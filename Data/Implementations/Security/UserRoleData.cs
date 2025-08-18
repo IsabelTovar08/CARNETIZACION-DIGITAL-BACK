@@ -2,7 +2,6 @@
 using Data.Interfases.Security;
 using Entity.Context;
 using Entity.DTOs.ModelSecurity.Request;
-using Entity.Migrations;
 using Entity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

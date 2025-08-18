@@ -35,6 +35,9 @@ using Infrastructure.Notifications.Interfases;
 using Utilities.Notifications.Implementations;
 using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
+using Data.Implementations.Security;
+using Business.Implementations.Security;
+using Data.Interfaces.Security;
 
 namespace Web.Extensions
 {
@@ -77,6 +80,13 @@ namespace Web.Extensions
             //UserRol 
             services.AddScoped<IUserRoleData, UserRolesData>();
             services.AddScoped<IUserRoleBusiness, UserRoleBusiness>();
+
+
+            //Menu
+            services.AddScoped<IMenuStructureData, MenuStructureData>();
+            services.AddScoped<MenuStructureData>();
+
+            services.AddScoped<IMenuStructureBusiness, MenuStructureBusiness>();
 
 
             //CustomType 

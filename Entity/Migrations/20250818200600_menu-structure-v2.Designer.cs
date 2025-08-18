@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250811142104_Initial")]
-    partial class Initial
+    [Migration("20250818200600_menu-structure-v2")]
+    partial class menustructurev2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,12 @@ namespace Entity.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -46,11 +51,13 @@ namespace Entity.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.HasKey("Id");
 
@@ -59,44 +66,645 @@ namespace Entity.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
+                    b.HasIndex("Url")
+                        .IsUnique();
+
                     b.ToTable("Forms", "ModelSecurity");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            Description = "Formulario para generar un nuevo carnet digital",
+                            Description = "Panel principal",
+                            Icon = "home",
                             IsDeleted = false,
                             ModuleId = 1,
-                            Name = "Crear Carnet",
-                            Url = "/formulario"
+                            Name = "Inicio",
+                            Url = "/dashboard"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Formulario para validar el correo del usuario",
+                            Description = "Centro de ayuda y documentación",
+                            Icon = "help",
                             IsDeleted = false,
-                            ModuleId = 2,
-                            Name = "Validar Correo",
-                            Url = "/formulario"
+                            ModuleId = 1,
+                            Name = "Ayuda",
+                            Url = "/dashboard/ayuda"
                         },
                         new
                         {
                             Id = 3,
-                            Description = "Formulario donde se visualiza el carnet",
+                            Description = "Cerrar sesión del sistema",
+                            Icon = "logout",
                             IsDeleted = false,
                             ModuleId = 1,
-                            Name = "Ver Carnet",
-                            Url = "/formulario"
+                            Name = "Cerrar Sesión",
+                            Url = "/auth/logout"
                         },
                         new
                         {
                             Id = 4,
-                            Description = "Formulario para registrar y consultar asistencia",
+                            Description = "Vista general de la estructura",
+                            Icon = "dashboard_customize",
                             IsDeleted = false,
                             ModuleId = 2,
-                            Name = "Control de Asistencia",
-                            Url = "/formulario"
+                            Name = "Resumen",
+                            Url = "/dashboard/organizational/structure"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Administración de sucursales",
+                            Icon = "store",
+                            IsDeleted = false,
+                            ModuleId = 2,
+                            Name = "Sucursales",
+                            Url = "/dashboard/organizational/structure/branch"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Gestión de unidades organizativas",
+                            Icon = "schema",
+                            IsDeleted = false,
+                            ModuleId = 2,
+                            Name = "Unidades Organizativas",
+                            Url = "/dashboard/organizational/structure/unit"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Administración de divisiones internas",
+                            Icon = "account_tree",
+                            IsDeleted = false,
+                            ModuleId = 2,
+                            Name = "Divisiones Internas",
+                            Url = "/dashboard/organizational/structure/internal-division"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Perfiles de las personas en el sistema",
+                            Icon = "badge",
+                            IsDeleted = false,
+                            ModuleId = 2,
+                            Name = "Perfiles",
+                            Url = "/dashboard/organizational/profile"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Configuración de horarios/jornadas",
+                            Icon = "schedule",
+                            IsDeleted = false,
+                            ModuleId = 2,
+                            Name = "Jornadas",
+                            Url = "/dashboard/organizational/structure/schedule"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Gestión de eventos",
+                            Icon = "event",
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            Name = "Eventos",
+                            Url = "/dashboard/operational/events"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Description = "Catálogo de tipos de evento",
+                            Icon = "category",
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            Name = "Tipos de Evento",
+                            Url = "/dashboard/operational/event-types"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Description = "Segmentos de público objetivo",
+                            Icon = "group",
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            Name = "Audiencias Objetivo",
+                            Url = "/dashboard/operational/event-target-audience"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Description = "Administración de puntos de acceso",
+                            Icon = "sensor_door",
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            Name = "Puntos de Acceso",
+                            Url = "/dashboard/operational/access-points"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Description = "Registro y consulta de asistencias",
+                            Icon = "how_to_reg",
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            Name = "Asistencias",
+                            Url = "/dashboard/operational/attendance"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Description = "Estados del sistema",
+                            Icon = "check_circle_unread",
+                            IsDeleted = false,
+                            ModuleId = 4,
+                            Name = "Estados",
+                            Url = "/dashboard/parametros/status"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Description = "Tipos y categorías del sistema",
+                            Icon = "category",
+                            IsDeleted = false,
+                            ModuleId = 4,
+                            Name = "Tipos y Categorías",
+                            Url = "/dashboard/parametros/types-category"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Description = "Tipos definidos por el usuario",
+                            Icon = "tune",
+                            IsDeleted = false,
+                            ModuleId = 4,
+                            Name = "Tipos Personalizados",
+                            Url = "/dashboard/parametros/custom-types"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Description = "Catálogo de departamentos",
+                            Icon = "flag",
+                            IsDeleted = false,
+                            ModuleId = 4,
+                            Name = "Departamentos",
+                            Url = "/dashboard/organizational/location/department"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Description = "Catálogo de municipios",
+                            Icon = "place",
+                            IsDeleted = false,
+                            ModuleId = 4,
+                            Name = "Municipios",
+                            Url = "/dashboard/organizational/location/municipality"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Description = "Gestión de personas",
+                            Icon = "person_pin_circle",
+                            IsDeleted = false,
+                            ModuleId = 5,
+                            Name = "Personas",
+                            Url = "/dashboard/seguridad/people"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Description = "Gestión de usuarios",
+                            Icon = "groups_2",
+                            IsDeleted = false,
+                            ModuleId = 5,
+                            Name = "Usuarios",
+                            Url = "/dashboard/seguridad/users"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Description = "Gestión de roles",
+                            Icon = "add_moderator",
+                            IsDeleted = false,
+                            ModuleId = 5,
+                            Name = "Roles",
+                            Url = "/dashboard/seguridad/roles"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Description = "Permisos por formulario",
+                            Icon = "folder_managed",
+                            IsDeleted = false,
+                            ModuleId = 5,
+                            Name = "Gestión de Permisos",
+                            Url = "/dashboard/seguridad/permission-forms"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Description = "Catálogo de permisos",
+                            Icon = "lock_open_circle",
+                            IsDeleted = false,
+                            ModuleId = 5,
+                            Name = "Permisos",
+                            Url = "/dashboard/seguridad/permissions"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Description = "Catálogo de formularios",
+                            Icon = "lists",
+                            IsDeleted = false,
+                            ModuleId = 5,
+                            Name = "Formularios",
+                            Url = "/dashboard/seguridad/forms"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Description = "Catálogo de módulos",
+                            Icon = "dashboard_2",
+                            IsDeleted = false,
+                            ModuleId = 5,
+                            Name = "Módulos",
+                            Url = "/dashboard/seguridad/modules"
+                        });
+                });
+
+            modelBuilder.Entity("Entity.Models.ModelSecurity.MenuStructure", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("FormId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentMenuId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FormId");
+
+                    b.HasIndex("ModuleId");
+
+                    b.HasIndex("ParentMenuId", "OrderIndex");
+
+                    b.ToTable("MenuStructures", "ModelSecurity", t =>
+                        {
+                            t.HasCheckConstraint("CK_MenuStructures_Type", "[Type] IN ('group','collapse','item')");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsDeleted = false,
+                            ModuleId = 1,
+                            OrderIndex = 1,
+                            Type = "group"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsDeleted = false,
+                            ModuleId = 2,
+                            OrderIndex = 2,
+                            Type = "group"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            OrderIndex = 3,
+                            Type = "group"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            OrderIndex = 4,
+                            Type = "group"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsDeleted = false,
+                            ModuleId = 4,
+                            OrderIndex = 5,
+                            Type = "group"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            FormId = 1,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 1,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            FormId = 2,
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 1,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            FormId = 3,
+                            IsDeleted = false,
+                            OrderIndex = 3,
+                            ParentMenuId = 1,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Icon = "account_tree",
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 2,
+                            Title = "Estructura Organizativa",
+                            Type = "collapse"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            FormId = 4,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 9,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            FormId = 5,
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 9,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            FormId = 6,
+                            IsDeleted = false,
+                            OrderIndex = 3,
+                            ParentMenuId = 9,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            FormId = 7,
+                            IsDeleted = false,
+                            OrderIndex = 4,
+                            ParentMenuId = 9,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            FormId = 8,
+                            IsDeleted = false,
+                            OrderIndex = 5,
+                            ParentMenuId = 9,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            FormId = 9,
+                            IsDeleted = false,
+                            OrderIndex = 6,
+                            ParentMenuId = 9,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Icon = "event_available",
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 3,
+                            Title = "Eventos y Control de Acceso",
+                            Type = "collapse"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            FormId = 10,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 16,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            FormId = 11,
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 16,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            FormId = 12,
+                            IsDeleted = false,
+                            OrderIndex = 3,
+                            ParentMenuId = 16,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            FormId = 13,
+                            IsDeleted = false,
+                            OrderIndex = 4,
+                            ParentMenuId = 16,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            FormId = 14,
+                            IsDeleted = false,
+                            OrderIndex = 5,
+                            ParentMenuId = 16,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Icon = "settings_applications",
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 4,
+                            Title = "Configuración General",
+                            Type = "collapse"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Icon = "location_on",
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 4,
+                            Title = "Ubicación",
+                            Type = "collapse"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            FormId = 15,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 22,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            FormId = 16,
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 22,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            FormId = 17,
+                            IsDeleted = false,
+                            OrderIndex = 3,
+                            ParentMenuId = 22,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            FormId = 18,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 23,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            FormId = 19,
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 23,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Icon = "admin_panel_settings",
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 5,
+                            Title = "Gestión de Seguridad",
+                            Type = "collapse"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            FormId = 20,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 29,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            FormId = 21,
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 29,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            FormId = 22,
+                            IsDeleted = false,
+                            OrderIndex = 3,
+                            ParentMenuId = 29,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            FormId = 23,
+                            IsDeleted = false,
+                            OrderIndex = 4,
+                            ParentMenuId = 29,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            FormId = 24,
+                            IsDeleted = false,
+                            OrderIndex = 5,
+                            ParentMenuId = 29,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            FormId = 25,
+                            IsDeleted = false,
+                            OrderIndex = 6,
+                            ParentMenuId = 29,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            FormId = 26,
+                            IsDeleted = false,
+                            OrderIndex = 7,
+                            ParentMenuId = 29,
+                            Type = "item"
                         });
                 });
 
@@ -213,7 +821,12 @@ namespace Entity.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -222,7 +835,8 @@ namespace Entity.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
 
                     b.HasKey("Id");
 
@@ -235,23 +849,42 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Gestión y emisión de carnets digitales",
+                            Description = "Grupo principal de navegación",
+                            Icon = "home",
                             IsDeleted = false,
-                            Name = "Carnetización"
+                            Name = "Menú Principal"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Validación de identidad y correos",
+                            Description = "Dominio Organizacional",
+                            Icon = "apartment",
                             IsDeleted = false,
-                            Name = "Validación"
+                            Name = "Organizacional"
                         },
                         new
                         {
                             Id = 3,
-                            Description = "Módulo para control de asistencia en eventos/clases",
+                            Description = "Dominio Operacional",
+                            Icon = "event_available",
                             IsDeleted = false,
-                            Name = "Asistencia"
+                            Name = "Operacional"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Parámetros y configuración",
+                            Icon = "settings_applications",
+                            IsDeleted = false,
+                            Name = "Parámetros"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Dominio de seguridad",
+                            Icon = "admin_panel_settings",
+                            IsDeleted = false,
+                            Name = "Seguridad"
                         });
                 });
 
@@ -2003,6 +2636,9 @@ namespace Entity.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasAllPermissions")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -2023,28 +2659,48 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Rol para personal autorizado a validar y emitir carnets",
+                            Description = "Acceso total al sistema.",
+                            HasAllPermissions = true,
                             IsDeleted = false,
-                            Name = "Funcionario"
+                            Name = "SuperAdmin"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Rol con permisos limitados a visualización de carnet y asistencia",
+                            Description = "Administra carnets y eventos de su organización.",
+                            HasAllPermissions = false,
+                            IsDeleted = false,
+                            Name = "OrgAdmin"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Gestiona únicamente los eventos (creación, control y reportes).",
+                            HasAllPermissions = false,
+                            IsDeleted = false,
+                            Name = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Funcionario (docentes, coordinadores, etc.) con visualización de su propio carnet.",
+                            HasAllPermissions = false,
+                            IsDeleted = false,
+                            Name = "Administrativo"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Consulta su propio carnet y asistencia.",
+                            HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "Estudiante"
                         },
                         new
                         {
-                            Id = 3,
-                            Description = "Acceso total al sistema de carnetización digital",
-                            IsDeleted = false,
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Acceso restringido, solo visualización",
+                            Id = 6,
+                            Description = "Acceso mínimo/público.",
+                            HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "Usuario"
                         });
@@ -2198,6 +2854,30 @@ namespace Entity.Migrations
                         .IsRequired();
 
                     b.Navigation("Module");
+                });
+
+            modelBuilder.Entity("Entity.Models.ModelSecurity.MenuStructure", b =>
+                {
+                    b.HasOne("Entity.Models.Form", "Form")
+                        .WithMany()
+                        .HasForeignKey("FormId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Entity.Models.Module", "Module")
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Entity.Models.ModelSecurity.MenuStructure", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentMenuId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Form");
+
+                    b.Navigation("Module");
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Entity.Models.ModelSecurity.Person", b =>
@@ -2565,6 +3245,11 @@ namespace Entity.Migrations
             modelBuilder.Entity("Entity.Models.Form", b =>
                 {
                     b.Navigation("RolFormPermissions");
+                });
+
+            modelBuilder.Entity("Entity.Models.ModelSecurity.MenuStructure", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("Entity.Models.ModelSecurity.Person", b =>
