@@ -38,6 +38,10 @@ using Data.Implementations.Security;
 using Business.Implementations.Security;
 using Data.Interfaces.Security;
 using Data.Implementations.Organizational.Structure;
+using Data.Interfases.Operational;
+using Data.Implementations.Operational;
+using Business.Interfaces.Operational;
+using Business.Implementations.Operational;
 
 namespace Web.Extensions
 {
@@ -84,8 +88,6 @@ namespace Web.Extensions
 
             //Menu
             services.AddScoped<IMenuStructureData, MenuStructureData>();
-            services.AddScoped<MenuStructureData>();
-
             services.AddScoped<IMenuStructureBusiness, MenuStructureBusiness>();
 
 
@@ -104,18 +106,22 @@ namespace Web.Extensions
             services.AddScoped(typeof(IBaseBusiness<,,>), typeof(BaseBusiness<,,>));
 
 
-            services.AddScoped<IBaseBusiness<UserRoles, UserRoleDtoRequest, UserRolDto>, UserRoleBusiness>();
-            services.AddScoped<IBaseBusiness<User, UserDtoRequest, UserDTO>, UserBusiness>();
-            services.AddScoped<IBaseBusiness<Person, PersonDtoRequest , PersonDto>, PersonBusiness>();
-            services.AddScoped<IBaseBusiness<Form, FormDtoRequest, FormDto>, FormBusiness>();
-            services.AddScoped<IBaseBusiness<Module, ModuleDtoRequest, ModuleDto>, ModuleBusiness>();
-            services.AddScoped<IBaseBusiness<Permission, PermissionDtoRequest, PermissionDto>, PermissionBusiness>();
-            services.AddScoped<IBaseBusiness<RolFormPermission, RolFormPermissionDtoRequest, RolFormPermissionDto>, RolFormPermissionBusiness>();
-
-            services.AddScoped<IBaseBusiness<CustomType, CustomTypeRequest, CustomTypeDto>, CustomTypeBusiness>();
-
             // Service Api Colombia
             services.AddHttpClient<IColombiaApiService, ApiColombiaService>();
+
+
+            //OPERATIONAL
+            //Event 
+            services.AddScoped<IEventData, EventData>();
+            services.AddScoped<IEventBusiness, EventBusiness>();
+
+            //EventType 
+            services.AddScoped<IEventTypeData, EventTypeData>();
+            services.AddScoped<IEventTypeBusiness, EventTypeBusiness>();
+
+            //AccessPoint 
+            services.AddScoped<IAccessPointData, AccessPointData>();
+            services.AddScoped<IAccessPointBusiness, AccessPointBusiness>();
 
 
 

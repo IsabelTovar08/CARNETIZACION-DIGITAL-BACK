@@ -4,6 +4,7 @@ using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250818220730_Menu-Forms")]
+    partial class MenuForms
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -387,7 +390,7 @@ namespace Entity.Migrations
                         {
                             Id = 4,
                             IsDeleted = false,
-                            ModuleId = 4,
+                            ModuleId = 3,
                             OrderIndex = 4,
                             Type = "group"
                         },
@@ -395,7 +398,7 @@ namespace Entity.Migrations
                         {
                             Id = 5,
                             IsDeleted = false,
-                            ModuleId = 5,
+                            ModuleId = 4,
                             OrderIndex = 5,
                             Type = "group"
                         },

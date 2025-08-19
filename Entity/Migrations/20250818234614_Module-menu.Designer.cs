@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250818201746_Init-Menu")]
-    partial class InitMenu
+    [Migration("20250818234614_Module-menu")]
+    partial class Modulemenu
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,16 +95,6 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 3,
-                            Description = "Cerrar sesión del sistema",
-                            Icon = "logout",
-                            IsDeleted = false,
-                            ModuleId = 1,
-                            Name = "Cerrar Sesión",
-                            Url = "/auth/logout"
-                        },
-                        new
-                        {
-                            Id = 4,
                             Description = "Vista general de la estructura",
                             Icon = "dashboard_customize",
                             IsDeleted = false,
@@ -114,7 +104,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 5,
+                            Id = 4,
                             Description = "Administración de sucursales",
                             Icon = "store",
                             IsDeleted = false,
@@ -124,7 +114,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 6,
+                            Id = 5,
                             Description = "Gestión de unidades organizativas",
                             Icon = "schema",
                             IsDeleted = false,
@@ -134,7 +124,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 7,
+                            Id = 6,
                             Description = "Administración de divisiones internas",
                             Icon = "account_tree",
                             IsDeleted = false,
@@ -144,7 +134,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 8,
+                            Id = 7,
                             Description = "Perfiles de las personas en el sistema",
                             Icon = "badge",
                             IsDeleted = false,
@@ -154,7 +144,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 9,
+                            Id = 8,
                             Description = "Configuración de horarios/jornadas",
                             Icon = "schedule",
                             IsDeleted = false,
@@ -164,7 +154,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 10,
+                            Id = 9,
                             Description = "Gestión de eventos",
                             Icon = "event",
                             IsDeleted = false,
@@ -174,7 +164,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 11,
+                            Id = 10,
                             Description = "Catálogo de tipos de evento",
                             Icon = "category",
                             IsDeleted = false,
@@ -184,17 +174,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 12,
-                            Description = "Segmentos de público objetivo",
-                            Icon = "group",
-                            IsDeleted = false,
-                            ModuleId = 3,
-                            Name = "Audiencias Objetivo",
-                            Url = "/dashboard/operational/event-target-audience"
-                        },
-                        new
-                        {
-                            Id = 13,
+                            Id = 11,
                             Description = "Administración de puntos de acceso",
                             Icon = "sensor_door",
                             IsDeleted = false,
@@ -204,7 +184,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 14,
+                            Id = 12,
                             Description = "Registro y consulta de asistencias",
                             Icon = "how_to_reg",
                             IsDeleted = false,
@@ -214,7 +194,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 15,
+                            Id = 13,
                             Description = "Estados del sistema",
                             Icon = "check_circle_unread",
                             IsDeleted = false,
@@ -224,7 +204,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 16,
+                            Id = 14,
                             Description = "Tipos y categorías del sistema",
                             Icon = "category",
                             IsDeleted = false,
@@ -234,17 +214,17 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 17,
-                            Description = "Tipos definidos por el usuario",
-                            Icon = "tune",
+                            Id = 15,
+                            Description = "Configuración del Menú del sistema",
+                            Icon = "background_dot_small",
                             IsDeleted = false,
                             ModuleId = 4,
-                            Name = "Tipos Personalizados",
-                            Url = "/dashboard/parametros/custom-types"
+                            Name = "Menu",
+                            Url = "/dashboard/parametros/menu"
                         },
                         new
                         {
-                            Id = 18,
+                            Id = 16,
                             Description = "Catálogo de departamentos",
                             Icon = "flag",
                             IsDeleted = false,
@@ -254,7 +234,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 19,
+                            Id = 17,
                             Description = "Catálogo de municipios",
                             Icon = "place",
                             IsDeleted = false,
@@ -264,7 +244,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 20,
+                            Id = 18,
                             Description = "Gestión de personas",
                             Icon = "person_pin_circle",
                             IsDeleted = false,
@@ -274,7 +254,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 21,
+                            Id = 19,
                             Description = "Gestión de usuarios",
                             Icon = "groups_2",
                             IsDeleted = false,
@@ -284,7 +264,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 22,
+                            Id = 20,
                             Description = "Gestión de roles",
                             Icon = "add_moderator",
                             IsDeleted = false,
@@ -294,7 +274,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 23,
+                            Id = 21,
                             Description = "Permisos por formulario",
                             Icon = "folder_managed",
                             IsDeleted = false,
@@ -304,7 +284,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 24,
+                            Id = 22,
                             Description = "Catálogo de permisos",
                             Icon = "lock_open_circle",
                             IsDeleted = false,
@@ -314,7 +294,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 25,
+                            Id = 23,
                             Description = "Catálogo de formularios",
                             Icon = "lists",
                             IsDeleted = false,
@@ -324,7 +304,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 26,
+                            Id = 24,
                             Description = "Catálogo de módulos",
                             Icon = "dashboard_2",
                             IsDeleted = false,
@@ -376,7 +356,7 @@ namespace Entity.Migrations
 
                     b.HasIndex("ParentMenuId", "OrderIndex");
 
-                    b.ToTable("MenuStructures", "ModelSecurity", t =>
+                    b.ToTable("MenuStructures", "Parameter", t =>
                         {
                             t.HasCheckConstraint("CK_MenuStructures_Type", "[Type] IN ('group','collapse','item')");
                         });
@@ -410,7 +390,7 @@ namespace Entity.Migrations
                         {
                             Id = 4,
                             IsDeleted = false,
-                            ModuleId = 3,
+                            ModuleId = 4,
                             OrderIndex = 4,
                             Type = "group"
                         },
@@ -418,7 +398,7 @@ namespace Entity.Migrations
                         {
                             Id = 5,
                             IsDeleted = false,
-                            ModuleId = 4,
+                            ModuleId = 5,
                             OrderIndex = 5,
                             Type = "group"
                         },
@@ -443,15 +423,6 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 8,
-                            FormId = 3,
-                            IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 1,
-                            Type = "item"
-                        },
-                        new
-                        {
-                            Id = 9,
                             Icon = "account_tree",
                             IsDeleted = false,
                             OrderIndex = 1,
@@ -461,11 +432,20 @@ namespace Entity.Migrations
                         },
                         new
                         {
+                            Id = 9,
+                            FormId = 3,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 8,
+                            Type = "item"
+                        },
+                        new
+                        {
                             Id = 10,
                             FormId = 4,
                             IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 9,
+                            OrderIndex = 2,
+                            ParentMenuId = 8,
                             Type = "item"
                         },
                         new
@@ -473,8 +453,8 @@ namespace Entity.Migrations
                             Id = 11,
                             FormId = 5,
                             IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 9,
+                            OrderIndex = 3,
+                            ParentMenuId = 8,
                             Type = "item"
                         },
                         new
@@ -482,8 +462,8 @@ namespace Entity.Migrations
                             Id = 12,
                             FormId = 6,
                             IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 9,
+                            OrderIndex = 4,
+                            ParentMenuId = 8,
                             Type = "item"
                         },
                         new
@@ -491,8 +471,8 @@ namespace Entity.Migrations
                             Id = 13,
                             FormId = 7,
                             IsDeleted = false,
-                            OrderIndex = 4,
-                            ParentMenuId = 9,
+                            OrderIndex = 5,
+                            ParentMenuId = 8,
                             Type = "item"
                         },
                         new
@@ -500,22 +480,13 @@ namespace Entity.Migrations
                             Id = 14,
                             FormId = 8,
                             IsDeleted = false,
-                            OrderIndex = 5,
-                            ParentMenuId = 9,
+                            OrderIndex = 6,
+                            ParentMenuId = 8,
                             Type = "item"
                         },
                         new
                         {
                             Id = 15,
-                            FormId = 9,
-                            IsDeleted = false,
-                            OrderIndex = 6,
-                            ParentMenuId = 9,
-                            Type = "item"
-                        },
-                        new
-                        {
-                            Id = 16,
                             Icon = "event_available",
                             IsDeleted = false,
                             OrderIndex = 1,
@@ -525,11 +496,20 @@ namespace Entity.Migrations
                         },
                         new
                         {
+                            Id = 16,
+                            FormId = 9,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 15,
+                            Type = "item"
+                        },
+                        new
+                        {
                             Id = 17,
                             FormId = 10,
                             IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 16,
+                            OrderIndex = 2,
+                            ParentMenuId = 15,
                             Type = "item"
                         },
                         new
@@ -537,8 +517,8 @@ namespace Entity.Migrations
                             Id = 18,
                             FormId = 11,
                             IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 16,
+                            OrderIndex = 3,
+                            ParentMenuId = 15,
                             Type = "item"
                         },
                         new
@@ -546,31 +526,13 @@ namespace Entity.Migrations
                             Id = 19,
                             FormId = 12,
                             IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 16,
+                            OrderIndex = 4,
+                            ParentMenuId = 15,
                             Type = "item"
                         },
                         new
                         {
                             Id = 20,
-                            FormId = 13,
-                            IsDeleted = false,
-                            OrderIndex = 4,
-                            ParentMenuId = 16,
-                            Type = "item"
-                        },
-                        new
-                        {
-                            Id = 21,
-                            FormId = 14,
-                            IsDeleted = false,
-                            OrderIndex = 5,
-                            ParentMenuId = 16,
-                            Type = "item"
-                        },
-                        new
-                        {
-                            Id = 22,
                             Icon = "settings_applications",
                             IsDeleted = false,
                             OrderIndex = 1,
@@ -580,7 +542,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 23,
+                            Id = 21,
                             Icon = "location_on",
                             IsDeleted = false,
                             OrderIndex = 2,
@@ -590,11 +552,29 @@ namespace Entity.Migrations
                         },
                         new
                         {
+                            Id = 22,
+                            FormId = 13,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 20,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            FormId = 14,
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 20,
+                            Type = "item"
+                        },
+                        new
+                        {
                             Id = 24,
                             FormId = 15,
                             IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 22,
+                            OrderIndex = 3,
+                            ParentMenuId = 20,
                             Type = "item"
                         },
                         new
@@ -602,8 +582,8 @@ namespace Entity.Migrations
                             Id = 25,
                             FormId = 16,
                             IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 22,
+                            OrderIndex = 1,
+                            ParentMenuId = 21,
                             Type = "item"
                         },
                         new
@@ -611,31 +591,13 @@ namespace Entity.Migrations
                             Id = 26,
                             FormId = 17,
                             IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 22,
+                            OrderIndex = 2,
+                            ParentMenuId = 21,
                             Type = "item"
                         },
                         new
                         {
                             Id = 27,
-                            FormId = 18,
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 23,
-                            Type = "item"
-                        },
-                        new
-                        {
-                            Id = 28,
-                            FormId = 19,
-                            IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 23,
-                            Type = "item"
-                        },
-                        new
-                        {
-                            Id = 29,
                             Icon = "admin_panel_settings",
                             IsDeleted = false,
                             OrderIndex = 1,
@@ -645,11 +607,29 @@ namespace Entity.Migrations
                         },
                         new
                         {
+                            Id = 28,
+                            FormId = 18,
+                            IsDeleted = false,
+                            OrderIndex = 1,
+                            ParentMenuId = 27,
+                            Type = "item"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            FormId = 19,
+                            IsDeleted = false,
+                            OrderIndex = 2,
+                            ParentMenuId = 27,
+                            Type = "item"
+                        },
+                        new
+                        {
                             Id = 30,
                             FormId = 20,
                             IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 29,
+                            OrderIndex = 3,
+                            ParentMenuId = 27,
                             Type = "item"
                         },
                         new
@@ -657,8 +637,8 @@ namespace Entity.Migrations
                             Id = 31,
                             FormId = 21,
                             IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 29,
+                            OrderIndex = 4,
+                            ParentMenuId = 27,
                             Type = "item"
                         },
                         new
@@ -666,8 +646,8 @@ namespace Entity.Migrations
                             Id = 32,
                             FormId = 22,
                             IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 29,
+                            OrderIndex = 5,
+                            ParentMenuId = 27,
                             Type = "item"
                         },
                         new
@@ -675,8 +655,8 @@ namespace Entity.Migrations
                             Id = 33,
                             FormId = 23,
                             IsDeleted = false,
-                            OrderIndex = 4,
-                            ParentMenuId = 29,
+                            OrderIndex = 6,
+                            ParentMenuId = 27,
                             Type = "item"
                         },
                         new
@@ -684,26 +664,8 @@ namespace Entity.Migrations
                             Id = 34,
                             FormId = 24,
                             IsDeleted = false,
-                            OrderIndex = 5,
-                            ParentMenuId = 29,
-                            Type = "item"
-                        },
-                        new
-                        {
-                            Id = 35,
-                            FormId = 25,
-                            IsDeleted = false,
-                            OrderIndex = 6,
-                            ParentMenuId = 29,
-                            Type = "item"
-                        },
-                        new
-                        {
-                            Id = 36,
-                            FormId = 26,
-                            IsDeleted = false,
                             OrderIndex = 7,
-                            ParentMenuId = 29,
+                            ParentMenuId = 27,
                             Type = "item"
                         });
                 });

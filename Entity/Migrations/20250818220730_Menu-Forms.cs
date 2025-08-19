@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMenu : Migration
+    public partial class MenuForms : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -246,7 +246,7 @@ namespace Entity.Migrations
 
             migrationBuilder.CreateTable(
                 name: "MenuStructures",
-                schema: "ModelSecurity",
+                schema: "Parameter",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -274,7 +274,7 @@ namespace Entity.Migrations
                     table.ForeignKey(
                         name: "FK_MenuStructures_MenuStructures_ParentMenuId",
                         column: x => x.ParentMenuId,
-                        principalSchema: "ModelSecurity",
+                        principalSchema: "Parameter",
                         principalTable: "MenuStructures",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -1107,30 +1107,28 @@ namespace Entity.Migrations
                 {
                     { 1, "Panel principal", "home", 1, "Inicio", "/dashboard" },
                     { 2, "Centro de ayuda y documentación", "help", 1, "Ayuda", "/dashboard/ayuda" },
-                    { 3, "Cerrar sesión del sistema", "logout", 1, "Cerrar Sesión", "/auth/logout" },
-                    { 4, "Vista general de la estructura", "dashboard_customize", 2, "Resumen", "/dashboard/organizational/structure" },
-                    { 5, "Administración de sucursales", "store", 2, "Sucursales", "/dashboard/organizational/structure/branch" },
-                    { 6, "Gestión de unidades organizativas", "schema", 2, "Unidades Organizativas", "/dashboard/organizational/structure/unit" },
-                    { 7, "Administración de divisiones internas", "account_tree", 2, "Divisiones Internas", "/dashboard/organizational/structure/internal-division" },
-                    { 8, "Perfiles de las personas en el sistema", "badge", 2, "Perfiles", "/dashboard/organizational/profile" },
-                    { 9, "Configuración de horarios/jornadas", "schedule", 2, "Jornadas", "/dashboard/organizational/structure/schedule" },
-                    { 10, "Gestión de eventos", "event", 3, "Eventos", "/dashboard/operational/events" },
-                    { 11, "Catálogo de tipos de evento", "category", 3, "Tipos de Evento", "/dashboard/operational/event-types" },
-                    { 12, "Segmentos de público objetivo", "group", 3, "Audiencias Objetivo", "/dashboard/operational/event-target-audience" },
-                    { 13, "Administración de puntos de acceso", "sensor_door", 3, "Puntos de Acceso", "/dashboard/operational/access-points" },
-                    { 14, "Registro y consulta de asistencias", "how_to_reg", 3, "Asistencias", "/dashboard/operational/attendance" },
-                    { 15, "Estados del sistema", "check_circle_unread", 4, "Estados", "/dashboard/parametros/status" },
-                    { 16, "Tipos y categorías del sistema", "category", 4, "Tipos y Categorías", "/dashboard/parametros/types-category" },
-                    { 17, "Tipos definidos por el usuario", "tune", 4, "Tipos Personalizados", "/dashboard/parametros/custom-types" },
-                    { 18, "Catálogo de departamentos", "flag", 4, "Departamentos", "/dashboard/organizational/location/department" },
-                    { 19, "Catálogo de municipios", "place", 4, "Municipios", "/dashboard/organizational/location/municipality" },
-                    { 20, "Gestión de personas", "person_pin_circle", 5, "Personas", "/dashboard/seguridad/people" },
-                    { 21, "Gestión de usuarios", "groups_2", 5, "Usuarios", "/dashboard/seguridad/users" },
-                    { 22, "Gestión de roles", "add_moderator", 5, "Roles", "/dashboard/seguridad/roles" },
-                    { 23, "Permisos por formulario", "folder_managed", 5, "Gestión de Permisos", "/dashboard/seguridad/permission-forms" },
-                    { 24, "Catálogo de permisos", "lock_open_circle", 5, "Permisos", "/dashboard/seguridad/permissions" },
-                    { 25, "Catálogo de formularios", "lists", 5, "Formularios", "/dashboard/seguridad/forms" },
-                    { 26, "Catálogo de módulos", "dashboard_2", 5, "Módulos", "/dashboard/seguridad/modules" }
+                    { 3, "Vista general de la estructura", "dashboard_customize", 2, "Resumen", "/dashboard/organizational/structure" },
+                    { 4, "Administración de sucursales", "store", 2, "Sucursales", "/dashboard/organizational/structure/branch" },
+                    { 5, "Gestión de unidades organizativas", "schema", 2, "Unidades Organizativas", "/dashboard/organizational/structure/unit" },
+                    { 6, "Administración de divisiones internas", "account_tree", 2, "Divisiones Internas", "/dashboard/organizational/structure/internal-division" },
+                    { 7, "Perfiles de las personas en el sistema", "badge", 2, "Perfiles", "/dashboard/organizational/profile" },
+                    { 8, "Configuración de horarios/jornadas", "schedule", 2, "Jornadas", "/dashboard/organizational/structure/schedule" },
+                    { 9, "Gestión de eventos", "event", 3, "Eventos", "/dashboard/operational/events" },
+                    { 10, "Catálogo de tipos de evento", "category", 3, "Tipos de Evento", "/dashboard/operational/event-types" },
+                    { 11, "Administración de puntos de acceso", "sensor_door", 3, "Puntos de Acceso", "/dashboard/operational/access-points" },
+                    { 12, "Registro y consulta de asistencias", "how_to_reg", 3, "Asistencias", "/dashboard/operational/attendance" },
+                    { 13, "Estados del sistema", "check_circle_unread", 4, "Estados", "/dashboard/parametros/status" },
+                    { 14, "Tipos y categorías del sistema", "category", 4, "Tipos y Categorías", "/dashboard/parametros/types-category" },
+                    { 15, "Configuración del Menú del sistema", "background_dot_small", 4, "Menu", "/dashboard/parametros/menu" },
+                    { 16, "Catálogo de departamentos", "flag", 4, "Departamentos", "/dashboard/organizational/location/department" },
+                    { 17, "Catálogo de municipios", "place", 4, "Municipios", "/dashboard/organizational/location/municipality" },
+                    { 18, "Gestión de personas", "person_pin_circle", 5, "Personas", "/dashboard/seguridad/people" },
+                    { 19, "Gestión de usuarios", "groups_2", 5, "Usuarios", "/dashboard/seguridad/users" },
+                    { 20, "Gestión de roles", "add_moderator", 5, "Roles", "/dashboard/seguridad/roles" },
+                    { 21, "Permisos por formulario", "folder_managed", 5, "Gestión de Permisos", "/dashboard/seguridad/permission-forms" },
+                    { 22, "Catálogo de permisos", "lock_open_circle", 5, "Permisos", "/dashboard/seguridad/permissions" },
+                    { 23, "Catálogo de formularios", "lists", 5, "Formularios", "/dashboard/seguridad/forms" },
+                    { 24, "Catálogo de módulos", "dashboard_2", 5, "Módulos", "/dashboard/seguridad/modules" }
                 });
 
             migrationBuilder.InsertData(
@@ -1147,7 +1145,7 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.InsertData(
-                schema: "ModelSecurity",
+                schema: "Parameter",
                 table: "MenuStructures",
                 columns: new[] { "Id", "FormId", "Icon", "IsDeleted", "ModuleId", "OrderIndex", "ParentMenuId", "Title", "Type" },
                 values: new object[,]
@@ -1194,19 +1192,18 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.InsertData(
-                schema: "ModelSecurity",
+                schema: "Parameter",
                 table: "MenuStructures",
                 columns: new[] { "Id", "FormId", "Icon", "IsDeleted", "ModuleId", "OrderIndex", "ParentMenuId", "Title", "Type" },
                 values: new object[,]
                 {
                     { 6, 1, null, false, null, 1, 1, null, "item" },
                     { 7, 2, null, false, null, 2, 1, null, "item" },
-                    { 8, 3, null, false, null, 3, 1, null, "item" },
-                    { 9, null, "account_tree", false, null, 1, 2, "Estructura Organizativa", "collapse" },
-                    { 16, null, "event_available", false, null, 1, 3, "Eventos y Control de Acceso", "collapse" },
-                    { 22, null, "settings_applications", false, null, 1, 4, "Configuración General", "collapse" },
-                    { 23, null, "location_on", false, null, 2, 4, "Ubicación", "collapse" },
-                    { 29, null, "admin_panel_settings", false, null, 1, 5, "Gestión de Seguridad", "collapse" }
+                    { 8, null, "account_tree", false, null, 1, 2, "Estructura Organizativa", "collapse" },
+                    { 15, null, "event_available", false, null, 1, 3, "Eventos y Control de Acceso", "collapse" },
+                    { 20, null, "settings_applications", false, null, 1, 4, "Configuración General", "collapse" },
+                    { 21, null, "location_on", false, null, 2, 4, "Ubicación", "collapse" },
+                    { 27, null, "admin_panel_settings", false, null, 1, 5, "Gestión de Seguridad", "collapse" }
                 });
 
             migrationBuilder.InsertData(
@@ -1292,34 +1289,33 @@ namespace Entity.Migrations
                 values: new object[] { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, "QR12345", 1 });
 
             migrationBuilder.InsertData(
-                schema: "ModelSecurity",
+                schema: "Parameter",
                 table: "MenuStructures",
                 columns: new[] { "Id", "FormId", "Icon", "IsDeleted", "ModuleId", "OrderIndex", "ParentMenuId", "Title", "Type" },
                 values: new object[,]
                 {
-                    { 10, 4, null, false, null, 1, 9, null, "item" },
-                    { 11, 5, null, false, null, 2, 9, null, "item" },
-                    { 12, 6, null, false, null, 3, 9, null, "item" },
-                    { 13, 7, null, false, null, 4, 9, null, "item" },
-                    { 14, 8, null, false, null, 5, 9, null, "item" },
-                    { 15, 9, null, false, null, 6, 9, null, "item" },
-                    { 17, 10, null, false, null, 1, 16, null, "item" },
-                    { 18, 11, null, false, null, 2, 16, null, "item" },
-                    { 19, 12, null, false, null, 3, 16, null, "item" },
-                    { 20, 13, null, false, null, 4, 16, null, "item" },
-                    { 21, 14, null, false, null, 5, 16, null, "item" },
-                    { 24, 15, null, false, null, 1, 22, null, "item" },
-                    { 25, 16, null, false, null, 2, 22, null, "item" },
-                    { 26, 17, null, false, null, 3, 22, null, "item" },
-                    { 27, 18, null, false, null, 1, 23, null, "item" },
-                    { 28, 19, null, false, null, 2, 23, null, "item" },
-                    { 30, 20, null, false, null, 1, 29, null, "item" },
-                    { 31, 21, null, false, null, 2, 29, null, "item" },
-                    { 32, 22, null, false, null, 3, 29, null, "item" },
-                    { 33, 23, null, false, null, 4, 29, null, "item" },
-                    { 34, 24, null, false, null, 5, 29, null, "item" },
-                    { 35, 25, null, false, null, 6, 29, null, "item" },
-                    { 36, 26, null, false, null, 7, 29, null, "item" }
+                    { 9, 3, null, false, null, 1, 8, null, "item" },
+                    { 10, 4, null, false, null, 2, 8, null, "item" },
+                    { 11, 5, null, false, null, 3, 8, null, "item" },
+                    { 12, 6, null, false, null, 4, 8, null, "item" },
+                    { 13, 7, null, false, null, 5, 8, null, "item" },
+                    { 14, 8, null, false, null, 6, 8, null, "item" },
+                    { 16, 9, null, false, null, 1, 15, null, "item" },
+                    { 17, 10, null, false, null, 2, 15, null, "item" },
+                    { 18, 11, null, false, null, 3, 15, null, "item" },
+                    { 19, 12, null, false, null, 4, 15, null, "item" },
+                    { 22, 13, null, false, null, 1, 20, null, "item" },
+                    { 23, 14, null, false, null, 2, 20, null, "item" },
+                    { 24, 15, null, false, null, 3, 20, null, "item" },
+                    { 25, 16, null, false, null, 1, 21, null, "item" },
+                    { 26, 17, null, false, null, 2, 21, null, "item" },
+                    { 28, 18, null, false, null, 1, 27, null, "item" },
+                    { 29, 19, null, false, null, 2, 27, null, "item" },
+                    { 30, 20, null, false, null, 3, 27, null, "item" },
+                    { 31, 21, null, false, null, 4, 27, null, "item" },
+                    { 32, 22, null, false, null, 5, 27, null, "item" },
+                    { 33, 23, null, false, null, 6, 27, null, "item" },
+                    { 34, 24, null, false, null, 7, 27, null, "item" }
                 });
 
             migrationBuilder.InsertData(
@@ -1527,19 +1523,19 @@ namespace Entity.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuStructures_FormId",
-                schema: "ModelSecurity",
+                schema: "Parameter",
                 table: "MenuStructures",
                 column: "FormId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuStructures_ModuleId",
-                schema: "ModelSecurity",
+                schema: "Parameter",
                 table: "MenuStructures",
                 column: "ModuleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuStructures_ParentMenuId_OrderIndex",
-                schema: "ModelSecurity",
+                schema: "Parameter",
                 table: "MenuStructures",
                 columns: new[] { "ParentMenuId", "OrderIndex" });
 
@@ -1770,7 +1766,7 @@ namespace Entity.Migrations
 
             migrationBuilder.DropTable(
                 name: "MenuStructures",
-                schema: "ModelSecurity");
+                schema: "Parameter");
 
             migrationBuilder.DropTable(
                 name: "NotificationReceived",
