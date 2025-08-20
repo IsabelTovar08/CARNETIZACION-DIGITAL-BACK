@@ -141,13 +141,13 @@ namespace Business.Classes.Base
         /// <summary>
         /// Actualiza una nueva entidad.
         /// </summary>
-        public override async Task<bool> Update(DCreate entity)
+        public override async Task<D?> Update(DCreate entity)
         {
             try
             {
                 BaseModel newEntity = _mapper.Map<T>(entity);
                 await _data.UpdateAsync((T)newEntity);
-                return true;
+                return _mapper.Map<D>(newEntity);
             }
             catch (ValidationException)
             {

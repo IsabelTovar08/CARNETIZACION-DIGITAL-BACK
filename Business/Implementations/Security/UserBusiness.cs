@@ -22,10 +22,10 @@ namespace Business.Classes
         private readonly IUserRoleBusiness _userRolBusiness;
 
         // Constructor para inyectar dependencias
-        public UserBusiness(IUserData data, ILogger<User> logger, IMapper mapper, UserService userService, IUserRoleBusiness userRolBusiness)
-            : base(data, logger, mapper)
+        public UserBusiness(IUserData userData, ILogger<User> logger, IMapper mapper, UserService userService, IUserRoleBusiness userRolBusiness)
+            : base(userData, logger, mapper)
         {
-            _userData = data;
+            _userData = userData;
             _userService = userService;
             _userRolBusiness = userRolBusiness;
         }

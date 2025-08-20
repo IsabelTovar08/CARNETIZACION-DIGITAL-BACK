@@ -13,7 +13,7 @@ namespace Business.Interfases
 
         Task<D?> GetById(int id);
         Task<D> Save(DCreate entity);
-        Task<bool> Update(DCreate entity);
+        Task<D?> Update(DCreate entity);
         Task<bool> Delete(int id);
         Task<bool> ToggleActiveAsync(int id);
     }

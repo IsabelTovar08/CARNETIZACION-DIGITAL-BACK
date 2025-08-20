@@ -17,7 +17,7 @@ namespace Web.Controllers.ModelSecurity
     public class PersonController : GenericController<Person, PersonDtoRequest, PersonDto>
     {
         protected readonly IPersonBusiness _personBusiness;
-        public PersonController(IBaseBusiness<Person,PersonDtoRequest, PersonDto> business, ILogger<PersonController> logger, IPersonBusiness personBusiness) : base(business, logger)
+        public PersonController(IPersonBusiness business, ILogger<PersonController> logger, IPersonBusiness personBusiness) : base(business, logger)
         {
             _personBusiness = personBusiness;
         }
