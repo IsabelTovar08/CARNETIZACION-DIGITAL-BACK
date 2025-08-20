@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Entity.Context;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.EntityFrameworkCore;
@@ -86,9 +87,13 @@ namespace Business.Services.Auth
             public async Task<User?> ValidateUserAsync(string email, string password)
             {
                 var user = await _context.Set<User>()
-                    .FirstOrDefaultAsync(u => u.Email == email && u.IsDeleted == false);
+                    .Include(u => u.Person)
+                     .FirstOrDefaultAsync(u =>
+                            !u.IsDeleted &&
+                            (u.Person.Email == email || u.UserName == email)
+                        );
 
-                if (user == null)
+            if (user == null)
                     return null;
 
                 bool isValid = VerifyPassword(password, user.Password); 

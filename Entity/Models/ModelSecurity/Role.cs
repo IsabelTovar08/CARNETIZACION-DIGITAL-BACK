@@ -6,8 +6,9 @@ namespace Entity.Models
     {
         public string? Description { get; set; }
 
-
-        public List<UserRoles> UserRoles { get; set; }
+        // # Rol sin restricciones (SuperAdmin)
+        public bool HasAllPermissions { get; set; } = false;
+        public List<UserRoles> UserRoles { get; set; } = new();
         public List<RolFormPermission> RolFormPermissions { get; set; }
 
     }

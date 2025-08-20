@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entity.DTOs.Organizational.Response.Location;
+using Entity.Models.Organizational.Location;
+
+namespace Business.Interfases.Organizational.Location
+{
+    public interface ICityBusiness : IBaseBusiness<City, CityDto, CityDto>
+    {
+        Task<List<CityDto>> GetCityesByDepartmentsAsync(int deparmentId);
+    }
+}

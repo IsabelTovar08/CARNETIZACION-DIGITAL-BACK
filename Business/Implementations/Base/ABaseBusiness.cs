@@ -13,7 +13,7 @@ using Entity.Models.Base;
 
 namespace Business.Classes.Base
 {
-    public abstract class ABaseBusiness<T, DCreate, D> : IBaseBusiness<T, DCreate, D> where T : BaseModel where D : BaseDTO
+    public abstract class ABaseBusiness<T, DCreate, D> : IBaseBusiness<T, DCreate, D> where T : BaseModel where D : class
     {
         public abstract Task<D> Save(DCreate entity);
         public abstract Task<bool> Delete(int id);

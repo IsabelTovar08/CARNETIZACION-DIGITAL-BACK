@@ -2,6 +2,7 @@
 using Data.Classes.Base;
 using Entity;
 using Entity.Context;
+using Entity.DTOs.ModelSecurity.Request;
 using Entity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

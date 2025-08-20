@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Business.Classes.Base;
+using Business.Interfaces.Security;
 using Business.Services.Auth;
 using Data.Classes.Specifics;
 using Data.Interfases;
+using Data.Interfases.Security;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
@@ -13,17 +15,17 @@ using static Utilities.Helper.EncryptedPassword;
 
 namespace Business.Classes
 {
-    public class UserBusiness : BaseBusiness<User, UserDtoRequest, UserDTO>
+    public class UserBusiness : BaseBusiness<User, UserDtoRequest, UserDTO>, IUserBusiness
     {
         private readonly UserService _userService;
-        public readonly UserData _userData;
-        private readonly UserRoleBusiness _userRolBusiness;
+        public readonly IUserData _userData;
+        private readonly IUserRoleBusiness _userRolBusiness;
 
         // Constructor para inyectar dependencias
-        public UserBusiness(ICrudBase<User> data, ILogger<User> logger, IMapper mapper, UserData userData,UserService userService, UserRoleBusiness userRolBusiness)
+        public UserBusiness(IUserData data, ILogger<User> logger, IMapper mapper, UserService userService, IUserRoleBusiness userRolBusiness)
             : base(data, logger, mapper)
         {
-            _userData = userData;
+            _userData = data;
             _userService = userService;
             _userRolBusiness = userRolBusiness;
         }
@@ -39,8 +41,6 @@ namespace Business.Classes
             }
             if (string.IsNullOrWhiteSpace(userDTO.UserName))
                 errors.Add("El Nombre del Usuario es obligatorio.");
-            if (string.IsNullOrWhiteSpace(userDTO.Email))
-                errors.Add("El Email del Usuario es obligatorio.");
             if (string.IsNullOrWhiteSpace(userDTO.Password))
                 errors.Add("La contraseña del Usuario es obligatoria.");
 
@@ -60,12 +60,10 @@ namespace Business.Classes
             try
             {
                 Validate(userDTO);
-                await EnsureEmailIsUnique(userDTO.Email);
-
                 var user = _mapper.Map<User>(userDTO);
                 user.Password = EncryptPassword(userDTO.Password);
 
-                var created = await _data.SaveAsync(user);
+                var created = await _userData.SaveAsync(user);
                 _= SendWelcomeEmailAsync(user);
                 _= AsignarRol(created.Id);
                 return _mapper.Map<UserDTO>(created);
