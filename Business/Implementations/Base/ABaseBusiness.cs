@@ -20,7 +20,7 @@ namespace Business.Classes.Base
         public abstract Task<IEnumerable<D>> GetAll();
         public abstract Task<D?> GetById(int id);
         public abstract Task<bool> ToggleActiveAsync(int id);
-        public abstract Task<bool> Update(DCreate entity);
+        public abstract Task<D?> Update(DCreate entity);
 
     }
    

@@ -50,7 +50,6 @@ namespace Web.Extensions
         public static IServiceCollection AddProjectServices(this IServiceCollection services)
         {
             //User 
-            services.AddScoped<UserData>();
             services.AddScoped<IUserData, UserData>();
             services.AddScoped<IUserBusiness, UserBusiness>();
 

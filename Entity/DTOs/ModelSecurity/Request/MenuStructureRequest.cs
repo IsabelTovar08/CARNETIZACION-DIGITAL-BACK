@@ -13,6 +13,9 @@ namespace Entity.DTOs.ModelSecurity.Request
         public int? ParentMenuId { get; set; }
         public int? ModuleId { get; set; }
         public int? FormId { get; set; }
+        public string? Icon { get; set; }
+        public string Title { get; set; }
+
         public string Type { get; set; }
         public int OrderIndex { get; set; }
     }
