@@ -1,4 +1,5 @@
 ﻿using Business.Classes;
+using Business.Interfaces.Auth;
 using Business.Interfaces.Security;
 using Business.Services.Auth;
 using Business.Services.JWT;
@@ -15,32 +16,26 @@ namespace Web.Controllers.ModelSecurity
     public class AuthController : ControllerBase
     {
         private readonly JwtService _jwtService;
-        private readonly AuthService _authService;
-        private readonly IUserRoleBusiness _userRolBusiness;
-        private readonly IMenuStructureBusiness _menuBusiness;
+        private readonly IAuthService _authService;
 
-        public AuthController(JwtService jwtService, AuthService userBusiness, IUserRoleBusiness userRolBusiness, IMenuStructureBusiness menuBusiness)
+        public AuthController(JwtService jwtService, IAuthService userBusiness, IMenuStructureBusiness menuBusiness)
         {
             _jwtService = jwtService;
             _authService = userBusiness;
-            _userRolBusiness = userRolBusiness;
-            _menuBusiness = menuBusiness;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var user = await _authService.LoginAsync(request.Email, request.Password);
+            var user = await _authService.LoginAsync(request);
             if (user == null)
             {
                 return Unauthorized("Credenciales inválidas.");
             }
 
-            var roles = await _userRolBusiness.GetRolesByUserIdAsync(user.Id);
-            var token = _jwtService.GenerateToken(user.Id.ToString(), user.UserName, roles);
-            var menu = await _menuBusiness.GetMenuTreeForUserAsync(user.Id);
+            var token = _jwtService.GenerateToken(user.Id.ToString(), request.Email);
 
-            return Ok(new { token , menu});
+            return Ok(new { token });
         }
 
 
