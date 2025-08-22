@@ -706,6 +706,21 @@
             <End Role="InternalDivision" EntitySet="InternalDivisions" />
             <End Role="AreaCategory" EntitySet="AreaCategorys" />
           </AssociationSet>
+          <EntitySet Name="TypeCategories" EntityType="DbModel.TypeCategory" />
+          <EntitySet Name="CustomTypes" EntityType="DbModel.CustomType" />
+          <AssociationSet Name="CustomTypeTypeCategory" Association="DbModel.CustomTypeTypeCategory">
+            <End Role="CustomType" EntitySet="CustomTypes" />
+            <End Role="TypeCategory" EntitySet="TypeCategories" />
+          </AssociationSet>
+          <EntitySet Name="MenuStructures" EntityType="DbModel.MenuStructure" />
+          <AssociationSet Name="MenuStructureModule" Association="DbModel.MenuStructureModule">
+            <End Role="MenuStructure" EntitySet="MenuStructures" />
+            <End Role="Module" EntitySet="Models" />
+          </AssociationSet>
+          <AssociationSet Name="MenuStructureForm" Association="DbModel.MenuStructureForm">
+            <End Role="MenuStructure" EntitySet="MenuStructures" />
+            <End Role="Form" EntitySet="Forms" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Role">
           <Key>
@@ -765,6 +780,8 @@
           <NavigationProperty Name="FormModule" Relationship="DbModel.FormModuleForm" FromRole="Form" ToRole="FormModule" />
           <NavigationProperty Name="RoleFormPermissio" Relationship="DbModel.RoleFormPermissioForm" FromRole="Form" ToRole="RoleFormPermissio" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="MenuStructure" Relationship="DbModel.MenuStructureForm" FromRole="Form" ToRole="MenuStructure" />
+          <Property Name="MenuStructureId" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Module">
           <Key>
@@ -775,6 +792,8 @@
           <Property Name="Description" Type="String" Nullable="false" />
           <NavigationProperty Name="FormModule" Relationship="DbModel.FormModuleModule" FromRole="Module" ToRole="FormModule" />
           <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <NavigationProperty Name="MenuStructure" Relationship="DbModel.MenuStructureModule" FromRole="Module" ToRole="MenuStructure" />
+          <Property Name="MenuStructureId" Type="Int32" Nullable="false" />
         </EntityType>
         <Association Name="UserPerson">
           <End Type="DbModel.User" Role="User" Multiplicity="1" />
@@ -1176,6 +1195,64 @@
         <Association Name="InternalDivisionAreaCategory">
           <End Type="DbModel.InternalDivision" Role="InternalDivision" Multiplicity="*" />
           <End Type="DbModel.AreaCategory" Role="AreaCategory" Multiplicity="1" />
+        </Association>
+        <EntityType Name="TypeCategory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <NavigationProperty Name="CustomTypes" Relationship="DbModel.CustomTypeTypeCategory" FromRole="TypeCategory" ToRole="CustomType" />
+        </EntityType>
+        <EntityType Name="CustomType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" />
+          <NavigationProperty Name="TypeCategoryId" Relationship="DbModel.CustomTypeTypeCategory" FromRole="CustomType" ToRole="TypeCategory" />
+        </EntityType>
+        <Association Name="CustomTypeTypeCategory">
+          <End Type="DbModel.CustomType" Role="CustomType" Multiplicity="*" />
+          <End Type="DbModel.TypeCategory" Role="TypeCategory" Multiplicity="1" />
+        </Association>
+        <EntityType Name="MenuStructure">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ParentMenuId" Type="String" Nullable="false" />
+          <Property Name="Type" Type="String" Nullable="false" />
+          <Property Name="Title" Type="String" Nullable="false" />
+          <Property Name="Icon" Type="String" Nullable="false" />
+          <NavigationProperty Name="ModuleId" Relationship="DbModel.MenuStructureModule" FromRole="MenuStructure" ToRole="Module" />
+          <NavigationProperty Name="FormId" Relationship="DbModel.MenuStructureForm" FromRole="MenuStructure" ToRole="Form" />
+        </EntityType>
+        <Association Name="MenuStructureModule">
+          <End Type="DbModel.MenuStructure" Role="MenuStructure" Multiplicity="0..1" />
+          <End Type="DbModel.Module" Role="Module" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MenuStructure">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Module">
+              <PropertyRef Name="MenuStructureId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="MenuStructureForm">
+          <End Type="DbModel.MenuStructure" Role="MenuStructure" Multiplicity="0..1" />
+          <End Type="DbModel.Form" Role="Form" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MenuStructure">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Form">
+              <PropertyRef Name="MenuStructureId" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
       </Schema>
     </edmx:ConceptualModels>
