@@ -25,11 +25,14 @@ namespace Business.Classes
         private readonly IPersonData _personData;
         private readonly INotify _notificationSender;
         private readonly IUserBusiness _userBusiness;
-        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserBusiness userBusiness) : base(personData, logger, mapper)
+        private readonly IUserRoleBusiness _userRolBusiness;
+
+        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserBusiness userBusiness, IUserRoleBusiness userRolBusiness) : base(personData, logger, mapper)
         {
             _notificationSender = messageSender;
             _userBusiness = userBusiness;
             _personData = personData;
+            _userRolBusiness = userRolBusiness;
         }
 
         protected  void Validate(PersonDtoRequest person)
@@ -92,11 +95,12 @@ namespace Business.Classes
 
             var personEntity = _mapper.Map<Person>(personUser.Person);
             var userEntity = _mapper.Map<User>(personUser.User);
-
             var result = await _personData.SavePersonAndUser(personEntity, userEntity);
 
             // Enviar notificaciones una sola vez
             await SendWelcomeNotifications(result.Person.Phone);
+            _=await AsignarRol(userEntity.Id);
+
             _logger.LogInformation("Persona y usuario registrados correctamente. PersonaID: {Id}", result.Person.Id);
 
             return new PersonRegistrerDto
@@ -104,6 +108,29 @@ namespace Business.Classes
                 Person = _mapper.Map<PersonDto>(result.Person),
                 User = _mapper.Map<UserDTO>(result.User)
             };
+        }
+
+        private async Task<bool> AsignarRol(int userId)
+        {
+            try
+            {
+                Console.WriteLine("Inicar a asignar rol.");
+                UserRoleDtoRequest userRol = new UserRoleDtoRequest()
+                {
+                    Id = 0,
+                    UserId = userId,
+                    RolId = 6 // Rol estándar por defecto
+                };
+                await _userRolBusiness.Save(userRol);
+                Console.WriteLine("Rol asignado.");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al asignar el rol por defecto para el nuevo usuario.");
+                return false;
+            }
         }
 
         // Método privado reutilizable

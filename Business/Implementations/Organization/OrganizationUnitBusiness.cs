@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Business.Classes.Base;
 using Data.Interfases;
-using Data.Implementations.Organization;    
 using Entity.DTOs.Organizational.Request.Structure;
 using Entity.DTOs.Organizational.Response.Structure;
 using Entity.Models.Organizational.Structure;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
+using Data.Implementations.Organizational.Structure;
 
 namespace Business.Implementations.Organization
 {

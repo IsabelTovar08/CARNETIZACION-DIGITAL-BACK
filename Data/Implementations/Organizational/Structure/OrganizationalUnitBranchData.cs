@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Implementations.Organization
+namespace Data.Implementations.Organizational.Structure
 {
     public class OrganizationalUnitBranchData: BaseData<OrganizationalUnitBranch>
     {

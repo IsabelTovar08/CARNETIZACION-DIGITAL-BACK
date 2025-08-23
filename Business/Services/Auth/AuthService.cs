@@ -6,10 +6,11 @@ using Entity.Models;
 using Entity.DTOs.Auth;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Response;
+using Business.Interfaces.Auth;
 
 namespace Business.Services.Auth
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly UserService _userService;
 
@@ -24,10 +25,10 @@ namespace Business.Services.Auth
             _logger = logger;
         }
 
-        public async Task<User> LoginAsync(string email, string password)
+        public async Task<User> LoginAsync(LoginRequest loginRequest)
         {
             // Validar usuario
-            var user = await _userService.ValidateUserAsync(email, password);
+            var user = await _userService.ValidateUserAsync(loginRequest.Email, loginRequest.Password);
             if (user == null)
                 throw new ValidationException("Credenciales inválidas");
 

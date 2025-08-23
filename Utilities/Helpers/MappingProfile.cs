@@ -2,6 +2,7 @@
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Operational;
 using Entity.DTOs.Organizational.Request.Structure;
 using Entity.DTOs.Organizational.Response.Location;
 using Entity.DTOs.Organizational.Response.Structure;
@@ -10,6 +11,7 @@ using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
+using Entity.Models.Organizational;
 using Entity.Models.Organizational.Location;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
@@ -52,12 +54,8 @@ namespace Utilities.Helper
 
             //Mapeo de la entidad User
             CreateMap<User, UserDTO>()
-             .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src =>
-                 (src.Person != null ? (src.Person.FirstName + " " + src.Person.LastName) : string.Empty)))
-
-             .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src =>
-                 src.Person != null ? src.Person.Email : string.Empty))
-
+             .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
+             .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src => src.Person.Email))
              .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(R => R.Rol)))
              .ReverseMap();
 
@@ -79,6 +77,17 @@ namespace Utilities.Helper
              .ForMember(dest => dest.PermissionName, opt => opt.MapFrom(src => src.Permission.Name))
              .ReverseMap();
             CreateMap<RolFormPermission, RolFormPermissionDtoRequest>().ReverseMap();
+
+            //Menu
+            CreateMap<MenuStructure, MenuStructureDto>()
+            .ForMember(d => d.Title,
+                o => o.MapFrom(s => !string.IsNullOrWhiteSpace(s.Title) ? s.Title : (s.FormId != null ? s.Form.Name : s.Module.Name)))
+            .ForMember(d => d.Url, o => o.MapFrom(s => s.Form != null ? s.Form.Url : null))
+            .ForMember(d => d.Icon, o => o.MapFrom(s => !string.IsNullOrWhiteSpace(s.Icon) ? s.Icon : (s.FormId != null ? s.Form.Icon : s.Module.Icon)))
+            .ForMember(d => d.Classes, o => o.MapFrom(s => s.Type == "item" ? "nav-item" : null))
+            .ForMember(d => d.Children, o => o.MapFrom(s => s.Children.OrderBy(c => c.OrderIndex)));
+
+            CreateMap<MenuStructure, MenuStructureRequest>().ReverseMap();
 
 
             //Parameter
@@ -116,7 +125,22 @@ namespace Utilities.Helper
                 .ForMember(d => d.BranchesCount,
                     m => m.MapFrom(s => s.OrganizationalUnitBranches.Count));
             CreateMap<OrganizationalUnitDtoRequest, OrganizationalUnit>();
-              
+
+
+
+
+            //OPERATIONAL
+            //Event
+            CreateMap<Event, EventDto>()
+           .ReverseMap();
+
+            //EventType
+            CreateMap<EventType, EventTypeDto>()
+           .ReverseMap();
+
+            //AccessPoint
+            CreateMap<AccessPoint, AccessPointDto>()
+           .ReverseMap();
         }
     }
 }

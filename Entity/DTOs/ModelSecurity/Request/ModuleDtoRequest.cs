@@ -11,5 +11,7 @@ namespace Entity.DTOs.ModelSecurity.Request
     public class ModuleDtoRequest : GenericBaseDto
     {
         public string? Description { get; set; }
+        public string? Icon { get; set; }
+
     }
 }

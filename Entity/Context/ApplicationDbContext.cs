@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Entity.DataInit.Parameter;
 using Entity.Models;
+using Entity.Models.Auth;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
 using Entity.Models.Organizational;
@@ -53,8 +54,11 @@ namespace Entity.Context
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
         public DbSet<RolFormPermission> RoleFormPermissions { get; set; }
-
         public DbSet<Person> People { get; set; }
+
+
+        //Auth 
+        public DbSet<RefreshToken> RefreshToken { get; set; }
 
 
         //Organizational 
@@ -78,6 +82,8 @@ namespace Entity.Context
 
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationReceived> NotificationReceiveds { get; set; }
+        public DbSet<MenuStructure> MenuStructure { get; set; }
+
 
 
 
