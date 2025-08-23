@@ -3,9 +3,9 @@ using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Operational;
-using Entity.DTOs.Organizational.Request.Structure;
-using Entity.DTOs.Organizational.Response.Location;
-using Entity.DTOs.Organizational.Response.Structure;
+using Entity.DTOs.Organizational.Location.Response;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Response;
 using Entity.DTOs.Parameter;
 using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
@@ -133,7 +133,7 @@ namespace Utilities.Helper
 
             //Area Categoria
 
-            CreateMap<AreaCategory, AreaCategoryDto>()
+            CreateMap<AreaCategory, ScheduleDto>()
                 .ReverseMap();
 
             //Event
@@ -146,6 +146,10 @@ namespace Utilities.Helper
 
             //AccessPoint
             CreateMap<AccessPoint, AccessPointDto>()
+           .ReverseMap();
+
+            //Schedule
+            CreateMap<Schedule, ScheduleDto>()
            .ReverseMap();
         }
     }

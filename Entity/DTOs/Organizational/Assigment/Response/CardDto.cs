@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Organizational.Response.Assigment
+namespace Entity.DTOs.Organizational.Assigment.Response
 {
     public class CardDto : GenericBaseDto
     {

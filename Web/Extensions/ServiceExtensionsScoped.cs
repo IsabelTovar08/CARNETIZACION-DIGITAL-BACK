@@ -21,8 +21,6 @@ using Data.Interfases.Security;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
-using Entity.DTOs.Organizational.Request.Structure;
-using Entity.DTOs.Organizational.Response.Structure;
 using Entity.DTOs.Parameter;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
@@ -48,6 +46,8 @@ using Data.Interfases.Auth;
 using Business.Implementations.Organizational.Structure;
 using Business.Interfaces.Organizational.Structure;
 using Data.Interfases.Organizational.Structure;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Response;
 
 namespace Web.Extensions
 {
@@ -161,9 +161,13 @@ namespace Web.Extensions
             //Area categoria
             services.AddScoped<IAreaCategoryData, AreaCategoryData>();
             services.AddScoped<ICategoryAreaBusiness, AreaCategoryBusiness>();
-            
-            
-            
+
+            //Schedule
+            services.AddScoped<IScheduleData, ScheduleData>();
+            services.AddScoped<IScheduleBusiness, ScheduleBusiness>();
+
+
+
             return services;
         }
     }

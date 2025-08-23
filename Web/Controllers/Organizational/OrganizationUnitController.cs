@@ -1,7 +1,7 @@
 ﻿using Business.Implementations.Organizational.Structure;
 using Business.Interfases;
-using Entity.DTOs.Organizational.Request.Structure;
-using Entity.DTOs.Organizational.Response.Structure;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Response;
 using Entity.Models.Organizational.Structure;
 using Microsoft.AspNetCore.Mvc;
 using Web.Controllers.Base;

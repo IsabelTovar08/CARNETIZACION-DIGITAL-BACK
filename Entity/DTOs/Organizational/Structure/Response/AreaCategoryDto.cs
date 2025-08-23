@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Entity.Models.Base;
+using Entity.DTOs.Base;
 
-namespace Entity.DTOs.Organizational.Request.Structure
+namespace Entity.DTOs.Organizational.Structure.Response
 {
-    public class AreaCategoryDtoRequest : BaseModel
+    public class ScheduleDto : GenericBaseDto
     {
         public string? Description { get; set; }
     }

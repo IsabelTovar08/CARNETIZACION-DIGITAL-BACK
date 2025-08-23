@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Business.Interfases;
-using Entity.DTOs.Organizational.Request.Structure;
-using Entity.DTOs.Organizational.Response.Structure;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Response;
 using Entity.Models.Organizational.Structure;
 
 namespace Business.Interfaces.Organizational.Structure
 {
-    public interface ICategoryAreaBusiness : IBaseBusiness<AreaCategory,AreaCategoryDtoRequest,AreaCategoryDto>
+    public interface ICategoryAreaBusiness : IBaseBusiness<AreaCategory,AreaCategoryDtoRequest,ScheduleDto>
     {
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class MenuForms : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,9 @@ namespace Entity.Migrations
 
             migrationBuilder.EnsureSchema(
                 name: "Notifications");
+
+            migrationBuilder.EnsureSchema(
+                name: "Auth");
 
             migrationBuilder.CreateTable(
                 name: "Areas",
@@ -122,6 +125,26 @@ namespace Entity.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Profiles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshToken",
+                schema: "Auth",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TokenHash = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    JwtId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Expires = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Revoked = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReplacedByTokenHash = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshToken", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -1153,8 +1176,8 @@ namespace Entity.Migrations
                     { 1, null, null, false, 1, 1, null, null, "group" },
                     { 2, null, null, false, 2, 2, null, null, "group" },
                     { 3, null, null, false, 3, 3, null, null, "group" },
-                    { 4, null, null, false, 3, 4, null, null, "group" },
-                    { 5, null, null, false, 4, 5, null, null, "group" }
+                    { 4, null, null, false, 4, 4, null, null, "group" },
+                    { 5, null, null, false, 5, 5, null, null, "group" }
                 });
 
             migrationBuilder.InsertData(
@@ -1675,6 +1698,13 @@ namespace Entity.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_RefreshToken_TokenHash",
+                schema: "Auth",
+                table: "RefreshToken",
+                column: "TokenHash",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Roles_Name",
                 schema: "ModelSecurity",
                 table: "Roles",
@@ -1775,6 +1805,10 @@ namespace Entity.Migrations
             migrationBuilder.DropTable(
                 name: "OrganizationalUnitBranches",
                 schema: "Organizational");
+
+            migrationBuilder.DropTable(
+                name: "RefreshToken",
+                schema: "Auth");
 
             migrationBuilder.DropTable(
                 name: "RolFormPermissions",

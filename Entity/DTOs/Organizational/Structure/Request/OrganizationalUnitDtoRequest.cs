@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Organizational.Request.Structure
+namespace Entity.DTOs.Organizational.Structure.Request
 {
     public class OrganizationalUnitDtoRequest : GenericModel
     {
