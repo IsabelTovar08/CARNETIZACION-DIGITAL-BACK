@@ -130,6 +130,12 @@ namespace Utilities.Helper
 
 
             //OPERATIONAL
+
+            //Area Categoria
+
+            CreateMap<AreaCategory, AreaCategoryDto>()
+                .ReverseMap();
+
             //Event
             CreateMap<Event, EventDto>()
            .ReverseMap();

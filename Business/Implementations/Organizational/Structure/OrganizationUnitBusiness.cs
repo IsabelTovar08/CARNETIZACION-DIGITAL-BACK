@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
 using Data.Implementations.Organizational.Structure;
 
-namespace Business.Implementations.Organization
+namespace Business.Implementations.Organizational.Structure
 {
     public class OrganizationalUnitBusiness
         : BaseBusiness<OrganizationalUnit, OrganizationalUnitDtoRequest, OrganizationalUnitDto>

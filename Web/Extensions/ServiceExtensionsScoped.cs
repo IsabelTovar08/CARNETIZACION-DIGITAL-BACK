@@ -1,7 +1,6 @@
 ﻿using Business.Classes;
 using Business.Classes.Base;
 using Business.Implementations.Organizational.Location;
-using Business.Implementations.Organization;
 using Business.Implementations.Parameters;
 using Business.Interfaces.ApiColombia;
 using Business.Interfaces.Parameters;
@@ -42,6 +41,13 @@ using Data.Interfases.Operational;
 using Data.Implementations.Operational;
 using Business.Interfaces.Operational;
 using Business.Implementations.Operational;
+using Business.Interfaces.Auth;
+using Entity.Models.Auth;
+using Data.Implementations.Auth;
+using Data.Interfases.Auth;
+using Business.Implementations.Organizational.Structure;
+using Business.Interfaces.Organizational.Structure;
+using Data.Interfases.Organizational.Structure;
 
 namespace Web.Extensions
 {
@@ -127,8 +133,11 @@ namespace Web.Extensions
             //Auth 
             services.AddScoped<UserService>();
 
-            services.AddScoped<AuthService>();
-            services.AddScoped<JwtService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IJwtService, JwtService>();
+
+            services.AddScoped<IRefreshTokenData, RefreshTokenData>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 
 
@@ -148,6 +157,10 @@ namespace Web.Extensions
 
             //Buscar La cantidad de branch que tienen una sola organizacion
             services.AddScoped<OrganizationalUnitBranchData>();
+
+            //Area categoria
+            services.AddScoped<IAreaCategoryData, AreaCategoryData>();
+            services.AddScoped<ICategoryAreaBusiness, AreaCategoryBusiness>();
             
             
             
