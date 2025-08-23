@@ -7,7 +7,7 @@ namespace Web.FactoryDB.Classes
     {
         public void Configure(DbContextOptionsBuilder optionsBuilder, IConfiguration configuration)
         {
-            //optionsBuilder.UseNpgsql(configuration.GetConnectionString("PostgresConnection"));
+           optionsBuilder.UseNpgsql(configuration.GetConnectionString("PostgresConnection"));
         }
     }
 }

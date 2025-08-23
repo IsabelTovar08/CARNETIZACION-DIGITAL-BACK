@@ -1,5 +1,5 @@
 ﻿using Business.Interfases;
-using Entity.DTOs.Organizational.Response.Location;
+using Entity.DTOs.Organizational.Location.Response;
 using Entity.Models.Organizational.Location;
 using Web.Controllers.Base;
 

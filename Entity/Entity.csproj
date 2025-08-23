@@ -23,11 +23,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0-preview.3.efcore.9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Organizational\Request\Location\" />
-    <Folder Include="DTOs\Organizational\Request\Assigment\" />
+    <Folder Include="DTOs\Organizational\Assigment\Request\" />
+    <Folder Include="DTOs\Organizational\Location\Request\" />
   </ItemGroup>
 
 </Project>
