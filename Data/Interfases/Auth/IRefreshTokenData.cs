@@ -10,5 +10,7 @@ namespace Data.Interfases.Auth
     public interface IRefreshTokenData : ICrudBase<RefreshToken>
     {
         Task<RefreshToken?> GetByHashAsync(string tokenHash, CancellationToken ct = default);
+        Task SaveChangesAsync(CancellationToken ct = default);
+
     }
 }

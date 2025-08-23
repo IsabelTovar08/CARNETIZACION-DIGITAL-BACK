@@ -1,4 +1,4 @@
-﻿using Business.Implementations.Organization;
+﻿using Business.Implementations.Organizational.Structure;
 using Business.Interfases;
 using Entity.DTOs.Organizational.Request.Structure;
 using Entity.DTOs.Organizational.Response.Structure;

@@ -1,4 +1,5 @@
-﻿using Entity.DTOs.Auth;
+﻿using Business.Interfaces.Auth;
+using Entity.DTOs.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace Business.Services.JWT
 {
-    public class JwtService
+    public class JwtService : IJwtService
     {
         private readonly IConfiguration _config;
         public JwtService(IConfiguration config)
