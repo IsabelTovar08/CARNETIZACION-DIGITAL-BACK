@@ -52,6 +52,9 @@ using Data.Interfases.Organizational.Assignment;
 using Business.Interfaces.Organizational.Assignment;
 using Data.Implementations.Organizational.Assignment;
 using Business.Implementations.Organizational.Assignment;
+using Data.Interfases.Notifications;
+using Business.Interfaces.Notifications;
+using Data.Implementations.Notifications;
 
 namespace Web.Extensions
 {
@@ -151,6 +154,9 @@ namespace Web.Extensions
 
             services.AddScoped<INotify, Notifier>();
             services.AddScoped<IMessageSender, TelegramMessageSender>();
+
+            services.AddScoped<INotificationData, NotificationData>();
+            services.AddScoped<INotificationBusiness, NotificationsBusiness>();
 
             //InternaDivision
             services.AddScoped<InternalDivisionData>();

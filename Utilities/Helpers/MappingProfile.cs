@@ -2,7 +2,11 @@
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Notifications;
+using Entity.DTOs.Notifications.Request;
 using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Organizational.Location.Response;
@@ -13,6 +17,7 @@ using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
+using Entity.Models.Notifications;
 using Entity.Models.Organizational;
 using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
@@ -156,7 +161,7 @@ namespace Utilities.Helper
                     .ForMember(s => s.IsDeleted, o => o.Ignore())
                     .ForMember(s => s.Status, o => o.Ignore())
                     .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
-                    //.ForMember(s => s.AreaCategory, o => o.Ignore());
+            //.ForMember(s => s.AreaCategory, o => o.Ignore());
 
             //PersonDivisionProfile
             CreateMap<PersonDivisionProfile, PersonDivisionProfileDto>()
@@ -185,11 +190,11 @@ namespace Utilities.Helper
 
             CreateMap<Branch, BranchDtoRequest>()
                 .ReverseMap()
-                    .ForMember(s => s.Id, o => o.Ignore())       
-                    .ForMember(s => s.IsDeleted, o => o.Ignore()) 
-                    .ForMember(s => s.City, o => o.Ignore()) 
+                    .ForMember(s => s.Id, o => o.Ignore())
+                    .ForMember(s => s.IsDeleted, o => o.Ignore())
+                    .ForMember(s => s.City, o => o.Ignore())
                     .ForMember(s => s.Organization, o => o.Ignore());
-            
+
             //Structure
 
             //Area Categoria
@@ -231,8 +236,22 @@ namespace Utilities.Helper
             CreateMap<EventTargetAudience, EventTargetAudienceDto>()
                 .ReverseMap();
 
-            //CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
-            //    .ReverseMap();
+            CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
+                .ReverseMap(); 
+
+     
+
+            CreateMap<Schedule, ScheduleDtoRequest>()
+                .ReverseMap();
+
+            //Notifications
+
+            CreateMap<Notification, NotificationDto>()
+    .ReverseMap();
+
+            CreateMap<Notification, NotificationDtoRequest>()
+                .ReverseMap();
         }
     }
 }
+
