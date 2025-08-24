@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Notifications.Response
 {
-    public class NotificationDtoResponse : BaseDTO
+    public class NotificatioReceivedDtoResponse : BaseDTO
     {
         public int PersonId { get; set; }
         public int StatusId { get; set; }

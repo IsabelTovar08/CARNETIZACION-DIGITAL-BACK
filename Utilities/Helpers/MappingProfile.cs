@@ -4,6 +4,7 @@ using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Notifications;
 using Entity.DTOs.Notifications.Request;
+using Entity.DTOs.Notifications.Response;
 using Entity.DTOs.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
@@ -243,10 +244,19 @@ namespace Utilities.Helper
             //Notifications
 
             CreateMap<Notification, NotificationDto>()
-    .ReverseMap();
+                 .ReverseMap();
 
             CreateMap<Notification, NotificationDtoRequest>()
                 .ReverseMap();
+
+            //NotificationsReceived
+            CreateMap<NotificationReceived, NotificatioReceivedDtoResponse>()
+                .ReverseMap();
+
+            CreateMap<NotificationReceived, NotificationReceivedDtoRequest>()
+                .ReverseMap();
+
+
         }
     }
 }
