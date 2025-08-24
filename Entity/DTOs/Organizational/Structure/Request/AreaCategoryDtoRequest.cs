@@ -7,7 +7,7 @@ using Entity.Models.Base;
 
 namespace Entity.DTOs.Organizational.Structure.Request
 {
-    public class AreaCategoryDtoRequest : BaseModel
+    public class AreaCategoryDtoRequest : GenericModel
     {
         public string? Description { get; set; }
     }

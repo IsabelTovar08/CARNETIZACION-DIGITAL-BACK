@@ -9,16 +9,16 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Entity.DataInit.Organizational
 {
-    public class ProfileConfiguration : IEntityTypeConfiguration<Profile>
+    public class ProfileConfiguration : IEntityTypeConfiguration<Profiles>
     {
-        public void Configure(EntityTypeBuilder<Profile> builder)
+        public void Configure(EntityTypeBuilder<Profiles> builder)
         {
             builder.HasData(
-                new Profile { Id = 1, Name = "Estudiante", Description = "Perfil para estudiantes de la institución", IsDeleted = false },
-                new Profile { Id = 2, Name = "Profesor", Description = "Perfil para docentes o instructores", IsDeleted = false },
-                new Profile { Id = 3, Name = "Administrativo", Description = "Perfil para personal administrativo", IsDeleted = false },
-                new Profile { Id = 4, Name = "Pasante", Description = "Perfil para pasantes o practicantes", IsDeleted = false },
-                new Profile { Id = 5, Name = "Invitado", Description = "Perfil para usuarios externos o visitantes", IsDeleted = false }
+                new Profiles { Id = 1, Name = "Estudiante", Description = "Perfil para estudiantes de la institución", IsDeleted = false },
+                new Profiles { Id = 2, Name = "Profesor", Description = "Perfil para docentes o instructores", IsDeleted = false },
+                new Profiles { Id = 3, Name = "Administrativo", Description = "Perfil para personal administrativo", IsDeleted = false },
+                new Profiles { Id = 4, Name = "Pasante", Description = "Perfil para pasantes o practicantes", IsDeleted = false },
+                new Profiles { Id = 5, Name = "Invitado", Description = "Perfil para usuarios externos o visitantes", IsDeleted = false }
             );
 
             builder.HasIndex(p => p.Name).IsUnique();

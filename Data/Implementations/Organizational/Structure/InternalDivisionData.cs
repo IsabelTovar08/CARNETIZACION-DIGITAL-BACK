@@ -1,4 +1,5 @@
 ﻿using Data.Classes.Base;
+using Data.Interfases.Organizational.Structure;
 using Entity.Context;
 using Entity.Models.Organizational.Structure;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,9 @@ using System.Threading.Tasks;
 
 namespace Data.Implementations.Organizational.Structure
 {
-    public class InternalDivisionData : BaseData<InternalDivision>
+    public class InternalDivisionData : BaseData<InternalDivision>, IInternalDivisionData
     {
-        public InternalDivisionData(ApplicationDbContext context, ILogger<InternalDivision> logger)
-            :base(context, logger) { }
+        public InternalDivisionData(ApplicationDbContext context, ILogger<InternalDivision> logger) :base(context, logger) { }
         public Task<int> CountByOrgUnitAsync(int organizationUnitId)
         {
             return _context.Set<InternalDivision>()

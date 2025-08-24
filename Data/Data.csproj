@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <Folder Include="Implementations\Notifications\" />
-    <Folder Include="Implementations\Organizational\Assignment\" />
   </ItemGroup>
 
 </Project>

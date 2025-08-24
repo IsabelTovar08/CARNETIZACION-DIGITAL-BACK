@@ -10,7 +10,7 @@ using Entity.Models.Organizational.Structure;
 
 namespace Business.Interfaces.Organizational.Structure
 {
-    public interface ICategoryAreaBusiness : IBaseBusiness<AreaCategory,AreaCategoryDtoRequest,ScheduleDto>
+    public interface ICategoryAreaBusiness : IBaseBusiness<AreaCategory,AreaCategoryDtoRequest,AreaCategoryDto>
     {
     }
 }

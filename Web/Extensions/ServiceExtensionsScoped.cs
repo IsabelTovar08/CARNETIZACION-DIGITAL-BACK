@@ -48,6 +48,10 @@ using Business.Interfaces.Organizational.Structure;
 using Data.Interfases.Organizational.Structure;
 using Entity.DTOs.Organizational.Structure.Request;
 using Entity.DTOs.Organizational.Structure.Response;
+using Data.Interfases.Organizational.Assignment;
+using Business.Interfaces.Organizational.Assignment;
+using Data.Implementations.Organizational.Assignment;
+using Business.Implementations.Organizational.Assignment;
 
 namespace Web.Extensions
 {
@@ -158,6 +162,10 @@ namespace Web.Extensions
             //Buscar La cantidad de branch que tienen una sola organizacion
             services.AddScoped<OrganizationalUnitBranchData>();
 
+            //Card
+            services.AddScoped<ICardData, CardData>();
+            services.AddScoped<ICardBusiness, CardBusiness>();
+
             //Area categoria
             services.AddScoped<IAreaCategoryData, AreaCategoryData>();
             services.AddScoped<ICategoryAreaBusiness, AreaCategoryBusiness>();
@@ -166,7 +174,19 @@ namespace Web.Extensions
             services.AddScoped<IScheduleData, ScheduleData>();
             services.AddScoped<IScheduleBusiness, ScheduleBusiness>();
 
+            //PersonDivisionProfile
+            services.AddScoped<IPersonDivisionProfileData, PersonDivisionProfileData>();
+            services.AddScoped<IPersonDivisionProfileBusiness, PersonDivisionProfileBusiness>();
 
+            //Profiles
+            services.AddScoped<IProfileData, ProfileData>();
+            services.AddScoped<IProfileBusiness, ProfileBusiness>();
+
+            //Branch
+            services.AddScoped<IBranchData, BranchData>();
+            services.AddScoped<IBranchBusiness, BranchBusiness>();
+
+            
 
             return services;
         }

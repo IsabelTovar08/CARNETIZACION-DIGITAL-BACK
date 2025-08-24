@@ -75,7 +75,7 @@ namespace Entity.Context
 
 
 
-        public DbSet<Profile> Profiles { get; set; }
+        public DbSet<Profiles> Profiles { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<PersonDivisionProfile> PersonDivisionProfiles { get; set; }
 
