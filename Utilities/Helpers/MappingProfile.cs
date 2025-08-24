@@ -3,6 +3,8 @@ using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Organizational.Location.Response;
 using Entity.DTOs.Organizational.Structure.Request;
 using Entity.DTOs.Organizational.Structure.Response;
@@ -151,6 +153,13 @@ namespace Utilities.Helper
             //Schedule
             CreateMap<Schedule, ScheduleDto>()
            .ReverseMap();
+
+            // EventTargetAudience
+            CreateMap<EventTargetAudience, EventTargetAudienceDtoRequest>()
+                .ReverseMap();
+
+            CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
+                .ReverseMap();
         }
     }
 }

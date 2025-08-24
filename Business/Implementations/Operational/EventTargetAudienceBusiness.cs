@@ -3,10 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Business.Classes.Base;
+using Business.Interfaces.Operational;
+using Data.Interfases;
+using Data.Interfases.Operational;
+using Entity.DTOs.Operational;
+using Entity.Models.Organizational;
+using Microsoft.Extensions.Logging;
 
 namespace Business.Implementations.Operational
 {
-    class EventTargetAudienceBusiness
+    public class EventTargetAudienceBusiness
+        : BaseBusiness<EventTargetAudience, EventTargetAudienceDto, EventTargetAudienceDto>, IEventTargetAudienceBusiness
     {
+        public readonly IEventTargetAudienceData _data;
+
+        public EventTargetAudienceBusiness(IEventTargetAudienceData data, ILogger<EventTargetAudience> logger, IMapper mapper)
+            : base(data, logger, mapper)
+        {
+            _data = data;
+        }
     }
 }
