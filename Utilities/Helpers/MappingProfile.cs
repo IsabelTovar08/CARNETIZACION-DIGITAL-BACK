@@ -2,14 +2,13 @@
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Notifications;
+using Entity.DTOs.Notifications.Request;
 using Entity.DTOs.Operational;
-<<<<<<< HEAD
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
-=======
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Organizational.Assigment.Response;
->>>>>>> origin/feature/marcos/organization
 using Entity.DTOs.Organizational.Location.Response;
 using Entity.DTOs.Organizational.Structure.Request;
 using Entity.DTOs.Organizational.Structure.Response;
@@ -18,6 +17,7 @@ using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
+using Entity.Models.Notifications;
 using Entity.Models.Organizational;
 using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
@@ -161,7 +161,7 @@ namespace Utilities.Helper
                     .ForMember(s => s.IsDeleted, o => o.Ignore())
                     .ForMember(s => s.Status, o => o.Ignore())
                     .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
-                    //.ForMember(s => s.AreaCategory, o => o.Ignore());
+            //.ForMember(s => s.AreaCategory, o => o.Ignore());
 
             //PersonDivisionProfile
             CreateMap<PersonDivisionProfile, PersonDivisionProfileDto>()
@@ -190,11 +190,11 @@ namespace Utilities.Helper
 
             CreateMap<Branch, BranchDtoRequest>()
                 .ReverseMap()
-                    .ForMember(s => s.Id, o => o.Ignore())       
-                    .ForMember(s => s.IsDeleted, o => o.Ignore()) 
-                    .ForMember(s => s.City, o => o.Ignore()) 
+                    .ForMember(s => s.Id, o => o.Ignore())
+                    .ForMember(s => s.IsDeleted, o => o.Ignore())
+                    .ForMember(s => s.City, o => o.Ignore())
                     .ForMember(s => s.Organization, o => o.Ignore());
-            
+
             //Structure
 
             //Area Categoria
@@ -226,7 +226,6 @@ namespace Utilities.Helper
 
             //Schedule
             CreateMap<Schedule, ScheduleDto>()
-<<<<<<< HEAD
            .ReverseMap();
 
             // EventTargetAudience
@@ -234,15 +233,21 @@ namespace Utilities.Helper
                 .ReverseMap();
 
             CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
-                .ReverseMap();
-=======
-             .ForMember(d => d.OrganizationName,
-                 opt => opt.MapFrom(s => s.Organization != null ? s.Organization.Name : null));
+                .ReverseMap(); 
+
+     
 
             CreateMap<Schedule, ScheduleDtoRequest>()
                 .ReverseMap();
-            //
->>>>>>> origin/feature/marcos/organization
+
+            //Notifications
+
+            CreateMap<Notification, NotificationDto>()
+    .ReverseMap();
+
+            CreateMap<Notification, NotificationDtoRequest>()
+                .ReverseMap();
         }
     }
 }
+
