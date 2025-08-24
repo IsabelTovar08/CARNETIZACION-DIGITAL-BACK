@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Notifications.Request
 {
-    public class NotificationDtoRequest : GenericBaseDto
+    public class NotificationDtoRequest : GenericDto
     {
         [Required]
         public int PersonId { get; set; }

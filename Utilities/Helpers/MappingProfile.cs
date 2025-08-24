@@ -5,8 +5,6 @@ using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Notifications;
 using Entity.DTOs.Notifications.Request;
 using Entity.DTOs.Operational;
-using Entity.DTOs.Operational.Request;
-using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Organizational.Location.Response;
