@@ -8,7 +8,7 @@ using Entity.DTOs.Base;
 
 namespace Entity.DTOs.ModelSecurity.Request
 {
-    public class PermissionDtoRequest : GenericBaseDto
+    public class PermissionDtoRequest : GenericDto
     {
         public string? Description { get; set; }
     }

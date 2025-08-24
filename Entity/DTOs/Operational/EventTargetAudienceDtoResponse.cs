@@ -1,6 +1,6 @@
 ﻿using Entity.DTOs.Base;
 
-namespace Entity.DTOs.Operational.Response
+namespace Entity.DTOs.Operational
 {
     public class EventTargetAudienceDtoResponse : BaseDTO
     {

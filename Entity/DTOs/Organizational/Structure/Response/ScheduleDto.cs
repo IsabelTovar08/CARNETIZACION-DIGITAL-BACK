@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Structure.Response
 {
-    public class SheduleDto : GenericBaseDto
+    public class ScheduleDto : GenericDto
     {
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
 
         public int OrganizationId { get; set; }
         public string? OrganizationName { get; set; }

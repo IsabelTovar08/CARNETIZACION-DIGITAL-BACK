@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Structure.Response
 {
-    public class OrganizationalUnitDto : GenericBaseDto
+    public class OrganizationalUnitDto : GenericDto
     {
         public string? Description { get; set; }
         public int DivisionsCount { get; set; }

@@ -11,7 +11,7 @@ using Entity.Models.Organizational.Structure;
 
 namespace Entity.DTOs.Parameter.Response
 {
-    public class CustomTypeDto : GenericBaseDto
+    public class CustomTypeDto : GenericDto
     {
         public string? Description { get; set; }
         public int TypeCategoryId { get; set; }

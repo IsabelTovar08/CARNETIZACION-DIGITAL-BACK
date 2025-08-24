@@ -7,7 +7,7 @@ using Entity.DTOs.Base;
 
 namespace Entity.DTOs.Parameter.Request
 {
-    public class CustomTypeRequest : GenericBaseDto
+    public class CustomTypeRequest : GenericDto
     {
         public string? Description { get; set; }
         public int TypeCategoryId { get; set; }

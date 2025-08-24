@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Operational
 {
-    public class AttendanceDto : BaseModel
+    public class AttendanceDto : BaseDTO
     {
         public int PersonId { get; set; }
         public string PersonFullName { get; set; }

@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Operational.Request
+namespace Entity.DTOs.Operational
 {
-    public class EventTargetAudienceDtoRequest : GenericBaseDto
+    public class EventTargetAudienceDtoRequest : GenericDto
     {
         [Required]
         public int TypeId { get; set; }

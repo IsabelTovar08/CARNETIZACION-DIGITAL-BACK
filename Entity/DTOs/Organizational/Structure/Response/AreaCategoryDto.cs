@@ -7,7 +7,7 @@ using Entity.DTOs.Base;
 
 namespace Entity.DTOs.Organizational.Structure.Response
 {
-    public class ScheduleDto : GenericBaseDto
+    public class AreaCategoryDto : GenericDto
     {
         public string? Description { get; set; }
     }

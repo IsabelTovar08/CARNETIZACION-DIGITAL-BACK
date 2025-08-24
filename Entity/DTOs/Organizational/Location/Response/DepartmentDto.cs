@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Location.Response
 {
-    public class DepartmentDto : GenericBaseDto
+    public class DepartmentDto : GenericDto
     {
     }
 }

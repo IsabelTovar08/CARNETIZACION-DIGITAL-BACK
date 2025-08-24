@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Base
 {
-    public class GenericBaseDto : BaseDTO
+    public class GenericDto : BaseDTO
     {
         public string? Name { get; set; }
+
     }
 }

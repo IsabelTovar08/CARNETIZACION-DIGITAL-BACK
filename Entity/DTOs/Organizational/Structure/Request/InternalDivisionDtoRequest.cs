@@ -1,4 +1,5 @@
-﻿using Entity.Models.Base;
+﻿using Entity.DTOs.Base;
+using Entity.Models.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +8,10 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Structure.Request
 {
-    public class InternalDivicionDtoRequest : BaseModel
+    public class InternalDivisionDtoRequest : GenericDto
     {
         public string? Description { get; set; }
-
-        public int OrganizationalUnitId { get; set; }
         public string OrganizationalUnitName { get; set; }
-        public int AreaCategoryId { get; set; }
         public int AreaCategoryName { get; set; }
     }
 }

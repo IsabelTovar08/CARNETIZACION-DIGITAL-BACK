@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Operational
 {
-    public class AccessPointDto : GenericBaseDto
+    public class AccessPointDto : GenericDto
     {
         public string? Description { get; set; }
         public int TypeId { get; set; }

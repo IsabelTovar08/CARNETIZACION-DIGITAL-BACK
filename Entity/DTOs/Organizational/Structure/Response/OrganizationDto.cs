@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Structure.Response
 {
-    public  class OrganizationDto : GenericBaseDto
+    public  class OrganizationDto : GenericDto
     {
         public string? Description { get; set; }
         public string? Logo { get; set; }

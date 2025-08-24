@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entity.DTOs.Base;
 
 namespace Entity.DTOs.ModelSecurity.Response
 {
-    public class MenuStructureDto
+    public class MenuStructureDto : BaseDTO
     {
-        public int Id { get; set; }                  // Id interno
         public string Title { get; set; }            // Texto visible
         public string Type { get; set; }             // "group", "collapse", "item"
         public string? Classes { get; set; }         // Clases CSS

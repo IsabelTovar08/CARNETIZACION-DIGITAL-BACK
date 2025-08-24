@@ -8,7 +8,7 @@ using Entity.DTOs.Base;
 
 namespace Entity.DTOs.ModelSecurity.Request
 {
-    public class ModuleDtoRequest : GenericBaseDto
+    public class ModuleDtoRequest : GenericDto
     {
         public string? Description { get; set; }
         public string? Icon { get; set; }

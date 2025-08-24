@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Assigment.Response
 {
-    public class CardDto : GenericBaseDto
+    public class CardDto : GenericDto
     {
         public string QRCode { get; set; }
 
@@ -21,8 +21,8 @@ namespace Entity.DTOs.Organizational.Assigment.Response
         public int PersonId { get; set; }
         public string? PersonFullName { get; set; }
 
-        public int DivissionId { get; set; }
-        public string? DivissionName { get; set; }
+        public int DivisionId { get; set; }
+        public string? DivisionName { get; set; }
 
         public int ProfileId { get; set; }
         public string? ProfileName { get; set; }

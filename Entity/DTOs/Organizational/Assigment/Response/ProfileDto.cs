@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Assigment.Response
 {
-    public class ProfileDto : GenericBaseDto
+    public class ProfileDto : GenericDto
     {
         public string? Description { get; set; }
     }
