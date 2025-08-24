@@ -8,11 +8,11 @@ using Entity.Models.Organizational.Structure;
 using Web.Controllers.Base;
 using Web.Controllers.ModelSecurity;
 
-namespace Web.Controllers.Organizational
+namespace Web.Controllers.Organizational.Structure
 {
-    public class AreaCategoryController : GenericController<AreaCategory, AreaCategoryDtoRequest, ScheduleDto>
+    public class AreaCategoryController : GenericController<AreaCategory, AreaCategoryDtoRequest, AreaCategoryDto>
     {
-        public AreaCategoryController(IBaseBusiness<AreaCategory, AreaCategoryDtoRequest, ScheduleDto> business, ILogger<AreaCategoryController> logger) : base(business, logger)
+        public AreaCategoryController(IBaseBusiness<AreaCategory, AreaCategoryDtoRequest, AreaCategoryDto> business, ILogger<AreaCategoryController> logger) : base(business, logger)
         {
         }
     }

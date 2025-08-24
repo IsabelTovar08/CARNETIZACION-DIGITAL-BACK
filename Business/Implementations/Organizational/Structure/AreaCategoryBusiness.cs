@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Business.Implementations.Organizational.Structure
 {
-    public class AreaCategoryBusiness : BaseBusiness<AreaCategory, AreaCategoryDtoRequest, ScheduleDto>, ICategoryAreaBusiness
+    public class AreaCategoryBusiness : BaseBusiness<AreaCategory, AreaCategoryDtoRequest, AreaCategoryDto>, ICategoryAreaBusiness
     {
         public AreaCategoryBusiness(ICrudBase<AreaCategory> data, ILogger<AreaCategory> logger ,IMapper mapper) : base(data, logger, mapper) 
         { 

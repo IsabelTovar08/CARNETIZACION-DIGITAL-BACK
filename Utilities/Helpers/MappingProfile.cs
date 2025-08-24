@@ -3,8 +3,13 @@ using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Operational;
+<<<<<<< HEAD
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
+=======
+using Entity.DTOs.Organizational.Assigment.Request;
+using Entity.DTOs.Organizational.Assigment.Response;
+>>>>>>> origin/feature/marcos/organization
 using Entity.DTOs.Organizational.Location.Response;
 using Entity.DTOs.Organizational.Structure.Request;
 using Entity.DTOs.Organizational.Structure.Response;
@@ -14,6 +19,7 @@ using Entity.DTOs.Parameter.Response;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Organizational;
+using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
@@ -123,7 +129,6 @@ namespace Utilities.Helper
             CreateMap<OrganizationalUnit, OrganizationalUnitDto>()
                 .ForMember(d => d.DivisionsCount,
                     m => m.MapFrom(s => s.InternalDivissions.Count))
-                //Mapeo de la entidad de organization Unit con sus branchs
                 .ForMember(d => d.BranchesCount,
                     m => m.MapFrom(s => s.OrganizationalUnitBranches.Count));
             CreateMap<OrganizationalUnitDtoRequest, OrganizationalUnit>();
@@ -133,9 +138,71 @@ namespace Utilities.Helper
 
             //OPERATIONAL
 
+            //Assingment
+
+            //Cards
+            CreateMap<Card, CardDto>()
+            .ForMember(d => d.StatusName, o => o.MapFrom(s => s.Status.Name))
+            .ForMember(d => d.PersonId, o => o.MapFrom(s => s.PersonDivisionProfile.Person.Id))
+            .ForMember(d => d.PersonFullName, o => o.MapFrom(s => s.PersonDivisionProfile.Person.FirstName + " " + s.PersonDivisionProfile.Person.LastName))
+            .ForMember(d => d.DivisionId, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.Id))
+            .ForMember(d => d.DivisionName, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.Name))
+            .ForMember(d => d.ProfileId, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Id))
+            .ForMember(d => d.ProfileName, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Name))
+            //.ForMember(d => d.AreaCategoryName, o => o.MapFrom(s => s.AreaCategory.Name))
+            .ReverseMap()
+                .ForMember(s => s.Status, o => o.Ignore())
+                .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
+            //.ForMember(s => s.AreaCategory, o => o.Ignore());
+
+            CreateMap<Card, CardDtoRequest>()
+                .ReverseMap()
+                    .ForMember(s => s.Id, o => o.Ignore())
+                    .ForMember(s => s.IsDeleted, o => o.Ignore())
+                    .ForMember(s => s.Status, o => o.Ignore())
+                    .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
+                    //.ForMember(s => s.AreaCategory, o => o.Ignore());
+
+            //PersonDivisionProfile
+            CreateMap<PersonDivisionProfile, PersonDivisionProfileDto>()
+                .ForMember(dest => dest.PersonName, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
+                .ForMember(dest => dest.DivisionName, opt => opt.MapFrom(src => src.InternalDivision.Name))
+                .ForMember(dest => dest.ProfileName, opt => opt.MapFrom(src => src.Profile.Name))
+                .ReverseMap();
+
+            CreateMap<PersonDivisionProfile, PersonDivisionProfileDtoRequest>()
+                .ReverseMap();
+
+            //Profiles
+            CreateMap<Profiles, ProfileDto>()
+                .ReverseMap();
+
+            CreateMap<Profiles, ProfileDtoRequest>()
+                .ReverseMap();
+
+            // Branch
+            CreateMap<Branch, BranchDto>()
+                .ForMember(d => d.CityName, o => o.MapFrom(s => s.City.Name))
+                .ForMember(d => d.OrganizationName, o => o.MapFrom(s => s.Organization.Name))
+                .ReverseMap()
+                    .ForMember(s => s.City, o => o.Ignore())
+                    .ForMember(s => s.Organization, o => o.Ignore());
+
+            CreateMap<Branch, BranchDtoRequest>()
+                .ReverseMap()
+                    .ForMember(s => s.Id, o => o.Ignore())       
+                    .ForMember(s => s.IsDeleted, o => o.Ignore()) 
+                    .ForMember(s => s.City, o => o.Ignore()) 
+                    .ForMember(s => s.Organization, o => o.Ignore());
+            
+            //Structure
+
             //Area Categoria
 
-            CreateMap<AreaCategory, ScheduleDto>()
+            CreateMap<AreaCategory, AreaCategoryDto>()
+                .ReverseMap();
+
+            CreateMap<AreaCategory, AreaCategoryDtoRequest>()
                 .ReverseMap();
 
             //Event
@@ -146,12 +213,20 @@ namespace Utilities.Helper
             CreateMap<EventType, EventTypeDto>()
            .ReverseMap();
 
+            //InternalDivision
+            CreateMap<InternalDivision, InternalDivisionDto>()
+                .ReverseMap();
+
+            CreateMap<InternalDivision, InternalDivisionDtoRequest>()
+                .ReverseMap();
+
             //AccessPoint
             CreateMap<AccessPoint, AccessPointDto>()
            .ReverseMap();
 
             //Schedule
             CreateMap<Schedule, ScheduleDto>()
+<<<<<<< HEAD
            .ReverseMap();
 
             // EventTargetAudience
@@ -160,6 +235,14 @@ namespace Utilities.Helper
 
             CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
                 .ReverseMap();
+=======
+             .ForMember(d => d.OrganizationName,
+                 opt => opt.MapFrom(s => s.Organization != null ? s.Organization.Name : null));
+
+            CreateMap<Schedule, ScheduleDtoRequest>()
+                .ReverseMap();
+            //
+>>>>>>> origin/feature/marcos/organization
         }
     }
 }
