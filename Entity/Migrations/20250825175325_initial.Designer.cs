@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250823231410_initial")]
+    [Migration("20250825175325_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -1182,7 +1182,7 @@ namespace Entity.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profile", b =>
+            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profiles", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2716,6 +2716,11 @@ namespace Entity.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Active")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -2740,6 +2745,21 @@ namespace Entity.Migrations
                     b.Property<DateTime?>("ResetCodeExpiration")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("TempCodeAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("TempCodeConsumedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("TempCodeCreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("TempCodeExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("TempCodeHash")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(450)");
 
@@ -2758,35 +2778,43 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
+                            Active = true,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Password = "123",
                             PersonId = 1,
+                            TempCodeAttempts = 0,
                             UserName = "admin"
                         },
                         new
                         {
                             Id = 2,
+                            Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Password = "L4d!Estudiante2025",
-                            PersonId = 2
+                            PersonId = 2,
+                            TempCodeAttempts = 0
                         },
                         new
                         {
                             Id = 3,
+                            Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Password = "Adm!nCarnet2025",
-                            PersonId = 3
+                            PersonId = 3,
+                            TempCodeAttempts = 0
                         },
                         new
                         {
                             Id = 4,
+                            Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Password = "Usr!Carnet2025",
-                            PersonId = 4
+                            PersonId = 4,
+                            TempCodeAttempts = 0
                         });
                 });
 
@@ -2995,7 +3023,7 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Assignment.Profile", "Profile")
+                    b.HasOne("Entity.Models.Organizational.Assignment.Profiles", "Profile")
                         .WithMany("PersonDivisionProfiles")
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3286,7 +3314,7 @@ namespace Entity.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profile", b =>
+            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profiles", b =>
                 {
                     b.Navigation("PersonDivisionProfiles");
                 });

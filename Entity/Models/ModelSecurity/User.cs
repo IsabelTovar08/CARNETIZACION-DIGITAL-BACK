@@ -22,5 +22,20 @@ namespace Entity.Models
         // Para recuperación
         public string? ResetCode { get; set; }
         public DateTime? ResetCodeExpiration { get; set; }
+
+        //Verificar si el usuario si esta activo
+        public bool Active { get; set; } = false;
+
+        //Codigo temporal
+        
+        public string? TempCodeHash { get; set; }
+        // Fecha de creacion del codigo temporal
+        public DateTimeOffset? TempCodeCreatedAt { get; set; }
+        // Fecha de expiracion del codigo temporal
+        public DateTimeOffset? TempCodeExpiresAt { get; set; }
+        public int TempCodeAttempts { get; set; }
+
+        //Este atributo lo que hace es guardar la fecha de los intentos de codigo
+        public DateTimeOffset? TempCodeConsumedAt { get; set; }
     }
 }

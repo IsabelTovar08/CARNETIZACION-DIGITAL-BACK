@@ -60,6 +60,7 @@ namespace Utilities.Helper
              .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
              .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src => src.Person.Email))
              .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(R => R.Rol)))
+             .ForMember(dest => dest.Active, opt => opt.MapFrom(src => src.Active))
              .ReverseMap();
 
             CreateMap<User, UserDtoRequest>().ReverseMap();

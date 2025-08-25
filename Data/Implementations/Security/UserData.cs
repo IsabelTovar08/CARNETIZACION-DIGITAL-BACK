@@ -42,5 +42,16 @@ namespace Data.Classes.Specifics
                .FirstOrDefaultAsync(u => u.Person.Email == email);
         }
 
+        //Email (coincide con la validacion de las credenciales)
+        public async Task<User?> FindByLoginIdentifierAsync(string identifier)
+        {
+            return await _context.Set<User>().Where(u => !u.IsDeleted)
+                .Include(u => u.Person)
+                .Include(u => u.UserRoles).ThenInclude(ur => ur.Rol)
+                .FirstOrDefaultAsync(u =>
+                    u.UserName == identifier || (u.Person != null && u.Person.Email == identifier));
+        }
+
+       
     }
 }

@@ -143,6 +143,11 @@ namespace Web.Extensions
             services.AddScoped<IRefreshTokenData, RefreshTokenData>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
+            services.AddScoped<ICodeGenerator, FiveDigitCodeGenerator>();
+            services.AddScoped<ICodeHasher, HmacCodeHasher>();
+            services.AddSingleton<IClock, SystemClock>();
+            services.AddScoped<UserVerificationService, UserVerificationService>();
+
 
 
             //Notificatios 
