@@ -10,7 +10,8 @@ namespace Entity.DTOs.ModelSecurity.Response
         public string EmailPerson { get; set; }
         public string NamePerson { get; set; }
         public int PersonId { get; set; }
-         
+        public bool Active { get; set; }
+
         public List<RolDto>? Roles { get; set; }
 
     }

@@ -10,5 +10,8 @@ namespace Data.Interfases.Security
     public interface IUserData : ICrudBase<User>
     {
         Task<User?> FindByEmail(string email);
+
+        Task<User?> FindByLoginIdentifierAsync(string identifier); 
+        
     }
 }

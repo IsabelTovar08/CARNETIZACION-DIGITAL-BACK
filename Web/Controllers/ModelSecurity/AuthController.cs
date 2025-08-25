@@ -5,9 +5,12 @@ using Business.Services.Auth;
 using Business.Services.JWT;
 using Data.Implementations.Security;
 using Data.Interfaces.Security;
+using Entity.Context;
 using Entity.DTOs;
 using Entity.DTOs.Auth;
+using Entity.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web.Controllers.ModelSecurity
 {
@@ -27,6 +30,12 @@ namespace Web.Controllers.ModelSecurity
             _refreshTokenService = refreshTokenService;
         }
 
+        public class VerifyCodeRequest
+        {
+            public int UserId { get; set; }
+            public string Code { get; set; }
+        }
+
         /// <summary>
         /// Login:
         /// - Valida credenciales con IAuthService
@@ -41,10 +50,40 @@ namespace Web.Controllers.ModelSecurity
             if (user == null)
                 return Unauthorized("Credenciales inválidas.");
 
+            var verifier = HttpContext.RequestServices.GetRequiredService<UserVerificationService>();
+            await verifier.GenerateAndSendAsync(user);
+
+            
+
             // 2) Emitir Access Token + jti (IMPORTANTE: JwtService debe devolver también jti)
-            var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName);
+            //var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName);
 
             // 3) Registrar y devolver Refresh Token (rotación futura)
+            //var pair = await _refreshTokenService.IssueAsync(
+            //    userId: user.Id,
+            //    accessToken: accessToken,
+            //    jti: jti,
+            //    ip: HttpContext.Connection.RemoteIpAddress?.ToString()
+            //);
+
+            // Si quieres, podrías setear el refresh en cookie HttpOnly aquí
+            // Response.Cookies.Append("rt", pair.RefreshToken, new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = DateTimeOffset.UtcNow.AddDays(7) });
+            return Ok(new { requieresCode = true, isFirstLogin = !user.Active, userId = user.Id });
+            //return Ok(pair);
+        }
+
+        [HttpPost("verify-code")]
+        public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeRequest dto)
+        {
+            var verifier = HttpContext.RequestServices.GetRequiredService<IUserVerificationService>();
+            var ok = await verifier.VerifyAsync(dto.UserId, dto.Code);
+            if (!ok) return BadRequest(new { message = "Código inválido o expirado." });
+
+            // Emitir Access + Refresh (aquí sí)
+            var db = HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+            var user = await db.Set<User>().FirstAsync(u => u.Id == dto.UserId);
+
+            var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName!);
             var pair = await _refreshTokenService.IssueAsync(
                 userId: user.Id,
                 accessToken: accessToken,
@@ -52,12 +91,17 @@ namespace Web.Controllers.ModelSecurity
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
-            // Si quieres, podrías setear el refresh en cookie HttpOnly aquí
-            // Response.Cookies.Append("rt", pair.RefreshToken, new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = DateTimeOffset.UtcNow.AddDays(7) });
-
             return Ok(pair);
         }
 
+        [HttpPost("resend-code")]
+        public async Task<IActionResult> Resend([FromBody] VerifyCodeRequest dto)
+        {
+            var verifier = HttpContext.RequestServices.GetRequiredService<IUserVerificationService>();
+            var ok = await verifier.ResendAsync(dto.UserId);
+            if (!ok) return BadRequest(new { message = "Espera antes de reenviar otro código." });
+            return NoContent();
+        }
         /// <summary>
         /// Refresh:
         /// - Valida el refresh recibido

@@ -519,6 +519,12 @@ namespace Entity.Migrations
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ResetCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResetCodeExpiration = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    TempCodeHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TempCodeCreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    TempCodeExpiresAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    TempCodeAttempts = table.Column<int>(type: "int", nullable: false),
+                    TempCodeConsumedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -1183,13 +1189,18 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
                 table: "Users",
-                columns: new[] { "Id", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "UserName" },
+                columns: new[] { "Id", "Active", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "UserName" },
+                values: new object[] { 1, true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "123", 1, null, null, null, null, 0, null, null, null, null, "admin" });
+
+            migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "Users",
+                columns: new[] { "Id", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "UserName" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "123", 1, null, null, null, null, "admin" },
-                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "L4d!Estudiante2025", 2, null, null, null, null, null },
-                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Adm!nCarnet2025", 3, null, null, null, null, null },
-                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Usr!Carnet2025", 4, null, null, null, null, null }
+                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "L4d!Estudiante2025", 2, null, null, null, null, 0, null, null, null, null, null },
+                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Adm!nCarnet2025", 3, null, null, null, null, 0, null, null, null, null, null },
+                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Usr!Carnet2025", 4, null, null, null, null, 0, null, null, null, null, null }
                 });
 
             migrationBuilder.InsertData(
