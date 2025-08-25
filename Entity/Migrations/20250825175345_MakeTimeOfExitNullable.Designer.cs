@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250823231410_initial")]
-    partial class initial
+    [Migration("20250825175345_MakeTimeOfExitNullable")]
+    partial class MakeTimeOfExitNullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1182,7 +1182,7 @@ namespace Entity.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profile", b =>
+            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profiles", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2995,7 +2995,7 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Assignment.Profile", "Profile")
+                    b.HasOne("Entity.Models.Organizational.Assignment.Profiles", "Profile")
                         .WithMany("PersonDivisionProfiles")
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3286,7 +3286,7 @@ namespace Entity.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profile", b =>
+            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profiles", b =>
                 {
                     b.Navigation("PersonDivisionProfiles");
                 });
