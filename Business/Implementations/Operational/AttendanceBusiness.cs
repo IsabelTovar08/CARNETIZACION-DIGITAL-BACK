@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
+// dotnet add <TU_PROYECTO> package QRCoder
+using QRCoder;
+
 namespace Business.Implementations.Operational
 {
     public class AttendanceBusiness : BaseBusiness<Attendance, AttendanceDto, AttendanceDto>, IAttendanceBusiness
@@ -28,35 +31,75 @@ namespace Business.Implementations.Operational
         }
 
         /// <summary>
-        /// Registra asistencia a través de un QR escaneado.
+        /// Registra asistencia (desde escaneo móvil), normaliza campos y genera el QR.
         /// </summary>
         public async Task<AttendanceDto?> RegisterAttendanceAsync(AttendanceDto dto)
         {
             if (dto == null || dto.PersonId <= 0)
             {
-                _logger.LogWarning("Intento de registrar asistencia con datos inválidos.");
+                _logger.LogWarning("Intento de registrar asistencia con datos inválidos (DTO nulo o PersonId <= 0).");
                 return null;
             }
 
             try
             {
-                // Si no viene hora de entrada → poner hora actual
+                // Si no viene hora de entrada, usar ahora.
                 if (dto.TimeOfEntry == default)
                     dto.TimeOfEntry = DateTime.Now;
 
-                // Salida puede quedar en null (aún no salió)
+                // Normalizar: si llegan 0 (o negativos) convertir a NULL para no violar FK
+                if (dto.AccessPointOfEntry.HasValue && dto.AccessPointOfEntry.Value <= 0)
+                    dto.AccessPointOfEntry = null;
+
+                if (dto.AccessPointOfExit.HasValue && dto.AccessPointOfExit.Value <= 0)
+                    dto.AccessPointOfExit = null;
+
+                // Si envían TimeOfExit anterior a TimeOfEntry, lo descartamos (entrada primero)
+                if (dto.TimeOfExit.HasValue && dto.TimeOfExit.Value < dto.TimeOfEntry)
+                    dto.TimeOfExit = null;
+
+                // 🔹 Construir payload del QR (no sensible) y generarlo en Base64 (PNG)
+                string qrPayload = BuildQrPayload(dto);
+                dto.QrCode = GenerateQrCodeBase64(qrPayload);
+
+                // Guardar asistencia (usa Save del BaseBusiness)
                 var created = await Save(dto);
 
-                _logger.LogInformation(
-                    $" Asistencia registrada correctamente para la persona con ID {dto.PersonId}."
-                );
+                _logger.LogInformation($"Asistencia registrada correctamente para PersonId={dto.PersonId}, EventId={dto.EventId}.");
                 return created;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, " Error al registrar asistencia en RegisterAttendanceAsync.");
+                _logger.LogError(ex, "Error al registrar asistencia en RegisterAttendanceAsync.");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Payload estable y fácil de validar. Evita datos sensibles.
+        /// </summary>
+        private static string BuildQrPayload(AttendanceDto dto)
+        {
+            // Se prioriza punto de entrada; si no hay, se usa salida; si no hay ninguno -> "NA"
+            var apId = dto.AccessPointOfEntry ?? dto.AccessPointOfExit;
+            var apText = apId.HasValue ? apId.Value.ToString() : "NA";
+
+            // Puedes ajustar el formato si quieres JSON; esto es compacto y suficiente para validar.
+            return $"EVENT:{dto.EventId}|PERSON:{dto.PersonId}|ACCESS:{apText}|DATE:{DateTime.UtcNow:O}";
+        }
+
+        /// <summary>
+        /// Genera QR PNG (Base64). Baja el tamaño para que el Base64 no sea gigante.
+        /// </summary>
+        private static string GenerateQrCodeBase64(string content)
+        {
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrData = qrGenerator.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new PngByteQRCode(qrData);
+
+            // Tamaño moderado para acortar el Base64; ajusta si lo quieres más grande
+            byte[] qrBytes = qrCode.GetGraphic(10);
+            return Convert.ToBase64String(qrBytes);
         }
     }
 }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Entity.Models.Organizational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,7 +9,7 @@ namespace Entity.DataInit.Operational
     {
         public void Configure(EntityTypeBuilder<Attendance> builder)
         {
-            // Datos iniciales
+            // Datos iniciales (puedes dejar TimeOfExit con valor o null)
             builder.HasData(
                new Attendance
                {
@@ -35,11 +31,9 @@ namespace Entity.DataInit.Operational
                    AccessPointOfExit = 2,
                    IsDeleted = false
                }
-           );
+            );
 
-
-            // Relacionessi
-
+            // Relaciones
             builder.HasOne(a => a.AccessPointEntry)
                    .WithMany(ap => ap.AttendancesEntry)
                    .HasForeignKey(a => a.AccessPointOfEntry)
@@ -50,16 +44,18 @@ namespace Entity.DataInit.Operational
                    .HasForeignKey(a => a.AccessPointOfExit)
                    .OnDelete(DeleteBehavior.Restrict);
 
-
             // Propiedades
-            builder.Property(a => a.TimeOfEntry)
-                   .IsRequired();
+            builder.Property(a => a.TimeOfEntry).IsRequired();
 
-            builder.Property(a => a.TimeOfExit)
-                   .IsRequired();
+            // Tu modelo es DateTime? -> debe ser NO requerido en la BD
+            builder.Property(a => a.TimeOfExit).IsRequired(false);
 
-            builder.Property(x => x.IsDeleted)
-                   .HasDefaultValue(false);
+            //  QrCode 
+            builder.Property(a => a.QrCode)
+                   .HasColumnType("nvarchar(max)")
+                   .IsRequired(false);
+
+            builder.Property(x => x.IsDeleted).HasDefaultValue(false);
 
             // Esquema y tabla
             builder.ToTable("Attendances", schema: "Operational");
