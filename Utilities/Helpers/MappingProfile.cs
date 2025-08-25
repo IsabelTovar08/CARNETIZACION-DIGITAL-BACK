@@ -196,6 +196,12 @@ namespace Utilities.Helper
 
             //Structure
 
+            //Organization 
+            CreateMap<Organization, OrganizationDto>()
+                .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.OrganizaionType.Name))
+                .ReverseMap();
+            CreateMap<Organization, OrganizationDtoRequest>();
+
             //Area Categoria
 
             CreateMap<AreaCategory, AreaCategoryDto>()

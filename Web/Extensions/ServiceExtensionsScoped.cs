@@ -1,60 +1,61 @@
 ﻿using Business.Classes;
 using Business.Classes.Base;
+using Business.Implementations.Operational;
+using Business.Implementations.Organizational.Assignment;
 using Business.Implementations.Organizational.Location;
+using Business.Implementations.Organizational.Structure;
 using Business.Implementations.Parameters;
+using Business.Implementations.Security;
 using Business.Interfaces.ApiColombia;
+using Business.Interfaces.Auth;
+using Business.Interfaces.Notifications;
+using Business.Interfaces.Operational;
+using Business.Interfaces.Organizational.Assignment;
+using Business.Interfaces.Organizational.Structure;
 using Business.Interfaces.Parameters;
 using Business.Interfaces.Security;
 using Business.Interfases;
 using Business.Interfases.Organizational.Location;
 using Business.Services.ApiColombia;
 using Business.Services.Auth;
+using Business.Services.Excel;
 using Business.Services.JWT;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
+using Data.Implementations.Auth;
+using Data.Implementations.Notifications;
+using Data.Implementations.Operational;
+using Data.Implementations.Organizational.Assignment;
 using Data.Implementations.Organizational.Location;
+using Data.Implementations.Organizational.Structure;
 using Data.Implementations.Parameters;
+using Data.Implementations.Security;
+using Data.Interfaces.Security;
 using Data.Interfases;
+using Data.Interfases.Auth;
+using Data.Interfases.Notifications;
+using Data.Interfases.Operational;
+using Data.Interfases.Organizational.Assignment;
 using Data.Interfases.Organizational.Location;
+using Data.Interfases.Organizational.Structure;
 using Data.Interfases.Parameters;
 using Data.Interfases.Security;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Response;
 using Entity.DTOs.Parameter;
+using Entity.DTOs.Parameter.Request;
+using Entity.DTOs.Parameter.Response;
 using Entity.Models;
+using Entity.Models.Auth;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
 using Utilities.Notifications.Implementations;
-using Entity.DTOs.Parameter.Request;
-using Entity.DTOs.Parameter.Response;
-using Data.Implementations.Security;
-using Business.Implementations.Security;
-using Data.Interfaces.Security;
-using Data.Implementations.Organizational.Structure;
-using Data.Interfases.Operational;
-using Data.Implementations.Operational;
-using Business.Interfaces.Operational;
-using Business.Implementations.Operational;
-using Business.Interfaces.Auth;
-using Entity.Models.Auth;
-using Data.Implementations.Auth;
-using Data.Interfases.Auth;
-using Business.Implementations.Organizational.Structure;
-using Business.Interfaces.Organizational.Structure;
-using Data.Interfases.Organizational.Structure;
-using Entity.DTOs.Organizational.Structure.Request;
-using Entity.DTOs.Organizational.Structure.Response;
-using Data.Interfases.Organizational.Assignment;
-using Business.Interfaces.Organizational.Assignment;
-using Data.Implementations.Organizational.Assignment;
-using Business.Implementations.Organizational.Assignment;
-using Data.Interfases.Notifications;
-using Business.Interfaces.Notifications;
-using Data.Implementations.Notifications;
 
 namespace Web.Extensions
 {
@@ -164,6 +165,9 @@ namespace Web.Extensions
             services.AddScoped<IBaseBusiness<OrganizationalUnit, OrganizationalUnitDtoRequest, OrganizationalUnitDto>,
             OrganizationalUnitBusiness>();
 
+            services.AddScoped<IOrganizationData, OrganizationData>();
+            services.AddScoped<IOrganizationBusiness, OrganizationBusiness>();
+
 
             //Buscar La cantidad de branch que tienen una sola organizacion
             services.AddScoped<OrganizationalUnitBranchData>();
@@ -192,7 +196,8 @@ namespace Web.Extensions
             services.AddScoped<IBranchData, BranchData>();
             services.AddScoped<IBranchBusiness, BranchBusiness>();
 
-            
+            services.AddSingleton<ExcelReaderService>();
+
 
             return services;
         }

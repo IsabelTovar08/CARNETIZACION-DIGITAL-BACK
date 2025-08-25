@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="82" >
+      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="54" >
 
 
         <EntityTypeShape EntityType="DbModel.Role" Width="1.5" PointX="4.375" PointY="10.125" FillColor="128, 128, 255" />
@@ -75,7 +75,7 @@
         <EntityTypeShape EntityType="DbModel.TypeCategory" Width="1.5" PointX="32.5" PointY="14.75" />
         <EntityTypeShape EntityType="DbModel.CustomType" Width="1.5" PointX="34.625" PointY="14.625" />
         <AssociationConnector Association="DbModel.CustomTypeTypeCategory" />
-        <EntityTypeShape EntityType="DbModel.MenuStructure" Width="1.5" PointX="9.375" PointY="19.625" />
+        <EntityTypeShape EntityType="DbModel.MenuStructure" Width="1.5" PointX="10.125" PointY="15.125" />
         <AssociationConnector Association="DbModel.MenuStructureModule" />
         <AssociationConnector Association="DbModel.MenuStructureForm" />
       </Diagram>

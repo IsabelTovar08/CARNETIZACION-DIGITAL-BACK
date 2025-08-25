@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Entity.Models.Base;
 using Entity.Models.ModelSecurity;
+using Entity.Models.Organizational.Structure;
 
 namespace Entity.Models
 {
@@ -22,5 +23,8 @@ namespace Entity.Models
         // Para recuperación
         public string? ResetCode { get; set; }
         public DateTime? ResetCodeExpiration { get; set; }
+
+        //public int OrganizationId { get; set; }
+        //public Organization Organization { get; set; } = default!;
     }
 }

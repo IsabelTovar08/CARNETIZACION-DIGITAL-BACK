@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Structure.Request
 {
-    public class OrganizationDtoRequest : BaseModel
+    public class OrganizationDtoRequest : GenericModel
     {
         public string? Description { get; set; }
         public string? Logo { get; set; }

@@ -7,6 +7,7 @@ using Business.Interfaces.Security;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Data.Interfases.Security;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
@@ -16,6 +17,7 @@ using Infrastructure.Notifications.Interfases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
+using Utilities.Notifications.Implementations.Templates.Email;
 using ValidationException = Utilities.Exeptions.ValidationException;
 
 namespace Business.Classes
@@ -61,7 +63,7 @@ namespace Business.Classes
                 var person = _mapper.Map<Person>(personDTO);
 
                 var created = await _data.SaveAsync(person);
-                await SendWelcomeNotifications(person.Email);
+                await SendWelcomeNotifications(person);
 
                 _logger.LogInformation("Persona registrada correctamente con ID {Id}", created.Id);
 
@@ -98,7 +100,7 @@ namespace Business.Classes
             var result = await _personData.SavePersonAndUser(personEntity, userEntity);
 
             // Enviar notificaciones una sola vez
-            await SendWelcomeNotifications(result.Person.Phone);
+            await SendWelcomeNotifications(result.Person);
             _=await AsignarRol(userEntity.Id);
 
             _logger.LogInformation("Persona y usuario registrados correctamente. PersonaID: {Id}", result.Person.Id);
@@ -134,20 +136,44 @@ namespace Business.Classes
         }
 
         // Método privado reutilizable
-        private async Task SendWelcomeNotifications(string phoneNumber)
+        private async Task SendWelcomeNotifications(Person person)
         {
-            await _notificationSender.NotifyAsync(
-                "whatsapp",
-                +57 + phoneNumber,
-                "¡Bienvenido!",
-                "Tu cuenta ha sido creada con éxito en nuestra app."
-            );
-            await _notificationSender.NotifyAsync(
-                "telegram",
-                +57 + phoneNumber,
-                "¡Bienvenido!",
-                "Tu cuenta ha sido creada con éxito en nuestra app."
-            );
+
+            // 1) Email con plantilla
+            if (!string.IsNullOrWhiteSpace(person.Email))
+            {
+                var model = new Dictionary<string, object>
+                {
+                    ["UserName"] = person.FirstName + person.LastName ?? "Nuevo usuario",
+                    ["Email"] = person.Email,
+                    ["Code"] = Guid.NewGuid().ToString("N").Substring(0, 6),
+                    ["CompanyName"] = "Sistema de Carnetización Digital",
+                    ["Year"] = DateTime.Now.Year,
+                    ["LoginUrl"] = "https://carnet.tuempresa.com",
+                    ["ActionUrl"] = "https://carnet.tuempresa.com/login"
+                };
+
+                var html = await EmailTemplates.RenderAsync("welcome", model);
+
+                //var model = new Dictionary<string, object>
+                //{
+                //    ["title"] = "Código de Verificación",
+                //    ["verification_code"] = 1234,
+                //    ["expiry_minutes"] = 10,
+                //};
+
+                //var html = await EmailTemplates.RenderByKeyAsync("verify", model);
+
+
+
+                await _notificationSender.NotifyAsync(
+                    "email",
+                    person.Email,
+                    "¡Bienvenido!",
+                    html 
+                );
+            }
+           
         }
 
     }
