@@ -4,6 +4,7 @@ using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250825175345_MakeTimeOfExitNullable")]
+    partial class MakeTimeOfExitNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1266,13 +1269,10 @@ namespace Entity.Migrations
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<string>("QrCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("TimeOfEntry")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("TimeOfExit")
+                    b.Property<DateTime>("TimeOfExit")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -2716,11 +2716,6 @@ namespace Entity.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("Active")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -2745,21 +2740,6 @@ namespace Entity.Migrations
                     b.Property<DateTime?>("ResetCodeExpiration")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TempCodeAttempts")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("TempCodeConsumedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("TempCodeCreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("TempCodeExpiresAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("TempCodeHash")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(450)");
 
@@ -2778,43 +2758,35 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            Active = true,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Password = "123",
                             PersonId = 1,
-                            TempCodeAttempts = 0,
                             UserName = "admin"
                         },
                         new
                         {
                             Id = 2,
-                            Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Password = "L4d!Estudiante2025",
-                            PersonId = 2,
-                            TempCodeAttempts = 0
+                            PersonId = 2
                         },
                         new
                         {
                             Id = 3,
-                            Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Password = "Adm!nCarnet2025",
-                            PersonId = 3,
-                            TempCodeAttempts = 0
+                            PersonId = 3
                         },
                         new
                         {
                             Id = 4,
-                            Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Password = "Usr!Carnet2025",
-                            PersonId = 4,
-                            TempCodeAttempts = 0
+                            PersonId = 4
                         });
                 });
 

@@ -136,6 +136,11 @@ namespace Web.Extensions
             services.AddScoped<IAccessPointData, AccessPointData>();
             services.AddScoped<IAccessPointBusiness, AccessPointBusiness>();
 
+            // Attendance
+            services.AddScoped<IAttendanceData, AttendanceData>();
+            services.AddScoped<IAttendanceBusiness, AttendanceBusiness>();
+
+
 
 
             //Auth 
