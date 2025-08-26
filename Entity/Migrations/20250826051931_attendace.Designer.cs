@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250826012208_update_user")]
-    partial class update_user
+    [Migration("20250826051931_attendace")]
+    partial class attendace
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1028,6 +1028,9 @@ namespace Entity.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QrCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TypeId")

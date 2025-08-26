@@ -56,6 +56,12 @@ namespace Entity.DataInit.Operational
                    .HasForeignKey(ap => ap.EventId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            // Columna grande para el Base64 del QR
+            builder.Property(ap => ap.QrCode)
+       .HasColumnType("nvarchar(max)")
+       .IsRequired(false);
+
+
             builder.ToTable("AccessPoints", schema: "Operational");
         }
     }

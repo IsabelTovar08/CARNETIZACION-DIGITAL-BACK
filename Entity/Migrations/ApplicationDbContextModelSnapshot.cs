@@ -1027,6 +1027,9 @@ namespace Entity.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("QrCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("TypeId")
                         .HasColumnType("int");
 

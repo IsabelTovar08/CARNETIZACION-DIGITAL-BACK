@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class update_user : Migration
+    public partial class attendace : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -754,11 +754,12 @@ namespace Entity.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EventId = table.Column<int>(type: "int", nullable: false),
                     TypeId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    QrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -1207,12 +1208,12 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "AccessPoints",
-                columns: new[] { "Id", "Description", "EventId", "Name", "TypeId" },
+                columns: new[] { "Id", "Description", "EventId", "Name", "QrCode", "TypeId" },
                 values: new object[,]
                 {
-                    { 1, "Acceso norte del evento", 1, "Punto Norte", 1 },
-                    { 2, "Acceso sur del evento", 1, "Punto Sur", 2 },
-                    { 3, "Acceso principal", 2, "Punto Principal", 1 }
+                    { 1, "Acceso norte del evento", 1, "Punto Norte", null, 1 },
+                    { 2, "Acceso sur del evento", 1, "Punto Sur", null, 2 },
+                    { 3, "Acceso principal", 2, "Punto Principal", null, 1 }
                 });
 
             migrationBuilder.InsertData(
