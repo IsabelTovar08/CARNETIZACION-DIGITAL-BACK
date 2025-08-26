@@ -12,6 +12,6 @@ namespace Business.Interfaces.Security
 {
     public interface IPersonBusiness: IBaseBusiness<Person, PersonDtoRequest, PersonDto>
     {
-        Task<PersonRegistrerDto> SavePersonAndUser(PersonRegistrer personUser);
+        Task<(PersonRegistrerDto, bool?)> SavePersonAndUser(PersonRegistrer personUser);
     }
 }

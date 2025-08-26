@@ -1,9 +1,13 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Security;
+using ClosedXML.Excel;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Data.Interfases.Security;
@@ -63,7 +67,7 @@ namespace Business.Classes
                 var person = _mapper.Map<Person>(personDTO);
 
                 var created = await _data.SaveAsync(person);
-                await SendWelcomeNotifications(person);
+                await SendWelcomeNotifications(person, null);
 
                 _logger.LogInformation("Persona registrada correctamente con ID {Id}", created.Id);
 
@@ -90,7 +94,7 @@ namespace Business.Classes
         }
 
 
-        public async Task<PersonRegistrerDto> SavePersonAndUser(PersonRegistrer personUser)
+        public async Task<(PersonRegistrerDto, bool?)> SavePersonAndUser(PersonRegistrer personUser)
         {
             Validate(personUser.Person);
             await EnsureIdentificationIsUnique(personUser.Person.DocumentNumber);
@@ -99,18 +103,20 @@ namespace Business.Classes
             var userEntity = _mapper.Map<User>(personUser.User);
             var result = await _personData.SavePersonAndUser(personEntity, userEntity);
 
-            // Enviar notificaciones una sola vez
-            await SendWelcomeNotifications(result.Person);
-            _=await AsignarRol(userEntity.Id);
+            // devuelve si se envió o no
+            var emailSent = _=await SendWelcomeNotifications(result.Person, userEntity);
+            _ = await AsignarRol(userEntity.Id);
 
-            _logger.LogInformation("Persona y usuario registrados correctamente. PersonaID: {Id}", result.Person.Id);
-
-            return new PersonRegistrerDto
-            {
-                Person = _mapper.Map<PersonDto>(result.Person),
-                User = _mapper.Map<UserDTO>(result.User)
-            };
+            return (
+                new PersonRegistrerDto
+                {
+                    Person = _mapper.Map<PersonDto>(result.Person),
+                    User = _mapper.Map<UserDTO>(result.User)
+                },
+                emailSent
+            );
         }
+
 
         private async Task<bool> AsignarRol(int userId)
         {
@@ -136,44 +142,41 @@ namespace Business.Classes
         }
 
         // Método privado reutilizable
-        private async Task SendWelcomeNotifications(Person person)
+        private async Task<bool> SendWelcomeNotifications(Person person, User? user)
         {
+            if (string.IsNullOrWhiteSpace(person?.Email))
+                return false;
 
-            // 1) Email con plantilla
-            if (!string.IsNullOrWhiteSpace(person.Email))
+            try
             {
                 var model = new Dictionary<string, object>
                 {
-                    ["UserName"] = person.FirstName + person.LastName ?? "Nuevo usuario",
+                    ["UserName"] = $"{person.FirstName} {person.LastName}".Trim(),
                     ["Email"] = person.Email,
-                    ["Code"] = Guid.NewGuid().ToString("N").Substring(0, 6),
+                    ["Code"] = user.Password,
                     ["CompanyName"] = "Sistema de Carnetización Digital",
                     ["Year"] = DateTime.Now.Year,
                     ["LoginUrl"] = "https://carnet.tuempresa.com",
                     ["ActionUrl"] = "https://carnet.tuempresa.com/login"
                 };
 
-                var html = await EmailTemplates.RenderAsync("welcome", model);
-
-                //var model = new Dictionary<string, object>
-                //{
-                //    ["title"] = "Código de Verificación",
-                //    ["verification_code"] = 1234,
-                //    ["expiry_minutes"] = 10,
-                //};
-
-                //var html = await EmailTemplates.RenderByKeyAsync("verify", model);
-
-
+                // Ojo con el nombre/ruta del template (ver nota al final)
+                var html = await EmailTemplates.RenderAsync("Welcome.html", model);
 
                 await _notificationSender.NotifyAsync(
                     "email",
                     person.Email,
                     "¡Bienvenido!",
-                    html 
+                    html
                 );
+
+                return true;
             }
-           
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "No se pudo enviar email de bienvenida a {Email}", person.Email);
+                return false; // no rompas el flujo de creación
+            }
         }
 
     }

@@ -17,7 +17,7 @@ namespace Web.Controllers.ModelSecurity
     public class PersonController : GenericController<Person, PersonDtoRequest, PersonDto>
     {
         protected readonly IPersonBusiness _personBusiness;
-        public PersonController(IPersonBusiness business, ILogger<PersonController> logger, IPersonBusiness personBusiness) : base(business, logger)
+        public PersonController(IPersonBusiness personBusiness, ILogger<PersonController> logger) : base(personBusiness, logger)
         {
             _personBusiness = personBusiness;
         }
@@ -27,6 +27,6 @@ namespace Web.Controllers.ModelSecurity
         {
             var result = await _personBusiness.SavePersonAndUser(person);
             return Ok(result);
-        }
+        }  
     }
 }

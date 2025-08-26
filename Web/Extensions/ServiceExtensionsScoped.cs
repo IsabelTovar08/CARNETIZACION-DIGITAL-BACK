@@ -206,7 +206,7 @@ namespace Web.Extensions
             services.AddScoped<IBranchData, BranchData>();
             services.AddScoped<IBranchBusiness, BranchBusiness>();
 
-            services.AddSingleton<ExcelReaderService>();
+            services.AddScoped<IExcelPersonParser, ExcelPersonParser>();
 
 
             return services;

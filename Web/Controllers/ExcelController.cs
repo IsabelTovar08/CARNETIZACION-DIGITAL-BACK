@@ -1,4 +1,5 @@
 ﻿using Business.Services.Excel;
+using Entity.DTOs.ModelSecurity.Response;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
@@ -7,47 +8,39 @@ namespace Web.Controllers
     [Route("api/excel")]
     public class ExcelController : ControllerBase
     {
-        private readonly ExcelReaderService _excel;
+        private readonly IExcelPersonParser _excel;
 
-        public ExcelController(ExcelReaderService excel) => _excel = excel;
-
-        [HttpPost("preview")]
-        [Consumes("multipart/form-data")] // <- importante para Swagger
-        public async Task<IActionResult> Preview([FromForm] ExcelPreviewForm form)
+        public ExcelController(IExcelPersonParser excel)
         {
-            if (form.File is null || form.File.Length == 0)
-                return BadRequest("Archivo vacío.");
-
-            var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.xlsx");
-            using (var stream = System.IO.File.Create(path))
-                await form.File.CopyToAsync(stream);
-
-            var data = _excel.ReadPreview(path, form.PreviewRows);
-            var token = Path.GetFileName(path); // o guarda el path/token en un diccionario si prefieres
-            return Ok(new { token, preview = data });
+            _excel = excel;
         }
 
-        [HttpPost("confirm")]
-        public IActionResult Confirm([FromBody] string token)
+        /// <summary>
+        /// Import Excel (.xlsx) with columns:
+        /// FirstName, MiddleName, LastName, SecondLastName, DocumentTypeId, DocumentNumber, BloodTypeId, Phone, Email, Address, CityId
+        /// </summary>
+        [HttpPost("people")]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(50_000_000)]
+        public async Task<ActionResult<BulkImportResultDto>> ImportExcel(ImportExcelRequest req)
         {
-            var path = Path.Combine(Path.GetTempPath(), token);
-            if (!System.IO.File.Exists(path))
-                return BadRequest("Token inválido");
+            // Validaciones
+            if (req?.File is null)
+                return BadRequest("Debe adjuntar el archivo en el campo 'file'.");
 
-            var data = _excel.ReadPreview(path, int.MaxValue); // aquí leerías todo y lo mapearías/guardarías
-            System.IO.File.Delete(path);
+            if (!req.File.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+                return BadRequest("Formato no soportado. Solo .xlsx.");
 
-            return Ok(new { imported = data.Count });
+            using var stream = req.File.OpenReadStream(); 
+            var result = await _excel.ImportFromExcelAsync(stream);
+
+            return Ok(result);
         }
-        public class ExcelPreviewForm
-        {
-            // nombre del campo en el form-data: "file"
-            [FromForm(Name = "file")]
-            public IFormFile File { get; set; } = default!;
+    }
 
-            // si quieres permitir cambiar el número de filas en el mismo form-data
-            [FromForm(Name = "previewRows")]
-            public int PreviewRows { get; set; } = 50;
-        }
+    public class ImportExcelRequest
+    {
+        /// <summary>Archivo Excel (.xlsx)</summary>
+        public IFormFile File { get; set; }
     }
 }
