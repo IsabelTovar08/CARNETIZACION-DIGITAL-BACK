@@ -160,7 +160,6 @@ namespace Business.Classes
                     ["ActionUrl"] = "https://carnet.tuempresa.com/login"
                 };
 
-                // Ojo con el nombre/ruta del template (ver nota al final)
                 var html = await EmailTemplates.RenderAsync("Welcome.html", model);
 
                 await _notificationSender.NotifyAsync(

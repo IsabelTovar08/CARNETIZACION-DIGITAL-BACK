@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utilities.Notifications.Implementations.Templates.Email;
 
 namespace Business.Services.Auth
 
 //Este servicio sirve como intermediario para la
 //generación, envío y verificación de los códigos creados temporalmente
 {
-    public class UserVerificationService
+    public class UserVerificationService : IUserVerificationService
     {
         // Inyección de dependencias
         private readonly ApplicationDbContext _db;
@@ -53,11 +54,18 @@ namespace Business.Services.Auth
 
             await _db.SaveChangesAsync();
 
-            var to = user.Person?.Email ?? user.UserName
-                     ?? throw new InvalidOperationException("User sin email/username");
-            var subject = user.Active ? "Código de verificación" : "Código de activación";
-            var body = $"Tu código es: <b>{code}</b>. Expira en {ttl} minutos.";
-            await _notify.NotifyAsync("Email", to, subject, body);
+           
+
+            
+                var model = new Dictionary<string, object> 
+                { 
+                 ["title"] = "Código de Verificación", 
+                 ["verification_code"] = code, 
+                 ["expiry_minutes"] = ttl, //
+                }; 
+                var html = await EmailTemplates.RenderByKeyAsync("verify", model);
+                
+                await _notify.NotifyAsync( "email", user.UserName ?? user.Person.Email, "Verifica tu identidad", html );
         }
 
         public async Task<bool> VerifyAsync(int userId, string code)

@@ -208,6 +208,9 @@ namespace Web.Extensions
 
             services.AddScoped<IExcelPersonParser, ExcelPersonParser>();
 
+            services.AddScoped<IUserVerificationService, UserVerificationService>();
+
+
 
             return services;
         }
