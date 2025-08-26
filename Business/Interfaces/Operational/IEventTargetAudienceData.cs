@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Business.Interfaces.Operational
 {
     public interface IEventTargetAudienceBusiness
-        : IBaseBusiness<EventTargetAudience, EventTargetAudienceDto, EventTargetAudienceDto>
+        : IBaseBusiness<EventTargetAudience, EventTargetAudienceDtoRequest, EventTargetAudienceDtoResponse>
     {
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Dynamic;
+using System.Linq.Expressions;
 using Data.Interfases;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
@@ -175,6 +176,29 @@ namespace Data.Classes.Base
         public Task<List<ExpandoObject>> GetAllDynamicAsync()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> ExistsByAsync(Expression<Func<T, object>> fieldSelector, object? value)
+        {
+            if (fieldSelector == null)
+                throw new ArgumentNullException(nameof(fieldSelector));
+
+            // extraer nombre de la propiedad
+            Expression body = fieldSelector.Body is UnaryExpression u && u.NodeType == ExpressionType.Convert
+                ? u.Operand
+                : fieldSelector.Body;
+
+            if (body is not MemberExpression m)
+                throw new ArgumentException("Selector must be a simple property access, e.g., x => x.Property.");
+
+            string propName = m.Member.Name;
+            string p = propName;
+            object? v = value;
+
+            return await _context.Set<T>()
+                .AsNoTracking()
+                .Where(e => EF.Property<object>(e, p) == v)
+                .AnyAsync();
         }
     }
 }

@@ -60,12 +60,11 @@ namespace Business.Implementations.Operational
 
                 // 🔹 Construir payload del QR (no sensible) y generarlo en Base64 (PNG)
                 string qrPayload = BuildQrPayload(dto);
-                dto.QrCode = GenerateQrCodeBase64(qrPayload);
 
                 // Guardar asistencia (usa Save del BaseBusiness)
                 var created = await Save(dto);
 
-                _logger.LogInformation($"Asistencia registrada correctamente para PersonId={dto.PersonId}, EventId={dto.EventId}.");
+                _logger.LogInformation($"Asistencia registrada correctamente para PersonId={dto.PersonId}, EventId={dto.EventName}.");
                 return created;
             }
             catch (Exception ex)
@@ -85,7 +84,7 @@ namespace Business.Implementations.Operational
             var apText = apId.HasValue ? apId.Value.ToString() : "NA";
 
             // Puedes ajustar el formato si quieres JSON; esto es compacto y suficiente para validar.
-            return $"EVENT:{dto.EventId}|PERSON:{dto.PersonId}|ACCESS:{apText}|DATE:{DateTime.UtcNow:O}";
+            return $"PERSON:{dto.PersonId}|ACCESS:{apText}|DATE:{DateTime.UtcNow:O}";
         }
 
         /// <summary>

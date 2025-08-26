@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 namespace Business.Interfases
 {
@@ -16,5 +17,9 @@ namespace Business.Interfases
         Task<D?> Update(DCreate entity);
         Task<bool> Delete(int id);
         Task<bool> ToggleActiveAsync(int id);
+
+        Task ValidateAsync(T newEntity);
+        void Validate(DCreate create);
+
     }
 }

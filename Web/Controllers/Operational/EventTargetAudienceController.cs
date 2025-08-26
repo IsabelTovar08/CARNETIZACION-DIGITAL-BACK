@@ -8,8 +8,7 @@ namespace Web.Controllers.Operational
 {
     public class EventTargetAudienceController : GenericController<EventTargetAudience, EventTargetAudienceDtoRequest, EventTargetAudienceDtoResponse>
     {
-        public EventTargetAudienceController(IBaseBusiness<EventTargetAudience, EventTargetAudienceDtoRequest, EventTargetAudienceDtoResponse> business, ILogger<EventTargetAudienceController> logger)
-            : base(business, logger)
+        public EventTargetAudienceController(IEventTargetAudienceBusiness business, ILogger<EventTargetAudienceController> logger) : base(business, logger)
         {
         }
     }

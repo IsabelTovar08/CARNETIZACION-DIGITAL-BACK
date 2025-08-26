@@ -239,6 +239,10 @@ namespace Utilities.Helper
                 .ReverseMap();
 
             CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
+                .ForMember(d => d.EventName,
+                 opt => opt.MapFrom(s => s.Event != null ? s.Event.Name : null))
+                .ForMember(d => d.ReferenceName,
+                 opt => opt.MapFrom(s => s.CustomType != null ? s.CustomType.Name : null))
                 .ReverseMap();
 
             CreateMap<Schedule, ScheduleDtoRequest>()
@@ -266,6 +270,10 @@ namespace Utilities.Helper
                     opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Name : null))
                 .ForMember(dest => dest.AccessPointOfExitName,
                     opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Name : null))
+                 .ForMember(dest => dest.EventName,
+                    opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Event.Name : null))
+                 //.ForMember(dest => dest.EventId,
+                 //   opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Event.Id : null))
                 .ReverseMap()
                     .ForMember(dest => dest.Person, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())

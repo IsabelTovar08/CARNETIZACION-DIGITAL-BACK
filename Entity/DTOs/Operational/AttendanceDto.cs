@@ -20,10 +20,7 @@ namespace Entity.DTOs.Operational
         public string? AccessPointOfExitName { get; set; }
 
 
-        public int EventId { get; set; }
         public string? EventName { get; set; }
 
-        // QR Base64
-        public string? QrCode { get; set; }
     }
 }
