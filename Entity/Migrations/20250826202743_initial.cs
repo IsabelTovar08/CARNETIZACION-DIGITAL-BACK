@@ -8,11 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:Entity/Migrations/20250826043006_initial.cs
     public partial class initial : Migration
-========
-    public partial class attendace : Migration
->>>>>>>> a0c81213dca632fcb4983fd2cb2688ed48763fd5:Entity/Migrations/20250826051931_attendace.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

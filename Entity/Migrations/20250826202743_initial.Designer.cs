@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:Entity/Migrations/20250826043006_initial.Designer.cs
-    [Migration("20250826043006_initial")]
+    [Migration("20250826202743_initial")]
     partial class initial
-========
-    [Migration("20250826051931_attendace")]
-    partial class attendace
->>>>>>>> a0c81213dca632fcb4983fd2cb2688ed48763fd5:Entity/Migrations/20250826051931_attendace.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

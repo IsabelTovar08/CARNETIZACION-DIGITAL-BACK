@@ -22,16 +22,23 @@ namespace Utilities.Notifications.Implementations
 
         public async Task SendMessageAsync(string to, string subject, string message)
         {
+            if (string.IsNullOrWhiteSpace(to))
+                throw new InvalidOperationException("Destinatario vacío.");
+
+            var addr = new System.Net.Mail.MailAddress(to.Trim()); // lanza si es inválido
+            var toOk = addr.Address;
+
             using var smtpClient = new SmtpClient(_settings.SmtpServer)
             {
                 Port = _settings.Port,
                 Credentials = new NetworkCredential(_settings.SenderEmail, _settings.SenderPassword),
                 EnableSsl = _settings.EnableSsl
             };
-            using var mailMessage = new MailMessage(_settings.SenderEmail, to)
+
+            using var mailMessage = new MailMessage(_settings.SenderEmail, toOk)
             {
-                Subject = subject,
-                Body = message,
+                Subject = subject ?? string.Empty,
+                Body = message ?? string.Empty,
                 IsBodyHtml = true
             };
 

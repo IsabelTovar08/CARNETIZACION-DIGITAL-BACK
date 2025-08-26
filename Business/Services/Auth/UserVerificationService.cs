@@ -6,16 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using Utilities.Notifications.Implementations.Templates.Email;
 
 namespace Business.Services.Auth
-
-//Este servicio sirve como intermediario para la
-//generación, envío y verificación de los códigos creados temporalmente
 {
+    // Este servicio sirve como intermediario para la
+    // generación, envío y verificación de los códigos creados temporalmente
     public class UserVerificationService : IUserVerificationService
     {
         // Inyección de dependencias
@@ -38,14 +36,34 @@ namespace Business.Services.Auth
             _cfg = cfg;
         }
 
+        private static string GetVerifiedEmail(User user)
+        {
+            // 1) Prioriza email real
+            string? toRaw = user.Person?.Email ?? user.UserName;
+
+            if (string.IsNullOrWhiteSpace(toRaw))
+                throw new InvalidOperationException("El usuario no tiene email configurado.");
+
+            // 2) Normaliza/valida (admite "Nombre <email@dom.com>")
+            MailAddress addr = new MailAddress(toRaw.Trim());
+            return addr.Address; // solo "email@dom.com"
+        }
+
         public async Task GenerateAndSendAsync(User user)
         {
-            var digits = int.Parse(_cfg["Codes:Digits"] ?? "6");
-            var ttl = int.Parse(_cfg["Codes:TtlMinutes"] ?? "10");
+            // Para asegurar que se trae el email de la persona
+            User? loaded = await _db.Set<User>()
+                .Include(u => u.Person)
+                .FirstOrDefaultAsync(u => u.Id == user.Id && !u.IsDeleted);
 
-            var code = _gen.Generate(digits);
+            user = loaded ?? throw new InvalidOperationException("Usuario no encontrado.");
 
-            var now = _clock.UtcNow;
+            int digits = int.Parse(_cfg["Codes:Digits"] ?? "5");
+            int ttl = int.Parse(_cfg["Codes:TtlMinutes"] ?? "10");
+
+            string code = _gen.Generate(digits);
+
+            DateTimeOffset now = _clock.UtcNow;
             user.TempCodeHash = _hasher.Hash(code);
             user.TempCodeAttempts = 0;
             user.TempCodeConsumedAt = null;
@@ -54,28 +72,30 @@ namespace Business.Services.Auth
 
             await _db.SaveChangesAsync();
 
-           
+            Dictionary<string, object> model = new Dictionary<string, object>
+            {
+                ["title"] = "Código de Verificación",
+                ["verification_code"] = code,
+                ["expiry_minutes"] = ttl,
+            };
 
-            
-                var model = new Dictionary<string, object> 
-                { 
-                 ["title"] = "Código de Verificación", 
-                 ["verification_code"] = code, 
-                 ["expiry_minutes"] = ttl, //
-                }; 
-                var html = await EmailTemplates.RenderByKeyAsync("verify", model);
-                
-                await _notify.NotifyAsync( "email", user.UserName ?? user.Person.Email, "Verifica tu identidad", html );
+            string html = await EmailTemplates.RenderByKeyAsync("verify", model);
+
+            // Validar/normalizar destinatario
+            string to = GetVerifiedEmail(user);
+
+            await _notify.NotifyAsync("email", to, "Verifica tu identidad", html);
         }
 
         public async Task<bool> VerifyAsync(int userId, string code)
         {
-            var maxAttempts = int.Parse(_cfg["Codes:MaxAttempts"] ?? "5");
-            var now = _clock.UtcNow;
+            int maxAttempts = int.Parse(_cfg["Codes:MaxAttempts"] ?? "5");
+            DateTimeOffset now = _clock.UtcNow;
 
-            var user = await _db.Set<User>()
+            User? user = await _db.Set<User>()
                 .Include(u => u.Person)
                 .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+
             if (user is null) return false;
 
             if (string.IsNullOrEmpty(user.TempCodeHash)) return false;
@@ -85,8 +105,12 @@ namespace Business.Services.Auth
 
             user.TempCodeAttempts++;
 
-            var ok = _hasher.Verify(code, user.TempCodeHash);
-            if (!ok) { await _db.SaveChangesAsync(); return false; }
+            bool ok = _hasher.Verify(code, user.TempCodeHash);
+            if (!ok)
+            {
+                await _db.SaveChangesAsync();
+                return false;
+            }
 
             user.TempCodeConsumedAt = now;
             if (!user.Active) user.Active = true;
@@ -97,12 +121,13 @@ namespace Business.Services.Auth
 
         public async Task<bool> ResendAsync(int userId)
         {
-            var cooldownSeconds = int.Parse(_cfg["Codes:ResendCooldownSeconds"] ?? "50");
-            var now = _clock.UtcNow;
+            int cooldownSeconds = int.Parse(_cfg["Codes:ResendCooldownSeconds"] ?? "50");
+            DateTimeOffset now = _clock.UtcNow;
 
-            var user = await _db.Set<User>()
+            User? user = await _db.Set<User>()
                 .Include(u => u.Person)
                 .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+
             if (user is null) return false;
 
             if (user.TempCodeCreatedAt.HasValue &&
@@ -112,6 +137,5 @@ namespace Business.Services.Auth
             await GenerateAndSendAsync(user);
             return true;
         }
-
     }
 }
