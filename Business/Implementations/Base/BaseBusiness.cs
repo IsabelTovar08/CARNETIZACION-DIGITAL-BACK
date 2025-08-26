@@ -15,12 +15,15 @@ using Utilities.Exeptions;
 
 namespace Business.Classes.Base
 {
-    public class BaseBusiness<T, DCreate, D> : ABaseBusiness<T, DCreate, D> where T : BaseModel where D  : class
+    public class BaseBusiness<T, DCreate, D> : ABaseBusiness<T, DCreate, D>
+        where T : BaseModel
+        where D : class
     {
         protected readonly ICrudBase<T> _data;
         protected readonly ILogger<T> _logger;
         protected readonly IMapper _mapper;
-        public BaseBusiness(ICrudBase<T> data, ILogger<T> logger, IMapper mapper) 
+
+        public BaseBusiness(ICrudBase<T> data, ILogger<T> logger, IMapper mapper)
         {
             _data = data;
             _mapper = mapper;
@@ -42,7 +45,6 @@ namespace Business.Classes.Base
             {
                 throw;
             }
-
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al crear {typeof(T).Name}");
@@ -76,7 +78,6 @@ namespace Business.Classes.Base
         /// <summary>
         /// Obtiene todos los registros.
         /// </summary>
-        /// 
         public override async Task<IEnumerable<D>> GetAll()
         {
             try
@@ -90,7 +91,6 @@ namespace Business.Classes.Base
                 _logger.LogError(ex, $"Error al obtener todos los {typeof(T).Name}");
                 throw new ExternalServiceException("Base de datos", $"Error al obtener todos los {typeof(T).Name}", ex);
             }
-            
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Business.Classes.Base
         }
 
         /// <summary>
-        /// Actualiza una nueva entidad.
+        /// Actualiza una entidad existente.
         /// </summary>
         public override async Task<D?> Update(DCreate entity)
         {
@@ -153,17 +153,11 @@ namespace Business.Classes.Base
             {
                 throw;
             }
-           
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al actualizar {typeof(T).Name}");
                 throw new ExternalServiceException("Base de datos", $"Error al actualizar {typeof(T).Name}");
             }
         }
-
-
-       
-
-
     }
 }

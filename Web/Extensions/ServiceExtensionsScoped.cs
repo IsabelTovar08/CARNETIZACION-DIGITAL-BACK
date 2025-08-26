@@ -55,6 +55,7 @@ using Business.Implementations.Organizational.Assignment;
 using Data.Interfases.Notifications;
 using Business.Interfaces.Notifications;
 using Data.Implementations.Notifications;
+using Entity.DTOs.Operational;
 
 namespace Web.Extensions
 {
@@ -135,6 +136,9 @@ namespace Web.Extensions
             services.AddScoped<IAccessPointData, AccessPointData>();
             services.AddScoped<IAccessPointBusiness, AccessPointBusiness>();
 
+           
+
+
 
 
             //Auth 
@@ -192,7 +196,7 @@ namespace Web.Extensions
             services.AddScoped<IBranchData, BranchData>();
             services.AddScoped<IBranchBusiness, BranchBusiness>();
 
-            
+
 
             return services;
         }

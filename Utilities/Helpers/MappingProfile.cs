@@ -24,6 +24,7 @@ using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
+
 namespace Utilities.Helper
 {
     public class MappingProfile : AutoMapper.Profile
@@ -38,11 +39,9 @@ namespace Utilities.Helper
                 .ReverseMap();
             CreateMap<Person, PersonDtoRequest>().ReverseMap();
 
-
             //Mapeo de la entidad Rol 
             CreateMap<Role, RolDto>().ReverseMap();
             CreateMap<Role, RoleDtoRequest>().ReverseMap();
-
 
             //Mapeo de la entidad Form 
             CreateMap<Form, FormDto>()
@@ -50,16 +49,13 @@ namespace Utilities.Helper
                 .ReverseMap();
             CreateMap<Form, FormDtoRequest>().ReverseMap();
 
-
             //Mapeo de la entidad Module 
             CreateMap<Module, ModuleDto>().ReverseMap();
             CreateMap<Module, ModuleDtoRequest>().ReverseMap();
 
-
             //Mapeo de la entidad permission
             CreateMap<Permission, PermissionDto>().ReverseMap();
             CreateMap<Permission, PermissionDtoRequest>().ReverseMap();
-
 
             //Mapeo de la entidad User
             CreateMap<User, UserDTO>()
@@ -70,13 +66,11 @@ namespace Utilities.Helper
 
             CreateMap<User, UserDtoRequest>().ReverseMap();
 
-
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()
              .ForMember(dest => dest.RolName, opt => opt.MapFrom(src => src.Rol.Name))
              .ReverseMap();
             CreateMap<UserRoles, UserRoleDtoRequest>().ReverseMap();
-
 
             //Mapeo de la entidad RolFormPermission
             CreateMap<RolFormPermission, RolFormPermissionDto>()
@@ -97,7 +91,6 @@ namespace Utilities.Helper
             .ForMember(d => d.Children, o => o.MapFrom(s => s.Children.OrderBy(c => c.OrderIndex)));
 
             CreateMap<MenuStructure, MenuStructureRequest>().ReverseMap();
-
 
             //Parameter
             CreateMap<Status, StatusDto>()
@@ -134,12 +127,7 @@ namespace Utilities.Helper
                     m => m.MapFrom(s => s.OrganizationalUnitBranches.Count));
             CreateMap<OrganizationalUnitDtoRequest, OrganizationalUnit>();
 
-
-
-
             //OPERATIONAL
-
-            //Assingment
 
             //Cards
             CreateMap<Card, CardDto>()
@@ -150,11 +138,9 @@ namespace Utilities.Helper
             .ForMember(d => d.DivisionName, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.Name))
             .ForMember(d => d.ProfileId, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Id))
             .ForMember(d => d.ProfileName, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Name))
-            //.ForMember(d => d.AreaCategoryName, o => o.MapFrom(s => s.AreaCategory.Name))
             .ReverseMap()
                 .ForMember(s => s.Status, o => o.Ignore())
                 .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
-            //.ForMember(s => s.AreaCategory, o => o.Ignore());
 
             CreateMap<Card, CardDtoRequest>()
                 .ReverseMap()
@@ -162,7 +148,6 @@ namespace Utilities.Helper
                     .ForMember(s => s.IsDeleted, o => o.Ignore())
                     .ForMember(s => s.Status, o => o.Ignore())
                     .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
-            //.ForMember(s => s.AreaCategory, o => o.Ignore());
 
             //PersonDivisionProfile
             CreateMap<PersonDivisionProfile, PersonDivisionProfileDto>()
@@ -199,7 +184,6 @@ namespace Utilities.Helper
             //Structure
 
             //Area Categoria
-
             CreateMap<AreaCategory, AreaCategoryDto>()
                 .ReverseMap();
 
@@ -221,9 +205,19 @@ namespace Utilities.Helper
             CreateMap<InternalDivision, InternalDivisionDtoRequest>()
                 .ReverseMap();
 
-            //AccessPoint
+
+            //AccessPoints
+
+            // ENTIDAD -> DTO
             CreateMap<AccessPoint, AccessPointDto>()
-           .ReverseMap();
+                .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.Event != null ? s.Event.Name : null))
+                .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null));
+
+            // DTO -> ENTIDAD
+            CreateMap<AccessPointDto, AccessPoint>()
+                .ForMember(d => d.Event, opt => opt.Ignore())
+                .ForMember(d => d.AccessPointType, opt => opt.Ignore());
+
 
             //Schedule
             CreateMap<Schedule, ScheduleDto>()
@@ -234,15 +228,12 @@ namespace Utilities.Helper
                 .ReverseMap();
 
             CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
-                .ReverseMap(); 
-
-     
+                .ReverseMap();
 
             CreateMap<Schedule, ScheduleDtoRequest>()
                 .ReverseMap();
 
             //Notifications
-
             CreateMap<Notification, NotificationDto>()
                  .ReverseMap();
 
@@ -256,8 +247,11 @@ namespace Utilities.Helper
             CreateMap<NotificationReceived, NotificationReceivedDtoRequest>()
                 .ReverseMap();
 
+            // Attendance
+            CreateMap<Attendance, AttendanceDto>()
+                .ReverseMap();
+
 
         }
     }
 }
-

@@ -751,6 +751,7 @@ namespace Entity.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EventId = table.Column<int>(type: "int", nullable: false),
                     TypeId = table.Column<int>(type: "int", nullable: false),
+                    QrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -1195,12 +1196,12 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "AccessPoints",
-                columns: new[] { "Id", "Description", "EventId", "Name", "TypeId" },
+                columns: new[] { "Id", "Description", "EventId", "Name", "QrCode", "TypeId" },
                 values: new object[,]
                 {
-                    { 1, "Acceso norte del evento", 1, "Punto Norte", 1 },
-                    { 2, "Acceso sur del evento", 1, "Punto Sur", 2 },
-                    { 3, "Acceso principal", 2, "Punto Principal", 1 }
+                    { 1, "Acceso norte del evento", 1, "Punto Norte", null, 1 },
+                    { 2, "Acceso sur del evento", 1, "Punto Sur", null, 2 },
+                    { 3, "Acceso principal", 2, "Punto Principal", null, 1 }
                 });
 
             migrationBuilder.InsertData(
