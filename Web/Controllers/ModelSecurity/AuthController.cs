@@ -18,42 +18,62 @@ namespace Web.Controllers.ModelSecurity
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IUserVerificationService _verifier;
         private readonly ApplicationDbContext _db;
+        private readonly ILogger<AuthController> _logger;
+
 
         public AuthController(
             IJwtService jwtService,
             IAuthService authService,
             IRefreshTokenService refreshTokenService,
             IUserVerificationService verifier,
-            ApplicationDbContext db
-        )
+            ApplicationDbContext db,
+            ILogger<AuthController> logger)
+        
         {
             _jwtService = jwtService;
             _authService = authService;
             _refreshTokenService = refreshTokenService;
             _verifier = verifier;
             _db = db;
+             _logger = logger;
         }
 
         /// <summary>
         /// 1) Autentica credenciales y envía código de verificación (NO emite JWT aquí).
         /// </summary>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
         {
-            var user = await _authService.LoginAsync(request);
-            if (user is null)
-                return Unauthorized(new { message = "Credenciales inválidas." });
+            if (!ModelState.IsValid)
+                return BadRequest(new LoginStep1ResponseDto { Message = "Solicitud inválida." });
 
-            // Opción 1: el servicio NO retorna bool; si falla, lanza excepción.
-            await _verifier.GenerateAndSendAsync(user);
-
-            // No emitir JWT aquí
-            return Ok(new LoginStep1ResponseDto
+            try
             {
-                RequiresCode = true,
-                IsFirstLogin = !user.Active,
-                UserId = user.Id
-            });
+                var user = await _authService.LoginAsync(request);
+                if (user is null)
+                    return Unauthorized(new LoginStep1ResponseDto { Message = "Credenciales inválidas." });
+
+                await _verifier.GenerateAndSendAsync(user);
+
+                return Ok(new LoginStep1ResponseDto
+                {
+                    Message = "El código fue enviado exitosamente a tu correo."
+                    // UserId = user.Id   // ← descomenta si quieres retornarlo al front
+                });
+            }
+            catch (Utilities.Exeptions.ValidationException ex)
+            {
+                _logger.LogWarning(ex, "Validación en /login para {Email}", request.Email);
+                return BadRequest(new LoginStep1ResponseDto { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado en /login");
+                return StatusCode(500, new LoginStep1ResponseDto
+                {
+                    Message = "No se pudo enviar el código, revisa los datos ingresados o vuelve a intentarlo."
+                });
+            }
         }
 
         /// <summary>
