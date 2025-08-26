@@ -57,8 +57,8 @@ namespace Web.Controllers.ModelSecurity
 
                 return Ok(new LoginStep1ResponseDto
                 {
-                    Message = "El código fue enviado exitosamente a tu correo."
-                    // UserId = user.Id   // ← descomenta si quieres retornarlo al front
+                    Message = "El código fue enviado exitosamente a tu correo.",
+                    isFirtsLogin = user.Active      // ← descomenta si quieres retornarlo al front
                 });
             }
             catch (Utilities.Exeptions.ValidationException ex)

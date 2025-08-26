@@ -1,4 +1,5 @@
-﻿using Business.Interfases;
+﻿using Business.Interfaces.Organizational.Assignment;
+using Business.Interfases;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.Models.Organizational.Assignment;
@@ -8,7 +9,7 @@ namespace Web.Controllers.Organizational.Assignment
 {
     public class CardController : GenericController<Card, CardDtoRequest, CardDto>
     {
-        public CardController(IBaseBusiness<Card, CardDtoRequest, CardDto> business, ILogger<CardController> logger)
+        public CardController(ICardBusiness business, ILogger<CardController> logger)
             : base(business, logger)
         { 
         }

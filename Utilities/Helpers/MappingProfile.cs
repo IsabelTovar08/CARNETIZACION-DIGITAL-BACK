@@ -137,6 +137,8 @@ namespace Utilities.Helper
             .ForMember(d => d.DivisionName, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.Name))
             .ForMember(d => d.ProfileId, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Id))
             .ForMember(d => d.ProfileName, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Name))
+            .ForMember(d => d.AreaCategoryName, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.AreaCategory.Name))
+
             .ReverseMap()
                 .ForMember(s => s.Status, o => o.Ignore())
                 .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
@@ -210,9 +212,19 @@ namespace Utilities.Helper
             CreateMap<InternalDivision, InternalDivisionDtoRequest>()
                 .ReverseMap();
 
-            //AccessPoint
+
+            //AccessPoints
+
+            // ENTIDAD -> DTO
             CreateMap<AccessPoint, AccessPointDto>()
-           .ReverseMap();
+                .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.Event != null ? s.Event.Name : null))
+                .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null));
+
+            // DTO -> ENTIDAD
+            CreateMap<AccessPointDto, AccessPoint>()
+                .ForMember(d => d.Event, opt => opt.Ignore())
+                .ForMember(d => d.AccessPointType, opt => opt.Ignore());
+
 
             //Schedule
             CreateMap<Schedule, ScheduleDto>()

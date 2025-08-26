@@ -15,7 +15,7 @@ namespace Entity.DTOs.Organizational.Assigment.Request
         public int PersonId { get; set; }
 
         [Required]
-        public int DivisionId { get; set; }
+        public int InternalDivisionId { get; set; }
         
         [Required]
         public int ProfileId { get; set; }

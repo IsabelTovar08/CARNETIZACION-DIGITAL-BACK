@@ -56,6 +56,33 @@ using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
 using Utilities.Notifications.Implementations;
+using Entity.DTOs.Parameter.Request;
+using Entity.DTOs.Parameter.Response;
+using Data.Implementations.Security;
+using Business.Implementations.Security;
+using Data.Interfaces.Security;
+using Data.Implementations.Organizational.Structure;
+using Data.Interfases.Operational;
+using Data.Implementations.Operational;
+using Business.Interfaces.Operational;
+using Business.Implementations.Operational;
+using Business.Interfaces.Auth;
+using Entity.Models.Auth;
+using Data.Implementations.Auth;
+using Data.Interfases.Auth;
+using Business.Implementations.Organizational.Structure;
+using Business.Interfaces.Organizational.Structure;
+using Data.Interfases.Organizational.Structure;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Response;
+using Data.Interfases.Organizational.Assignment;
+using Business.Interfaces.Organizational.Assignment;
+using Data.Implementations.Organizational.Assignment;
+using Business.Implementations.Organizational.Assignment;
+using Data.Interfases.Notifications;
+using Business.Interfaces.Notifications;
+using Data.Implementations.Notifications;
+using Entity.DTOs.Operational;
 
 namespace Web.Extensions
 {
@@ -139,6 +166,9 @@ namespace Web.Extensions
             // Attendance
             services.AddScoped<IAttendanceData, AttendanceData>();
             services.AddScoped<IAttendanceBusiness, AttendanceBusiness>();
+
+
+
 
 
 
