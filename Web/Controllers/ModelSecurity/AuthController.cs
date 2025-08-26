@@ -1,89 +1,80 @@
-﻿using Business.Classes;
-using Business.Interfaces.Auth;
+﻿using Business.Interfaces.Auth;
 using Business.Interfaces.Security;
-using Business.Services.Auth;
-using Business.Services.JWT;
-using Data.Implementations.Security;
-using Data.Interfaces.Security;
 using Entity.Context;
-using Entity.DTOs;
 using Entity.DTOs.Auth;
 using Entity.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Web.Controllers.ModelSecurity
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IJwtService _jwtService;
         private readonly IAuthService _authService;
         private readonly IRefreshTokenService _refreshTokenService;
+        private readonly IUserVerificationService _verifier;
+        private readonly ApplicationDbContext _db;
 
-
-        public AuthController(IJwtService jwtService, IAuthService userBusiness, IMenuStructureBusiness menuBusiness, IRefreshTokenService refreshTokenService)
+        public AuthController(
+            IJwtService jwtService,
+            IAuthService authService,
+            IRefreshTokenService refreshTokenService,
+            IUserVerificationService verifier,
+            ApplicationDbContext db
+        )
         {
             _jwtService = jwtService;
-            _authService = userBusiness;
+            _authService = authService;
             _refreshTokenService = refreshTokenService;
-        }
-
-        public class VerifyCodeRequest
-        {
-            public int UserId { get; set; }
-            public string Code { get; set; }
+            _verifier = verifier;
+            _db = db;
         }
 
         /// <summary>
-        /// Login:
-        /// - Valida credenciales con IAuthService
-        /// - Emite Access Token + jti con IJwtService
-        /// - Registra y devuelve Refresh Token (hash en BD, valor en claro al cliente)
+        /// 1) Autentica credenciales y envía código de verificación (NO emite JWT aquí).
         /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            // 1) Autenticar usuario (tu lógica actual)
             var user = await _authService.LoginAsync(request);
-            if (user == null)
-                return Unauthorized("Credenciales inválidas.");
+            if (user is null)
+                return Unauthorized(new { message = "Credenciales inválidas." });
 
-            var verifier = HttpContext.RequestServices.GetRequiredService<UserVerificationService>();
-            await verifier.GenerateAndSendAsync(user);
+            // Opción 1: el servicio NO retorna bool; si falla, lanza excepción.
+            await _verifier.GenerateAndSendAsync(user);
 
-            
-
-            // 2) Emitir Access Token + jti (IMPORTANTE: JwtService debe devolver también jti)
-            //var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName);
-
-            // 3) Registrar y devolver Refresh Token (rotación futura)
-            //var pair = await _refreshTokenService.IssueAsync(
-            //    userId: user.Id,
-            //    accessToken: accessToken,
-            //    jti: jti,
-            //    ip: HttpContext.Connection.RemoteIpAddress?.ToString()
-            //);
-
-            // Si quieres, podrías setear el refresh en cookie HttpOnly aquí
-            // Response.Cookies.Append("rt", pair.RefreshToken, new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = DateTimeOffset.UtcNow.AddDays(7) });
-            return Ok(new { requieresCode = true, isFirstLogin = !user.Active, userId = user.Id });
-            //return Ok(pair);
+            // No emitir JWT aquí
+            return Ok(new LoginStep1ResponseDto
+            {
+                RequiresCode = true,
+                IsFirstLogin = !user.Active,
+                UserId = user.Id
+            });
         }
 
+        /// <summary>
+        /// 2) Verifica el código enviado y emite Access/Refresh tokens.
+        /// </summary>
         [HttpPost("verify-code")]
-        public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeRequest dto)
+        [ProducesResponseType(typeof(AuthTokens), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeRequestDto dto)
         {
-            var verifier = HttpContext.RequestServices.GetRequiredService<IUserVerificationService>();
-            var ok = await verifier.VerifyAsync(dto.UserId, dto.Code);
+            // Verifica el código (expiración, intentos, etc. lo maneja el servicio)
+            var ok = await _verifier.VerifyAsync(dto.UserId, dto.Code);
             if (!ok) return BadRequest(new { message = "Código inválido o expirado." });
 
-            // Emitir Access + Refresh (aquí sí)
-            var db = HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
-            var user = await db.Set<User>().FirstAsync(u => u.Id == dto.UserId);
+            // Cargar usuario y emitir tokens
+            var user = await _db.Set<User>().FirstOrDefaultAsync(u => u.Id == dto.UserId);
+            if (user is null) return BadRequest(new { message = "Usuario no existe." });
 
             var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName!);
+
             var pair = await _refreshTokenService.IssueAsync(
                 userId: user.Id,
                 accessToken: accessToken,
@@ -91,49 +82,60 @@ namespace Web.Controllers.ModelSecurity
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
+            // (Opcional) Cookie HttpOnly para el refresh:
+            // Response.Cookies.Append("rt", pair.RefreshToken, new CookieOptions {
+            //     HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict,
+            //     Expires = DateTimeOffset.UtcNow.AddDays(7)
+            // });
+
             return Ok(pair);
         }
 
+        /// <summary>
+        /// Reenvía el código (con cooldown en el servicio).
+        /// </summary>
         [HttpPost("resend-code")]
-        public async Task<IActionResult> Resend([FromBody] VerifyCodeRequest dto)
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.TooManyRequests)]
+        public async Task<IActionResult> Resend([FromBody] ResendCodeRequestDto dto)
         {
-            var verifier = HttpContext.RequestServices.GetRequiredService<IUserVerificationService>();
-            var ok = await verifier.ResendAsync(dto.UserId);
-            if (!ok) return BadRequest(new { message = "Espera antes de reenviar otro código." });
+            var canSend = await _verifier.ResendAsync(dto.UserId);
+            if (!canSend)
+                return StatusCode((int)HttpStatusCode.TooManyRequests,
+                    new { message = "Espera antes de reenviar otro código." });
+
             return NoContent();
         }
+
         /// <summary>
-        /// Refresh:
-        /// - Valida el refresh recibido
-        /// - Revoca el refresh usado (rotación obligatoria)
-        /// - Emite y devuelve nuevo Access Token + nuevo Refresh Token
+        /// Rotación de refresh token (best practice).
         /// </summary>
         [HttpPost("refresh")]
+        [ProducesResponseType(typeof(AuthTokens), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<ActionResult<AuthTokens>> Refresh([FromBody] RefreshRequest request)
         {
             var pair = await _refreshTokenService.RefreshAsync(
                 refreshTokenPlain: request.RefreshToken,
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
-
             return Ok(pair);
         }
 
         /// <summary>
-        /// Revoke:
-        /// - Revoca un refresh token específico (logout)
+        /// Revoca un refresh token (logout).
         /// </summary>
         [HttpPost("revoke")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public async Task<IActionResult> Revoke([FromBody] RefreshRequest request)
         {
             await _refreshTokenService.RevokeAsync(
                 refreshTokenPlain: request.RefreshToken,
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
-
             return NoContent();
         }
-
-
     }
-}
+    
+   }
