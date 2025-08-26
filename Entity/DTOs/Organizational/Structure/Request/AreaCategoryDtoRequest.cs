@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entity.Models.Base;
+﻿using System.ComponentModel.DataAnnotations;
+using Entity.DTOs.Base;
 
 namespace Entity.DTOs.Organizational.Structure.Request
 {
-    public class AreaCategoryDtoRequest : GenericModel
+    public class AreaCategoryDtoRequest : GenericDtoRequest
     {
+        [StringLength(300, ErrorMessage = "La descripción no puede exceder los 300 caracteres.")]
+        [RegularExpression(@"(^$|.*\S.*)", ErrorMessage = "La descripción no puede estar compuesta únicamente por espacios en blanco.")]
         public string? Description { get; set; }
     }
 }

@@ -1,14 +1,15 @@
-﻿using Entity.DTOs.Base;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entity.DTOs.Base;
 
-namespace Entity.DTOs.Operational
+namespace Entity.DTOs.Operational.Response
 {
-    public class EventTypeDto : GenericDto
+    public class EventTypeDtoResponse : GenericDto
     {
         public string? Description { get; set; }
+
     }
 }

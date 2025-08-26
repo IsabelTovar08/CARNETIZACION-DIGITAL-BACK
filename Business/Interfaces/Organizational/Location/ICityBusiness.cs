@@ -8,8 +8,8 @@ using Entity.Models.Organizational.Location;
 
 namespace Business.Interfases.Organizational.Location
 {
-    public interface ICityBusiness : IBaseBusiness<City, CityDto, CityDto>
+    public interface ICityBusiness : IBaseBusiness<City, CityDtoResponse, CityDtoResponse>
     {
-        Task<List<CityDto>> GetCityesByDepartmentsAsync(int deparmentId);
+        Task<List<CityDtoResponse>> GetCityesByDepartmentsAsync(int deparmentId);
     }
 }

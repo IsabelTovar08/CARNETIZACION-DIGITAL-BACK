@@ -6,6 +6,8 @@ using Entity.DTOs.Notifications;
 using Entity.DTOs.Notifications.Request;
 using Entity.DTOs.Notifications.Response;
 using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Organizational.Location.Response;
@@ -92,8 +94,8 @@ namespace Utilities.Helper
             CreateMap<MenuStructure, MenuStructureRequest>().ReverseMap();
 
             //Parameter
-            CreateMap<Status, StatusDto>()
-             .ReverseMap();
+            CreateMap<Status, StatusDtoRequest>().ReverseMap();
+            CreateMap<Status, StatusDtoResponse>().ReverseMap();
 
             CreateMap<CustomType, CustomTypeDto>()
              .ForMember(dest => dest.TypeCategoryName, opt => opt.MapFrom(src => src.TypeCategory.Name))
@@ -110,12 +112,12 @@ namespace Utilities.Helper
             //Organizational
 
             //City
-            CreateMap<City, CityDto>()
+            CreateMap<City, CityDtoResponse>()
              .ForMember(dest => dest.DeparmentName, opt => opt.MapFrom(src => src.Department.Name))
             .ReverseMap();
 
             //Deparments
-            CreateMap<Department, DepartmentDto>()
+            CreateMap<Department, DepartmentDtoResponse>()
             .ReverseMap();
 
             //Mapeo de la entidad de organization Unit con sus divisiones
@@ -198,12 +200,12 @@ namespace Utilities.Helper
                 .ReverseMap();
 
             //Event
-            CreateMap<Event, EventDto>()
+            CreateMap<Event, EventDtoResponse>()
            .ReverseMap();
 
             //EventType
-            CreateMap<EventType, EventTypeDto>()
-           .ReverseMap();
+            CreateMap<EventType, EventTypeDtoRequest>().ReverseMap();
+            CreateMap<EventType, EventTypeDtoResponse>().ReverseMap();
 
             //InternalDivision
             CreateMap<InternalDivision, InternalDivisionDto>()
@@ -214,14 +216,15 @@ namespace Utilities.Helper
 
 
             //AccessPoints
+            CreateMap<AccessPoint, AccessPointDtoRequest>().ReverseMap();
 
             // ENTIDAD -> DTO
-            CreateMap<AccessPoint, AccessPointDto>()
+            CreateMap<AccessPoint, AccessPointDtoResponsee>()
                 .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.Event != null ? s.Event.Name : null))
                 .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null));
 
             // DTO -> ENTIDAD
-            CreateMap<AccessPointDto, AccessPoint>()
+            CreateMap<AccessPointDtoResponsee, AccessPoint>()
                 .ForMember(d => d.Event, opt => opt.Ignore())
                 .ForMember(d => d.AccessPointType, opt => opt.Ignore());
 
@@ -235,8 +238,7 @@ namespace Utilities.Helper
                 .ReverseMap();
 
             // EventTargetAudience
-            CreateMap<EventTargetAudience, EventTargetAudienceDto>()
-                .ReverseMap();
+            CreateMap<EventTargetAudience, EventTargetAudienceDtoRequest>().ReverseMap();
 
             CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
                 .ForMember(d => d.EventName,
@@ -263,7 +265,10 @@ namespace Utilities.Helper
                 .ReverseMap();
 
             // Attendance
-            CreateMap<Attendance, AttendanceDto>()
+
+            CreateMap<Attendance, AttendanceDtoRequest>().ReverseMap();
+
+            CreateMap<Attendance, AttendanceDtoResponse>()
                 .ForMember(dest => dest.PersonFullName,
                     opt => opt.MapFrom(src => src.Person != null ? src.Person.FirstName + " " + src.Person.LastName : string.Empty))
                 .ForMember(dest => dest.AccessPointOfEntryName,

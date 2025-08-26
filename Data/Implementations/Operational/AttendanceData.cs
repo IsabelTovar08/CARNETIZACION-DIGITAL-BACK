@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Implementations.Operational
 {
-    public class AttendanceData : CrudBase<Attendance>, IAttendanceData
+    public class AttendanceData : BaseData<Attendance>, IAttendanceData
     {
         public AttendanceData(ApplicationDbContext context, ILogger<Attendance> logger)
             : base(context, logger)

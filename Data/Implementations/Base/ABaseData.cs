@@ -14,6 +14,7 @@ namespace Data.Classes.Base
     public abstract class ABaseData<T> : ICrudBase<T> where T : BaseModel
     {
         public abstract Task<IEnumerable<T>> GetAllAsync();
+        public abstract Task<IEnumerable<T>> GetActiveAsync();
         public abstract Task<T?> GetByIdAsync(int id);
         public abstract Task<T> SaveAsync(T entity);
         public abstract Task<T?> UpdateAsync(T entity);

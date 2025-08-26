@@ -1,8 +1,8 @@
 ﻿using Entity.DTOs.Base;
 
-namespace Entity.DTOs.Operational
+namespace Entity.DTOs.Operational.Response
 {
-    public class EventTargetAudienceDtoResponse : BaseDTO
+    public class EventTargetAudienceDtoResponse : BaseDtoRequest
     {
         public int TypeId { get; set; }
         public int ReferenceId { get; set; }

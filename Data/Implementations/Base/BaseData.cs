@@ -43,6 +43,20 @@ namespace Data.Classes.Base
             }
         }
 
+        public override async Task<IEnumerable<T>> GetActiveAsync()
+        {
+            try
+            {
+                return await _context.Set<T>().Where(x => !x.IsDeleted).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener todos los registros de la entidad {typeof(T).Name}");
+                throw;
+            }
+        }
+
+
         public override async Task<T?> GetByIdAsync(int id)
         {
             try

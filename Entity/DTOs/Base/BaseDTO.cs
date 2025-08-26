@@ -9,6 +9,9 @@ namespace Entity.DTOs.Base
     public class BaseDTO
     {
         public int Id { get; set; }
-        public bool IsDeleted { get; set; } 
+        public bool IsDeleted { get; set; }
+        public DateTime CreateAt { get; set; }
+        public DateTime UpdateAt { get; set; }
+
     }
 }

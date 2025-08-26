@@ -1,15 +1,16 @@
-﻿using Business.Interfases;
-using Entity.DTOs.Operational;
+﻿using System.Threading.Tasks;
+using Business.Interfases;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
-using System.Threading.Tasks;
 
 namespace Business.Interfaces.Operational
 {
-    public interface IAccessPointBusiness : IBaseBusiness<AccessPoint, AccessPointDto, AccessPointDto>
+    public interface IAccessPointBusiness : IBaseBusiness<AccessPoint, AccessPointDtoRequest, AccessPointDtoResponsee>
     {
         /// <summary>
         /// Crea el punto de acceso y genera su QR (Base64 PNG).
         /// </summary>
-        Task<AccessPointDto?> RegisterAsync(AccessPointDto dto);
+        Task<AccessPointDtoResponsee?> RegisterAsync(AccessPointDtoRequest dto);
     }
 }

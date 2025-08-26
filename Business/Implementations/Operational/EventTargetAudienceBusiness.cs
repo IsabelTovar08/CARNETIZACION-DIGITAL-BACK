@@ -8,7 +8,8 @@ using Business.Classes.Base;
 using Business.Interfaces.Operational;
 using Data.Interfases;
 using Data.Interfases.Operational;
-using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
 using Microsoft.Extensions.Logging;
 

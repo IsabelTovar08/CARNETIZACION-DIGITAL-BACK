@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Implementations.Notifications
 {
-    public class NotificationsReceivedData : CrudBase<NotificationReceived>, INotificationsReceivedData
+    public class NotificationsReceivedData : BaseData<NotificationReceived>, INotificationsReceivedData
     {
         public NotificationsReceivedData(ApplicationDbContext context, ILogger<NotificationReceived> logger)
             : base(context, logger)

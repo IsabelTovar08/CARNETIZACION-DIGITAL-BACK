@@ -1,5 +1,6 @@
 ﻿using Business.Interfases;
-using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
 using System;
 using System.Collections.Generic;

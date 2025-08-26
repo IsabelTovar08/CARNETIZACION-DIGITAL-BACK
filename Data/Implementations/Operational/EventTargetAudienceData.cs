@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Implementations.Operational
 {
-    public class EventTargetAudienceData : CrudBase<EventTargetAudience>, IEventTargetAudienceData
+    public class EventTargetAudienceData : BaseData<EventTargetAudience>, IEventTargetAudienceData
     {
         public EventTargetAudienceData(ApplicationDbContext context, ILogger<EventTargetAudience> logger)
             : base(context, logger)

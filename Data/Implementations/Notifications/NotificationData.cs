@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Implementations.Notifications
 {
-    public class NotificationData : CrudBase<Notification>, INotificationData
+    public class NotificationData : BaseData<Notification>, INotificationData
     {
         public NotificationData(ApplicationDbContext context, ILogger<Notification> logger)
             : base(context, logger)

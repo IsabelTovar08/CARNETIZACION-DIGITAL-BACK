@@ -20,6 +20,7 @@ namespace Business.Classes.Base
         public abstract Task<D> Save(DCreate entity);
         public abstract Task<bool> Delete(int id);
         public abstract Task<IEnumerable<D>> GetAll();
+        public abstract Task<IEnumerable<D>> GetActive();
         public abstract Task<D?> GetById(int id);
         public abstract Task<bool> ToggleActiveAsync(int id);
         public abstract Task<D?> Update(DCreate entity);

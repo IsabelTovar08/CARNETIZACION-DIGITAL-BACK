@@ -187,12 +187,19 @@ namespace Business.Classes
                 {
                     ["UserName"] = $"{person.FirstName} {person.LastName}".Trim(),
                     ["Email"] = person.Email,
-                    ["Code"] = user.Password,
                     ["CompanyName"] = "Sistema de Carnetización Digital",
                     ["Year"] = DateTime.Now.Year,
                     ["LoginUrl"] = "https://carnet.tuempresa.com",
                     ["ActionUrl"] = "https://carnet.tuempresa.com/login"
                 };
+                if(user != null)
+                {
+                    if (!string.IsNullOrEmpty(user.Password))
+                    {
+                        model["Code"] = user.Password;
+                    }
+                }
+                
 
                 var html = await EmailTemplates.RenderAsync("Welcome.html", model);
 

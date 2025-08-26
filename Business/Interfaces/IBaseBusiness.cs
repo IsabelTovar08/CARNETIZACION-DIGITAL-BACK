@@ -11,6 +11,7 @@ namespace Business.Interfases
     public interface IBaseBusiness<T, DCreate, D>
     {
         Task<IEnumerable<D>> GetAll();
+        Task<IEnumerable<D>> GetActive();
 
         Task<D?> GetById(int id);
         Task<D> Save(DCreate entity);

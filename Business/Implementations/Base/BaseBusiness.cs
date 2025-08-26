@@ -99,6 +99,24 @@ namespace Business.Classes.Base
         }
 
         /// <summary>
+        /// Obtiene todos los registros activos.
+        /// </summary>
+        public override async Task<IEnumerable<D>> GetActive()
+        {
+            try
+            {
+                IEnumerable<T> list = await _data.GetActiveAsync();
+                IEnumerable<D> listDto = _mapper.Map<IEnumerable<D>>(list);
+                return listDto.ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener todos los {typeof(T).Name}");
+                throw new ExternalServiceException("Base de datos", $"Error al obtener todos los {typeof(T).Name}", ex);
+            }
+        }
+
+        /// <summary>
         /// Obtiene una entidad por ID.
         /// </summary>
         public override async Task<D?> GetById(int id)

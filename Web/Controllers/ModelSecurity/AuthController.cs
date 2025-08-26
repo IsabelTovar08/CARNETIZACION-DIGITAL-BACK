@@ -1,11 +1,13 @@
-﻿using Business.Interfaces.Auth;
+﻿using System.Net;
+using System.Security.Claims;
+using Business.Interfaces.Auth;
 using Business.Interfaces.Security;
 using Entity.Context;
 using Entity.DTOs.Auth;
 using Entity.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace Web.Controllers.ModelSecurity
 {
@@ -126,6 +128,33 @@ namespace Web.Controllers.ModelSecurity
                     new { message = "Espera antes de reenviar otro código." });
 
             return NoContent();
+        }
+
+
+        /// <summary>
+        /// Cambiar la contraseña del usuario.
+        /// </summary>
+        [HttpPatch("change-password")]
+        [Authorize] // ← Requiere usuario autenticado (JWT)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest dto)
+        {
+            // Validación básica del payload
+            if (dto is null || string.IsNullOrWhiteSpace(dto.NewPassword) || string.IsNullOrWhiteSpace(dto.CurrentPassword))
+                return BadRequest("Invalid payload.");
+
+            if (dto.NewPassword != dto.ConfirmNewPassword)
+                return BadRequest("NewPassword and ConfirmNewPassword do not match.");
+
+            // Obtener el userId desde los claims del JWT
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                              ?? User.FindFirst("sub")?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized("Invalid token.");
+
+            // Ejecutar cambio de contraseña
+            await _authService.ChangePasswordAsync(userId, dto.CurrentPassword, dto.NewPassword);
+
+            return NoContent(); // 204 sin contenido cuando todo ok
         }
 
         /// <summary>

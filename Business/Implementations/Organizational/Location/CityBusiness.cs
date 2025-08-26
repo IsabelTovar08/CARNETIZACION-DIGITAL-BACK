@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Business.Implementations.Organizational.Location
 {
-    public class CityBusiness : BaseBusiness<City, CityDto, CityDto>, ICityBusiness
+    public class CityBusiness : BaseBusiness<City, CityDtoResponse, CityDtoResponse>, ICityBusiness
     {
         protected readonly ICityData _cityData;
         public CityBusiness(ICityData cityData, ILogger<City> logger, IMapper mapper) : base(cityData, logger, mapper)
@@ -22,10 +22,10 @@ namespace Business.Implementations.Organizational.Location
             _cityData = cityData;
         }
 
-        public async Task<List<CityDto>> GetCityesByDepartmentsAsync(int deparmentId)
+        public async Task<List<CityDtoResponse>> GetCityesByDepartmentsAsync(int deparmentId)
         {
             var list = await _cityData.GetCityesByDepartmentsAsync(deparmentId);
-            return _mapper.Map<List<CityDto>>(list);
+            return _mapper.Map<List<CityDtoResponse>>(list);
         }
     }
 }

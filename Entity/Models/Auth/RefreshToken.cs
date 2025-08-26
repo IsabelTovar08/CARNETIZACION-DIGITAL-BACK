@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entity.Models.Base;
 
 namespace Entity.Models.Auth
 {
-    public class RefreshToken
+    public class RefreshToken: BaseModel
     {
-        public int Id { get; set; }
         public string TokenHash { get; set; } = default!;
         public string JwtId { get; set; } = default!;
 

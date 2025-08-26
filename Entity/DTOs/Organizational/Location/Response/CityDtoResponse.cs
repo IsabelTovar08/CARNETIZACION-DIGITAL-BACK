@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Location.Response
 {
-    public class DepartmentDto : GenericDto
+    public class CityDtoResponse : GenericDto
     {
+        public int DeparmentId { get; set; }
+        public string? DeparmentName { get; set; }
     }
 }

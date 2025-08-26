@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Operational
 {
-    public  class EventDto : GenericDto
+    public  class EventDtoResponse : GenericDto
     {
         public string Code { get; set; }
         public string? Description { get; set; }

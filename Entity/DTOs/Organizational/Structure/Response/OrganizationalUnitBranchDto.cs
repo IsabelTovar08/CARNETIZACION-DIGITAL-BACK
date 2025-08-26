@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Structure.Response
 {
-    public  class OrganizationalUnitBranchDto : BaseModel
+    public  class OrganizationalUnitBranchDto : BaseDTO
     {
         public int BranchId { get; set; }
         public string? BranchName { get; set; }
