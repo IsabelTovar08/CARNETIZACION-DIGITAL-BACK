@@ -1,17 +1,18 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Threading.Tasks;
+using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Operational;
 using Data.Interfases.Operational;
-using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 using QRCoder;
 
 namespace Business.Implementations.Operational
 {
-    public class AccessPointBusiness : BaseBusiness<AccessPoint, AccessPointDto, AccessPointDto>, IAccessPointBusiness
+    public class AccessPointBusiness : BaseBusiness<AccessPoint, AccessPointDtoRequest, AccessPointDtoResponsee>, IAccessPointBusiness
     {
         private readonly IAccessPointData _data;
         private readonly ILogger<AccessPoint> _logger;
@@ -28,7 +29,7 @@ namespace Business.Implementations.Operational
         /// <summary>
         /// Registra el Punto de Acceso y genera el QR (Base64 PNG) para escaneo en móvil.
         /// </summary>
-        public async Task<AccessPointDto?> RegisterAsync(AccessPointDto dto)
+        public async Task<AccessPointDtoResponsee?> RegisterAsync(AccessPointDtoRequest dto)
         {
             if (dto == null || dto.EventId <= 0 || dto.TypeId <= 0)
             {
@@ -36,14 +37,10 @@ namespace Business.Implementations.Operational
                 return null;
             }
 
-            // Limpia campos de solo lectura
-            dto.EventName = null;
-            dto.Type = null;
-
 
 
             // 1) Guardar para obtener Id
-            var created = await Save(dto);
+            AccessPointDtoResponsee created = await Save(dto);
             if (created == null)
             {
                 _logger.LogWarning("No se pudo crear el AccessPoint.");
@@ -58,8 +55,9 @@ namespace Business.Implementations.Operational
                 // 3) Generar QR Base64 PNG
                 created.QrCode = GenerateQrBase64(payload);
 
-                // 4) Actualizar (tu BaseBusiness.Update recibe DCreate, SIN id)
-                await Update(created);
+                // 4) Mapear de Response -> Request para actualizar
+                AccessPointDtoRequest updateRequest = _mapper.Map<AccessPointDtoRequest>(created);
+                await Update(updateRequest);
 
                 _logger.LogInformation($"AccessPoint registrado con QR (Id={created.Id}).");
                 return created;

@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces.Operational;
-using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Mvc;
 using Web.Controllers.Base;
@@ -8,7 +9,7 @@ namespace Web.Controllers.Operational
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AccessPointController : GenericController<AccessPoint, AccessPointDto, AccessPointDto>
+    public class AccessPointController : GenericController<AccessPoint, AccessPointDtoRequest, AccessPointDtoResponsee>
     {
         private readonly IAccessPointBusiness _business;
         private readonly ILogger<AccessPointController> _logger;
@@ -26,7 +27,7 @@ namespace Web.Controllers.Operational
         /// <param name="dto">Datos del punto de acceso</param>
         /// <returns>AccessPoint con su QR generado</returns>
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] AccessPointDto dto)
+        public async Task<IActionResult> Register([FromBody] AccessPointDtoRequest dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

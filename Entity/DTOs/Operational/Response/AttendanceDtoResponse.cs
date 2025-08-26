@@ -2,9 +2,9 @@
 using Entity.Models.Base;
 using System;
 
-namespace Entity.DTOs.Operational
+namespace Entity.DTOs.Operational.Response
 {
-    public class AttendanceDto : BaseDTO
+    public class AttendanceDtoResponse : BaseDTO
     {
         public int PersonId { get; set; }
         public string PersonFullName { get; set; }
@@ -20,10 +20,7 @@ namespace Entity.DTOs.Operational
         public string? AccessPointOfExitName { get; set; }
 
 
-        public int EventId { get; set; }
         public string? EventName { get; set; }
 
-        // QR Base64
-        public string? QrCode { get; set; }
     }
 }

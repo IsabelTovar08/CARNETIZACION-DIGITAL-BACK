@@ -1,15 +1,16 @@
-﻿using Business.Interfases;
-using Entity.DTOs.Operational;
+﻿using System.Threading.Tasks;
+using Business.Interfases;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
-using System.Threading.Tasks;
 
 namespace Business.Interfaces.Operational
 {
-    public interface IAttendanceBusiness : IBaseBusiness<Attendance, AttendanceDto, AttendanceDto>
+    public interface IAttendanceBusiness : IBaseBusiness<Attendance, AttendanceDtoRequest, AttendanceDtoResponse>
     {
         /// <summary>
         /// Registra la asistencia a través de un QR escaneado.
         /// </summary>
-        Task<AttendanceDto?> RegisterAttendanceAsync(AttendanceDto dto);
+        Task<AttendanceDtoResponse?> RegisterAttendanceAsync(AttendanceDtoRequest dto);
     }
 }

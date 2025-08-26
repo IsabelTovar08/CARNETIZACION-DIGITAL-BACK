@@ -9,7 +9,7 @@ using Entity.Models.Organizational;
 
 namespace Business.Interfaces.Operational
 {
-    public interface IEventBusiness : IBaseBusiness<Event, EventDto, EventDto>
+    public interface IEventBusiness : IBaseBusiness<Event, EventDtoResponse, EventDtoResponse>
     {
     }
 }

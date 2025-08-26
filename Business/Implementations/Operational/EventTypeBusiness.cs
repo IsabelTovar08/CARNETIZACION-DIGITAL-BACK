@@ -10,12 +10,14 @@ using Business.Interfases;
 using Data.Interfases;
 using Data.Interfases.Operational;
 using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
 using Microsoft.Extensions.Logging;
 
 namespace Business.Implementations.Operational
 {
-    public class EventTypeBusiness : BaseBusiness<EventType, EventTypeDto, EventTypeDto>, IEventTypeBusiness
+    public class EventTypeBusiness : BaseBusiness<EventType, EventTypeDtoRequest, EventTypeDtoResponse>, IEventTypeBusiness
     {
         public readonly IEventTypeData _data;
         public EventTypeBusiness(IEventTypeData data, ILogger<EventType> logger, IMapper mapper) : base(data, logger, mapper)

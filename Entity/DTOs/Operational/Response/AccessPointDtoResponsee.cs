@@ -2,9 +2,9 @@
 using Entity.Models.Base;
 using System;
 
-namespace Entity.DTOs.Operational
+namespace Entity.DTOs.Operational.Response
 {
-    public class AccessPointDto : GenericDto
+    public class AccessPointDtoResponsee : GenericDto
     {
         public string? Description { get; set; }
 

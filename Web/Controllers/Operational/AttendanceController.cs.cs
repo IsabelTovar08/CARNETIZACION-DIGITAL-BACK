@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Business.Interfaces.Operational;
-using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace Web.Controllers.Operational
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class AttendanceController : GenericController<Attendance, AttendanceDto, AttendanceDto>
+    public class AttendanceController : GenericController<Attendance, AttendanceDtoRequest, AttendanceDtoResponse>
     {
         private readonly IAttendanceBusiness _attendanceBusiness;
         private readonly ILogger<AttendanceController> _logger;
@@ -34,7 +35,7 @@ namespace Web.Controllers.Operational
         [HttpPost("scan")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RegisterAttendance([FromBody] AttendanceDto dto)
+        public async Task<IActionResult> RegisterAttendance([FromBody] AttendanceDtoRequest dto)
         {
             if (dto == null)
             {

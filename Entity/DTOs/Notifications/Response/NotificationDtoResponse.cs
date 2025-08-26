@@ -11,9 +11,10 @@ namespace Entity.DTOs.Notifications.Response
     {
         public int PersonId { get; set; }
         public int StatusId { get; set; }
+        public int StatusName { get; set; }
+
         public string Title { get; set; }
         public string Message { get; set; }
         public bool IsRead { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }

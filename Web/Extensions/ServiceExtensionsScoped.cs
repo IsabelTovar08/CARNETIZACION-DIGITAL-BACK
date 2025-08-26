@@ -169,7 +169,9 @@ namespace Web.Extensions
 
 
 
-
+            // Event-target
+            services.AddScoped<IEventTargetAudienceData, EventTargetAudienceData>();
+            services.AddScoped<IEventTargetAudienceBusiness, EventTargetAudienceBusiness>();
 
 
 

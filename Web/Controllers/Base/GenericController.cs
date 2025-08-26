@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Exeptions;
+using Utilities.Responses;
 
 namespace Web.Controllers.Base
 {
@@ -12,7 +13,6 @@ namespace Web.Controllers.Base
     /// <typeparam name="T">Entidad principal</typeparam>
     /// <typeparam name="DRequest">DTO de entrada para crear o actualizar</typeparam>
     /// <typeparam name="D">DTO de salida o de respuesta</typeparam>
-    
     [Route("api/[controller]")]
     [ApiController]
     [Produces("application/json")]
@@ -42,13 +42,34 @@ namespace Web.Controllers.Base
         {
             try
             {
-                var entities = await _business.GetAll();
-                return Ok(entities);
+                var entities = await _business.GetAll(); // IEnumerable<D>
+                // Si tu capa Business puede brindar el total, colócalo aquí.
+                return Ok(ApiResponse<IEnumerable<D>>.Ok(entities, "Listado obtenido"));
             }
             catch (ExternalServiceException ex)
             {
                 _logger.LogError(ex, "Error al obtener datos");
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Obtiene todas las entidades activas.
+        /// </summary>
+        /// <returns>Lista de entidades activas filtrando IsDeleted : False.</returns>
+        //[Authorize]
+        [HttpGet("Active")]
+        public virtual async Task<IActionResult> GetActive()
+        {
+            try
+            {
+                var entities = await _business.GetActive(); // IEnumerable<D>
+                return Ok(ApiResponse<IEnumerable<D>>.Ok(entities, "Listado activo obtenido"));
+            }
+            catch (ExternalServiceException ex)
+            {
+                _logger.LogError(ex, "Error al obtener datos");
+                return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
             }
         }
 
@@ -63,23 +84,23 @@ namespace Web.Controllers.Base
         {
             try
             {
-                var entity = await _business.GetById(id);
-                return Ok(entity);
+                var entity = await _business.GetById(id); // D
+                return Ok(ApiResponse<D>.Ok(entity, "Entidad encontrada"));
             }
             catch (ValidationException ex)
             {
                 _logger.LogWarning(ex, "Validación fallida para el ID: {Id}", id);
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse<object>.Fail(ex.Message));
             }
             catch (EntityNotFoundException ex)
             {
                 _logger.LogInformation(ex, "Entidad no encontrada con ID: {Id}", id);
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.Fail(ex.Message));
             }
             catch (ExternalServiceException ex)
             {
                 _logger.LogError(ex, "Error al obtener entidad con ID: {Id}", id);
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
             }
         }
 
@@ -97,18 +118,26 @@ namespace Web.Controllers.Base
 
             try
             {
-                var created = await _business.Save(dto);
-                return CreatedAtAction(nameof(GetById), new { id = ((dynamic)created).Id }, created);
+                var created = await _business.Save(dto); // D
+                // Intento obtener el Id de la respuesta sin forzar contrato
+                var id = TryGetId(created);
+                var response = ApiResponse<D>.Ok(created, "Entidad creada");
+
+                if (id is not null)
+                    return CreatedAtAction(nameof(GetById), new { id }, response);
+
+                // Si no hay Id, devolvemos 201 sin location
+                return StatusCode(201, response);
             }
             catch (ValidationException ex)
             {
                 _logger.LogWarning(ex, "Validación fallida al crear entidad");
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse<object>.Fail(ex.Message));
             }
             catch (ExternalServiceException ex)
             {
                 _logger.LogError(ex, "Error al crear entidad");
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
             }
         }
 
@@ -126,23 +155,23 @@ namespace Web.Controllers.Base
 
             try
             {
-                var updated = await _business.Update(dto);
-                return Ok(updated);
+                var updated = await _business.Update(dto); // D
+                return Ok(ApiResponse<D>.Ok(updated, "Entidad actualizada"));
             }
             catch (ValidationException ex)
             {
                 _logger.LogWarning(ex, "Validación fallida al actualizar entidad");
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse<object>.Fail(ex.Message));
             }
             catch (EntityNotFoundException ex)
             {
                 _logger.LogInformation(ex, "Entidad no encontrada al actualizar");
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.Fail(ex.Message));
             }
             catch (ExternalServiceException ex)
             {
                 _logger.LogError(ex, "Error al actualizar entidad");
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
             }
         }
 
@@ -158,22 +187,22 @@ namespace Web.Controllers.Base
             try
             {
                 await _business.Delete(id);
-                return Ok();
+                return Ok(ApiResponse<object>.Ok(null, "Eliminado correctamente"));
             }
             catch (ValidationException ex)
             {
                 _logger.LogWarning(ex, "Validación fallida al eliminar entidad");
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse<object>.Fail(ex.Message));
             }
             catch (EntityNotFoundException ex)
             {
                 _logger.LogInformation(ex, "Entidad no encontrada al eliminar");
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.Fail(ex.Message));
             }
             catch (ExternalServiceException ex)
             {
                 _logger.LogError(ex, "Error al eliminar entidad");
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
             }
         }
 
@@ -188,29 +217,46 @@ namespace Web.Controllers.Base
         {
             if (id <= 0)
             {
-                return BadRequest("El id debe ser mayor que cero.");
+                return BadRequest(ApiResponse<object>.Fail("El id debe ser mayor que cero."));
             }
 
             try
             {
-                var result = await _business.ToggleActiveAsync(id);
-                return Ok(new { Message = $"Estado lógico actualizado correctamente para Id {id}." });
+                await _business.ToggleActiveAsync(id);
+                return Ok(ApiResponse<object>.Ok(null, $"Estado lógico actualizado correctamente para Id {id}."));
             }
             catch (ValidationException vex)
             {
                 _logger.LogWarning(vex, $"Validación fallida para ToggleActive con Id: {id}");
-                return BadRequest(vex.Message);
+                return BadRequest(ApiResponse<object>.Fail(vex.Message));
             }
             catch (ExternalServiceException esex)
             {
                 _logger.LogError(esex, $"Error externo al actualizar estado lógico para Id: {id}");
-                return StatusCode(500, esex.Message);
+                return StatusCode(500, ApiResponse<object>.Fail(esex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error inesperado al actualizar estado lógico para Id: {id}");
-                return StatusCode(500, "Error interno en el servidor.");
+                return StatusCode(500, ApiResponse<object>.Fail("Error interno en el servidor."));
             }
+        }
+
+        // ==========================
+        // Helpers privados
+        // ==========================
+
+        // Intenta leer una propiedad "Id" (por convención) sin forzar interfaz
+        private static int? TryGetId(object? entity)
+        {
+            if (entity is null) return null;
+            var prop = entity.GetType().GetProperty("Id");
+            if (prop is null) return null;
+            var value = prop.GetValue(entity);
+            if (value is int i) return i;
+            if (value is long l) return (int)l;
+            if (int.TryParse(value?.ToString(), out var parsed)) return parsed;
+            return null;
         }
     }
 }

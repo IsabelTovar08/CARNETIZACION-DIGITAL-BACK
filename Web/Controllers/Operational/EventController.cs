@@ -6,7 +6,7 @@ using Web.Controllers.Base;
 
 namespace Web.Controllers.Operational
 {
-    public class EventController : GenericController<Event, EventDto, EventDto>
+    public class EventController : GenericController<Event, EventDtoResponse, EventDtoResponse>
     {
         public EventController(IEventBusiness business, ILogger<EventController> logger) : base(business, logger)
         {

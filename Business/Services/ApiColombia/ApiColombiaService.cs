@@ -19,26 +19,26 @@ namespace Business.Services.ApiColombia
             _httpClient = httpClient;
         }
 
-        public async Task<List<DepartmentDto>> GetDepartmentsAsync()
+        public async Task<List<DepartmentDtoResponse>> GetDepartmentsAsync()
         {
             var response = await _httpClient.GetAsync($"{UrlBase}/Department");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var departamentos = JsonSerializer.Deserialize<List<DepartmentDto>>(json, new JsonSerializerOptions
+            var departamentos = JsonSerializer.Deserialize<List<DepartmentDtoResponse>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
             return departamentos!;
         }
 
-        public async Task<List<CityDto>> GetCityesByDepartmentsAsync(int deparmentId)
+        public async Task<List<CityDtoResponse>> GetCityesByDepartmentsAsync(int deparmentId)
         {
             var response = await _httpClient.GetAsync($"{UrlBase}/Department/{deparmentId}/cities");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var departamentos = JsonSerializer.Deserialize<List<CityDto>>(json, new JsonSerializerOptions
+            var departamentos = JsonSerializer.Deserialize<List<CityDtoResponse>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });

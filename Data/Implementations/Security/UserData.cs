@@ -52,6 +52,11 @@ namespace Data.Classes.Specifics
                     u.UserName == identifier || (u.Person != null && u.Person.Email == identifier));
         }
 
-       
+        public async Task<User?> ChangePassword(string email)
+        {
+            return await _context.Set<User>().Where(u => !u.IsDeleted)
+                .Include(u => u.Person)
+               .FirstOrDefaultAsync(u => u.Person.Email == email);
+        }
     }
 }

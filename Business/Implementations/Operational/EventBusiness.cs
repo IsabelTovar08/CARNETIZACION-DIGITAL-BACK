@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Business.Implementations.Operational
 {
-    public class EventBusiness : BaseBusiness<Event, EventDto, EventDto>, IEventBusiness
+    public class EventBusiness : BaseBusiness<Event, EventDtoResponse, EventDtoResponse>, IEventBusiness
     {
         public readonly IEventData _data;
         public EventBusiness(IEventData data, ILogger<Event> logger, IMapper mapper) : base(data, logger, mapper)

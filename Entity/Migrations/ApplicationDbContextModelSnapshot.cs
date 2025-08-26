@@ -36,6 +36,9 @@ namespace Entity.Migrations
                     b.Property<DateTime>("Expires")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("JwtId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -777,7 +780,7 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             DocumentNumber = "1234567890",
-                            FirstName = "Carlos",
+                            FirstName = "Demo",
                             IsDeleted = false,
                             LastName = "Funcionario",
                             Phone = "3200001111"
@@ -808,6 +811,33 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             LastName = "Usuario",
                             Phone = "3151234567"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DocumentNumber = "1234561630",
+                            FirstName = "María",
+                            IsDeleted = false,
+                            LastName = "Tovar",
+                            Phone = "3200056311"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            DocumentNumber = "1245567890",
+                            FirstName = "Camilo",
+                            IsDeleted = false,
+                            LastName = "Charry",
+                            Phone = "3200014311"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            DocumentNumber = "1235267890",
+                            FirstName = "Marcos",
+                            IsDeleted = false,
+                            LastName = "Alvarez",
+                            Phone = "320026111"
                         });
                 });
 
@@ -2792,6 +2822,39 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 2,
+                            Active = true,
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Password = "Marcos2025",
+                            PersonId = 7,
+                            TempCodeAttempts = 0,
+                            UserName = "marcosrojasalvarez09172007@gmail.com"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Password = "isa123",
+                            PersonId = 5,
+                            TempCodeAttempts = 0,
+                            UserName = "isabeltovarp.18@gmail.com"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Active = true,
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Password = "Katalin@01",
+                            PersonId = 6,
+                            TempCodeAttempts = 0,
+                            UserName = "cachape64@gmail.com"
+                        },
+                        new
+                        {
+                            Id = 5,
                             Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
@@ -2801,7 +2864,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 3,
+                            Id = 6,
                             Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
@@ -2811,7 +2874,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 4,
+                            Id = 7,
                             Active = false,
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,

@@ -1,18 +1,16 @@
-﻿using Entity.Models.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using Entity.DTOs.Base;
 
 namespace Entity.DTOs.Organizational.Structure.Request
 {
-    public class OrganizationalUnitBranchDtoRequest : BaseModel
+    public class OrganizationalUnitBranchDtoRequest : BaseDtoRequest
     {
+        [Required(ErrorMessage = "El identificador de la sede es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El identificador de la sede debe ser un número entero mayor que 0.")]
         public int BranchId { get; set; }
-        public string? BranchName { get; set; }
 
+        [Required(ErrorMessage = "El identificador de la unidad organizacional es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El identificador de la unidad organizacional debe ser un número entero mayor que 0.")]
         public int OrganizationalUnitId { get; set; }
-        public string? OrganizationalUnitName { get; set; }
     }
 }

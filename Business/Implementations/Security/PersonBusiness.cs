@@ -41,6 +41,37 @@ namespace Business.Classes
             _userRolBusiness = userRolBusiness;
         }
 
+        public override async Task ValidateAsync(Person entity)
+        {
+            var errors = new List<(string Field, string Message)>();
+
+            if (!string.IsNullOrWhiteSpace(entity.Phone))
+            {
+                if (await _data.ExistsByAsync(x => x.Phone , entity.Phone ))
+                    errors.Add(("Phone ", "El teléfono ya está registrado."));
+            }
+            if (!string.IsNullOrWhiteSpace(entity.Email))
+            {
+                if (await _data.ExistsByAsync(x => x.Email, entity.Email))
+                    errors.Add(("Email ", "El Email ya está registrado."));
+            }
+            if (!string.IsNullOrWhiteSpace(entity.DocumentNumber))
+            {
+                if (await _data.ExistsByAsync(x => x.DocumentNumber, entity.DocumentNumber))
+                    errors.Add(("DocumentNumber ", "El DocumentNumber ya está registrado."));
+            }
+            if ((int)entity.DocumentTypeId <= 0)
+                errors.Add(("Tipo de documento", "Debe seleccionar un Tipo de documento válido."));
+            if ((int)entity.BloodTypeId <= 0)
+                errors.Add(("Tipo de sangre", "Debe seleccionar un Tipo de sangre válido."));
+            if ((int)entity.CityId <= 0)
+                errors.Add(("Ciudad", "Debe seleccionar una ciudad válida."));
+            if (errors.Count > 0)
+            {
+                var combined = string.Join(" | ", errors.Select(e => $"{e.Field}: {e.Message}"));
+                throw new ValidationException(errors[0].Field, combined);
+            }
+        }
         protected  void Validate(PersonDtoRequest person)
         {
             if (person == null)
@@ -61,10 +92,13 @@ namespace Business.Classes
         {
             try
             {
-                //Validate(personDTO);
+                Validate(personDTO);
+         
                 await EnsureIdentificationIsUnique(personDTO.DocumentNumber);
 
                 var person = _mapper.Map<Person>(personDTO);
+
+                await ValidateAsync(person);
 
                 var created = await _data.SaveAsync(person);
                 await SendWelcomeNotifications(person, null);
@@ -153,12 +187,19 @@ namespace Business.Classes
                 {
                     ["UserName"] = $"{person.FirstName} {person.LastName}".Trim(),
                     ["Email"] = person.Email,
-                    ["Code"] = user.Password,
                     ["CompanyName"] = "Sistema de Carnetización Digital",
                     ["Year"] = DateTime.Now.Year,
                     ["LoginUrl"] = "https://carnet.tuempresa.com",
                     ["ActionUrl"] = "https://carnet.tuempresa.com/login"
                 };
+                if(user != null)
+                {
+                    if (!string.IsNullOrEmpty(user.Password))
+                    {
+                        model["Code"] = user.Password;
+                    }
+                }
+                
 
                 var html = await EmailTemplates.RenderAsync("Welcome.html", model);
 

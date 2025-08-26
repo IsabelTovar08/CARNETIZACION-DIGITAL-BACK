@@ -7,7 +7,7 @@ using Web.Controllers.Base;
 
 namespace Web.Controllers.Ubication
 {
-    public class CityController : GenericController<City, CityDto, CityDto>
+    public class CityController : GenericController<City, CityDtoResponse, CityDtoResponse>
     {
         protected readonly ICityBusiness _cityBusiness;
         public CityController(ICityBusiness cityBusiness, ILogger<CityController> logger) : base(cityBusiness, logger)

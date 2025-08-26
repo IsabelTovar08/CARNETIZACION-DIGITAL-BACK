@@ -2,7 +2,6 @@
 using Business.Classes.Base;
 using Business.Interfaces.Operational;
 using Data.Interfases.Operational;
-using Entity.DTOs.Operational;
 using Entity.Models.Organizational;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,10 +9,12 @@ using System.Threading.Tasks;
 
 // dotnet add <TU_PROYECTO> package QRCoder
 using QRCoder;
+using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Operational.Request;
 
 namespace Business.Implementations.Operational
 {
-    public class AttendanceBusiness : BaseBusiness<Attendance, AttendanceDto, AttendanceDto>, IAttendanceBusiness
+    public class AttendanceBusiness : BaseBusiness<Attendance, AttendanceDtoRequest, AttendanceDtoResponse>, IAttendanceBusiness
     {
         private readonly IAttendanceData _attendanceData;
         private readonly ILogger<Attendance> _logger;
@@ -33,7 +34,7 @@ namespace Business.Implementations.Operational
         /// <summary>
         /// Registra asistencia (desde escaneo móvil), normaliza campos y genera el QR.
         /// </summary>
-        public async Task<AttendanceDto?> RegisterAttendanceAsync(AttendanceDto dto)
+        public async Task<AttendanceDtoResponse?> RegisterAttendanceAsync(AttendanceDtoRequest dto)
         {
             if (dto == null || dto.PersonId <= 0)
             {
@@ -60,12 +61,11 @@ namespace Business.Implementations.Operational
 
                 // 🔹 Construir payload del QR (no sensible) y generarlo en Base64 (PNG)
                 string qrPayload = BuildQrPayload(dto);
-                dto.QrCode = GenerateQrCodeBase64(qrPayload);
 
                 // Guardar asistencia (usa Save del BaseBusiness)
                 var created = await Save(dto);
 
-                _logger.LogInformation($"Asistencia registrada correctamente para PersonId={dto.PersonId}, EventId={dto.EventId}.");
+                _logger.LogInformation($"Asistencia registrada correctamente para PersonId={dto.PersonId}, EventId={created.EventName}.");
                 return created;
             }
             catch (Exception ex)
@@ -78,14 +78,14 @@ namespace Business.Implementations.Operational
         /// <summary>
         /// Payload estable y fácil de validar. Evita datos sensibles.
         /// </summary>
-        private static string BuildQrPayload(AttendanceDto dto)
+        private static string BuildQrPayload(AttendanceDtoRequest dto)
         {
             // Se prioriza punto de entrada; si no hay, se usa salida; si no hay ninguno -> "NA"
             var apId = dto.AccessPointOfEntry ?? dto.AccessPointOfExit;
             var apText = apId.HasValue ? apId.Value.ToString() : "NA";
 
             // Puedes ajustar el formato si quieres JSON; esto es compacto y suficiente para validar.
-            return $"EVENT:{dto.EventId}|PERSON:{dto.PersonId}|ACCESS:{apText}|DATE:{DateTime.UtcNow:O}";
+            return $"PERSON:{dto.PersonId}|ACCESS:{apText}|DATE:{DateTime.UtcNow:O}";
         }
 
         /// <summary>

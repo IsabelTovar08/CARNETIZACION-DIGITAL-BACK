@@ -9,8 +9,8 @@ namespace Business.Interfaces.ApiColombia
 {
     public interface IColombiaApiService
     {
-        Task<List<DepartmentDto>> GetDepartmentsAsync();
-        Task<List<CityDto>> GetCityesByDepartmentsAsync(int deparmentId);
+        Task<List<DepartmentDtoResponse>> GetDepartmentsAsync();
+        Task<List<CityDtoResponse>> GetCityesByDepartmentsAsync(int deparmentId);
     }
 }
 
