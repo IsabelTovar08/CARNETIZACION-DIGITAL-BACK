@@ -24,6 +24,7 @@ using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
+using System.Globalization; // ➕ para formateo es-CO
 
 namespace Utilities.Helper
 {
@@ -275,10 +276,17 @@ namespace Utilities.Helper
                     opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Name : null))
                 .ForMember(dest => dest.AccessPointOfExitName,
                     opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Name : null))
-                 .ForMember(dest => dest.EventName,
+                .ForMember(dest => dest.EventName,
                     opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Event.Name : null))
-                 //.ForMember(dest => dest.EventId,
-                 //   opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Event.Id : null))
+
+                // ➕ Formateo de fechas a string (cultura es-CO). Sin helpers externos.
+                .ForMember(dest => dest.TimeOfEntryStr,
+                    opt => opt.MapFrom(src => src.TimeOfEntry.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))))
+                .ForMember(dest => dest.TimeOfExitStr,
+                    opt => opt.MapFrom(src => src.TimeOfExit.HasValue
+                        ? src.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))
+                        : null))
+
                 .ReverseMap()
                     .ForMember(dest => dest.Person, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())
