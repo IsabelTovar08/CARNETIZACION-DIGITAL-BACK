@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:Entity/Migrations/20250826202743_initial.Designer.cs
-    [Migration("20250826202743_initial")]
+    [Migration("20250827042304_initial")]
     partial class initial
-========
-    [Migration("20250826155214_Users-init")]
-    partial class Usersinit
->>>>>>>> 1c7d671cda603a4210b8e82fa351a6ef1f32b7d4:Entity/Migrations/20250826155214_Users-init.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2800,6 +2795,9 @@ namespace Entity.Migrations
 
                     b.Property<string>("TempCodeHash")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("TempCodeResendBlockedUntil")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(450)");

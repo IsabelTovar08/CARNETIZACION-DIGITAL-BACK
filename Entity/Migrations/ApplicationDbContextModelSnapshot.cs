@@ -2793,6 +2793,9 @@ namespace Entity.Migrations
                     b.Property<string>("TempCodeHash")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("TempCodeResendBlockedUntil")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(450)");
 

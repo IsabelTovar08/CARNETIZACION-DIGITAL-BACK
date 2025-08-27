@@ -48,10 +48,13 @@ namespace Business.Services.Auth
             MailAddress addr = new MailAddress(toRaw.Trim());
             return addr.Address; // solo "email@dom.com"
         }
-
         public async Task GenerateAndSendAsync(User user)
         {
-            // Para asegurar que se trae el email de la persona
+            await GenerateAndSendAsync(user, true); // por defecto, resetea
+        }
+
+        public async Task GenerateAndSendAsync(User user, bool resetResendAttempts)
+        {
             User? loaded = await _db.Set<User>()
                 .Include(u => u.Person)
                 .FirstOrDefaultAsync(u => u.Id == user.Id && !u.IsDeleted);
@@ -65,14 +68,20 @@ namespace Business.Services.Auth
 
             DateTimeOffset now = _clock.UtcNow;
             user.TempCodeHash = _hasher.Hash(code);
-            user.TempCodeAttempts = 0;
+            user.TempCodeAttempts = 0;          // intentos de verificación del código
             user.TempCodeConsumedAt = null;
-            user.TempCodeCreatedAt = now;
+            user.TempCodeCreatedAt = now;       // marca el último envío/generación
             user.TempCodeExpiresAt = now.AddMinutes(ttl);
+
+            if (resetResendAttempts)
+            {
+                user.TempCodeAttempts = 0;           // ← reset SOLO de reenvíos
+                user.TempCodeResendBlockedUntil = null; // ← quita bloqueo
+            }
 
             await _db.SaveChangesAsync();
 
-            Dictionary<string, object> model = new Dictionary<string, object>
+            var model = new Dictionary<string, object>
             {
                 ["title"] = "Código de Verificación",
                 ["verification_code"] = code,
@@ -80,10 +89,7 @@ namespace Business.Services.Auth
             };
 
             string html = await EmailTemplates.RenderByKeyAsync("verify", model);
-
-            // Validar/normalizar destinatario
             string to = GetVerifiedEmail(user);
-
             await _notify.NotifyAsync("email", to, "Verifica tu identidad", html);
         }
 
@@ -115,13 +121,21 @@ namespace Business.Services.Auth
             user.TempCodeConsumedAt = now;
             if (!user.Active) user.Active = true;
 
+            // Éxito: limpia intentos de verificación y (opcional) reenvíos/bloqueo
+            user.TempCodeAttempts = 0;
+            user.TempCodeAttempts = 0;
+            user.TempCodeResendBlockedUntil = null;
+
             await _db.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> ResendAsync(int userId)
         {
-            int cooldownSeconds = int.Parse(_cfg["Codes:ResendCooldownSeconds"] ?? "50");
+            int cooldownSeconds = int.Parse(_cfg["Codes:ResendCooldownSeconds"] ?? "60");
+            int maxResends = int.Parse(_cfg["Codes:MaxResendAttempts"] ?? "5");
+            int blockMinutes = 60;
+
             DateTimeOffset now = _clock.UtcNow;
 
             User? user = await _db.Set<User>()
@@ -130,11 +144,28 @@ namespace Business.Services.Auth
 
             if (user is null) return false;
 
+            // 1) ¿bloqueado?
+            if (user.TempCodeResendBlockedUntil.HasValue && now < user.TempCodeResendBlockedUntil.Value)
+                return false;
+
+            // 2) ¿llegó al tope? -> bloquear 1 hora
+            if (user.TempCodeAttempts >= maxResends)
+            {
+                user.TempCodeResendBlockedUntil = now.AddMinutes(blockMinutes);
+                await _db.SaveChangesAsync();
+                return false;
+            }
+
+            // 3) cooldown entre reenvíos (usa la marca del último envío/generación)
             if (user.TempCodeCreatedAt.HasValue &&
                 (now - user.TempCodeCreatedAt.Value).TotalSeconds < cooldownSeconds)
                 return false;
 
-            await GenerateAndSendAsync(user);
+            // 4) OK → genera y envía (no resetees el estado de reenvíos aquí)
+            await GenerateAndSendAsync(user, resetResendAttempts: false);
+
+            user.TempCodeAttempts++;
+            await _db.SaveChangesAsync();
             return true;
         }
     }
