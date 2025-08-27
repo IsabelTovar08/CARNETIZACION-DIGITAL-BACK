@@ -12,6 +12,6 @@ namespace Entity.DTOs.Auth
         public bool isFirtsLogin   { get; set; }
         public string Message { get; set; }
         //public string userName { get; set; }
-        //public int UserId { get; set; }
+        public int UserId { get; set; }
     }
 }

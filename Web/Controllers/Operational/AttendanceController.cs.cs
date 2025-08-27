@@ -58,5 +58,61 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
+
+        /// <summary>
+        /// REGISTRA SOLO LA ENTRADA usando AttendanceDtoRequestSpecific.
+        /// Falla si ya existe una entrada abierta para la persona.
+        /// </summary>
+        [HttpPost("register-entry")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RegisterEntry([FromBody] AttendanceDtoRequestSpecific dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _attendanceBusiness.RegisterEntryAsync(dto);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Entrada registrada correctamente.",
+                    data = result
+                });
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar ENTRADA.");
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// REGISTRA SOLO LA SALIDA usando AttendanceDtoRequestSpecific.
+        /// Falla si no existe una entrada abierta para la persona.
+        /// </summary>
+        [HttpPost("register-exit")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RegisterExit([FromBody] AttendanceDtoRequestSpecific dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _attendanceBusiness.RegisterExitAsync(dto);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Salida registrada correctamente.",
+                    data = result
+                });
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar SALIDA.");
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }
