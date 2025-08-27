@@ -28,7 +28,6 @@ namespace Entity.Models
         public bool Active { get; set; } = false;
 
         //Codigo temporal
-        
         public string? TempCodeHash { get; set; }
         // Fecha de creacion del codigo temporal
         public DateTimeOffset? TempCodeCreatedAt { get; set; }
