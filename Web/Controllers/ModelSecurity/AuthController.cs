@@ -8,6 +8,7 @@ using Entity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Utilities.Responses;
 
 namespace Web.Controllers.ModelSecurity
 {
@@ -47,36 +48,63 @@ namespace Web.Controllers.ModelSecurity
         public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new LoginStep1ResponseDto { Message = "Solicitud inválida." });
+            {
+                return BadRequest(new ApiResponse<LoginStep1ResponseDto>
+                {
+                    Success = false,
+                    Message = "Solicitud inválida.",
+                    Data = null
+                });
+            }
 
             try
             {
                 var user = await _authService.LoginAsync(request);
                 if (user is null)
-                    return Unauthorized(new LoginStep1ResponseDto { Message = "Credenciales inválidas." });
+                {
+                    return Unauthorized(new ApiResponse<LoginStep1ResponseDto>
+                    {
+                        Success = false,
+                        Message = "Credenciales inválidas.",
+                        Data = null
+                    });
+                }
 
                 await _verifier.GenerateAndSendAsync(user);
 
-                return Ok(new LoginStep1ResponseDto
+                return Ok(new ApiResponse<LoginStep1ResponseDto>
                 {
+                    Success = true,
                     Message = "El código fue enviado exitosamente a tu correo.",
-                    isFirtsLogin = user.Active      // ← descomenta si quieres retornarlo al front
+                    Data = new LoginStep1ResponseDto
+                    {
+                        isFirtsLogin = user.Active,
+                        UserId = user.Id
+                    }
                 });
             }
             catch (Utilities.Exeptions.ValidationException ex)
             {
                 _logger.LogWarning(ex, "Validación en /login para {Email}", request.Email);
-                return BadRequest(new LoginStep1ResponseDto { Message = ex.Message });
+                return BadRequest(new ApiResponse<LoginStep1ResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inesperado en /login");
-                return StatusCode(500, new LoginStep1ResponseDto
+                return StatusCode(500, new ApiResponse<LoginStep1ResponseDto>
                 {
-                    Message = "No se pudo enviar el código, revisa los datos ingresados o vuelve a intentarlo."
+                    Success = false,
+                    Message = "No se pudo enviar el código, revisa los datos ingresados o vuelve a intentarlo.",
+                    Data = null
                 });
             }
         }
+
 
         /// <summary>
         /// 2) Verifica el código enviado y emite Access/Refresh tokens.

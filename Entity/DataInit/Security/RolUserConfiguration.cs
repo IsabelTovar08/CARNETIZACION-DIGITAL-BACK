@@ -18,7 +18,12 @@ namespace Entity.DataInit.Security
                new UserRoles { Id = 1, RolId = 1, UserId = 1 }, // Funcionario
                new UserRoles { Id = 2, RolId = 2, UserId = 2 }, // Estudiante
                new UserRoles { Id = 3, RolId = 3, UserId = 3 }, // Admin
-               new UserRoles { Id = 4, RolId = 4, UserId = 4 }  // Usuario
+               new UserRoles { Id = 4, RolId = 4, UserId = 4 },  // Usuario
+
+               new UserRoles { Id = 5, RolId = 1, UserId = 2 },  // Usuario
+               new UserRoles { Id = 6, RolId = 1, UserId = 3 },  // Usuario
+               new UserRoles { Id = 7, RolId = 1, UserId = 4 }  // Usuario
+
            );
 
             builder.HasIndex(x => new { x.RolId, x.UserId }).IsUnique();
