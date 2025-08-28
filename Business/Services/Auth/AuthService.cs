@@ -89,7 +89,7 @@ namespace Business.Services.Auth
             {
                 var token = await _userData.RequestPasswordResetAsync(email);
 
-                var resetLink = $"http://localhost:4200/reset-password?token={token}&email={email}";
+                var resetLink = $"http://localhost:4200/auth/new-password?token={token}&email={email}";
 
                 var model = new Dictionary<string, object>
                 {
