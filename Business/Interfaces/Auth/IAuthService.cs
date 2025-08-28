@@ -13,5 +13,8 @@ namespace Business.Interfaces.Auth
     {
         Task<User> LoginAsync(LoginRequest loginRequest);
         Task ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+
+        Task<string?> RequestPasswordResetAsync(string email);
+        Task<bool> ResetPasswordAsync(string email, string token, string newPassword);
     }
 }
