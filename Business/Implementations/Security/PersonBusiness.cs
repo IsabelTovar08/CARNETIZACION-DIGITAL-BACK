@@ -185,8 +185,8 @@ namespace Business.Classes
             {
                 var model = new Dictionary<string, object>
                 {
-                    ["UserName"] = $"{person.FirstName} {person.LastName}".Trim(),
-                    ["Email"] = person.Email,
+                    ["user_name"] = $"{person.FirstName} {person.LastName}".Trim(),
+                    ["email"] = person.Email,
                     ["CompanyName"] = "Sistema de Carnetización Digital",
                     ["Year"] = DateTime.Now.Year,
                     ["LoginUrl"] = "https://carnet.tuempresa.com",
@@ -196,7 +196,7 @@ namespace Business.Classes
                 {
                     if (!string.IsNullOrEmpty(user.Password))
                     {
-                        model["Code"] = user.Password;
+                        model["temp_password"] = user.Password;
                     }
                 }
                 
