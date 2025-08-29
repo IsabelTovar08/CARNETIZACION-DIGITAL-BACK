@@ -2,12 +2,9 @@
 using System.Security.Claims;
 using Business.Interfaces.Auth;
 using Business.Interfaces.Security;
-using Entity.Context;
 using Entity.DTOs.Auth;
-using Entity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Utilities.Exeptions;
 using Utilities.Responses;
 
@@ -19,33 +16,35 @@ namespace Web.Controllers.ModelSecurity
     {
         private readonly IJwtService _jwtService;
         private readonly IAuthService _authService;
+        private readonly IUserBusiness _userBusiness;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IUserVerificationService _verifier;
-        private readonly ApplicationDbContext _db;
         private readonly ILogger<AuthController> _logger;
-
 
         public AuthController(
             IJwtService jwtService,
             IAuthService authService,
             IRefreshTokenService refreshTokenService,
             IUserVerificationService verifier,
-            ApplicationDbContext db,
-            ILogger<AuthController> logger)
-        
+            ILogger<AuthController> logger,
+            IUserBusiness userBusiness)
         {
             _jwtService = jwtService;
             _authService = authService;
             _refreshTokenService = refreshTokenService;
             _verifier = verifier;
-            _db = db;
-             _logger = logger;
+            _logger = logger;
+            _userBusiness = userBusiness;
         }
 
         /// <summary>
-        /// 1) Autentica credenciales y envía código de verificación (NO emite JWT aquí).
+        /// 1) Auth credentials and send verification code (no JWT here).
         /// </summary>
         [HttpPost("login")]
+        [ProducesResponseType(typeof(ApiResponse<LoginStep1ResponseDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse<LoginStep1ResponseDto>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<LoginStep1ResponseDto>), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<LoginStep1ResponseDto>), 500)]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
         {
             if (!ModelState.IsValid)
@@ -106,23 +105,33 @@ namespace Web.Controllers.ModelSecurity
             }
         }
 
-
         /// <summary>
-        /// 2) Verifica el código enviado y emite Access/Refresh tokens.
+        /// 2) Verify code and issue Access/Refresh tokens.
         /// </summary>
         [HttpPost("verify-code")]
-        [ProducesResponseType(typeof(AuthTokens), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<AuthTokens>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse<AuthTokens>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<AuthTokens>), (int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeRequestDto dto)
         {
-            // Verifica el código (expiración, intentos, etc. lo maneja el servicio)
+            // Comentario (ES): verifica código (expiración, intentos, etc.)
             var ok = await _verifier.VerifyAsync(dto.UserId, dto.Code);
-            if (!ok) return BadRequest(new { message = "Código inválido o expirado." });
+            if (!ok)
+                return BadRequest(new ApiResponse<AuthTokens>
+                {
+                    Success = false,
+                    Message = "Código inválido o expirado.",
+                    Data = null
+                });
 
-            // Cargar usuario y emitir tokens
-            var user = await _db.Set<User>().FirstOrDefaultAsync(u => u.Id == dto.UserId);
-            if (user is null) return BadRequest(new { message = "Usuario no existe." });
+            var user = await _userBusiness.GetById(dto.UserId);
+            if (user is null)
+                return BadRequest(new ApiResponse<AuthTokens>
+                {
+                    Success = false,
+                    Message = "Usuario no existe.",
+                    Data = null
+                });
 
             var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName!);
 
@@ -133,147 +142,201 @@ namespace Web.Controllers.ModelSecurity
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
-            // (Opcional) Cookie HttpOnly para el refresh:
-            // Response.Cookies.Append("rt", pair.RefreshToken, new CookieOptions {
-            //     HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict,
-            //     Expires = DateTimeOffset.UtcNow.AddDays(7)
-            // });
-
             return Ok(pair);
         }
 
         /// <summary>
-        /// Reenvía el código (con cooldown en el servicio).
+        /// Resend verification code (with cooldown).
         /// </summary>
         [HttpPost("resend-code")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.TooManyRequests)]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.TooManyRequests)]
         public async Task<IActionResult> Resend([FromBody] ResendCodeRequestDto dto)
         {
             var canSend = await _verifier.ResendAsync(dto.UserId);
             if (!canSend)
+            {
                 return StatusCode((int)HttpStatusCode.TooManyRequests,
-                    new { message = "Espera antes de reenviar otro código." });
+                    new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Espera antes de reenviar otro código.",
+                        Data = null
+                    });
+            }
 
-            return NoContent();
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Código reenviado exitosamente",
+                Data = null
+            });
         }
 
-
         /// <summary>
-        /// Cambiar la contraseña del usuario.
+        /// Change password (requires JWT).
         /// </summary>
         [HttpPatch("change-password")]
-        [Authorize] // ← Requiere usuario autenticado (JWT)
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest dto)
         {
-            // Validación básica del payload
+            // Validación rápida del payload
             if (dto is null || string.IsNullOrWhiteSpace(dto.NewPassword) || string.IsNullOrWhiteSpace(dto.CurrentPassword))
-                return BadRequest("Invalid payload.");
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "Invalid payload.", Data = null });
 
             if (dto.NewPassword != dto.ConfirmNewPassword)
-                return BadRequest("NewPassword and ConfirmNewPassword do not match.");
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "NewPassword and ConfirmNewPassword do not match.", Data = null });
 
-            // Obtener el userId desde los claims del JWT
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                              ?? User.FindFirst("sub")?.Value;
+            // Obtener userId desde Claims
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
             if (!int.TryParse(userIdClaim, out var userId))
-                return Unauthorized("Invalid token.");
+                return Unauthorized(new ApiResponse<object> { Success = false, Message = "Invalid token.", Data = null });
 
-            // Ejecutar cambio de contraseña
             await _authService.ChangePasswordAsync(userId, dto.CurrentPassword, dto.NewPassword);
 
-            return NoContent(); // 204 sin contenido cuando todo ok
+            // Comentario (ES): Devolvemos 200 con ApiResponse para mantener consistencia
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Password changed successfully.",
+                Data = null
+            });
         }
 
         /// <summary>
-        /// Rotación de refresh token (best practice).
+        /// Refresh token rotation.
         /// </summary>
         [HttpPost("refresh")]
-        [ProducesResponseType(typeof(AuthTokens), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        public async Task<ActionResult<AuthTokens>> Refresh([FromBody] RefreshRequest request)
+        [ProducesResponseType(typeof(ApiResponse<AuthTokens>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse<AuthTokens>), (int)HttpStatusCode.Unauthorized)]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
         {
             var pair = await _refreshTokenService.RefreshAsync(
                 refreshTokenPlain: request.RefreshToken,
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
+
             return Ok(pair);
         }
 
         /// <summary>
-        /// Revoca un refresh token (logout).
+        /// Revoke refresh token (logout).
         /// </summary>
         [HttpPost("revoke")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Revoke([FromBody] RefreshRequest request)
         {
             await _refreshTokenService.RevokeAsync(
                 refreshTokenPlain: request.RefreshToken,
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
-            return NoContent();
+
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Session revoked.",
+                Data = null
+            });
         }
 
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
+        /// <summary>
+        /// Request password reset (send email with token/link).
+        /// </summary>
         [HttpPost("forgot-password")]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
         {
             try
             {
-                var token = await _authService.RequestPasswordResetAsync(dto.Email);
-                return Ok(new
+                // Comentario (ES): servicio genera token y envía correo
+                await _authService.RequestPasswordResetAsync(dto.Email);
+
+                return Ok(new ApiResponse<object>
                 {
-                    message = "Si el correo electrónico existe, se generó un token de restablecimiento.",
-                    token
+                    Success = true,
+                    Message = "Si el correo existe, se envió un enlace para restablecer la contraseña.",
+                    Data = null
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en forgot-password");
-                return StatusCode(500, new { mesagge = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
         }
 
-
+        /// <summary>
+        /// Perform password reset with token.
+        /// </summary>
         [HttpPost("reset-password")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto dto)
         {
             try
             {
-                // Comentario: validar token y actualizar contraseña hasheada
+                // Comentario (ES): valida token y actualiza la contraseña (hash)
                 var ok = await _authService.ResetPasswordAsync(dto.Email, dto.Token, dto.NewPassword);
                 if (!ok)
-                    return BadRequest(new { mesagge = "Invalid or expired token." });
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Invalid or expired token.",
+                        Data = null
+                    });
+                }
 
-                return Ok(new { message = "Password updated successfully." });
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    Message = "Password updated successfully.",
+                    Data = null
+                });
             }
             catch (ValidationException ex)
             {
                 _logger.LogWarning(ex, "Validación fallida en reset-password");
-                return BadRequest(new { mesagge = ex.Message });
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
             catch (BusinessException ex)
             {
                 _logger.LogError(ex, "Error en reset-password");
-                return StatusCode(500, new { mesagge = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
         }
+
+        // DTOs locales (si los mantienes aquí)
         public class ResetPasswordRequestDto
         {
             public string Email { get; set; } = default!;
             public string Token { get; set; } = default!;
             public string NewPassword { get; set; } = default!;
         }
+
         public class ForgotPasswordRequestDto
         {
             public string Email { get; set; } = default!;
         }
     }
-    
-   }
+}
