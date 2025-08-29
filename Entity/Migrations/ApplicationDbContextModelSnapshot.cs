@@ -2941,6 +2941,27 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             RolId = 4,
                             UserId = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsDeleted = false,
+                            RolId = 1,
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsDeleted = false,
+                            RolId = 1,
+                            UserId = 3
+                        },
+                        new
+                        {
+                            Id = 7,
+                            IsDeleted = false,
+                            RolId = 1,
+                            UserId = 4
                         });
                 });
 

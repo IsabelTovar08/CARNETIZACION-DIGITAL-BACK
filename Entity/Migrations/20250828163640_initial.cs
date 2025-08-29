@@ -1306,7 +1306,10 @@ namespace Entity.Migrations
                     { 1, false, 1, 1 },
                     { 2, false, 2, 2 },
                     { 3, false, 3, 3 },
-                    { 4, false, 4, 4 }
+                    { 4, false, 4, 4 },
+                    { 5, false, 1, 2 },
+                    { 6, false, 1, 3 },
+                    { 7, false, 1, 4 }
                 });
 
             migrationBuilder.InsertData(
