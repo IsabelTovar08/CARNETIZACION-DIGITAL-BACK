@@ -49,5 +49,6 @@ namespace Entity.DTOs.ModelSecurity.Request
         [Required(ErrorMessage = "La ciudad es obligatoria.")]
         [Range(1, int.MaxValue, ErrorMessage = "El identificador de la ciudad debe ser un número entero mayor que 0.")]
         public int CityId { get; set; }
+
     }
 }

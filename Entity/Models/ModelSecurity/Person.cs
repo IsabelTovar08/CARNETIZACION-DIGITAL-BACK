@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml.Linq;
 using Entity.Models.Base;
 using Entity.Models.Organizational;
 using Entity.Models.Organizational.Assignment;
@@ -30,7 +31,7 @@ namespace Entity.Models.ModelSecurity
 
         public List<Attendance>? Attendances { get; set; }
         public PersonDivisionProfile? PersonDivisionProfile { get; set; }
-        public CustomType? DocumentType { get; set; }
+        public CustomType DocumentType { get; set; }
         public CustomType? BloodType { get; set; }
     }
 }

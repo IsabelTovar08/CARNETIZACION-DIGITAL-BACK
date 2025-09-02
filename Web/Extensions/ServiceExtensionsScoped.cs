@@ -83,6 +83,8 @@ using Data.Interfases.Notifications;
 using Business.Interfaces.Notifications;
 using Data.Implementations.Notifications;
 using Entity.DTOs.Operational;
+using Business.Interfaces.Enums;
+using Business.Services.Enums;
 
 namespace Web.Extensions
 {
@@ -241,6 +243,11 @@ namespace Web.Extensions
             services.AddScoped<IExcelPersonParser, ExcelPersonParser>();
 
             services.AddScoped<IUserVerificationService, UserVerificationService>();
+
+
+
+            //Enums
+            services.AddScoped<IEnumCatalogService, EnumCatalogService>();
 
 
 
