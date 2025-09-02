@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace Data.Interfases.Organizational.Structure
 {
-    public interface IInternalDivisionData : ICrudBase<InternalDivision>
+    public interface IOrganizationalUnitBranchData : ICrudBase<OrganizationalUnitBranch>
     {
-        Task<int> CountByOrgUnitAsync(int organizationUnitId);
-
-        Task<List<InternalDivision>> ListByOrgUnitAsync(int organizationUnitId);
+        Task<int> CountBranchesByOrgUnitAsync(int organizationalUnitId);
     }
 }

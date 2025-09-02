@@ -4,10 +4,10 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="54" >
+      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="83" >
 
 
-        <EntityTypeShape EntityType="DbModel.Role" Width="1.5" PointX="4.375" PointY="10.125" FillColor="128, 128, 255" />
+        <EntityTypeShape EntityType="DbModel.Rol" Width="1.5" PointX="4.375" PointY="10.125" FillColor="128, 128, 255" />
         <EntityTypeShape EntityType="DbModel.User" Width="1.5" PointX="9.5" PointY="10" IsExpanded="true" FillColor="128, 128, 255" />
         <EntityTypeShape EntityType="DbModel.Person" Width="2.125" PointX="12.625" PointY="10.5" FillColor="192, 192, 255" />
         <EntityTypeShape EntityType="DbModel.Form" Width="1.5" PointX="7.625" PointY="13" FillColor="128, 128, 255" />
@@ -40,7 +40,7 @@
         <AssociationConnector Association="DbModel.DivisionBranchBranch" ManuallyRouted="false" >
         </AssociationConnector>
         <EntityTypeShape EntityType="DbModel.Event" Width="1.875" PointX="26.5" PointY="15" FillColor="255, 192, 192" />
-        <EntityTypeShape EntityType="DbModel.EventType" Width="1.5" PointX="28.625" PointY="17.125" FillColor="255, 192, 192" />
+        <EntityTypeShape EntityType="DbModel.EventType" Width="1.5" PointX="29.125" PointY="17.125" FillColor="255, 192, 192" />
         <EntityTypeShape EntityType="DbModel.AccessPoint" Width="1.5" PointX="24.5" PointY="15" FillColor="255, 192, 192" />
         <AssociationConnector Association="DbModel.AccessPointEvent" />
         <EntityTypeShape EntityType="DbModel.Attendance" Width="1.75" PointX="22.25" PointY="14.875" FillColor="255, 192, 192" />

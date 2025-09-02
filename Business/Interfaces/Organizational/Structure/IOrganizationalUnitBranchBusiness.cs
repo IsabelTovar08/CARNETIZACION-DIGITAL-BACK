@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Business.Interfaces.Organizational.Structure
 {
-    public interface IInternalDivisionBusiness : IBaseBusiness<InternalDivision, InternalDivisionDtoRequest, InternalDivisionDto>
+    public interface IOrganizationalUnitBranchBusiness : IBaseBusiness<OrganizationalUnitBranch, OrganizationalUnitBranchDtoRequest, OrganizationalUnitBranchDto>
     {
     }
 }

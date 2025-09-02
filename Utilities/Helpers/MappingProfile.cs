@@ -210,10 +210,22 @@ namespace Utilities.Helper
 
             //InternalDivision
             CreateMap<InternalDivision, InternalDivisionDto>()
+                .ForMember(d => d.OrganizationalUnitName, o => o.MapFrom(s => s.OrganizationalUnit.Name))
+                .ForMember(d => d.AreaCategoryName, o => o.MapFrom(s => s.AreaCategory.Name))
                 .ReverseMap();
 
             CreateMap<InternalDivision, InternalDivisionDtoRequest>()
                 .ReverseMap();
+
+            // OrganizationalUnitBranch
+            CreateMap<OrganizationalUnitBranch, OrganizationalUnitBranchDto>()
+                .ForMember(d => d.OrganizationalUnitName, o => o.MapFrom(s => s.OrganizationUnit.Name))
+                .ForMember(d => d.BranchName, o => o.MapFrom(s => s.Branch.Name))
+                .ReverseMap();
+
+            CreateMap<OrganizationalUnitBranch, OrganizationalUnitBranchDtoRequest>()
+                .ReverseMap();
+
 
 
             //AccessPoints

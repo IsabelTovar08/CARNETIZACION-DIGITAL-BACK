@@ -1,5 +1,9 @@
 ﻿using Business.Interfaces.Auth;
+using Data.Interfases.Security;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.Context;
+using Entity.DTOs.Auth;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Net.Mail;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Utilities.Notifications.Implementations.Templates.Email;
 
@@ -17,23 +22,23 @@ namespace Business.Services.Auth
     public class UserVerificationService : IUserVerificationService
     {
         // Inyección de dependencias
-        private readonly ApplicationDbContext _db;
         private readonly INotify _notify;
         private readonly ICodeGenerator _gen;
         private readonly ICodeHasher _hasher;
         private readonly IClock _clock;
         private readonly IConfiguration _cfg;
+        private readonly IUserData _userData;
 
-        public UserVerificationService(
-            ApplicationDbContext db, INotify notify, ICodeGenerator gen,
-            ICodeHasher hasher, IClock clock, IConfiguration cfg)
+        public UserVerificationService(INotify notify, ICodeGenerator gen,
+            ICodeHasher hasher, IClock clock, IConfiguration cfg,
+            IUserData userData)
         {
-            _db = db;
             _notify = notify;
             _gen = gen;
             _hasher = hasher;
             _clock = clock;
             _cfg = cfg;
+            _userData = userData;
         }
 
         private static string GetVerifiedEmail(User user)
@@ -48,13 +53,14 @@ namespace Business.Services.Auth
             MailAddress addr = new MailAddress(toRaw.Trim());
             return addr.Address; // solo "email@dom.com"
         }
-
         public async Task GenerateAndSendAsync(User user)
         {
-            // Para asegurar que se trae el email de la persona
-            User? loaded = await _db.Set<User>()
-                .Include(u => u.Person)
-                .FirstOrDefaultAsync(u => u.Id == user.Id && !u.IsDeleted);
+            await GenerateAndSendAsync(user, true); // por defecto, resetea
+        }
+
+        public async Task GenerateAndSendAsync(User user, bool resetResendAttempts)
+        {
+            User? loaded = await _userData.GetByIdAsync(user.Id);
 
             user = loaded ?? throw new InvalidOperationException("Usuario no encontrado.");
 
@@ -65,14 +71,20 @@ namespace Business.Services.Auth
 
             DateTimeOffset now = _clock.UtcNow;
             user.TempCodeHash = _hasher.Hash(code);
-            user.TempCodeAttempts = 0;
+            user.TempCodeAttempts = 0;          // intentos de verificación del código
             user.TempCodeConsumedAt = null;
-            user.TempCodeCreatedAt = now;
+            user.TempCodeCreatedAt = now;       // marca el último envío/generación
             user.TempCodeExpiresAt = now.AddMinutes(ttl);
 
-            await _db.SaveChangesAsync();
+            if (resetResendAttempts)
+            {
+                user.TempCodeAttempts = 0;           // ← reset SOLO de reenvíos
+                user.TempCodeResendBlockedUntil = null; // ← quita bloqueo
+            }
 
-            Dictionary<string, object> model = new Dictionary<string, object>
+            await _userData.UpdateAsync(user);
+
+            var model = new Dictionary<string, object>
             {
                 ["title"] = "Código de Verificación",
                 ["verification_code"] = code,
@@ -80,62 +92,87 @@ namespace Business.Services.Auth
             };
 
             string html = await EmailTemplates.RenderByKeyAsync("verify", model);
-
-            // Validar/normalizar destinatario
             string to = GetVerifiedEmail(user);
-
             await _notify.NotifyAsync("email", to, "Verifica tu identidad", html);
         }
 
-        public async Task<bool> VerifyAsync(int userId, string code)
+        public async Task<VerifyResult> VerifyAsync(int userId, string code)
         {
             int maxAttempts = int.Parse(_cfg["Codes:MaxAttempts"] ?? "5");
-            DateTimeOffset now = _clock.UtcNow;
 
-            User? user = await _db.Set<User>()
-                .Include(u => u.Person)
-                .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+            var tz = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time")
+                : TimeZoneInfo.FindSystemTimeZoneById("America/Bogota");
 
-            if (user is null) return false;
+            var now = TimeZoneInfo.ConvertTime(_clock.UtcNow, tz);
 
-            if (string.IsNullOrEmpty(user.TempCodeHash)) return false;
-            if (user.TempCodeConsumedAt.HasValue) return false;
-            if (!user.TempCodeExpiresAt.HasValue || now > user.TempCodeExpiresAt.Value) return false;
-            if (user.TempCodeAttempts >= maxAttempts) return false;
+            var user = await _userData.GetByIdAsync(userId);
+            if (user is null) return VerifyResult.Fail("Usuario no existe.");
+
+            if (string.IsNullOrEmpty(user.TempCodeHash)) return VerifyResult.Fail("No hay código generado.");
+            if (user.TempCodeConsumedAt.HasValue) return VerifyResult.Fail("El código ya fue usado.");
+            if (!user.TempCodeExpiresAt.HasValue || now > user.TempCodeExpiresAt.Value)
+                return VerifyResult.Fail("El código expiró.");
+            if (user.TempCodeAttempts >= maxAttempts) return VerifyResult.Fail("Máximos intentos alcanzados.");
 
             user.TempCodeAttempts++;
 
-            bool ok = _hasher.Verify(code, user.TempCodeHash);
-            if (!ok)
+            if (!_hasher.Verify(code, user.TempCodeHash))
             {
-                await _db.SaveChangesAsync();
-                return false;
+                await _userData.UpdateAsync(user);
+                return VerifyResult.Fail("Código incorrecto.");
             }
 
+            // Éxito
             user.TempCodeConsumedAt = now;
             if (!user.Active) user.Active = true;
+            user.TempCodeAttempts = 0;
+            user.TempCodeResendBlockedUntil = null;
 
-            await _db.SaveChangesAsync();
-            return true;
+            await _userData.UpdateAsync(user);
+            return VerifyResult.Ok();
         }
 
-        public async Task<bool> ResendAsync(int userId)
+
+
+
+        public async Task<VerifyResult> ResendAsync(int userId)
         {
-            int cooldownSeconds = int.Parse(_cfg["Codes:ResendCooldownSeconds"] ?? "50");
-            DateTimeOffset now = _clock.UtcNow;
+            int cooldownSeconds = int.Parse(_cfg["Codes:ResendCooldownSeconds"] ?? "60");
+            int maxResends = int.Parse(_cfg["Codes:MaxResendAttempts"] ?? "5");
+            int blockMinutes = 60;
 
-            User? user = await _db.Set<User>()
-                .Include(u => u.Person)
-                .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+            var tz = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time")
+                : TimeZoneInfo.FindSystemTimeZoneById("America/Bogota");
 
-            if (user is null) return false;
+            var now = TimeZoneInfo.ConvertTime(_clock.UtcNow, tz);
+
+            var user = await _userData.GetByIdAsync(userId);
+            if (user is null) return VerifyResult.Fail("Usuario no existe.");
+
+            if (user.TempCodeResendBlockedUntil.HasValue && now < user.TempCodeResendBlockedUntil.Value)
+                return VerifyResult.Fail("Usuario bloqueado temporalmente para reenvíos.");
+
+            if (user.TempCodeAttempts >= maxResends)
+            {
+                user.TempCodeResendBlockedUntil = now.AddMinutes(blockMinutes);
+                await _userData.UpdateAsync(user);
+                return VerifyResult.Fail("Máximos reenvíos alcanzados, bloqueado por 1 hora.");
+            }
 
             if (user.TempCodeCreatedAt.HasValue &&
                 (now - user.TempCodeCreatedAt.Value).TotalSeconds < cooldownSeconds)
-                return false;
+                return VerifyResult.Fail($"Debe esperar {cooldownSeconds} segundos antes de reenviar.");
 
-            await GenerateAndSendAsync(user);
-            return true;
+            // OK → genera y envía
+            await GenerateAndSendAsync(user, resetResendAttempts: false);
+
+            user.TempCodeAttempts++;
+            await _userData.UpdateAsync(user);
+
+            return VerifyResult.Ok();
         }
+
     }
 }

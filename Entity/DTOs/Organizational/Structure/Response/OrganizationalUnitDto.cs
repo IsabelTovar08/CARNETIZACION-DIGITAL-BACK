@@ -13,8 +13,5 @@ namespace Entity.DTOs.Organizational.Structure.Response
         public int DivisionsCount { get; set; }
         public int BranchesCount { get; set; }
 
-
-
-
     }
 }

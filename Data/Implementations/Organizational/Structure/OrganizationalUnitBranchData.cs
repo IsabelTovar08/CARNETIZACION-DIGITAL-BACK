@@ -1,4 +1,5 @@
 ﻿using Data.Classes.Base;
+using Data.Interfases.Organizational.Structure;
 using Entity.Context;
 using Entity.Models.Organizational.Structure;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Data.Implementations.Organizational.Structure
 {
-    public class OrganizationalUnitBranchData: BaseData<OrganizationalUnitBranch>
+    public class OrganizationalUnitBranchData: BaseData<OrganizationalUnitBranch>, IOrganizationalUnitBranchData
     {
         public OrganizationalUnitBranchData(ApplicationDbContext context, ILogger<OrganizationalUnitBranch> logger)
             : base(context, logger) { }
@@ -22,5 +23,7 @@ namespace Data.Implementations.Organizational.Structure
                 .AsNoTracking()
                 .CountAsync(x => x.OrganizationUnitId == organizationalUnitId);
         }
+
+
     }
 }

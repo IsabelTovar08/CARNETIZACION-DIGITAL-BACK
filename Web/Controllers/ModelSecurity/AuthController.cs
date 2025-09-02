@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Business.Interfaces.Auth;
 using Business.Interfaces.Security;
 using Entity.DTOs.Auth;
+using Entity.DTOs.ModelSecurity.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Exeptions;
@@ -109,41 +110,28 @@ namespace Web.Controllers.ModelSecurity
         /// 2) Verify code and issue Access/Refresh tokens.
         /// </summary>
         [HttpPost("verify-code")]
-        [ProducesResponseType(typeof(ApiResponse<AuthTokens>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(AuthTokens), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponse<AuthTokens>), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse<AuthTokens>), (int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeRequestDto dto)
         {
-            // Comentario (ES): verifica código (expiración, intentos, etc.)
-            var ok = await _verifier.VerifyAsync(dto.UserId, dto.Code);
-            if (!ok)
-                return BadRequest(new ApiResponse<AuthTokens>
-                {
-                    Success = false,
-                    Message = "Código inválido o expirado.",
-                    Data = null
-                });
+            var result = await _verifier.VerifyAsync(dto.UserId, dto.Code);
+            if (!result.Success)
+                return BadRequest(new ApiResponse<AuthTokens> { Success = false, Message = result.Error });
 
+            // Cargar usuario solo si fue exitoso (1 sola lectura si quieres: puedes mover el GenerateToken al servicio)
             var user = await _userBusiness.GetById(dto.UserId);
-            if (user is null)
-                return BadRequest(new ApiResponse<AuthTokens>
-                {
-                    Success = false,
-                    Message = "Usuario no existe.",
-                    Data = null
-                });
+            var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName ?? user.EmailPerson);
 
-            var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName!);
-
-            var pair = await _refreshTokenService.IssueAsync(
+            AuthTokens pair = await _refreshTokenService.IssueAsync(
                 userId: user.Id,
                 accessToken: accessToken,
                 jti: jti,
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
-            return Ok(pair);
+            return Ok( pair );
         }
+
 
         /// <summary>
         /// Resend verification code (with cooldown).
@@ -153,14 +141,14 @@ namespace Web.Controllers.ModelSecurity
         [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.TooManyRequests)]
         public async Task<IActionResult> Resend([FromBody] ResendCodeRequestDto dto)
         {
-            var canSend = await _verifier.ResendAsync(dto.UserId);
-            if (!canSend)
+            var result = await _verifier.ResendAsync(dto.UserId);
+            if (!result.Success)
             {
                 return StatusCode((int)HttpStatusCode.TooManyRequests,
                     new ApiResponse<object>
                     {
                         Success = false,
-                        Message = "Espera antes de reenviar otro código.",
+                        Message = result.Error,
                         Data = null
                     });
             }

@@ -37,6 +37,7 @@ namespace Entity.Models
 
         //Este atributo lo que hace es guardar la fecha de los intentos de codigo
         public DateTimeOffset? TempCodeConsumedAt { get; set; }
+        public DateTimeOffset? TempCodeResendBlockedUntil { get; set; }
 
         //public int OrganizationId { get; set; }
         //public Organization Organization { get; set; } = default!;
