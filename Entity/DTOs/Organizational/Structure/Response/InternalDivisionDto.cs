@@ -14,7 +14,7 @@ namespace Entity.DTOs.Organizational.Structure.Response
         public int OrganizationalUnitId { get; set; }
         public string OrganizationalUnitName { get; set; }
         public int AreaCategoryId {  get; set; }
-        public int AreaCategoryName { get; set; }
+        public string AreaCategoryName { get; set; }
 
     }
 }

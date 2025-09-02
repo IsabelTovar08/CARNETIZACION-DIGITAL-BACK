@@ -11,6 +11,7 @@ public class OrganizationalUnitController
 {
     private readonly OrganizationalUnitBusiness _orgUnitBusiness;
     public OrganizationalUnitController(
+
         IBaseBusiness<OrganizationalUnit, OrganizationalUnitDtoRequest, OrganizationalUnitDto> business,
         ILogger<OrganizationalUnitController> logger,
         OrganizationalUnitBusiness orgUnitBusiness)
@@ -18,6 +19,14 @@ public class OrganizationalUnitController
     {
         _orgUnitBusiness = orgUnitBusiness;
     }
+
+    [HttpGet("{organizationalUnitId:int}/internal-divisions")]
+    public async Task<IActionResult> GetInternalDivisions(int organizationalUnitId, CancellationToken ct)
+    {
+        var result = await _orgUnitBusiness.GetInternalDivisionsAsync(organizationalUnitId, ct);
+        return Ok(result);
+    }
+
 
     [HttpGet("{id}/divisions/count")]
     public async Task<IActionResult> GetDivisionsCount(int id)

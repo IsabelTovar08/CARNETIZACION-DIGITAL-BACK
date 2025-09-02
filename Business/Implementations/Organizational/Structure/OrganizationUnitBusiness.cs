@@ -7,20 +7,21 @@ using Utilities.Exeptions;
 using Data.Implementations.Organizational.Structure;
 using Entity.DTOs.Organizational.Structure.Request;
 using Entity.DTOs.Organizational.Structure.Response;
+using Data.Interfases.Organizational.Structure;
+using Business.Interfaces.Organizational.Structure;
 
 namespace Business.Implementations.Organizational.Structure
 {
-    public class OrganizationalUnitBusiness
-        : BaseBusiness<OrganizationalUnit, OrganizationalUnitDtoRequest, OrganizationalUnitDto>
+    public class OrganizationalUnitBusiness : BaseBusiness<OrganizationalUnit, OrganizationalUnitDtoRequest, OrganizationalUnitDto>, IOrganizationUnitBusiness
     {
-        private readonly InternalDivisionData _divisionData;
-        private readonly OrganizationalUnitBranchData _branchData;
+        private readonly IInternalDivisionData _divisionData;
+        private readonly IOrganizationalUnitBranchData _branchData;
         public OrganizationalUnitBusiness(
             ICrudBase<OrganizationalUnit> data,
             ILogger<OrganizationalUnit> logger,
             IMapper mapper,
-            InternalDivisionData divisionData,
-            OrganizationalUnitBranchData branchData
+            IInternalDivisionData divisionData,   
+            IOrganizationalUnitBranchData branchData 
         ) : base(data, logger, mapper)
         {
             _divisionData = divisionData;
@@ -28,11 +29,11 @@ namespace Business.Implementations.Organizational.Structure
         }
 
         // Valida lo mínimo necesario para crear/actualizar
-        private static void Validate(OrganizationalUnitDtoRequest dto)
+        public void Validate(OrganizationalUnitDtoRequest dto)
         {
             var errors = new List<string>();
             if (dto == null) throw new ValidationException("La UO no puede ser nula.");
-            // Ajusta reglas según tu dominio:
+
             if (string.IsNullOrWhiteSpace(dto.Description))
                 errors.Add("La descripción es obligatoria.");
 
@@ -40,42 +41,7 @@ namespace Business.Implementations.Organizational.Structure
                 throw new ValidationException(string.Join(" | ", errors));
         }
 
-        //public override async Task<OrganizationalUnitDto> Save(OrganizationalUnitDtoRequest dto)
-        //{
-        //    try
-        //    {
-        //        Validate(dto);
 
-        //        var entity = _mapper.Map<OrganizationalUnit>(dto);
-        //        var created = await _data.SaveAsync(entity);
-
-        //        return _mapper.Map<OrganizationalUnitDto>(created);
-        //    }
-        //    catch (ValidationException) { throw; }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error al crear OrganizationalUnit.");
-        //        throw new ExternalServiceException("Base de datos", "No se pudo crear la Unidad Organizativa.");
-        //    }
-        //}
-
-        //public override async Task<bool> Update(OrganizationalUnitDtoRequest dto)
-        //{
-        //    try
-        //    {
-        //        if (dto.Id <= 0) throw new ValidationException("Id inválido para actualizar.");
-        //        Validate(dto);
-
-        //        var entity = _mapper.Map<OrganizationalUnit>(dto);
-        //        return await _data.UpdateAsync(entity);
-        //    }
-        //    catch (ValidationException) { throw; }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error al actualizar OrganizationalUnit con Id {Id}.", dto.Id);
-        //        throw new ExternalServiceException("Base de datos", "No se pudo actualizar la Unidad Organizativa.");
-        //    }
-        //}
 
         // Conteo de divisiones
         public Task<int> CountDivisionAsync(int organizationalUnitId) =>
@@ -85,5 +51,14 @@ namespace Business.Implementations.Organizational.Structure
 
         public Task<int> CountBranchesAsync(int organizationalUnitId) =>
             _branchData.CountBranchesByOrgUnitAsync(organizationalUnitId);
+
+        public async Task<IReadOnlyList<InternalDivisionDto>> GetInternalDivisionsAsync(int organizationalUnitId, CancellationToken ct = default)
+        {
+            // Traer divisiones desde Data
+            var list = await _divisionData.ListByOrgUnitAsync(organizationalUnitId);
+
+            // Mapear a DTOs
+            return _mapper.Map<List<InternalDivisionDto>>(list);
+        }
     }
 }
