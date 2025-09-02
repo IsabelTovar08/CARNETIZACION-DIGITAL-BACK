@@ -21,6 +21,8 @@ public class OrganizationalUnitController
     }
 
     [HttpGet("{organizationalUnitId:int}/internal-divisions")]
+    [ProducesResponseType(typeof(IEnumerable<InternalDivisionDto>), 200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetInternalDivisions(int organizationalUnitId, CancellationToken ct)
     {
         var result = await _orgUnitBusiness.GetInternalDivisionsAsync(organizationalUnitId, ct);

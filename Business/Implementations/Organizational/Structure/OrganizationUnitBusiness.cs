@@ -54,11 +54,14 @@ namespace Business.Implementations.Organizational.Structure
 
         public async Task<IReadOnlyList<InternalDivisionDto>> GetInternalDivisionsAsync(int organizationalUnitId, CancellationToken ct = default)
         {
+
             // Traer divisiones desde Data
             var list = await _divisionData.ListByOrgUnitAsync(organizationalUnitId);
 
             // Mapear a DTOs
             return _mapper.Map<List<InternalDivisionDto>>(list);
+
+
         }
     }
 }
