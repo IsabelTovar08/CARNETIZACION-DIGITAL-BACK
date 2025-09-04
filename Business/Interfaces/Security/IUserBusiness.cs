@@ -7,12 +7,14 @@ using Business.Classes.Base;
 using Business.Interfases;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models;
 
 namespace Business.Interfaces.Security
 {
     public interface IUserBusiness : IBaseBusiness<User, UserDtoRequest, UserDTO>
     {
-
+        Task<List<string>> GetUserRolesById(int userId);
+        Task<UserMeDto?> GetByIdForMe(int userId, List<string> roles);
     }
 }

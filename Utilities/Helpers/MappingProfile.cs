@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Globalization; // ➕ para formateo es-CO
+using AutoMapper;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
@@ -16,6 +17,7 @@ using Entity.DTOs.Organizational.Structure.Response;
 using Entity.DTOs.Parameter;
 using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
@@ -24,7 +26,6 @@ using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
-using System.Globalization; // ➕ para formateo es-CO
 
 namespace Utilities.Helper
 {
@@ -67,6 +68,17 @@ namespace Utilities.Helper
              .ReverseMap();
 
             CreateMap<User, UserDtoRequest>().ReverseMap();
+
+
+            CreateMap<User, UserMeDto>()
+            // ⬇️ AQUÍ el cambio clave: pasa Rol ENTIDAD, no Name string
+            .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.UserRoles.Select(ur => ur.Rol)))
+            .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
+        s.UserRoles
+         .SelectMany(ur => ur.Rol.RolFormPermissions.Select(rp => rp.Permission))
+         .DistinctBy(p => p.Id)))
+            .ForMember(d => d.CurrentProfile, opt => opt.MapFrom(s =>
+                s.Person.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)));
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()

@@ -10,5 +10,8 @@ namespace Entity.Models.Base
     {
         public int Id { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public DateTime CreateAt { get; set; } 
+        public DateTime UpdateAt { get; set; } 
+
     }
 }

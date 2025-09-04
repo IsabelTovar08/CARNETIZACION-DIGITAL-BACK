@@ -16,5 +16,7 @@ namespace Entity.DTOs.Organizational.Assigment.Request
         [Required(ErrorMessage = "El identificador del perfil es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El identificador del perfil debe ser un número entero mayor que 0.")]
         public int ProfileId { get; set; }
+        public bool isCurrentlySelected { get; set; }
+
     }
 }

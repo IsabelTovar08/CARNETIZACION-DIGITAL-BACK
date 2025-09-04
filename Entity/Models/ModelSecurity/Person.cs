@@ -30,7 +30,7 @@ namespace Entity.Models.ModelSecurity
         public City? City { get; set; }
 
         public List<Attendance>? Attendances { get; set; }
-        public PersonDivisionProfile? PersonDivisionProfile { get; set; }
+        public List<PersonDivisionProfile>? PersonDivisionProfile { get; set; }
         public CustomType DocumentType { get; set; }
         public CustomType? BloodType { get; set; }
     }
