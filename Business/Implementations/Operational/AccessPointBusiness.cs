@@ -8,7 +8,7 @@ using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
 using Microsoft.Extensions.Logging;
-using QRCoder;
+using Utilities.Helpers; // ✅ usamos el helper genérico en Utilities
 
 namespace Business.Implementations.Operational
 {
@@ -27,7 +27,7 @@ namespace Business.Implementations.Operational
         }
 
         /// <summary>
-        /// Registra el Punto de Acceso y genera el QR (Base64 PNG) para escaneo en móvil.
+        /// Registra el Punto de Acceso y genera el QR (Base64 PNG) usando Utilities.
         /// </summary>
         public async Task<AccessPointDtoResponsee?> RegisterAsync(AccessPointDtoRequest dto)
         {
@@ -36,8 +36,6 @@ namespace Business.Implementations.Operational
                 _logger.LogWarning("Datos inválidos al registrar AccessPoint.");
                 return null;
             }
-
-
 
             // 1) Guardar para obtener Id
             AccessPointDtoResponsee created = await Save(dto);
@@ -49,13 +47,13 @@ namespace Business.Implementations.Operational
 
             try
             {
-                // 2) Construir payload del QR (no sensible)
+                // 2) Construir payload del QR (ejemplo no sensible)
                 string payload = $"AP:{created.Id}|EVENT:{created.EventId}|DATE:{DateTime.UtcNow:O}";
 
-                // 3) Generar QR Base64 PNG
-                created.QrCode = GenerateQrBase64(payload);
+                // 3) Generar QR Base64 PNG con Utilities (genérico para cualquier string)
+                created.QrCode = QrCodeHelper.ToPngBase64(payload);
 
-                // 4) Mapear de Response -> Request para actualizar
+                // 4) Actualizar registro con el QR
                 AccessPointDtoRequest updateRequest = _mapper.Map<AccessPointDtoRequest>(created);
                 await Update(updateRequest);
 
@@ -67,17 +65,6 @@ namespace Business.Implementations.Operational
                 _logger.LogError(ex, "Error generando QR para AccessPoint.");
                 return created; // Ya quedó creado; solo falló el QR
             }
-        }
-
-        private static string GenerateQrBase64(string payload)
-        {
-            using var gen = new QRCodeGenerator();
-            using var data = gen.CreateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
-            using var png = new PngByteQRCode(data);
-            var bytes = png.GetGraphic(10);
-            return Convert.ToBase64String(bytes);
-
-
         }
     }
 }
