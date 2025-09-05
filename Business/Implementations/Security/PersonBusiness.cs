@@ -16,6 +16,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Infrastructure.Notifications.Interfases;
@@ -233,16 +234,57 @@ namespace Business.Classes
         }
 
 
+        public async Task<PersonOrganizationalInfoDto?> GetOrganizationalInfoAsync(int personId)
+        {
+            if (personId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(personId), "El id de persona debe ser mayor que cero.");
+
+            try
+            {
+                var dto = await _personData.GetOrganizationalInfo(personId);
+
+                //  Si no hay perfil seleccionado o no existe la persona, regresa null.
+                if (dto == null)
+                {
+                    _logger.LogInformation("Person {PersonId} no encontrada o sin perfil seleccionado.", personId);
+                    return null;
+                }
+
+                return dto;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error obteniendo información organizacional de la persona {PersonId}", personId);
+                throw;
+            }
+        }
+
         public async Task<(string PublicUrl, string StoragePath)> UpsertPersonPhotoAsync(int personId, Stream fileStream, string contentType, string fileName)
         {
             // Buscar persona
-            PersonInfoDto? person = await GetPersonInfoAsync(personId);
+            Person? person = await _personData.GetByIdAsync(personId);
             if (person == null)
-                throw new KeyNotFoundException($"Person {personId} not found");
+                throw new KeyNotFoundException($"La persona {personId} no fue encontrada");
+
+            PersonOrganizationalInfoDto? info = await GetOrganizationalInfoAsync(personId);
 
             // Generar path único
-            string ext = Path.GetExtension(fileName);
-            string path = $"people/{person.}{personId}/{Guid.NewGuid()}{ext}";
+            string ext = Path.GetExtension(fileName); 
+
+            // Arma la ruta de forma dinámica, ignorando valores nulos o vacíos
+            var parts = new List<string>
+            {
+                "people",
+                info.OrganizationCode,
+                info.OrganizationUnitCode,
+                info.InternalDivissionCode,
+                personId.ToString(),
+                $"{Guid.NewGuid()}{ext}"
+            };
+
+            // Filtra valores nulos/vacíos antes de concatenar
+            string path = string.Join("/", parts.Where(p => !string.IsNullOrWhiteSpace(p)));
+
 
             var prevPath = person.PhotoPath;
 

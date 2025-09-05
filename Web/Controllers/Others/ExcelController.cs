@@ -1,7 +1,7 @@
 ﻿using Business.Services.Excel;
-using Entity.DTOs.ModelSecurity.Response;
-using Entity.DTOs.Organizational.Assigment.Request;
+using Entity.DTOs.Specifics;
 using Microsoft.AspNetCore.Mvc;
+using Web.Controllers.ModelSecurity;
 
 namespace Web.Controllers.Others
 {
@@ -10,29 +10,45 @@ namespace Web.Controllers.Others
     public class ExcelController : ControllerBase
     {
         private readonly IExcelPersonParser _excel;
+        private readonly IExcelBulkImporter _importer;
 
-        public ExcelController(IExcelPersonParser excel)
+
+        public ExcelController(IExcelPersonParser excel, IExcelBulkImporter importer)
         {
             _excel = excel;
+            _importer = importer;
         }
 
         /// <summary>
         /// Import Excel (.xlsx) with columns:
         /// FirstName, MiddleName, LastName, SecondLastName, DocumentTypeId, DocumentNumber, BloodTypeId, Phone, Email, Address, CityId
         /// </summary>
-        [HttpPost("people")]
-        [Consumes("multipart/form-data")]
-        [RequestSizeLimit(50_000_000)]
-        public async Task<ActionResult<BulkImportResultDto>> ImportExcel(MassiveInfluxOfPeople req)
+        //[HttpPost("people")]
+        //[Consumes("multipart/form-data")]
+        //[RequestSizeLimit(50_000_000)]
+        //public async Task<ActionResult<BulkImportResultDto>> ImportExcel(MassiveInfluxOfPeople req)
+        //{
+        //    if (req?.File is null)
+        //        return BadRequest("Debe adjuntar el archivo en el campo 'file'.");
+
+        //    if (!req.File.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+        //        return BadRequest("Formato no soportado. Solo .xlsx.");
+
+        //    using var stream = req.File.OpenReadStream(); 
+        //    var result = await _excel.ImportFromExcelAsync(stream);
+
+        //    return Ok(result);
+        //}
+
+
+        [HttpPost("import/people")]
+        public async Task<IActionResult> ImportPeople([FromForm] ImportContextCard ctx, [FromForm] UploadFile fileRequest)
         {
-            if (req?.File is null)
-                return BadRequest("Debe adjuntar el archivo en el campo 'file'.");
+            var file = fileRequest.file;
+            if (file == null || file.Length == 0) return BadRequest("Archivo Excel vacío.");
 
-            if (!req.File.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
-                return BadRequest("Formato no soportado. Solo .xlsx.");
-
-            using var stream = req.File.OpenReadStream(); 
-            var result = await _excel.ImportFromExcelAsync(stream);
+            using var stream = file.OpenReadStream();
+            var result = await _importer.ImportAsync(stream, ctx); // IExcelBulkImporter
 
             return Ok(result);
         }

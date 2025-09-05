@@ -282,6 +282,8 @@ namespace Web.Extensions
             services.AddScoped<IBranchBusiness, BranchBusiness>();
 
             services.AddScoped<IExcelPersonParser, ExcelPersonParser>();
+            services.AddScoped<IExcelBulkImporter, ExcelBulkImporter>();
+
 
             services.AddScoped<IUserVerificationService, UserVerificationService>();
 

@@ -31,7 +31,7 @@ namespace Web.Controllers.ModelSecurity
 
 
         [HttpPost("{id:int}/photo")]
-        public async Task<IActionResult> UploadPhoto(int id, [FromForm] Photo photo)
+        public async Task<IActionResult> UploadPhoto(int id, [FromForm] UploadFile photo)
         {
             var file = photo.file;
             if (file == null || file.Length == 0)
@@ -71,7 +71,7 @@ namespace Web.Controllers.ModelSecurity
         }
     }
 
-    public class Photo
+    public class UploadFile
     {
         public IFormFile file { get; set; }
     }

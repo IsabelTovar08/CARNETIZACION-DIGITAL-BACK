@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Business.Interfases;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models.ModelSecurity;
 
 namespace Business.Interfaces.Security
@@ -24,5 +25,8 @@ namespace Business.Interfaces.Security
             string originalFileName);
 
         Task<PersonInfoDto?> GetPersonInfoAsync(int id);
+
+        // Devuelve los códigos orgánicos para la persona indicada, los cuales sirven para la organización de archivos
+        Task<PersonOrganizationalInfoDto?> GetOrganizationalInfoAsync(int personId);
     }
 }

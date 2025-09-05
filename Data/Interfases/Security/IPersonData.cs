@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Entity.DTOs.ModelSecurity.Request;
+using Entity.DTOs.Specifics;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 
@@ -14,5 +15,7 @@ namespace Data.Interfases.Security
         Task<Person?> FindByIdentification(string identification);
         Task<(Person Person, User User)> SavePersonAndUser(Person person, User user);
         Task<Person?> GetPersonInfo(int id);
+
+        Task<PersonOrganizationalInfoDto?> GetOrganizationalInfo(int personId);
     }
 }
