@@ -27,6 +27,52 @@ namespace Web.Controllers.ModelSecurity
         {
             var result = await _personBusiness.SavePersonAndUser(person);
             return Ok(result);
-        }  
+        }
+
+
+        [HttpPost("{id:int}/photo")]
+        public async Task<IActionResult> UploadPhoto(int id, [FromForm] Photo photo)
+        {
+            var file = photo.file;
+            if (file == null || file.Length == 0)
+                return BadRequest(new { status = false, message = "File is required" });
+
+            await using var stream = file.OpenReadStream();
+
+            (string url, string path) = await _personBusiness.UpsertPersonPhotoAsync(
+                id,
+                stream,
+                file.ContentType,
+                file.FileName);
+
+            return Ok(new
+            {
+                status = true,
+                message = "Photo updated",
+                data = new { personId = id, photoUrl = url, photoPath = path }
+            });
+        }
+
+        [HttpGet("personal-info/{id:int}")]
+        public async Task<IActionResult> PersonaInfo(int id)
+        {
+            if (id == null || id == 0)
+                return BadRequest(new { status = false, message = "Ingresa un id válido" });
+
+
+            PersonInfoDto? personalInfo = await _personBusiness.GetPersonInfoAsync(id);
+
+            return Ok(new
+            {
+                status = true,
+                message = "Información obtenida",
+                data = personalInfo
+            });
+        }
+    }
+
+    public class Photo
+    {
+        public IFormFile file { get; set; }
     }
 }

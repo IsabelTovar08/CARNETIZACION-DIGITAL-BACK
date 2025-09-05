@@ -1,5 +1,6 @@
 
 using Entity.DTOs.Notifications;
+using Entity.DTOs.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -79,6 +80,10 @@ namespace Web
 
             builder.Services.Configure<TwilioSettings>(
                 builder.Configuration.GetSection("Twilio"));
+
+            // Supabase para almacenar imágenes 
+            builder.Services.Configure<SupabaseOptions>(builder.Configuration.GetSection("Supabase"));
+            builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Upload"));
 
 
             var app = builder.Build();

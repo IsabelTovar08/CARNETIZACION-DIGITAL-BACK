@@ -27,6 +27,8 @@ namespace Business.Classes.Base
 
         public abstract Task ValidateAsync(T entity);
         public abstract void Validate(DCreate d);
+
+        public abstract Task<bool> ExistsCodeAsync(string code, int excludeId);
     }
    
 }

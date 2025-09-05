@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Security;
+using Business.Interfases.Storage;
 using ClosedXML.Excel;
 using Data.Classes.Specifics;
 using Data.Interfases;
@@ -32,13 +33,14 @@ namespace Business.Classes
         private readonly INotify _notificationSender;
         private readonly IUserBusiness _userBusiness;
         private readonly IUserRoleBusiness _userRolBusiness;
-
-        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserBusiness userBusiness, IUserRoleBusiness userRolBusiness) : base(personData, logger, mapper)
+        private readonly IFileStorageService _storage;
+        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserBusiness userBusiness, IUserRoleBusiness userRolBusiness, IFileStorageService storage) : base(personData, logger, mapper)
         {
             _notificationSender = messageSender;
             _userBusiness = userBusiness;
             _personData = personData;
-            _userRolBusiness = userRolBusiness;
+            _userRolBusiness = userRolBusiness; 
+            _storage = storage;
         }
 
         public override async Task ValidateAsync(Person entity)
@@ -217,6 +219,47 @@ namespace Business.Classes
                 _logger.LogWarning(ex, "No se pudo enviar email de bienvenida a {Email}", person.Email);
                 return false; // no rompas el flujo de creación
             }
+        }
+
+
+        public async Task<PersonInfoDto?> GetPersonInfoAsync(int id)
+        {
+            Person? person = await _personData.GetPersonInfo(id);
+            if (person is null) return null;
+
+            PersonInfoDto dto = _mapper.Map<PersonInfoDto>(person);
+
+            return dto;
+        }
+
+
+        public async Task<(string PublicUrl, string StoragePath)> UpsertPersonPhotoAsync(int personId, Stream fileStream, string contentType, string fileName)
+        {
+            // Buscar persona
+            PersonInfoDto? person = await GetPersonInfoAsync(personId);
+            if (person == null)
+                throw new KeyNotFoundException($"Person {personId} not found");
+
+            // Generar path único
+            string ext = Path.GetExtension(fileName);
+            string path = $"people/{person.}{personId}/{Guid.NewGuid()}{ext}";
+
+            var prevPath = person.PhotoPath;
+
+            // Subir archivo
+            var (publicUrl, storagePath) = await _storage.UploadAsync(fileStream, contentType, path);
+
+            // Actualizar entidad
+            person.PhotoUrl = publicUrl;
+            person.PhotoPath = storagePath;
+
+            await _personData.UpdateAsync(person);
+
+            // Borrar foto anterior si existe
+            if (!string.IsNullOrWhiteSpace(prevPath) && prevPath != storagePath)
+                await _storage.DeleteIfExistsAsync(prevPath);
+
+            return (publicUrl, storagePath);
         }
 
     }

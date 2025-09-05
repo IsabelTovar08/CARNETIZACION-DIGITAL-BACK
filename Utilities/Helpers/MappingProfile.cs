@@ -41,6 +41,38 @@ namespace Utilities.Helper
                 .ReverseMap();
             CreateMap<Person, PersonDtoRequest>().ReverseMap();
 
+
+            CreateMap<Person, PersonInfoDto>()
+            // Info básica de la persona
+            .ForMember(d => d.PersonalInfo, o => o.MapFrom(s => s))
+
+            // División actual (IsCurrentlySelected)
+            .ForMember(d => d.DivissionId, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Id))
+            .ForMember(d => d.DivissionName, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Name))
+
+            // Unidad
+            .ForMember(d => d.UnitId, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Id))
+            .ForMember(d => d.UnitName, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Name))
+
+            // Organización (desde Branch → Organization)
+            .ForMember(d => d.OrganizationId, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
+                    .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
+                    .Select(oub => oub.Branch.Organization.Id)
+                    .FirstOrDefault()))
+            .ForMember(d => d.OrganizationName, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
+                    .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
+                    .Select(oub => oub.Branch.Organization.Name)
+                    .FirstOrDefault()));
+
+
+
+
             //Mapeo de la entidad Rol 
             CreateMap<Role, RolDto>().ReverseMap();
             CreateMap<Role, RoleDtoRequest>().ReverseMap();

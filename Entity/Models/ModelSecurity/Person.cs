@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
+using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models.Base;
 using Entity.Models.Organizational;
 using Entity.Models.Organizational.Assignment;
@@ -21,9 +22,10 @@ namespace Entity.Models.ModelSecurity
         public int? DocumentTypeId { get; set; }
 
         public int? BloodTypeId { get; set; }
-        public string? Photo { get; set; }
+        public string? PhotoUrl { get; set; }
+        public string? PhotoPath { get; set; }
 
-       
+
         public int? CityId { get; set; }
 
         public User? User { get; set; }
@@ -33,5 +35,10 @@ namespace Entity.Models.ModelSecurity
         public List<PersonDivisionProfile>? PersonDivisionProfile { get; set; }
         public CustomType DocumentType { get; set; }
         public CustomType? BloodType { get; set; }
+
+        public static implicit operator Person?(PersonInfoDto? v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
