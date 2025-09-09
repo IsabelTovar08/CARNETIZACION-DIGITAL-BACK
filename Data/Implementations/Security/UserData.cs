@@ -35,6 +35,38 @@ namespace Data.Classes.Specifics
 
             return user?.UserRoles.Select(ur => ur.Rol.Name).ToList() ?? new List<string>();
         }
+
+        public async Task<User?> GetByIdForMeAsync(int userId, bool includeProfile)
+        {
+            var query = _context.Users
+                .AsNoTrackingWithIdentityResolution() // <- permite fix-up sin tracking
+                .Where(u => u.Id == userId && !u.IsDeleted)
+                // Roles / Permisos
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Rol)
+                        .ThenInclude(r => r.RolFormPermissions)
+                            .ThenInclude(rp => rp.Permission)
+                .AsQueryable();
+
+            if (includeProfile)
+            {
+                query = query
+                    // Person + City desde el root (NO volver a Person desde PDP)
+                    .Include(u => u.Person)
+                        .ThenInclude(p => p.City)
+
+                    // Solo el perfil actual y sus dependencias HACIA ADELANTE
+                    .Include(u => u.Person.PersonDivisionProfile.Where(pdp => pdp.IsCurrentlySelected))
+                        .ThenInclude(pdp => pdp.Profile)
+                    .Include(u => u.Person.PersonDivisionProfile.Where(pdp => pdp.IsCurrentlySelected))
+                        .ThenInclude(pdp => pdp.InternalDivision); // o Division, según tu modelo
+                                                                   // 👈 NO hagas: .ThenInclude(pdp => pdp.Person) ni .ThenInclude(...Person.City)
+            }
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+
         public async Task<User?> ValidateUserAsync(string email, string password)
         {
             var user = await _context.Set<User>()

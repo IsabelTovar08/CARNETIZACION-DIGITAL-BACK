@@ -30,7 +30,7 @@ namespace Business.Services.Excel
 
         public async Task<BulkImportResultDto> ImportFromExcelAsync(Stream excelStream)
         {
-            // Español: Validación básica del stream
+            // Validación básica del stream
             if (excelStream == null || !excelStream.CanRead)
                 throw new ArgumentException("El stream de Excel es nulo o no es legible.");
 
@@ -40,11 +40,11 @@ namespace Business.Services.Excel
             var ws = workbook.Worksheets.FirstOrDefault();
             if (ws == null) throw new ArgumentException("No se encontró una hoja válida en el Excel.");
 
-            // Español: Suponemos fila 1 = encabezados, fila 2..N = datos
+            // Suponemos fila 1 = encabezados, fila 2..N = datos
             const int HEADER_ROW = 1;
             const int FIRST_DATA_ROW = 2;
 
-            // Español: Mapea columnas por índice (A=1, B=2, ... K=11)
+            // Mapea columnas por índice (A=1, B=2, ... K=11)
             const int COL_FIRSTNAME = 1;  // A
             const int COL_MIDDLENAME = 2;  // B
             const int COL_LASTNAME = 3;  // C
@@ -66,7 +66,7 @@ namespace Business.Services.Excel
 
             result.TotalRows = lastRow - HEADER_ROW;
 
-            // Español: Evita duplicados dentro del mismo archivo (rendimiento O(1))
+            // Evita duplicados dentro del mismo archivo (rendimiento O(1))
             var emailsInFile = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var docsInFile = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -117,7 +117,7 @@ namespace Business.Services.Excel
                         },
                         User = new UserDtoRequest
                         {
-                            UserName = dto.Email,       // Español: usualmente user = email
+                            UserName = dto.Email,       // usualmente user = email
                             Password = tempPassword
                         }
                     };
@@ -134,7 +134,7 @@ namespace Business.Services.Excel
                 catch (Exception ex)
                 {
                     rowRes.Success = false;
-                    rowRes.Message = ShortError(ex); // Español: mensaje corto e inteligible
+                    rowRes.Message = ShortError(ex); // mensaje corto e inteligible
                     result.ErrorCount++;
                     _logger.LogWarning(ex, "Error importando fila {Row}", row);
                 }
@@ -147,7 +147,7 @@ namespace Business.Services.Excel
 
         // ================== Helpers ==================
 
-        // Español: Validación mínima + duplicados en el archivo
+        // Validación mínima + duplicados en el archivo
         private static string? ValidateRow(PersonDtoRequest r, HashSet<string> emailsInFile, HashSet<string> docsInFile)
         {
             if (string.IsNullOrWhiteSpace(r.FirstName)) return "FirstName es requerido.";
@@ -196,14 +196,14 @@ namespace Business.Services.Excel
         // ================== Small helpers ==================
         public static class StringHelpers
         {
-            // Español: Trim que retorna null si queda vacío
+            // Trim que retorna null si queda vacío
             public static string? TrimToNull(string s)
                 => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
         }
 
         public static class ExcelHelpers
         {
-            // Español: Int? a partir de una celda; soporta números o texto numérico
+            // Int? a partir de una celda; soporta números o texto numérico
             public static int? TryGetIntNull(IXLCell cell)
             {
                 if (cell.IsEmpty()) return null;

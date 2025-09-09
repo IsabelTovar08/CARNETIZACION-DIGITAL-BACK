@@ -13,6 +13,6 @@ namespace Data.Interfases.Security
     {
         Task<Person?> FindByIdentification(string identification);
         Task<(Person Person, User User)> SavePersonAndUser(Person person, User user);
-
+        Task<Person?> GetPersonInfo(int id);
     }
 }

@@ -8,6 +8,7 @@ using Data.Interfases.Security;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
@@ -123,6 +124,34 @@ namespace Business.Classes
                 _logger.LogError(ex, "Error al asignar el rol por defecto para el nuevo usuario.");
                 return false;
             }
+        }
+        public async Task<List<string>> GetUserRolesById(int userId)
+        {
+           return await _userData.GetUserRolesByIdAsync(userId);
+        }
+
+
+        public async Task<UserMeDto?> GetByIdForMe(int userId, List<string> roles)
+        {
+            // Define aquí qué roles SON "web" y NO deben traer perfil
+            bool isWebRole = roles.Any(r =>
+                r.Equals("AdminOrg", StringComparison.OrdinalIgnoreCase) ||
+                r.Equals("Backoffice", StringComparison.OrdinalIgnoreCase) ||
+                r.Equals("AdminWeb", StringComparison.OrdinalIgnoreCase));
+
+            bool includeProfile = !isWebRole;
+
+            // Trae la entidad con o sin includes, según el rol
+            var user = await _userData.GetByIdForMeAsync(userId, true);
+            if (user == null) return null;
+
+            // Mapeo completo con AutoMapper
+            var dto = _mapper.Map<UserMeDto>(user);
+
+            // Por contrato: si es rol web, CurrentProfile debe ir null
+            if (!includeProfile) dto.CurrentProfile = null;
+
+            return dto;
         }
 
     }

@@ -69,10 +69,10 @@ namespace Entity.DataInit.Parameter
                    .WithOne(n => n.NotificationType)
                    .HasForeignKey(n => n.NotificationTypeId);
 
-            builder.HasMany(ct => ct.PersonDocumentType)
-                   .WithOne(p => p.DocumentType)
-                   .HasForeignKey(p => p.DocumentTypeId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasMany(ct => ct.PersonDocumentType)
+            //       .WithOne(p => p.DocumentType)
+            //       .HasForeignKey(p => p.DocumentTypeId)
+            //       .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(ct => ct.PersonBlodType)
                    .WithOne(p => p.BloodType)

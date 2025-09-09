@@ -166,5 +166,12 @@ namespace Data.Classes.Base
                 .Where(e => EF.Property<object>(e, p) == v)
                 .AnyAsync();
         }
+
+
+        public override Task<bool> ExistsCodeAsync(string code, int excludeId)
+        {
+            return _context.Set<T>().AnyAsync(x => x.Code == code && x.Id != excludeId && !x.IsDeleted);
+        }
+
     }
 }

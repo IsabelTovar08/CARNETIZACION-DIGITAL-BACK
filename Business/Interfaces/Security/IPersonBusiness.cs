@@ -10,8 +10,19 @@ using Entity.Models.ModelSecurity;
 
 namespace Business.Interfaces.Security
 {
-    public interface IPersonBusiness: IBaseBusiness<Person, PersonDtoRequest, PersonDto>
+    public interface IPersonBusiness : IBaseBusiness<Person, PersonDtoRequest, PersonDto>
     {
         Task<(PersonRegistrerDto, bool?)> SavePersonAndUser(PersonRegistrer personUser);
+
+        /// <summary>
+        /// Upsert person's photo and persist URL/path on the entity.
+        /// </summary>
+        Task<(string PublicUrl, string StoragePath)> UpsertPersonPhotoAsync(
+            int personId,
+            Stream fileStream,
+            string contentType,
+            string originalFileName);
+
+        Task<PersonInfoDto?> GetPersonInfoAsync(int id);
     }
 }

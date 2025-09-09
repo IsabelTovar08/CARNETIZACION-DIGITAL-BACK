@@ -22,6 +22,6 @@ namespace Data.Classes.Base
         public abstract Task<bool> ToggleActiveAsync(int id);
         public abstract Task<bool> ExistsByAsync(Expression<Func<T, object>> fieldSelector, object? value);
 
-
+        public abstract Task<bool> ExistsCodeAsync(string code, int excludeId);
     }
 }

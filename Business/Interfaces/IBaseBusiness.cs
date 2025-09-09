@@ -22,5 +22,7 @@ namespace Business.Interfases
         Task ValidateAsync(T newEntity);
         void Validate(DCreate create);
 
+        public Task<bool> ExistsCodeAsync(string code, int excludeId);
+
     }
 }

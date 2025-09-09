@@ -30,6 +30,19 @@ namespace Data.Classes.Specifics
             return await _context.Set<Person>().Where(u => !u.IsDeleted).FirstOrDefaultAsync(p => p.DocumentNumber == identification);
         }
 
+        public async Task<Person?> GetPersonInfo(int id)
+        {
+            return await _context.Set<Person>()
+                .Include(u => u.PersonDivisionProfile.Where(up => up.IsCurrentlySelected))
+                    .ThenInclude(pdp => pdp.InternalDivision)
+                        .ThenInclude(id => id.OrganizationalUnit)
+                            .ThenInclude(ou => ou.OrganizationalUnitBranches)
+                                .ThenInclude(oub => oub.Branch)
+                                    .ThenInclude(b => b.Organization)
+                .Where(u => !u.IsDeleted)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
         public async Task<(Person Person, User User)> SavePersonAndUser(Person person, User user)
         {
             await using var transaction = await _context.Database.BeginTransactionAsync();

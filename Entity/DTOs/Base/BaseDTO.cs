@@ -10,8 +10,10 @@ namespace Entity.DTOs.Base
     {
         public int Id { get; set; }
         public bool IsDeleted { get; set; }
-        public DateTime CreateAt { get; set; }
-        public DateTime UpdateAt { get; set; }
+        public string? Code { get; set; }
+
+        //public DateTime CreateAt { get; set; }
+        //public DateTime UpdateAt { get; set; }
 
     }
 }

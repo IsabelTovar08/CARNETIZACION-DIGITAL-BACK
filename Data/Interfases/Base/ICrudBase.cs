@@ -11,5 +11,6 @@ namespace Data.Interfases
     public interface ICrudBase<T> : IRead<T>, ICreate<T>, IUpdate<T>, IDelete, ISoftDelete where T : class 
     {
         Task<bool> ExistsByAsync(Expression<Func<T, object>> fieldSelector, object? value);
+        Task<bool> ExistsCodeAsync(string code, int excludeId);
     }
 }

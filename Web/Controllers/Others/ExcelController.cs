@@ -1,8 +1,9 @@
 ﻿using Business.Services.Excel;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Organizational.Assigment.Request;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Web.Controllers
+namespace Web.Controllers.Others
 {
     [ApiController]
     [Route("api/excel")]
@@ -22,9 +23,8 @@ namespace Web.Controllers
         [HttpPost("people")]
         [Consumes("multipart/form-data")]
         [RequestSizeLimit(50_000_000)]
-        public async Task<ActionResult<BulkImportResultDto>> ImportExcel(ImportExcelRequest req)
+        public async Task<ActionResult<BulkImportResultDto>> ImportExcel(MassiveInfluxOfPeople req)
         {
-            // Validaciones
             if (req?.File is null)
                 return BadRequest("Debe adjuntar el archivo en el campo 'file'.");
 
@@ -36,11 +36,5 @@ namespace Web.Controllers
 
             return Ok(result);
         }
-    }
-
-    public class ImportExcelRequest
-    {
-        /// <summary>Archivo Excel (.xlsx)</summary>
-        public IFormFile File { get; set; }
     }
 }

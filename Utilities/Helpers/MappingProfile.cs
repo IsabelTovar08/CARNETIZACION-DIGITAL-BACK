@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Globalization; // ➕ para formateo es-CO
+using AutoMapper;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
@@ -16,6 +17,7 @@ using Entity.DTOs.Organizational.Structure.Response;
 using Entity.DTOs.Parameter;
 using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
@@ -24,7 +26,6 @@ using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
-using System.Globalization; // ➕ para formateo es-CO
 
 namespace Utilities.Helper
 {
@@ -39,6 +40,38 @@ namespace Utilities.Helper
                 .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
                 .ReverseMap();
             CreateMap<Person, PersonDtoRequest>().ReverseMap();
+
+
+            CreateMap<Person, PersonInfoDto>()
+            // Info básica de la persona
+            .ForMember(d => d.PersonalInfo, o => o.MapFrom(s => s))
+
+            // División actual (IsCurrentlySelected)
+            .ForMember(d => d.DivissionId, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Id))
+            .ForMember(d => d.DivissionName, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Name))
+
+            // Unidad
+            .ForMember(d => d.UnitId, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Id))
+            .ForMember(d => d.UnitName, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Name))
+
+            // Organización (desde Branch → Organization)
+            .ForMember(d => d.OrganizationId, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
+                    .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
+                    .Select(oub => oub.Branch.Organization.Id)
+                    .FirstOrDefault()))
+            .ForMember(d => d.OrganizationName, o => o.MapFrom(s =>
+                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
+                    .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
+                    .Select(oub => oub.Branch.Organization.Name)
+                    .FirstOrDefault()));
+
+
+
 
             //Mapeo de la entidad Rol 
             CreateMap<Role, RolDto>().ReverseMap();
@@ -67,6 +100,17 @@ namespace Utilities.Helper
              .ReverseMap();
 
             CreateMap<User, UserDtoRequest>().ReverseMap();
+
+
+            CreateMap<User, UserMeDto>()
+            // ⬇️ AQUÍ el cambio clave: pasa Rol ENTIDAD, no Name string
+            .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.UserRoles.Select(ur => ur.Rol)))
+            .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
+        s.UserRoles
+         .SelectMany(ur => ur.Rol.RolFormPermissions.Select(rp => rp.Permission))
+         .DistinctBy(p => p.Id)))
+            .ForMember(d => d.CurrentProfile, opt => opt.MapFrom(s =>
+                s.Person.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)));
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()

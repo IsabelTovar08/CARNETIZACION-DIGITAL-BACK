@@ -7,8 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Business.Interfases;
+using Business.Services.CodeGenerator;
 using Data.Interfases;
 using Entity.DTOs.Base;
+using Entity.Migrations;
 using Entity.Models.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -23,12 +25,14 @@ namespace Business.Classes.Base
         protected readonly ICrudBase<T> _data;
         protected readonly ILogger<T> _logger;
         protected readonly IMapper _mapper;
+        private readonly ICodeGeneratorService<T> _codeService;
 
-        public BaseBusiness(ICrudBase<T> data, ILogger<T> logger, IMapper mapper)
+        public BaseBusiness(ICrudBase<T> data, ILogger<T> logger, IMapper mapper, ICodeGeneratorService<T>? codeService = null)
         {
             _data = data;
             _mapper = mapper;
             _logger = logger;
+            _codeService = codeService ?? new CodeGeneratorService<T>(); ;
         }
 
         /// <summary>
@@ -40,8 +44,17 @@ namespace Business.Classes.Base
             {
                 Validate(entity);
 
-                var newEntity = _mapper.Map<T>(entity);
+                T newEntity = _mapper.Map<T>(entity);
+
                 await ValidateAsync(newEntity);
+
+                await _codeService.EnsureCodeAsync(
+           newEntity,
+           (codeCandidate, currentId) => ExistsCodeAsync(codeCandidate, currentId)
+       );
+
+
+                newEntity.CreateAt = DateTime.UtcNow;
 
                 newEntity = await _data.SaveAsync((T)newEntity);
                 return _mapper.Map<D>(newEntity);
@@ -168,7 +181,12 @@ namespace Business.Classes.Base
         {
             try
             {
+                //await ValidateAsync(entity);
+
                 BaseModel newEntity = _mapper.Map<T>(entity);
+
+                newEntity.UpdateAt = DateTime.UtcNow;
+
                 await _data.UpdateAsync((T)newEntity);
                 return _mapper.Map<D>(newEntity);
             }
@@ -206,6 +224,11 @@ namespace Business.Classes.Base
             if (d == null)
                 throw new ValidationException("la entidad no puede ser nula.");
 
+        }
+
+        public override Task<bool> ExistsCodeAsync(string code, int excludeId)
+        {
+            return _data.ExistsCodeAsync(code, excludeId);
         }
     }
 }
