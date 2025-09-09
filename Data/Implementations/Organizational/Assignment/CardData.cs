@@ -38,5 +38,11 @@ namespace Data.Implementations.Organizational.Assignment
             return cards;
         }
 
+        public override Task<Card> SaveAsync(Card entity)
+        {
+            entity.QRCode = "123";
+            return base.SaveAsync(entity);
+        }
+
     }
 }

@@ -3,6 +3,7 @@ using Data.Interfases.Security;
 using Entity.Context;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Microsoft.EntityFrameworkCore;
@@ -45,7 +46,9 @@ namespace Data.Classes.Specifics
 
         public async Task<(Person Person, User User)> SavePersonAndUser(Person person, User user)
         {
-            await using var transaction = await _context.Database.BeginTransactionAsync();
+            var hasAmbientTx = _context.Database.CurrentTransaction != null;
+            if (!hasAmbientTx)
+                await _context.Database.BeginTransactionAsync();
 
             try
             {
@@ -59,18 +62,46 @@ namespace Data.Classes.Specifics
                 user.PersonId = personCreated.Id;
                 User userCreated = await _userData.SaveAsync(user);
 
-                // Confirmar cambios en la BD
-                await transaction.CommitAsync();
+                if (!hasAmbientTx)
+                    await _context.Database.CommitTransactionAsync();
 
                 return (person, user);
             }
             catch
             {
                 // Revertir cambios si hay error
-                await transaction.RollbackAsync();
+                if (!hasAmbientTx)
+                    await _context.Database.RollbackTransactionAsync();
                 throw;
             }
         }
+
+        public async Task<PersonOrganizationalInfoDto?> GetOrganizationalInfo(int personId)
+        {
+            return await _context.Set<Person>()
+                .AsNoTracking()
+                .Where(p => p.Id == personId && !p.IsDeleted)
+                .Select(p => new PersonOrganizationalInfoDto
+                {
+                    InternalDivissionCode = p.PersonDivisionProfile
+                        .Where(x => x.IsCurrentlySelected)
+                        .Select(x => x.InternalDivision.Code)
+                        .FirstOrDefault(),
+
+                    OrganizationUnitCode = p.PersonDivisionProfile
+                        .Where(x => x.IsCurrentlySelected)
+                        .Select(x => x.InternalDivision.OrganizationalUnit.Code)
+                        .FirstOrDefault(),
+
+                    OrganizationCode = p.PersonDivisionProfile
+                        .Where(x => x.IsCurrentlySelected)
+                        .SelectMany(x => x.InternalDivision.OrganizationalUnit.OrganizationalUnitBranches)
+                        .Select(oub => oub.Branch.Organization.Code)
+                        .FirstOrDefault()
+                })
+                .FirstOrDefaultAsync();
+        }
+
 
     }
 }

@@ -31,7 +31,7 @@ namespace Business.Implementations.Storage
         {
             _client.DefaultRequestHeaders.Add("x-upsert", "true");
 
-            var uri = $"{_opt.PublicBaseUrl}/{_opt.Bucket}/{destinationPath}";
+            var uri = $"{_opt.Url}/storage/v1/object/{_opt.Bucket}/{destinationPath}";
             using var streamContent = new StreamContent(content);
             streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
@@ -47,7 +47,7 @@ namespace Business.Implementations.Storage
         {
             if (string.IsNullOrEmpty(storagePath)) return;
 
-            var uri = $"{_opt.PublicBaseUrl}/{_opt.Bucket}/delete";
+            var uri = $"{_opt.Url}/{_opt.Bucket}/delete";
             var payload = new { prefixes = new[] { storagePath } };
 
             await _client.PostAsJsonAsync(uri, payload);

@@ -15,6 +15,7 @@ namespace Entity.DTOs.ModelSecurity.Response
         public string? GeneratedPassword { get; set; }  // opcional: para auditoría (no recomendado devolverla)
         public bool Created { get; set; }      // true si se persistió persona/usuario
         public bool EmailSent { get; set; }    // true si el email salió ok
-    
+        public bool UpdatedPhoto { get; set; }
+
     }
 }

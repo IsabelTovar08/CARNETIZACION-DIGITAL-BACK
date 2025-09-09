@@ -23,6 +23,7 @@ namespace Entity.DTOs.ModelSecurity.Response
 
         public int CityId { get; set; }
         public string CityName { get; set; }
+        public string? PhotoUrl { get; set; }
 
     }
 }

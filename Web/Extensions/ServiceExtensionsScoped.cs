@@ -20,6 +20,7 @@ using Business.Interfaces.Auth;
 using Business.Interfaces.Auth;
 using Business.Interfaces.Auth;
 using Business.Interfaces.Enums;
+using Business.Interfaces.Logging;
 using Business.Interfaces.Notifications;
 using Business.Interfaces.Notifications;
 using Business.Interfaces.Notifications;
@@ -34,6 +35,7 @@ using Business.Interfaces.Organizational.Structure;
 using Business.Interfaces.Organizational.Structure;
 using Business.Interfaces.Parameters;
 using Business.Interfaces.Security;
+using Business.Interfaces.Storage;
 using Business.Interfases;
 using Business.Interfases.Organizational.Location;
 using Business.Interfases.Storage;
@@ -43,11 +45,14 @@ using Business.Services.CodeGenerator;
 using Business.Services.Enums;
 using Business.Services.Excel;
 using Business.Services.JWT;
+using Business.Services.Logging;
+using Business.Services.Storage;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Implementations.Auth;
 using Data.Implementations.Auth;
 using Data.Implementations.Auth;
+using Data.Implementations.Logging;
 using Data.Implementations.Notifications;
 using Data.Implementations.Notifications;
 using Data.Implementations.Notifications;
@@ -65,6 +70,7 @@ using Data.Implementations.Parameters;
 using Data.Implementations.Security;
 using Data.Implementations.Security;
 using Data.Implementations.Security;
+using Data.Implementations.Transaction;
 using Data.Interfaces.Security;
 using Data.Interfaces.Security;
 using Data.Interfaces.Security;
@@ -72,6 +78,7 @@ using Data.Interfases;
 using Data.Interfases.Auth;
 using Data.Interfases.Auth;
 using Data.Interfases.Auth;
+using Data.Interfases.Logging;
 using Data.Interfases.Notifications;
 using Data.Interfases.Notifications;
 using Data.Interfases.Notifications;
@@ -87,6 +94,7 @@ using Data.Interfases.Organizational.Structure;
 using Data.Interfases.Organizational.Structure;
 using Data.Interfases.Parameters;
 using Data.Interfases.Security;
+using Data.Interfases.Transaction;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
@@ -116,7 +124,9 @@ using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client.Extensions.Msal;
+using Utilities.Helpers.Excel;
 using Utilities.Notifications.Implementations;
+using Web.Auth;
 
 namespace Web.Extensions
 {
@@ -261,6 +271,10 @@ namespace Web.Extensions
             services.AddScoped<ICardData, CardData>();
             services.AddScoped<ICardBusiness, CardBusiness>();
 
+            //Card Templates
+            services.AddScoped<ICardTemplateData, CardTemplateData>();
+            services.AddScoped<ICardTemplateBusiness, CardTemplateBusiness>();
+
             //Area categoria
             services.AddScoped<IAreaCategoryData, AreaCategoryData>();
             services.AddScoped<ICategoryAreaBusiness, AreaCategoryBusiness>();
@@ -282,6 +296,8 @@ namespace Web.Extensions
             services.AddScoped<IBranchBusiness, BranchBusiness>();
 
             services.AddScoped<IExcelPersonParser, ExcelPersonParser>();
+            services.AddScoped<IExcelBulkImporter, ExcelBulkImporter>();
+
 
             services.AddScoped<IUserVerificationService, UserVerificationService>();
 
@@ -293,6 +309,24 @@ namespace Web.Extensions
             services.AddScoped<IFileStorageService, SupabaseStorageService>();
 
             services.AddScoped(typeof(ICodeGeneratorService<>), typeof(CodeGeneratorService<>));
+
+            // storage route images
+            services.AddScoped<IAssetUploader, AssetUploader>();
+            services.AddScoped<IExcelReaderHelper, ClosedXmlExcelReaderHelper>();
+
+
+            // Data
+            services.AddScoped<IImportBatchData, ImportBatchData>();
+            services.AddScoped<IImportBatchRowData, ImportBatchRowData>();
+
+            // Business
+            services.AddScoped<IImportHistoryBusiness, ImportHistoryBusiness>();
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 
 

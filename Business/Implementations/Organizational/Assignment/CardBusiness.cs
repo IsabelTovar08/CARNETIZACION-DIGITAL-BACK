@@ -20,5 +20,11 @@ namespace Business.Implementations.Organizational.Assignment
         public CardBusiness(ICardData data, ILogger<Card> logger, IMapper mapper) : base(data, logger, mapper)
         {
         }
+
+        public override Task<CardDto> Save(CardDtoRequest entity)
+        {
+            
+            return base.Save(entity);
+        }
     }
 }
