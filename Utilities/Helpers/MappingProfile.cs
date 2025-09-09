@@ -21,6 +21,8 @@ using Entity.DTOs.Specifics;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
+using Entity.Models.Operational;
+using Entity.Models.Operational.BulkLoading;
 using Entity.Models.Organizational;
 using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
@@ -197,6 +199,9 @@ namespace Utilities.Helper
                     .ForMember(s => s.Status, o => o.Ignore())
                     .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
 
+            CreateMap<CardTemplate, CardTemplateRequest>().ReverseMap();
+            CreateMap<CardTemplate, CardTemplateResponse>().ReverseMap();
+
             //PersonDivisionProfile
             CreateMap<PersonDivisionProfile, PersonDivisionProfileDto>()
                 .ForMember(dest => dest.PersonName, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
@@ -347,6 +352,12 @@ namespace Utilities.Helper
                     .ForMember(dest => dest.Person, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointExit, opt => opt.Ignore());
+
+
+
+            CreateMap<ImportBatchStartDto, ImportBatch>().ReverseMap();
+
+            CreateMap<ImportBatchRowDto, ImportBatchRow>().ReverseMap();
         }
     }
 }

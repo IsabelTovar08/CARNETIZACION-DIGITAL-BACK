@@ -13,7 +13,7 @@ namespace Business.Interfaces.Security
 {
     public interface IPersonBusiness : IBaseBusiness<Person, PersonDtoRequest, PersonDto>
     {
-        Task<(PersonRegistrerDto, bool?)> SavePersonAndUser(PersonRegistrer personUser);
+        Task<PersonRegistrerDto> SavePersonAndUser(PersonRegistrer personUser);
 
         /// <summary>
         /// Upsert person's photo and persist URL/path on the entity.

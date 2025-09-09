@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Security;
+using Business.Interfaces.Storage;
 using Business.Interfases.Storage;
 using ClosedXML.Excel;
 using Data.Classes.Specifics;
@@ -32,16 +33,14 @@ namespace Business.Classes
     {
         private readonly IPersonData _personData;
         private readonly INotify _notificationSender;
-        private readonly IUserBusiness _userBusiness;
         private readonly IUserRoleBusiness _userRolBusiness;
-        private readonly IFileStorageService _storage;
-        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserBusiness userBusiness, IUserRoleBusiness userRolBusiness, IFileStorageService storage) : base(personData, logger, mapper)
+        private readonly IAssetUploader _assetUploader;
+        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserRoleBusiness userRolBusiness, IAssetUploader assetUploader) : base(personData, logger, mapper)
         {
             _notificationSender = messageSender;
-            _userBusiness = userBusiness;
             _personData = personData;
             _userRolBusiness = userRolBusiness; 
-            _storage = storage;
+            _assetUploader = assetUploader;
         }
 
         public override async Task ValidateAsync(Person entity)
@@ -131,26 +130,26 @@ namespace Business.Classes
         }
 
 
-        public async Task<(PersonRegistrerDto, bool?)> SavePersonAndUser(PersonRegistrer personUser)
+        public async Task<PersonRegistrerDto> SavePersonAndUser(PersonRegistrer personUser)
         {
             Validate(personUser.Person);
             await EnsureIdentificationIsUnique(personUser.Person.DocumentNumber);
 
-            var personEntity = _mapper.Map<Person>(personUser.Person);
-            var userEntity = _mapper.Map<User>(personUser.User);
-            var result = await _personData.SavePersonAndUser(personEntity, userEntity);
+            Person personEntity = _mapper.Map<Person>(personUser.Person);
+            User userEntity = _mapper.Map<User>(personUser.User);
+            (Person Person, User User) result = await _personData.SavePersonAndUser(personEntity, userEntity);
 
             // devuelve si se envió o no
-            var emailSent = _=await SendWelcomeNotifications(result.Person, userEntity);
+            bool emailSent = _=await SendWelcomeNotifications(result.Person, userEntity);
             _ = await AsignarRol(userEntity.Id);
 
             return (
                 new PersonRegistrerDto
                 {
                     Person = _mapper.Map<PersonDto>(result.Person),
-                    User = _mapper.Map<UserDTO>(result.User)
-                },
-                emailSent
+                    User = _mapper.Map<UserDTO>(result.User),
+                    EmailSent = emailSent
+                }
             );
         }
 
@@ -259,50 +258,57 @@ namespace Business.Classes
             }
         }
 
-        public async Task<(string PublicUrl, string StoragePath)> UpsertPersonPhotoAsync(int personId, Stream fileStream, string contentType, string fileName)
+        
+
+        // Método público: upsert foto de persona 
+        public async Task<(string PublicUrl, string StoragePath)> UpsertPersonPhotoAsync(
+            int personId,
+            Stream fileStream,
+            string contentType,
+            string fileName)
         {
-            // Buscar persona
-            Person? person = await _personData.GetByIdAsync(personId);
-            if (person == null)
-                throw new KeyNotFoundException($"La persona {personId} no fue encontrada");
+            // 1) Cargar persona
+            var person = await _personData.GetByIdAsync(personId)
+                ?? throw new KeyNotFoundException($"La persona {personId} no fue encontrada");
 
-            PersonOrganizationalInfoDto? info = await GetOrganizationalInfoAsync(personId);
+            // 2) Calcular ruta (segmentos) para esta entidad
+            var pathParts = await BuildPersonPhotoPathPartsAsync(personId);
 
-            // Generar path único
-            string ext = Path.GetExtension(fileName); 
+            // 3) Subir y reemplazar, delegando en el servicio genérico
+            var (publicUrl, storagePath) = await _assetUploader.UpsertAsync(
+                pathParts,
+                person.PhotoPath,             // previous path
+                fileStream,
+                contentType,
+                fileName
+            );
 
-            // Arma la ruta de forma dinámica, ignorando valores nulos o vacíos
-            var parts = new List<string>
-            {
-                "people",
-                info.OrganizationCode,
-                info.OrganizationUnitCode,
-                info.InternalDivissionCode,
-                personId.ToString(),
-                $"{Guid.NewGuid()}{ext}"
-            };
-
-            // Filtra valores nulos/vacíos antes de concatenar
-            string path = string.Join("/", parts.Where(p => !string.IsNullOrWhiteSpace(p)));
-
-
-            var prevPath = person.PhotoPath;
-
-            // Subir archivo
-            var (publicUrl, storagePath) = await _storage.UploadAsync(fileStream, contentType, path);
-
-            // Actualizar entidad
+            // 4) Persistir cambios en entidad
             person.PhotoUrl = publicUrl;
             person.PhotoPath = storagePath;
-
             await _personData.UpdateAsync(person);
-
-            // Borrar foto anterior si existe
-            if (!string.IsNullOrWhiteSpace(prevPath) && prevPath != storagePath)
-                await _storage.DeleteIfExistsAsync(prevPath);
 
             return (publicUrl, storagePath);
         }
 
+
+        // Helper para armar los segmentos de ruta
+        private async Task<IReadOnlyList<string?>> BuildPersonPhotoPathPartsAsync(int personId)
+        {
+            // Pueden existir personas sin perfil org seleccionada:
+            // usa los códigos si existen; si no, solo people/{personId}
+            var info = await GetOrganizationalInfoAsync(personId);
+
+            var parts = new List<string?>
+        {
+            "people",
+            info?.OrganizationCode,
+            info?.OrganizationUnitCode,
+            info?.InternalDivissionCode,
+            personId.ToString()
+        };
+
+            return parts;
+        }
     }
 }

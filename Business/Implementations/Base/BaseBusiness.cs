@@ -10,7 +10,6 @@ using Business.Interfases;
 using Business.Services.CodeGenerator;
 using Data.Interfases;
 using Entity.DTOs.Base;
-using Entity.Migrations;
 using Entity.Models.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -48,11 +47,7 @@ namespace Business.Classes.Base
 
                 await ValidateAsync(newEntity);
 
-                await _codeService.EnsureCodeAsync(
-           newEntity,
-           (codeCandidate, currentId) => ExistsCodeAsync(codeCandidate, currentId)
-       );
-
+                await _codeService.EnsureCodeAsync(newEntity,(codeCandidate, currentId) => ExistsCodeAsync(codeCandidate, currentId));
 
                 newEntity.CreateAt = DateTime.UtcNow;
 

@@ -23,6 +23,7 @@ namespace Business.Implementations.Organizational.Assignment
 
         public override Task<CardDto> Save(CardDtoRequest entity)
         {
+            
             return base.Save(entity);
         }
     }

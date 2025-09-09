@@ -11,6 +11,8 @@ using Entity.Models;
 using Entity.Models.Auth;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
+using Entity.Models.Operational;
+using Entity.Models.Operational.BulkLoading;
 using Entity.Models.Organizational;
 using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
@@ -99,6 +101,13 @@ namespace Entity.Context
         public DbSet<Status> Statuses { get; set; }
         public DbSet<CustomType> CustomTypes { get; set; }
         public DbSet<TypeCategory> TypeCategories { get; set; }
+
+        public DbSet<ImportBatch> ImportBatches { get; set; }
+        public DbSet<ImportBatchRow> ImportBatchRows { get; set; }
+
+        public DbSet<CardTemplate> CardTemplates { get; set; }
+
+
 
 
 
