@@ -12,18 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<< HEAD:Entity/Migrations/20250904012622_init.Designer.cs
-<<<<<<<< HEAD:Entity/Migrations/20250905171551_initial.Designer.cs
-    [Migration("20250905171551_initial")]
+    [Migration("20250909223249_initial")]
     partial class initial
-========
-    [Migration("20250904012622_init")]
-    partial class init
->>>>>>>> 9038855f36dc55ff0e6c083f13ad57c17879da2d:Entity/Migrations/20250904012622_init.Designer.cs
-=======
-    [Migration("20250909161504_Url")]
-    partial class Url
->>>>>>> origin/feature/isabel/cards:Entity/Migrations/20250909161504_Url.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

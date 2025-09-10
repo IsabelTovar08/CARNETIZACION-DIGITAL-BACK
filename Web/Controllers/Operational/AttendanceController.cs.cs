@@ -16,14 +16,17 @@ namespace Web.Controllers.Operational
     public class AttendanceController : GenericController<Attendance, AttendanceDtoRequest, AttendanceDtoResponse>
     {
         private readonly IAttendanceBusiness _attendanceBusiness;
+        private readonly IAccessPointBusiness _accessPointBusiness;
         private readonly ILogger<AttendanceController> _logger;
 
         public AttendanceController(
             IAttendanceBusiness attendanceBusiness,
+            IAccessPointBusiness accessPointBusiness,
             ILogger<AttendanceController> logger
         ) : base(attendanceBusiness, logger)
         {
             _attendanceBusiness = attendanceBusiness;
+            _accessPointBusiness = accessPointBusiness;
             _logger = logger;
         }
 
@@ -114,5 +117,36 @@ namespace Web.Controllers.Operational
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
+        // ========================== NUEVO ENDPOINT ==========================
+        /// <summary>
+        /// Registra asistencia a un evento a través de un código QR.
+        /// </summary>
+        /// <param name="dto">Debe traer PersonId y QrCode</param>
+        [HttpPost("register-by-qr")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RegisterByQr([FromBody] AttendanceDtoRequest dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.QrCode))
+            {
+                return BadRequest(new { success = false, message = "Solicitud inválida: debe incluir el QrCode y el PersonId." });
+            }
+
+            var result = await _accessPointBusiness.RegisterAttendanceByQrAsync(dto.QrCode, dto.PersonId);
+
+            if (result == null || !result.Success)
+            {
+                return BadRequest(new { success = false, message = result?.Message ?? "No se pudo registrar la asistencia." });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                data = result
+            });
+        }
+        
     }
 }

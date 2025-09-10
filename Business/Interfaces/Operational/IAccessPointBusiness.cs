@@ -8,9 +8,11 @@ namespace Business.Interfaces.Operational
 {
     public interface IAccessPointBusiness : IBaseBusiness<AccessPoint, AccessPointDtoRequest, AccessPointDtoResponsee>
     {
-        /// <summary>
-        /// Crea el punto de acceso y genera su QR (Base64 PNG).
-        /// </summary>
         Task<AccessPointDtoResponsee?> RegisterAsync(AccessPointDtoRequest dto);
+
+        /// <summary>
+        /// Registrar asistencia mediante escaneo de QR.
+        /// </summary>
+        Task<AttendanceDtoResponse?> RegisterAttendanceByQrAsync(string qrCode, int personId);
     }
 }
