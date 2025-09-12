@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Data.Interfases;
@@ -18,5 +19,14 @@ namespace Data.Interfases.Operational
         /// Retorna la entidad actualizada.
         /// </summary>
         Task<Attendance> UpdateExitAsync(int id, DateTime timeOfExit, int? accessPointOut, CancellationToken ct = default);
+
+        /// <summary>
+        /// Consulta filtrada y paginada de asistencias.
+        /// Filtros opcionales: personId, eventId (por AccessPoint Entry/Exit), rango de fechas, orden y paginación.
+        /// </summary>
+        Task<(IList<Attendance> Items, int Total)> QueryAsync(
+            int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
+            string? sortBy, string? sortDir, int page, int pageSize,
+            CancellationToken ct = default);
     }
 }

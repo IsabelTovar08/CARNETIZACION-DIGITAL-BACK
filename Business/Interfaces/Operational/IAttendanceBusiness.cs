@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Business.Interfases;
 using Entity.DTOs.Operational.Request;
@@ -17,5 +19,13 @@ namespace Business.Interfaces.Operational
 
         /// <summary>Registra SOLO la SALIDA. Falla si no existe una entrada abierta.</summary>
         Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default);
+
+        /// <summary>
+        /// Consulta filtrada y paginada de asistencias. Devuelve lista de DTOs y total.
+        /// </summary>
+        Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
+            int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
+            string? sortBy, string? sortDir, int page, int pageSize,
+            CancellationToken ct = default);
     }
 }
