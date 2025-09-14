@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Business.Interfaces.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
@@ -118,7 +120,33 @@ namespace Web.Controllers.Operational
             }
         }
 
-        // ========================== NUEVO ENDPOINT ==========================
+        //NUEVO ENDPOINT: CONSULTA Y FILTRO
+        /// <summary>
+        /// Consulta y filtra registros de asistencia con paginación.
+        /// Query params opcionales: personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize.
+        /// </summary>
+        [HttpGet("search")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Search(
+            [FromQuery] int? personId,
+            [FromQuery] int? eventId,
+            [FromQuery] DateTime? fromUtc,
+            [FromQuery] DateTime? toUtc,
+            [FromQuery] string? sortBy = "TimeOfEntry",
+            [FromQuery] string? sortDir = "DESC",
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            CancellationToken ct = default)
+        {
+            var (items, total) = await _attendanceBusiness.SearchAsync(
+                personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize, ct);
+
+            if (total == 0)
+                return Ok(new { items = Array.Empty<object>(), total = 0, page, pageSize, message = "Sin resultados para los filtros aplicados." });
+
+            return Ok(new { items, total, page, pageSize });
+        }
+
         /// <summary>
         /// Registra asistencia a un evento a través de un código QR.
         /// </summary>
@@ -147,6 +175,6 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
-        
+
     }
 }

@@ -10,6 +10,7 @@ using QRCoder;
 using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Operational.Request;
 using System.Threading;
+using System.Linq;
 
 namespace Business.Implementations.Operational
 {
@@ -162,6 +163,27 @@ namespace Business.Implementations.Operational
             using var qrCode = new PngByteQRCode(qrData);
             byte[] qrBytes = qrCode.GetGraphic(10);
             return Convert.ToBase64String(qrBytes);
+        }
+
+        //NUEVO MÉTODO: búsqueda con filtros y paginación
+        public async Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
+            int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
+            string? sortBy, string? sortDir, int page, int pageSize,
+            CancellationToken ct = default)
+        {
+            var (entities, total) = await _attendanceData.QueryAsync(
+                personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize, ct);
+
+            var list = entities.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
+
+            // completar strings amigables
+            foreach (var it in list)
+            {
+                it.TimeOfEntryStr = it.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
+                if (it.TimeOfExit.HasValue) it.TimeOfExitStr = it.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
+            }
+
+            return (list, total);
         }
     }
 }
