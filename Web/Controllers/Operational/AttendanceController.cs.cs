@@ -120,7 +120,7 @@ namespace Web.Controllers.Operational
             }
         }
 
-        //NUEVO ENDPOINT: CONSULTA Y FILTRO
+        // ========================== NUEVO ENDPOINT: CONSULTA Y FILTRO ==========================
         /// <summary>
         /// Consulta y filtra registros de asistencia con paginación.
         /// Query params opcionales: personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize.
