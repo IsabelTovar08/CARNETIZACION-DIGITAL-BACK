@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250909161051_template")]
-    partial class template
+    [Migration("20250911120847_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1397,10 +1397,6 @@ namespace Entity.Migrations
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
@@ -1419,8 +1415,7 @@ namespace Entity.Migrations
                             FrontElementsJson = "\r\n                    {\r\n                        \"qr\": { \"x\": 332, \"y\": 48 },\r\n                        \"underQrText\": { \"x\": 302, \"y\": 115 },\r\n                        \"companyName\": { \"x\": 70, \"y\": 78 },\r\n                        \"logo\": { \"x\": 7, \"y\": 97 },\r\n                        \"userPhoto\": { \"x\": -16, \"y\": -1 },\r\n                        \"name\": { \"x\": 240, \"y\": 209 },\r\n                        \"profile\": { \"x\": 240, \"y\": 333 },\r\n                        \"categoryArea\": { \"x\": 138, \"y\": 371 },\r\n                        \"phoneNumber\": { \"x\": 46, \"y\": 502 },\r\n                        \"bloodTypeValue\": { \"x\": 379, \"y\": 462 },\r\n                        \"email\": { \"x\": 144, \"y\": 560 },\r\n                        \"cardId\": { \"x\": 164, \"y\": 603 }\r\n                    }",
                             IsDeleted = false,
                             Name = "Plantilla Básica",
-                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Url = "plantilla-basica"
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 

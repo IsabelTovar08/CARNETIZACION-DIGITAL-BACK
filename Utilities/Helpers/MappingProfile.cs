@@ -353,6 +353,14 @@ namespace Utilities.Helper
                     .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointExit, opt => opt.Ignore());
 
+            CreateMap<User, UserProfileDto>()
+                .ForMember(d => d.FirstName, opt => opt.MapFrom(s => s.Person.FirstName))
+                .ForMember(d => d.LastName, opt => opt.MapFrom(s => s.Person.LastName))
+                .ForMember(d => d.SecondLastName, opt => opt.MapFrom(s => s.Person.SecondLastName))
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Person.Email))
+                .ForMember(d => d.Phone, opt => opt.MapFrom(s => s.Person.Phone));
+
+
 
 
             CreateMap<ImportBatchStartDto, ImportBatch>().ReverseMap();

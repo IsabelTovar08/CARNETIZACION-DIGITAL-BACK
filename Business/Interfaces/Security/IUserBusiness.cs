@@ -16,5 +16,9 @@ namespace Business.Interfaces.Security
     {
         Task<List<string>> GetUserRolesById(int userId);
         Task<UserMeDto?> GetByIdForMe(int userId, List<string> roles);
+        Task<User?> GetUserByIdAsync(int userId);
+
+        Task<UserProfileDto?> GetProfileAsync(int userId);
+
     }
 }

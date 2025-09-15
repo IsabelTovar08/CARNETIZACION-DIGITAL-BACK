@@ -79,6 +79,8 @@ namespace Business.Classes
                 throw new ExternalServiceException("Base de datos", "No se pudo crear el usuario.");
             }
         }
+
+        //verifica si el correo ya esta en uso
         private async Task EnsureEmailIsUnique(string email)
         {
             if (await _userData.FindByEmail(email) != null)
@@ -87,6 +89,7 @@ namespace Business.Classes
             }
         }
 
+        //envio del correo electronico con un mensaje de bienvenida
         private async Task SendWelcomeEmailAsync(User user)
         {
             try
@@ -154,5 +157,34 @@ namespace Business.Classes
             return dto;
         }
 
+        public async Task<User?> GetUserByIdAsync(int userId)
+        {
+            try
+            {
+                var user = await _userData.GetByIdAsync(userId);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el usuario por Id.");
+                throw new ExternalServiceException("Base de datos", "No se pudo obtener el usuario.");
+            }
+        }
+
+        public async Task<UserProfileDto?> GetProfileAsync(int userId)
+        {
+            try
+            {
+                var user = await _userData.GetByIdAsync(userId);
+                if (user == null) return null;
+
+                return _mapper.Map<UserProfileDto>(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el perfil del usuario con Id {UserId}", userId);
+                throw new ExternalServiceException("Base de datos", "No se pudo obtener el perfil del usuario.");
+            }
+        }
     }
 }
