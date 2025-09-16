@@ -6,12 +6,14 @@ using Data.Classes.Specifics;
 using Data.Interfases;
 using Data.Interfases.Security;
 using Entity.DTOs;
+using Entity.DTOs.Auth;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Specifics;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
+using Utilities.Helper;
 using static Utilities.Helper.EncryptedPassword;
 
 namespace Business.Classes
@@ -175,7 +177,7 @@ namespace Business.Classes
         {
             try
             {
-                var user = await _userData.GetByIdAsync(userId);
+                var user = await _userData.GetByIdWithPersonAsync(userId);
                 if (user == null) return null;
 
                 return _mapper.Map<UserProfileDto>(user);
@@ -186,5 +188,33 @@ namespace Business.Classes
                 throw new ExternalServiceException("Base de datos", "No se pudo obtener el perfil del usuario.");
             }
         }
+
+        public async Task<UserProfileDto?> UpdateProfileAsync(int userId, UserProfileRequestDto dto)
+        {
+            try
+            {
+                var user = await _userData.GetByIdWithPersonAsync(userId);
+                if (user == null) return null;
+
+                if (user.Person != null)
+                {
+                    user.Person.FirstName = dto.FirstName;
+                    user.Person.LastName = dto.LastName;
+                    user.Person.SecondLastName = dto.SecondLastName;
+                    user.Person.Phone = dto.Phone;
+                    user.Person.Email = dto.Email;
+                }
+
+                await _userData.UpdateAsync(user);
+
+                return _mapper.Map<UserProfileDto>(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar el perfil del usuario {UserId}", userId);
+                throw new ExternalServiceException("Base de datos", "No se pudo actualizar el perfil del usuario.");
+            }
+        }
+
     }
 }

@@ -25,5 +25,6 @@ namespace Data.Interfases.Security
         //Task<UserMeDto?> GetMeWithProfileAsync(int userId);
 
         Task<User?> GetByIdForMeAsync(int userId, bool includeProfile);
+        Task<User?> GetByIdWithPersonAsync(int userId);
     }
 }

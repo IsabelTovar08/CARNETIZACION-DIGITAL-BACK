@@ -61,7 +61,7 @@ namespace Business.Services.Auth
             // 2) Verificar contraseña actual
             var valid = VerifyPassword(currentPassword, user.Password);
             if (!valid)
-                throw new ValidationException("Credenciales inválidas"); // mensaje consistente con tu proyecto
+                throw new ValidationException("Credenciales incorrecta"); // mensaje consistente con tu proyecto
 
             // 3) Reglas mínimas de robustez (opcional)
             if (newPassword.Length < 8)

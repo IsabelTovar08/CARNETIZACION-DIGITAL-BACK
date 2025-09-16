@@ -360,7 +360,12 @@ namespace Utilities.Helper
                 .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Person.Email))
                 .ForMember(d => d.Phone, opt => opt.MapFrom(s => s.Person.Phone));
 
-
+            CreateMap<UserProfileRequestDto, User>()
+                .ForPath(dest => dest.Person.Email, opt => opt.MapFrom(src => src.Email))
+                .ForPath(dest => dest.Person.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ForPath(dest => dest.Person.LastName, opt => opt.MapFrom(src => src.LastName))
+                .ForPath(dest => dest.Person.SecondLastName, opt => opt.MapFrom(src => src.SecondLastName))
+                .ForPath(dest => dest.Person.Phone, opt => opt.MapFrom(src => src.Phone));
 
 
             CreateMap<ImportBatchStartDto, ImportBatch>().ReverseMap();

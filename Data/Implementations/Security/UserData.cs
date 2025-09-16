@@ -169,5 +169,12 @@ namespace Data.Classes.Specifics
             bool isValid = EncryptedPassword.VerifyPassword(password, user.Password);
             return isValid ? user : null;
         }
+
+        public async Task<User?> GetByIdWithPersonAsync(int userId)
+        {
+            return await _context.Set<User>()
+                .Include(u => u.Person)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
     }
 }
