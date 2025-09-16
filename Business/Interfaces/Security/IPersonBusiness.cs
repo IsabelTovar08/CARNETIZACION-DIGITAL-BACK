@@ -28,5 +28,7 @@ namespace Business.Interfaces.Security
 
         // Devuelve los códigos orgánicos para la persona indicada, los cuales sirven para la organización de archivos
         Task<PersonOrganizationalInfoDto?> GetOrganizationalInfoAsync(int personId);
+        Task<PersonDto?> GetMyPersonAsync();
+        //Task<PersonDto?> GetPersonByUserIdAsync(int userId);
     }
 }

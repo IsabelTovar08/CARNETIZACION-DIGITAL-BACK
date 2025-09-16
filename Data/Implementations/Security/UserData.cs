@@ -3,6 +3,7 @@ using Data.Interfases;
 using Data.Interfases.Security;
 using Entity.Context;
 using Entity.Models;
+using Entity.Models.ModelSecurity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
@@ -176,5 +177,15 @@ namespace Data.Classes.Specifics
                 .Include(u => u.Person)
                 .FirstOrDefaultAsync(u => u.Id == userId);
         }
+
+        public async Task<Person?> GetPersonByUserIdAsync(int userId)
+        {
+            return await _context.Users
+                .Where(u => u.Id == userId && !u.IsDeleted)
+                .Include(u => u.Person)
+                .Select(u => u.Person)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

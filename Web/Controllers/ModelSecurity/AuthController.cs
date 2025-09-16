@@ -204,7 +204,7 @@ namespace Web.Controllers.ModelSecurity
                 return Ok(new ApiResponse<object>
                 {
                     Success = true,
-                    Message = "Contraseña cambiada exitosamente.",
+                    Message = "Contraseña actualizada exitosamente.",
                     Data = null
                 });
             }
