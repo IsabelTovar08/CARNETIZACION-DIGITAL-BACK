@@ -22,7 +22,7 @@ namespace Data.Interfases.Operational
 
         /// <summary>
         /// Consulta filtrada y paginada de asistencias.
-        /// Filtros opcionales: personId, eventId (por AccessPoint Entry/Exit), rango de fechas, orden y paginación.
+        /// Filtros opcionales: personId, eventId (vía AccessPoint Entry/Exit), rango de fechas, orden y paginación.
         /// </summary>
         Task<(IList<Attendance> Items, int Total)> QueryAsync(
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,

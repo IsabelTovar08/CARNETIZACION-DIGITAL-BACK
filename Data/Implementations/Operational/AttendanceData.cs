@@ -56,7 +56,7 @@ namespace Data.Implementations.Operational
             return entity;
         }
 
-        // NUEVO MÉTODO: consulta con filtros y paginación
+        //NUEVO: consulta con filtros y paginación
         public async Task<(IList<Attendance> Items, int Total)> QueryAsync(
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
@@ -72,7 +72,7 @@ namespace Data.Implementations.Operational
             if (personId.HasValue)
                 q = q.Where(a => a.PersonId == personId.Value);
 
-            // Filtra por evento (vía AccessPoint de entrada o salida)
+            // Filtra por evento (entrada o salida)
             if (eventId.HasValue)
             {
                 q = q.Where(a =>

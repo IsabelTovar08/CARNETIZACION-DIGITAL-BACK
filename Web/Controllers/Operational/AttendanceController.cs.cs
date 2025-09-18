@@ -34,9 +34,8 @@ namespace Web.Controllers.Operational
 
         /// <summary>
         /// Registra asistencia por escaneo (móvil) y retorna la asistencia creada.
-        /// Si tu AttendanceBusiness genera el QR, este viajará en el AttendanceDto.
         /// </summary>
-        /// <param name="dto">Datos mínimos: PersonId, EventId y AccessPoint (entrada/salida).</param>
+        /// <param name="dto">Datos mínimos: PersonId y AccessPoint (entrada/salida).</param>
         [HttpPost("scan")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
@@ -85,7 +84,7 @@ namespace Web.Controllers.Operational
                     data = result
                 });
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al registrar ENTRADA.");
                 return BadRequest(new { success = false, message = ex.Message });
@@ -113,7 +112,7 @@ namespace Web.Controllers.Operational
                     data = result
                 });
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al registrar SALIDA.");
                 return BadRequest(new { success = false, message = ex.Message });
@@ -123,7 +122,7 @@ namespace Web.Controllers.Operational
         //NUEVO ENDPOINT: CONSULTA Y FILTRO
         /// <summary>
         /// Consulta y filtra registros de asistencia con paginación.
-        /// Query params opcionales: personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize.
+        /// Query params: personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize.
         /// </summary>
         [HttpGet("search")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
@@ -150,7 +149,7 @@ namespace Web.Controllers.Operational
         /// <summary>
         /// Registra asistencia a un evento a través de un código QR.
         /// </summary>
-        /// <param name="dto">Debe traer PersonId y QrCode</param>
+        /// <param name="dto">Debe traer PersonId y QrCode.</param>
         [HttpPost("register-by-qr")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
@@ -175,6 +174,5 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
-
     }
 }

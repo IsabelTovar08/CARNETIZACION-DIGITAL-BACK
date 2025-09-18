@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -24,7 +24,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace Entity.Context
 {
- 
     /// <summary>
     /// Representa el contexto de la base de datos de la aplicación, proporcionando configuraciones y métodos
     /// para la gestión de entidades y consultas personalizadas con Dapper.
@@ -47,8 +46,7 @@ namespace Entity.Context
             _configuration = configuration;
         }
 
-
-        //Security  
+        //Security
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Form> Forms { get; set; }
@@ -58,10 +56,8 @@ namespace Entity.Context
         public DbSet<RolFormPermission> RoleFormPermissions { get; set; }
         public DbSet<Person> People { get; set; }
 
-
         //Auth 
         public DbSet<RefreshToken> RefreshToken { get; set; }
-
 
         //Organizational 
         public DbSet<Organization> Organizations { get; set; }
@@ -71,23 +67,16 @@ namespace Entity.Context
         public DbSet<OrganizationalUnit> OrganizationalUnits { get; set; }
         public DbSet<OrganizationalUnitBranch> OrganizationalUnitBranches { get; set; }
         public DbSet<AreaCategory> AreaCategories { get; set; }
-
         public DbSet<InternalDivision> InternalDivisions { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
-
-
 
         public DbSet<Profiles> Profiles { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<PersonDivisionProfile> PersonDivisionProfiles { get; set; }
 
-
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationReceived> NotificationReceiveds { get; set; }
         public DbSet<MenuStructure> MenuStructure { get; set; }
-
-
-
 
         //Events
         public DbSet<Event> Events { get; set; }
@@ -106,10 +95,6 @@ namespace Entity.Context
         public DbSet<ImportBatchRow> ImportBatchRows { get; set; }
 
         public DbSet<CardTemplate> CardTemplates { get; set; }
-
-
-
-
 
         /// <summary>
         /// Configura los modelos de la base de datos aplicando configuraciones desde ensamblados.
@@ -132,9 +117,31 @@ namespace Entity.Context
                     v => v.ToTimeSpan(),
                     v => TimeOnly.FromTimeSpan(v));
 
+            // ======================== ÍNDICES DE RENDIMIENTO (OPTIMIZACIÓN) ========================
+            // Attendance: filtros más frecuentes y escenarios de "entrada abierta".
+            modelBuilder.Entity<Attendance>(b =>
+            {
+                b.HasIndex(x => x.PersonId);
+                b.HasIndex(x => x.TimeOfEntry);
+                b.HasIndex(x => x.TimeOfExit);
+                b.HasIndex(x => x.IsDeleted);
+
+                // Compuesto: acelerar consultas de "abierto" (TimeOfExit == null) por persona.
+                b.HasIndex(x => new { x.PersonId, x.TimeOfExit });
+
+                // Si usas SQL Server y quieres índice filtrado, puedes agregarlo por migración SQL manual:
+                // b.HasIndex(x => x.PersonId).HasFilter("[TimeOfExit] IS NULL AND [IsDeleted] = 0");
+            });
+
+            // AccessPoint: filtrar rápidamente por evento (se usa en reportes/consultas)
+            modelBuilder.Entity<AccessPoint>(b =>
+            {
+                b.HasIndex(x => x.EventId);
+            });
+            // ========================================================================================
+
             // Si tienes varias configuraciones en tu proyecto
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-
         }
 
         /// <summary>
@@ -181,12 +188,6 @@ namespace Entity.Context
         /// <summary>
         /// Ejecuta una consulta SQL utilizando Dapper y devuelve una colección de resultados de tipo genérico.
         /// </summary>
-        /// <typeparam name="T">Tipo de los datos de retorno.</typeparam>
-        /// <param name="text">Consulta SQL a ejecutar.</param>
-        /// <param name="parameters">Parámetros opcionales de la consulta.</param>
-        /// <param name="timeout">Tiempo de espera opcional para la consulta.</param>
-        /// <param name="type">Tipo opcional de comando SQL.</param>
-        /// <returns>Una colección de objetos del tipo especificado.</returns>
         public async Task<IEnumerable<T>> QueryAsync<T>(string text, object parameters = null, int? timeout = null, CommandType? type = null)
         {
             using var command = new DapperEFCoreCommand(this, text, parameters, timeout, type, CancellationToken.None);
@@ -197,12 +198,6 @@ namespace Entity.Context
         /// <summary>
         /// Ejecuta una consulta SQL utilizando Dapper y devuelve un solo resultado o el valor predeterminado si no hay resultados.
         /// </summary>
-        /// <typeparam name="T">Tipo de los datos de retorno.</typeparam>
-        /// <param name="text">Consulta SQL a ejecutar.</param>
-        /// <param name="parameters">Parámetros opcionales de la consulta.</param>
-        /// <param name="timeout">Tiempo de espera opcional para la consulta.</param>
-        /// <param name="type">Tipo opcional de comando SQL.</param>
-        /// <returns>Un objeto del tipo especificado o su valor predeterminado.</returns>
         public async Task<T> QueryFirstOrDefaultAsync<T>(string text, object parameters = null, int? timeout = null, CommandType? type = null)
         {
             using var command = new DapperEFCoreCommand(this, text, parameters, timeout, type, CancellationToken.None);
@@ -223,15 +218,6 @@ namespace Entity.Context
         /// </summary>
         public readonly struct DapperEFCoreCommand : IDisposable
         {
-            /// <summary>
-            /// Constructor del comando Dapper.
-            /// </summary>
-            /// <param name="context">Contexto de la base de datos.</param>
-            /// <param name="text">Consulta SQL.</param>
-            /// <param name="parameters">Parámetros opcionales.</param>
-            /// <param name="timeout">Tiempo de espera opcional.</param>
-            /// <param name="type">Tipo de comando SQL opcional.</param>
-            /// <param name="ct">Token de cancelación.</param>
             public DapperEFCoreCommand(DbContext context, string text, object parameters, int? timeout, CommandType? type, CancellationToken ct)
             {
                 var transaction = context.Database.CurrentTransaction?.GetDbTransaction();
@@ -248,14 +234,8 @@ namespace Entity.Context
                 );
             }
 
-            /// <summary>
-            /// Define los parámetros del comando SQL.
-            /// </summary>
             public CommandDefinition Definition { get; }
 
-            /// <summary>
-            /// Método para liberar los recursos.
-            /// </summary>
             public void Dispose()
             {
             }
