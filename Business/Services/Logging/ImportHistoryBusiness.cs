@@ -45,5 +45,36 @@ namespace Business.Services.Logging
         {
            return _batchData.CompleteAsync(dto.ImportBatchId, dto.SuccessCount, dto.ErrorCount);
         }
+
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ImportBatchDto>> GetAllAsync()
+        {
+            var batches = await _batchData.GetAllAsync();
+            return _mapper.Map<IEnumerable<ImportBatchDto>>(batches);
+        }
+
+        /// <inheritdoc/>
+        public async Task<ImportBatchDto?> GetByIdAsync(int id)
+        {
+            var batch = await _batchData.GetByIdAsync(id);
+            return _mapper.Map<ImportBatchDto?>(batch);
+        }
+
+        /// <inheritdoc/>
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ImportBatchRowTableDto>> GetRowsAsync(int batchId)
+        {
+            var rows = await _batchData.GetRowsAsync(batchId);
+            return _mapper.Map<IEnumerable<ImportBatchRowTableDto>>(rows);
+        }
+
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ImportBatchRowDetailDto>> GetErrorRowsAsync(int batchId)
+        {
+            var rows = await _batchData.GetErrorRowsAsync(batchId);
+            return _mapper.Map<IEnumerable<ImportBatchRowDetailDto>>(rows);
+        }
     }
 }

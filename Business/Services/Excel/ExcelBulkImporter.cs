@@ -17,6 +17,9 @@ using Utilities.Helpers.Images;
 
 namespace Business.Services.Excel
 {
+    /// <summary>
+    /// Servicio que procesa la carga masiva de personas desde un archivo Excel.
+    /// </summary>
     public class ExcelBulkImporter : IExcelBulkImporter
     {
         private readonly ILogger _logger;
@@ -26,8 +29,8 @@ namespace Business.Services.Excel
         private readonly ICardBusiness _cardBusiness;
         private readonly IUnitOfWork _uow;
         private readonly IImportHistoryBusiness _history;
-        private readonly ICurrentUser _currentUser;          
-        private readonly IExcelReaderHelper _excel;  
+        private readonly ICurrentUser _currentUser;
+        private readonly IExcelReaderHelper _excel;
 
         public ExcelBulkImporter(
             ILogger<ExcelBulkImporter> logger,
@@ -51,16 +54,19 @@ namespace Business.Services.Excel
             _excel = excelReaderHelper;
         }
 
+        /// <summary>
+        /// Procesa el archivo Excel, crea las entidades correspondientes y devuelve el resultado.
+        /// </summary>
         public async Task<BulkImportResultDto> ImportAsync(Stream excelStream, ImportContextCard ctx)
         {
             var parsed = await _parser.ParseAsync(excelStream);
             var result = new BulkImportResultDto { TotalRows = parsed.Count };
+            var tableRows = new List<ImportBatchRowTableDto>();
 
-            // 🧾 Metadatos desde la operación:
-            var fileName = _excel.GetFileName(excelStream);       // nombre del archivo, si se puede
-            var startedBy = _currentUser.UserName ?? _currentUser.UserId; // del token
+            // Metadatos de la operación
+            var fileName = _excel.GetFileName(excelStream);
+            var startedBy = _currentUser.UserName ?? _currentUser.UserId;
 
-            // Snapshot de contexto (negocio)
             var ctxJson = JsonSerializer.Serialize(new
             {
                 ctx.OrganizationId,
@@ -74,7 +80,6 @@ namespace Business.Services.Excel
                 ctx.ValidTo
             });
 
-            // Lote
             var batchId = await _history.StartBatchAsync(new ImportBatchStartDto
             {
                 Source = "Excel",
@@ -87,8 +92,8 @@ namespace Business.Services.Excel
             foreach (var row in parsed)
             {
                 var rowRes = new BulkRowResult { RowNumber = row.RowNumber, UpdatedPhoto = false };
-                int? personId = null; 
-                int? pdpId = null; 
+                int? personId = null;
+                int? pdpId = null;
                 int? cardId = null;
                 PersonRegistrerDto? personCreated = null;
 
@@ -97,125 +102,90 @@ namespace Business.Services.Excel
                 try
                 {
                     // === STEP 1: Crear persona/usuario ===
-                    try
+                    var registrer = new PersonRegistrer
                     {
-                        var registrer = new PersonRegistrer
-                        {
-                            Person = row.Person,
-                            User = new UserDtoRequest { UserName = row.Person.Email, Password = row.TempPassword ?? "ChangeMe.123" }
-                        };
+                        Person = row.Person,
+                        User = new UserDtoRequest { UserName = row.Person.Email, Password = row.TempPassword ?? "ChangeMe.123" }
+                    };
 
-                        personCreated = await _personBusiness.SavePersonAndUser(registrer);
-                        var personDto = personCreated.Person;
-                        if (personDto == null || personDto.Id <= 0)
-                            throw new InvalidOperationException("No fue posible crear la persona.");
+                    personCreated = await _personBusiness.SavePersonAndUser(registrer);
+                    var personDto = personCreated.Person;
+                    if (personDto == null || personDto.Id <= 0)
+                        throw new InvalidOperationException("No fue posible crear la persona.");
 
-                        personId = personDto.Id;
-                        rowRes.EmailSent = personCreated.EmailSent;
-                    }
-                    catch (ValidationException vex) // <-- conserva texto específico
-                    {
-                        _logger.LogWarning(vex, "Validación creando persona en fila {Row}", row.RowNumber);
-                        throw new InvalidOperationException($"No se pudo registrar la persona: {vex.Message}", vex);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error creando persona en fila {Row}", row.RowNumber);
-                        throw new InvalidOperationException($"No se pudo registrar la persona. {Innermost(ex)}", ex);
-                    }
-
-
+                    personId = personDto.Id;
+                    rowRes.EmailSent = personCreated.EmailSent;
 
                     // === STEP 2: Vincular PDP ===
-                    try
+                    var pdpSaved = await _pdpBusiness.Save(new PersonDivisionProfileDtoRequest
                     {
-                        var pdpSaved = await _pdpBusiness.Save(new PersonDivisionProfileDtoRequest
-                        {
-                            PersonId = personId.Value,
-                            InternalDivisionId = ctx.InternalDivisionId,
-                            ProfileId = ctx.ProfileId,
-                            isCurrentlySelected = true,
-                        });
-                        pdpId = pdpSaved.Id;
-                    }
-                    catch (ValidationException vex)
-                    {
-                        _logger.LogWarning(vex, "Validación vinculando PDP en fila {Row}", row.RowNumber);
-                        throw new InvalidOperationException($"No se pudo asignar el perfil/división: {vex.Message}", vex);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error vinculando PDP en fila {Row}", row.RowNumber);
-                        throw new InvalidOperationException($"No se pudo asignar el perfil/división. {Innermost(ex)}", ex);
-                    }
+                        PersonId = personId.Value,
+                        InternalDivisionId = ctx.InternalDivisionId,
+                        ProfileId = ctx.ProfileId,
+                        isCurrentlySelected = true,
+                    });
+                    pdpId = pdpSaved.Id;
 
-
-
-                    // === STEP 3: Subir/actualizar foto (si viene) ===
+                    // === STEP 3: Subir/actualizar foto ===
                     if (row.PhotoBytes is { Length: > 0 })
                     {
-                        try
-                        {
-                            var (ext, contentType) = ImageFormatValidator.EnsureSupported(row.PhotoBytes, row.PhotoExtension);
-                            using var ms = new MemoryStream(row.PhotoBytes);
-                            await _personBusiness.UpsertPersonPhotoAsync(personId.Value, ms, contentType, $"excel-upload{ext}");
-                            rowRes.UpdatedPhoto = true;
-                        }
-                        catch (ValidationException vex)
-                        {
-                            _logger.LogWarning(vex, "Validación subiendo foto en fila {Row}", row.RowNumber);
-                            throw new InvalidOperationException($"La foto no se pudo guardar: {vex.Message}", vex);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogWarning(ex, "Error subiendo foto en fila {Row}", row.RowNumber);
-                            throw new InvalidOperationException($"La foto no se pudo guardar. {Innermost(ex)}", ex);
-                        }
+                        var (ext, contentType) = ImageFormatValidator.EnsureSupported(row.PhotoBytes, row.PhotoExtension);
+                        using var ms = new MemoryStream(row.PhotoBytes);
+                        await _personBusiness.UpsertPersonPhotoAsync(personId.Value, ms, contentType, $"excel-upload{ext}");
+                        rowRes.UpdatedPhoto = true;
                     }
-
-
 
                     // === STEP 4: Crear carnet ===
-                    try
+                    var card = await _cardBusiness.Save(new CardDtoRequest
                     {
-                        var card = await _cardBusiness.Save(new CardDtoRequest
-                        {
-                            CreationDate = ctx.ValidFrom,
-                            ExpirationDate = ctx.ValidTo,
-                            PersonDivissionProfileId = pdpId.Value,
-                            StatusId = 1
-                        });
-                        cardId = card.Id;
-                    }
-                    catch (ValidationException vex)
-                    {
-                        _logger.LogWarning(vex, "Validación creando carnet en fila {Row}", row.RowNumber);
-                        throw new InvalidOperationException($"No se pudo generar el carnet: {vex.Message}", vex);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error creando carnet en fila {Row}", row.RowNumber);
-                        throw new InvalidOperationException($"No se pudo generar el carnet. {Innermost(ex)}", ex);
-                    }
+                        CreationDate = ctx.ValidFrom,
+                        ExpirationDate = ctx.ValidTo,
+                        PersonDivissionProfileId = pdpId.Value,
+                        StatusId = 1,
+                        CardTemplateId = 1
+                    });
+                    cardId = card.Id;
 
                     await _uow.CommitAsync();
 
                     rowRes.Success = true;
                     rowRes.Created = true;
-                    rowRes.EmailSent = personCreated.EmailSent;
                     rowRes.Message = "Importación exitosa.";
                     result.SuccessCount++;
+
+                    // Armar DTO para tabla
+                    tableRows.Add(new ImportBatchRowTableDto
+                    {
+                        RowNumber = row.RowNumber,
+                        Photo = personDto.PhotoUrl ?? "/images/default-avatar.png",
+                        Name = $"{personDto.FirstName} {personDto.LastName}",
+                        Org = ctx.OrganizationalUnitCode ?? "N/A",
+                        Division = ctx.InternalDivisionCode ?? "N/A",
+                        State = "Activo",
+                        IsDeleted = false
+                    });
                 }
                 catch (Exception ex)
                 {
                     await _uow.RollbackAsync();
                     rowRes.Success = false;
                     rowRes.Created = false;
-                    rowRes.Message = ex is InvalidOperationException ioe ? ioe.Message : Innermost(ex);
+                    rowRes.Message = Innermost(ex);
                     result.ErrorCount++;
                     _logger.LogWarning(ex, "Error importando fila {Row}", row.RowNumber);
-                }
 
+                    // DTO para tabla con error
+                    tableRows.Add(new ImportBatchRowTableDto
+                    {
+                        RowNumber = row.RowNumber,
+                        Photo = null,
+                        Name = row.Person.FirstName ?? "Desconocido",
+                        Org = ctx.OrganizationalUnitCode ?? "N/A",
+                        Division = ctx.InternalDivisionCode ?? "N/A",
+                        State = "Error",
+                        IsDeleted = false
+                    });
+                }
                 finally
                 {
                     await _history.AppendRowAsync(new ImportBatchRowDto
@@ -241,15 +211,17 @@ namespace Business.Services.Excel
                 ErrorCount = result.ErrorCount
             });
 
+            result.TableRows = tableRows;
             return result;
         }
 
-        // helper muy pequeño
+        /// <summary>
+        /// Obtiene el mensaje más interno de una excepción.
+        /// </summary>
         private static string Innermost(Exception ex)
         {
             while (ex.InnerException != null) ex = ex.InnerException;
             return ex.Message;
         }
-
     }
 }

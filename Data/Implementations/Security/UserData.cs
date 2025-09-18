@@ -1,11 +1,14 @@
-﻿using System.Security.Cryptography;
-using Data.Classes.Base;
+﻿using Data.Classes.Base;
 using Data.Interfases;
 using Data.Interfases.Security;
 using Entity.Context;
 using Entity.Models;
+using Entity.Models.ModelSecurity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
+using Utilities.Helper;
+using Utilities.Helpers;
 using static Utilities.Helper.EncryptedPassword;
 
 namespace Data.Classes.Specifics
@@ -149,5 +152,40 @@ namespace Data.Classes.Specifics
 
             return true;
         }
+
+        public async Task<User?> VerificationPassword(string token, string password)
+        {
+            var userId = Verificate_Password.GetUserIdFromToken(token);
+
+            if (string.IsNullOrEmpty(userId))
+                return null;
+
+            var user = await _context.Set<User>()
+
+                 .FirstOrDefaultAsync(u => !u.IsDeleted && u.Id.ToString() == userId);
+
+            if (user == null)
+                return null;
+
+            bool isValid = EncryptedPassword.VerifyPassword(password, user.Password);
+            return isValid ? user : null;
+        }
+
+        public async Task<User?> GetByIdWithPersonAsync(int userId)
+        {
+            return await _context.Set<User>()
+                .Include(u => u.Person)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
+        public async Task<Person?> GetPersonByUserIdAsync(int userId)
+        {
+            return await _context.Users
+                .Where(u => u.Id == userId && !u.IsDeleted)
+                .Include(u => u.Person)
+                .Select(u => u.Person)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

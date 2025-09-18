@@ -26,6 +26,8 @@ namespace Business.Interfaces.Security
         /// <param name="request">Objeto con RolId, FormId y lista de PermissionsIds</param>
         /// <returns>True si el guardado fue exitoso, false en caso de error</returns>
         Task<bool> SaveRoleFormPermissionsAsync(RoleFormPermissionsRequest request);
+
+        Task<List<int>> GetAllowedFormIdsAsync(List<string> roleIds);
     }
 
 }

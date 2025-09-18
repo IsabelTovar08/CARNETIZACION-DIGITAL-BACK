@@ -83,6 +83,20 @@ namespace Business.Classes
                 throw new ExternalServiceException( "Ocurrió un error al guardar los permisos. Por favor, intente nuevamente.", ex.ToString());
             }
         }
+
+
+        public async Task<List<int>> GetAllowedFormIdsAsync(List<string> roleIds)
+        {
+            try
+            {
+                return await _rolFormPermissionData.GetAllowedFormIdsAsync(roleIds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error obteniendo formularios permitidos para roles");
+                throw;
+            }
+        }
     }
 
 }

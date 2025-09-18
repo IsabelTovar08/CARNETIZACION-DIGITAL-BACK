@@ -1,11 +1,7 @@
 ﻿
-using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using AutoMapper;
 using Business.Classes.Base;
+using Business.Interfaces.Auth;
 using Business.Interfaces.Security;
 using Business.Interfaces.Storage;
 using Business.Interfases.Storage;
@@ -13,6 +9,7 @@ using ClosedXML.Excel;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Data.Interfases.Security;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
@@ -23,6 +20,11 @@ using Entity.Models.ModelSecurity;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Utilities.Exeptions;
 using Utilities.Notifications.Implementations.Templates.Email;
 using ValidationException = Utilities.Exeptions.ValidationException;
@@ -35,12 +37,14 @@ namespace Business.Classes
         private readonly INotify _notificationSender;
         private readonly IUserRoleBusiness _userRolBusiness;
         private readonly IAssetUploader _assetUploader;
-        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserRoleBusiness userRolBusiness, IAssetUploader assetUploader) : base(personData, logger, mapper)
+        private readonly ICurrentUser _currentUser;
+        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserRoleBusiness userRolBusiness, IAssetUploader assetUploader, ICurrentUser currentUser) : base(personData, logger, mapper)
         {
             _notificationSender = messageSender;
             _personData = personData;
             _userRolBusiness = userRolBusiness; 
             _assetUploader = assetUploader;
+            _currentUser = currentUser;
         }
 
         public override async Task ValidateAsync(Person entity)
@@ -310,5 +314,22 @@ namespace Business.Classes
 
             return parts;
         }
+
+        public async Task<PersonDto?> GetMyPersonAsync()
+        {
+            var userIdStr = _currentUser.UserId;
+            if (userIdStr == "unknown")
+                throw new UnauthorizedAccessException("Usuario no identificado.");
+
+            int userId = int.Parse(userIdStr);
+
+            // 👇 obtiene la persona asociada al User actual
+            var person = await _personData.GetPersonByUserIdAsync(userId);
+            if (person == null)
+                throw new KeyNotFoundException("No se encontró la persona asociada al usuario actual.");
+
+            return _mapper.Map<PersonDto>(person);
+        }
+
     }
 }

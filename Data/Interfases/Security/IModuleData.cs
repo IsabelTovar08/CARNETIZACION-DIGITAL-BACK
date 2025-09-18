@@ -7,8 +7,8 @@ using Entity.Models;
 
 namespace Data.Interfases.Security
 {
-    public interface IRoleData: ICrudBase<Role>
+    public interface IModuleData : ICrudBase<Module>
     {
-        Task<bool> UserIsSuperAdminAsync(List<string> roleIds);
+        Task<List<Module>> GetModulesWithFormsByAllowedFormsAsync(List<int> allowedFormIds);
     }
 }

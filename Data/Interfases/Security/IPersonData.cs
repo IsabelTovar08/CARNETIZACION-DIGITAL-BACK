@@ -17,5 +17,6 @@ namespace Data.Interfases.Security
         Task<Person?> GetPersonInfo(int id);
 
         Task<PersonOrganizationalInfoDto?> GetOrganizationalInfo(int personId);
+        Task<Person?> GetPersonByUserIdAsync(int userId);
     }
 }

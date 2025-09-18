@@ -1,24 +1,28 @@
 ﻿using System.Security.Claims;
-using System.Threading.Tasks;
+using Business.Interfaces.Auth;
 using Business.Interfaces.Security;
-using Business.Interfases;
-using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
-using Entity.Models.ModelSecurity;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.Controllers.Base;
 
-namespace Web.Controllers.ModelSecurity
+namespace Web.Controllers.Security
 {
-    public class MenuStructureController : GenericController<MenuStructure, MenuStructureRequest, MenuStructureDto>
+    [ApiController]
+    [Route("api/[controller]")]
+    public class MenuController : ControllerBase
     {
-        protected readonly IMenuStructureBusiness _business;
-        public MenuStructureController(IMenuStructureBusiness business, ILogger<MenuStructureController> logger) : base(business, logger)
+        private readonly IMenuService _menuService;
+
+        public MenuController(IMenuService menuService)
         {
-            _business = business;
+            _menuService = menuService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<List<MenuStructureDto>>> GetAll()
+        {
+            var menu = await _menuService.GetMenuAsync();
+            return Ok(menu);
+        }
 
         [HttpGet("menu-by-user")]
         public async Task<IActionResult> GetMenuStructureByUser()
@@ -29,7 +33,7 @@ namespace Web.Controllers.ModelSecurity
             if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
                 return Unauthorized(); // # No hay userId válido
 
-            var result = await _business.GetMenuTreeForUserAsync(userId);
+            var result = await _menuService.GetMenuForUserAsync(userId);
             return Ok(result);
         }
     }

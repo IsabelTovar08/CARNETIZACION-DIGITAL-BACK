@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Entity.Models.Base;
+using Entity.Models.ModelSecurity;
+using Entity.Models.Organizational.Assignment;
 
 namespace Entity.Models.Operational.BulkLoading
 {
@@ -20,5 +22,9 @@ namespace Entity.Models.Operational.BulkLoading
         public int? PersonDivisionProfileId { get; set; }
         public int? CardId { get; set; }
         public bool UpdatedPhoto { get; set; }
+
+        public PersonDivisionProfile PersonDivisionProfile { get; set; }
+        public Card Card { get; set; }
+
     }
 }

@@ -11,9 +11,6 @@ using Business.Implementations.Organizational.Structure;
 using Business.Implementations.Organizational.Structure;
 using Business.Implementations.Organizational.Structure;
 using Business.Implementations.Parameters;
-using Business.Implementations.Security;
-using Business.Implementations.Security;
-using Business.Implementations.Security;
 using Business.Implementations.Storage;
 using Business.Interfaces.ApiColombia;
 using Business.Interfaces.Auth;
@@ -67,9 +64,6 @@ using Data.Implementations.Organizational.Structure;
 using Data.Implementations.Organizational.Structure;
 using Data.Implementations.Organizational.Structure;
 using Data.Implementations.Parameters;
-using Data.Implementations.Security;
-using Data.Implementations.Security;
-using Data.Implementations.Security;
 using Data.Implementations.Transaction;
 using Data.Interfaces.Security;
 using Data.Interfaces.Security;
@@ -144,16 +138,18 @@ namespace Web.Extensions
             services.AddScoped<IPersonBusiness, PersonBusiness>();
 
             //Rol 
-            //services.AddScoped<ICrudBase<Role>, RoleData>();
-            //services.AddScoped<RoleBusiness>();
+            services.AddScoped<IRoleData, RoleData>();
+            services.AddScoped<IRoleBusiness ,RoleBusiness>();
 
             //Form 
             services.AddScoped<ICrudBase<Form>, FormData>();
             services.AddScoped<FormBusiness>();
 
             //Module
-            services.AddScoped<ICrudBase<Module>, ModuleData>();
-            services.AddScoped<ModuleBusiness>();
+            services.AddScoped<IModuleData, ModuleData>();
+            services.AddScoped<IModuleBusiness, ModuleBusiness>();
+
+            services.AddScoped<IMenuService, MenuService>();
 
 
             //Permission 
@@ -168,11 +164,6 @@ namespace Web.Extensions
             //UserRol 
             services.AddScoped<IUserRoleData, UserRolesData>();
             services.AddScoped<IUserRoleBusiness, UserRoleBusiness>();
-
-
-            //Menu
-            services.AddScoped<IMenuStructureData, MenuStructureData>();
-            services.AddScoped<IMenuStructureBusiness, MenuStructureBusiness>();
 
 
             //CustomType 

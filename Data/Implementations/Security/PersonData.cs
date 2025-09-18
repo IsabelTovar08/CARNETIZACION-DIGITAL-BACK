@@ -101,7 +101,14 @@ namespace Data.Classes.Specifics
                 })
                 .FirstOrDefaultAsync();
         }
-
+        public async Task<Person?> GetPersonByUserIdAsync(int userId)
+        {
+            return await _context.Users
+                .Where(u => u.Id == userId && !u.IsDeleted)
+                .Include(u => u.Person)
+                .Select(u => u.Person)
+                .FirstOrDefaultAsync();
+        }
 
     }
 }

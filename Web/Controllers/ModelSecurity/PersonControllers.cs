@@ -69,6 +69,62 @@ namespace Web.Controllers.ModelSecurity
                 data = personalInfo
             });
         }
+
+        [HttpGet("me/person")]
+        [Authorize]
+        public async Task<IActionResult> GetMyPerson()
+        {
+            try
+            {
+                var dto = await _personBusiness.GetMyPersonAsync();
+
+                if (dto == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "No se encontró información de la persona asociada al usuario actual.",
+                        data = (object?)null
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Información de la persona obtenida correctamente.",
+                    data = dto
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "No se pudo identificar al usuario actual. Verifique el token.",
+                    data = (object?)null
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = ex.Message, // "No se encontró la persona asociada al usuario actual."
+                    data = (object?)null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al obtener información de la persona.");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Ocurrió un error interno al obtener la información de la persona.",
+                    data = (object?)null
+                });
+            }
+        }
+
     }
 
     public class UploadFile
