@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250909223249_initial")]
+    [Migration("20250918010216_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -1769,7 +1769,15 @@ namespace Entity.Migrations
 
                     b.HasIndex("AccessPointOfExit");
 
+                    b.HasIndex("IsDeleted");
+
                     b.HasIndex("PersonId");
+
+                    b.HasIndex("TimeOfEntry");
+
+                    b.HasIndex("TimeOfExit");
+
+                    b.HasIndex("PersonId", "TimeOfExit");
 
                     b.ToTable("Attendances", "Operational");
 

@@ -1612,10 +1612,34 @@ namespace Entity.Migrations
                 column: "AccessPointOfExit");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Attendances_IsDeleted",
+                schema: "Operational",
+                table: "Attendances",
+                column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Attendances_PersonId",
                 schema: "Operational",
                 table: "Attendances",
                 column: "PersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendances_PersonId_TimeOfExit",
+                schema: "Operational",
+                table: "Attendances",
+                columns: new[] { "PersonId", "TimeOfExit" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendances_TimeOfEntry",
+                schema: "Operational",
+                table: "Attendances",
+                column: "TimeOfEntry");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendances_TimeOfExit",
+                schema: "Operational",
+                table: "Attendances",
+                column: "TimeOfExit");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Branches_CityId",

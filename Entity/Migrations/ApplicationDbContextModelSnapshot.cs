@@ -1766,7 +1766,15 @@ namespace Entity.Migrations
 
                     b.HasIndex("AccessPointOfExit");
 
+                    b.HasIndex("IsDeleted");
+
                     b.HasIndex("PersonId");
+
+                    b.HasIndex("TimeOfEntry");
+
+                    b.HasIndex("TimeOfExit");
+
+                    b.HasIndex("PersonId", "TimeOfExit");
 
                     b.ToTable("Attendances", "Operational");
 
