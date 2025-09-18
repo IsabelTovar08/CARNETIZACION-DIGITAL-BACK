@@ -171,28 +171,65 @@ namespace Web.Controllers.ModelSecurity
         [ProducesResponseType(typeof(ApiResponse<object>), (int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest dto)
         {
-            // Validación rápida del payload
             if (dto is null || string.IsNullOrWhiteSpace(dto.NewPassword) || string.IsNullOrWhiteSpace(dto.CurrentPassword))
-                return BadRequest(new ApiResponse<object> { Success = false, Message = "Invalid payload.", Data = null });
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Datos inválidos.",
+                    Data = null
+                });
 
             if (dto.NewPassword != dto.ConfirmNewPassword)
-                return BadRequest(new ApiResponse<object> { Success = false, Message = "NewPassword and ConfirmNewPassword do not match.", Data = null });
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "La nueva contraseña y su confirmación no coinciden.",
+                    Data = null
+                });
 
-            // Obtener userId desde Claims
+            // userId desde el token
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
             if (!int.TryParse(userIdClaim, out var userId))
-                return Unauthorized(new ApiResponse<object> { Success = false, Message = "Invalid token.", Data = null });
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Token inválido.",
+                    Data = null
+                });
 
-            await _authService.ChangePasswordAsync(userId, dto.CurrentPassword, dto.NewPassword);
-
-            // Comentario (ES): Devolvemos 200 con ApiResponse para mantener consistencia
-            return Ok(new ApiResponse<object>
+            try
             {
-                Success = true,
-                Message = "Password changed successfully.",
-                Data = null
-            });
+                await _authService.ChangePasswordAsync(userId, dto.CurrentPassword, dto.NewPassword);
+
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    Message = "Contraseña actualizada exitosamente.",
+                    Data = null
+                });
+            }
+            catch (ValidationException ex) //atrapamos tus errores de validación
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = ex.Message, // "Credenciales inválidas", "Usuario no encontrado", etc.
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al cambiar la contraseña.");
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor.",
+                    Data = null
+                });
+            }
         }
+
+
 
         /// <summary>
         /// Refresh token rotation.

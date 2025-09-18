@@ -19,5 +19,9 @@ namespace Entity.DTOs.Organizational.Assigment.Request
         [Required(ErrorMessage = "El identificador de la asignación persona–división–perfil es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El identificador de la asignación persona–división–perfil debe ser un número entero mayor que 0.")]
         public int PersonDivissionProfileId { get; set; }
+
+        [Required(ErrorMessage = "El identificador de la asignación card-template es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El identificador de la asignación card-template debe ser un número entero mayor que 0.")]
+        public int CardTemplateId { get; set; }
     }
 }

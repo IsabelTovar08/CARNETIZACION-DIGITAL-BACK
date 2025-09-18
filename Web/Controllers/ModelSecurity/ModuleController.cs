@@ -1,4 +1,5 @@
 ﻿using Business.Classes;
+using Business.Interfaces.Security;
 using Business.Interfases;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
@@ -14,7 +15,7 @@ namespace Web.Controllers.ModelSecurity
 {
     public class ModuleController : GenericController<Module,ModuleDtoRequest, ModuleDto>
     {
-        public ModuleController(IBaseBusiness<Module, ModuleDtoRequest, ModuleDto> business, ILogger<ModuleController> logger) : base(business, logger)
+        public ModuleController(IModuleBusiness business, ILogger<ModuleController> logger) : base(business, logger)
         {
         }
     }

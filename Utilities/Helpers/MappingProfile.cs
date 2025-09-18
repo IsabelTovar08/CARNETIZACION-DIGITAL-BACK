@@ -354,11 +354,42 @@ namespace Utilities.Helper
                     .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointExit, opt => opt.Ignore());
 
+            CreateMap<User, UserProfileDto>()
+                .ForMember(d => d.FirstName, opt => opt.MapFrom(s => s.Person.FirstName))
+                .ForMember(d => d.LastName, opt => opt.MapFrom(s => s.Person.LastName))
+                .ForMember(d => d.SecondLastName, opt => opt.MapFrom(s => s.Person.SecondLastName))
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Person.Email))
+                .ForMember(d => d.Phone, opt => opt.MapFrom(s => s.Person.Phone));
+
+            CreateMap<UserProfileRequestDto, User>()
+                .ForPath(dest => dest.Person.Email, opt => opt.MapFrom(src => src.Email))
+                .ForPath(dest => dest.Person.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ForPath(dest => dest.Person.LastName, opt => opt.MapFrom(src => src.LastName))
+                .ForPath(dest => dest.Person.SecondLastName, opt => opt.MapFrom(src => src.SecondLastName))
+                .ForPath(dest => dest.Person.Phone, opt => opt.MapFrom(src => src.Phone));
 
 
             CreateMap<ImportBatchStartDto, ImportBatch>().ReverseMap();
 
             CreateMap<ImportBatchRowDto, ImportBatchRow>().ReverseMap();
+
+            // Mapear ImportBatch -> ImportBatchDto
+            CreateMap<ImportBatch, ImportBatchDto>();
+
+            // Mapear ImportBatchRow -> ImportBatchRowDetailDto
+            CreateMap<ImportBatchRow, ImportBatchRowDetailDto>();
+
+            CreateMap<ImportBatchRow, ImportBatchRowTableDto>()
+                .ForMember(d => d.Photo, opt => opt.MapFrom(src => src.PersonDivisionProfile.Person!.PhotoUrl))
+                .ForMember(d => d.Name, opt => opt.MapFrom(src =>
+                    src.PersonDivisionProfile.Person != null ? $"{src.PersonDivisionProfile.Person.FirstName} {src.PersonDivisionProfile.Person.LastName}" : "N/A"))
+                .ForMember(d => d.Org, opt => opt.MapFrom(src =>
+                    src.PersonDivisionProfile!.InternalDivision!.OrganizationalUnit!.Name))
+                .ForMember(d => d.Division, opt => opt.MapFrom(src =>
+                    src.PersonDivisionProfile!.InternalDivision!.Name))
+                .ForMember(d => d.State, opt => opt.MapFrom(src =>
+                    src.Card != null ? src.Card.Status!.Name : (src.Success ? "Activo" : "Error")))
+                .ForMember(d => d.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted));
         }
     }
 }

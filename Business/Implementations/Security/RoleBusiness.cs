@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Business.Classes.Base;
+using Business.Interfaces.Security;
+using Data.Classes.Specifics;
 using Data.Interfases;
 using Data.Interfases.Security;
 using Entity.DTOs;
@@ -11,7 +13,7 @@ using Utilities.Exeptions;
 
 namespace Business.Classes
 {
-    public class RoleBusiness : BaseBusiness<Role, RoleDtoRequest, RolDto>
+    public class RoleBusiness : BaseBusiness<Role, RoleDtoRequest, RolDto>, IRoleBusiness
     {
         public readonly IRoleData _data;
         public RoleBusiness(IRoleData data, ILogger<Role> logger, IMapper mapper) : base(data, logger, mapper)
@@ -27,6 +29,20 @@ namespace Business.Classes
             if (string.IsNullOrWhiteSpace(rol.Name))
                 throw new ValidationException("El nombre del rol es obligatorio.");
 
+        }
+
+
+        public async Task<bool> UserIsSuperAdminAsync(List<string> roleIds)
+        {
+            try
+            {
+                return await _data.UserIsSuperAdminAsync(roleIds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error verificando si usuario es SuperAdmin");
+                throw;
+            }
         }
 
     }

@@ -55,6 +55,8 @@ namespace Entity.DataInit.Security
               new Form { Id = 10, Name = "Tipos de Evento", Description = "Catálogo de tipos de evento", Icon = "category", Url = "/dashboard/operational/event-types", ModuleId = 3 },
               new Form { Id = 11, Name = "Puntos de Acceso", Description = "Administración de puntos de acceso", Icon = "sensor_door", Url = "/dashboard/operational/access-points", ModuleId = 3 },
               new Form { Id = 12, Name = "Asistencias", Description = "Registro y consulta de asistencias", Icon = "how_to_reg", Url = "/dashboard/operational/attendance", ModuleId = 3 },
+              new Form { Id = 13, Name = "Emisión de Carnet", Description = "Registro y consulta de generación masiva de carnets", Icon = "badge", Url = "/dashboard/operational/card-issuance", ModuleId = 3 },
+
 
               // Parámetros > Configuración General / Ubicación  =>  ModuleId = 4
               new Form { Id = 13, Name = "Estados", Description = "Estados del sistema", Icon = "check_circle_unread", Url = "/dashboard/parametros/status", ModuleId = 4 },

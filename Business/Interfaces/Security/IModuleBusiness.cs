@@ -10,8 +10,8 @@ using Entity.Models;
 
 namespace Business.Interfaces.Security
 {
-    public interface IRoleBusiness: IBaseBusiness<Role, RoleDtoRequest, RolDto>
+    public interface IModuleBusiness : IBaseBusiness<Module, ModuleDtoRequest, ModuleDto>
     {
-        Task<bool> UserIsSuperAdminAsync(List<string> roleIds);
+        Task<List<ModuleDto>> GetModulesWithFormsByAllowedFormsAsync(List<int> allowedFormIds);
     }
 }

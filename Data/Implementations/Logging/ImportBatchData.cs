@@ -32,5 +32,50 @@ namespace Data.Implementations.Logging
 
             await _context.SaveChangesAsync();
         }
+
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ImportBatch>> GetAllAsync()
+        {
+            return await _context.Set<ImportBatch>()
+                .AsNoTracking()
+                .OrderByDescending(b => b.StartedAt)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<ImportBatch?> GetByIdAsync(int id)
+        {
+            return await _context.Set<ImportBatch>()
+                .AsNoTracking()
+                .Include(b => b.Rows)
+                .FirstOrDefaultAsync(b => b.Id == id);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ImportBatchRow>> GetRowsAsync(int batchId)
+        {
+            return await _context.ImportBatchRows
+              .Include(r => r.PersonDivisionProfile)
+                  .ThenInclude(pdp => pdp.Person)
+              .Include(r => r.PersonDivisionProfile)
+                  .ThenInclude(pdp => pdp.InternalDivision)
+                      .ThenInclude(div => div.OrganizationalUnit)
+              .Include(r => r.Card)
+                  .ThenInclude(c => c.Status)
+              .Where(r => r.ImportBatchId == batchId)
+              .ToListAsync();
+
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ImportBatchRow>> GetErrorRowsAsync(int batchId)
+        {
+            return await _context.Set<ImportBatchRow>()
+                .AsNoTracking()
+                .Where(r => r.ImportBatchId == batchId && !r.Success)
+                .OrderBy(r => r.RowNumber)
+                .ToListAsync();
+        }
     }
 }

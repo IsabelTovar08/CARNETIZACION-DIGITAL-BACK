@@ -216,6 +216,15 @@ namespace Data.Classes.Specifics
             }
         }
 
+        public async Task<List<int>> GetAllowedFormIdsAsync(List<string> roleIds)
+        {
+            return await _context.Set<RolFormPermission>()
+                .AsNoTracking()
+                .Where(rfp => roleIds.Contains(rfp.RolId.ToString()))
+                .Select(rfp => rfp.FormId)
+                .Distinct()
+                .ToListAsync();
+        }
 
     }
 }
