@@ -106,6 +106,7 @@ namespace Utilities.Helper
 
             CreateMap<User, UserMeDto>()
             // ⬇️ AQUÍ el cambio clave: pasa Rol ENTIDAD, no Name string
+            .ForMember(d => d.PhotoUrl, opt => opt.MapFrom(s => s.Person.PhotoUrl))
             .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.UserRoles.Select(ur => ur.Rol)))
             .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
         s.UserRoles
