@@ -23,6 +23,16 @@ namespace Entity.DTOs.Operational.Response
         public string? EventName { get; set; }
 
         /// <summary>
+        /// Alias para compatibilidad con reportes
+        /// Usa internamente PersonFullName
+        /// </summary>
+        public string? PersonName
+        {
+            get => PersonFullName;
+            set => PersonFullName = value;
+        }
+
+        /// <summary>
         /// Resultado de la operación
         /// </summary>
         public bool Success { get; set; }

@@ -1,10 +1,11 @@
-
-using Entity.DTOs.Notifications;
+Ôªøusing Entity.DTOs.Notifications;
 using Entity.DTOs.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Web.Extensions;
+using QuestPDF.Infrastructure;   //  Para QuestPDF
+using OfficeOpenXml;            //  Para EPPlus <= 7.x
 
 namespace Web
 {
@@ -12,12 +13,15 @@ namespace Web
     {
         public static void Main(string[] args)
         {
+            //  Declarar licencias
+            QuestPDF.Settings.License = LicenseType.Community;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
-            // Add services to the container.
 
+            // Add services to the container.
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
 
             // Swagger + JWT Bearer
@@ -25,10 +29,9 @@ namespace Web
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mi API", Version = "v1" });
 
-                // Definir el esquema Bearer
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "AutenticaciÛn JWT con esquema Bearer. **Pega solo el token (sin 'Bearer ')**.",
+                    Description = "Autenticaci√≥n JWT con esquema Bearer. **Pega solo el token (sin 'Bearer ')**.",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
@@ -36,7 +39,6 @@ namespace Web
                     BearerFormat = "JWT"
                 });
 
-                // Requisito global de seguridad
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
@@ -53,56 +55,47 @@ namespace Web
                 });
             });
 
-            builder.Services.AddSwaggerGen();
-
-
-            // servicios y data
+            // Servicios personalizados y configuraci√≥n
             builder.Services.AddProjectServices();
-            //Cors
             builder.Services.AddCorsConfiguration(configuration);
 
-            //Automapper
+            // Automapper
             builder.Services.AddAutoMapper(typeof(Utilities.Helper.MappingProfile));
 
             // JWT
             builder.Services.AddJwtAuthentication(configuration);
-            //ConexiÛn 
+
+            // Conexi√≥n a DB
             builder.Services.AddDatabaseConfiguration(configuration);
 
-
-            //Mail 
+            // Mail
             builder.Services.Configure<EmailSettings>(
-            builder.Configuration.GetSection("EmailSettings"));
+                builder.Configuration.GetSection("EmailSettings"));
 
-            //Telegram 
-            builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
+            // Telegram
+            builder.Services.Configure<TelegramSettings>(
+                builder.Configuration.GetSection("TelegramSettings"));
 
-
+            // Twilio
             builder.Services.Configure<TwilioSettings>(
                 builder.Configuration.GetSection("Twilio"));
 
-            // Supabase para almacenar im·genes 
-            builder.Services.Configure<SupabaseOptions>(builder.Configuration.GetSection("Supabase"));
-            builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Upload"));
-
+            // Supabase para almacenar im√°genes 
+            builder.Services.Configure<SupabaseOptions>(
+                builder.Configuration.GetSection("Supabase"));
+            builder.Services.Configure<UploadOptions>(
+                builder.Configuration.GetSection("Upload"));
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment())
-            //{
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            //}
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
-
             app.UseCors();
-
             app.UseAuthentication();
-
             app.UseAuthorization();
-
             app.MapControllers();
 
             app.Run();
