@@ -278,6 +278,18 @@ namespace Entity.Migrations
                         {
                             Id = 13,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Registro y consulta de generación masiva de carnets",
+                            Icon = "badge",
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            Name = "Emisión de Carnet",
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Url = "/dashboard/operational/card-issuance"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Estados del sistema",
                             Icon = "check_circle_unread",
                             IsDeleted = false,
@@ -288,7 +300,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 14,
+                            Id = 15,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Tipos y categorías del sistema",
                             Icon = "category",
@@ -300,7 +312,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 15,
+                            Id = 16,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Configuración del Menú del sistema",
                             Icon = "background_dot_small",
@@ -312,7 +324,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 16,
+                            Id = 17,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Catálogo de departamentos",
                             Icon = "flag",
@@ -324,7 +336,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 17,
+                            Id = 18,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Catálogo de municipios",
                             Icon = "place",
@@ -336,7 +348,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 18,
+                            Id = 19,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Gestión de personas",
                             Icon = "person_pin_circle",
@@ -348,7 +360,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 19,
+                            Id = 20,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Gestión de usuarios",
                             Icon = "groups_2",
@@ -360,7 +372,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 20,
+                            Id = 21,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Gestión de roles",
                             Icon = "add_moderator",
@@ -372,7 +384,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 21,
+                            Id = 22,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Permisos por formulario",
                             Icon = "folder_managed",
@@ -384,7 +396,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 22,
+                            Id = 23,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Catálogo de permisos",
                             Icon = "lock_open_circle",
@@ -396,7 +408,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 23,
+                            Id = 24,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Catálogo de formularios",
                             Icon = "lists",
@@ -408,7 +420,7 @@ namespace Entity.Migrations
                         },
                         new
                         {
-                            Id = 24,
+                            Id = 25,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Catálogo de módulos",
                             Icon = "dashboard_2",
@@ -1347,7 +1359,11 @@ namespace Entity.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CardId");
+
                     b.HasIndex("ImportBatchId");
+
+                    b.HasIndex("PersonDivisionProfileId");
 
                     b.ToTable("ImportBatchRows");
                 });
@@ -1617,7 +1633,7 @@ namespace Entity.Migrations
                             Id = 1,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             InternalDivisionId = 1,
-                            IsCurrentlySelected = false,
+                            IsCurrentlySelected = true,
                             IsDeleted = false,
                             PersonId = 1,
                             ProfileId = 1,
@@ -1631,6 +1647,39 @@ namespace Entity.Migrations
                             IsCurrentlySelected = true,
                             IsDeleted = false,
                             PersonId = 2,
+                            ProfileId = 2,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            InternalDivisionId = 1,
+                            IsCurrentlySelected = true,
+                            IsDeleted = false,
+                            PersonId = 5,
+                            ProfileId = 2,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            InternalDivisionId = 1,
+                            IsCurrentlySelected = true,
+                            IsDeleted = false,
+                            PersonId = 6,
+                            ProfileId = 2,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            InternalDivisionId = 1,
+                            IsCurrentlySelected = true,
+                            IsDeleted = false,
+                            PersonId = 7,
                             ProfileId = 2,
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -3933,13 +3982,25 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Operational.BulkLoading.ImportBatchRow", b =>
                 {
+                    b.HasOne("Entity.Models.Organizational.Assignment.Card", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardId");
+
                     b.HasOne("Entity.Models.Operational.BulkLoading.ImportBatch", "Batch")
                         .WithMany("Rows")
                         .HasForeignKey("ImportBatchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Entity.Models.Organizational.Assignment.PersonDivisionProfile", "PersonDivisionProfile")
+                        .WithMany()
+                        .HasForeignKey("PersonDivisionProfileId");
+
                     b.Navigation("Batch");
+
+                    b.Navigation("Card");
+
+                    b.Navigation("PersonDivisionProfile");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>

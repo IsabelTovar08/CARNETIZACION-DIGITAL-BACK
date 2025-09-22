@@ -24,5 +24,6 @@ namespace Entity.DTOs.Operational.Request
         /// QR recibido desde el frontend para registrar asistencia.
         /// </summary>
         public string? QrCode { get; set; }
+
     }
 }

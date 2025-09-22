@@ -59,20 +59,20 @@ namespace Entity.DataInit.Security
 
 
               // Parámetros > Configuración General / Ubicación  =>  ModuleId = 4
-              new Form { Id = 13, Name = "Estados", Description = "Estados del sistema", Icon = "check_circle_unread", Url = "/dashboard/parametros/status", ModuleId = 4 },
-              new Form { Id = 14, Name = "Tipos y Categorías", Description = "Tipos y categorías del sistema", Icon = "category", Url = "/dashboard/parametros/types-category", ModuleId = 4 },
-              new Form { Id = 15, Name = "Menu", Description = "Configuración del Menú del sistema", Icon = "background_dot_small", Url = "/dashboard/parametros/menu", ModuleId = 4 },
-              new Form { Id = 16, Name = "Departamentos", Description = "Catálogo de departamentos", Icon = "flag", Url = "/dashboard/organizational/location/department", ModuleId = 4 },
-              new Form { Id = 17, Name = "Municipios", Description = "Catálogo de municipios", Icon = "place", Url = "/dashboard/organizational/location/municipality", ModuleId = 4 },
+              new Form { Id = 14, Name = "Estados", Description = "Estados del sistema", Icon = "check_circle_unread", Url = "/dashboard/parametros/status", ModuleId = 4 },
+              new Form { Id = 15, Name = "Tipos y Categorías", Description = "Tipos y categorías del sistema", Icon = "category", Url = "/dashboard/parametros/types-category", ModuleId = 4 },
+              new Form { Id = 16, Name = "Menu", Description = "Configuración del Menú del sistema", Icon = "background_dot_small", Url = "/dashboard/parametros/menu", ModuleId = 4 },
+              new Form { Id = 17, Name = "Departamentos", Description = "Catálogo de departamentos", Icon = "flag", Url = "/dashboard/organizational/location/department", ModuleId = 4 },
+              new Form { Id = 18, Name = "Municipios", Description = "Catálogo de municipios", Icon = "place", Url = "/dashboard/organizational/location/municipality", ModuleId = 4 },
 
               // Seguridad > ModuleId = 5
-              new Form { Id = 18, Name = "Personas", Description = "Gestión de personas", Icon = "person_pin_circle", Url = "/dashboard/seguridad/people", ModuleId = 5 },
-              new Form { Id = 19, Name = "Usuarios", Description = "Gestión de usuarios", Icon = "groups_2", Url = "/dashboard/seguridad/users", ModuleId = 5 },
-              new Form { Id = 20, Name = "Roles", Description = "Gestión de roles", Icon = "add_moderator", Url = "/dashboard/seguridad/roles", ModuleId = 5 },
-              new Form { Id = 21, Name = "Gestión de Permisos", Description = "Permisos por formulario", Icon = "folder_managed", Url = "/dashboard/seguridad/permission-forms", ModuleId = 5 },
-              new Form { Id = 22, Name = "Permisos", Description = "Catálogo de permisos", Icon = "lock_open_circle", Url = "/dashboard/seguridad/permissions", ModuleId = 5 },
-              new Form { Id = 23, Name = "Formularios", Description = "Catálogo de formularios", Icon = "lists", Url = "/dashboard/seguridad/forms", ModuleId = 5 },
-              new Form { Id = 24, Name = "Módulos", Description = "Catálogo de módulos", Icon = "dashboard_2", Url = "/dashboard/seguridad/modules", ModuleId = 5 }
+              new Form { Id = 19, Name = "Personas", Description = "Gestión de personas", Icon = "person_pin_circle", Url = "/dashboard/seguridad/people", ModuleId = 5 },
+              new Form { Id = 20, Name = "Usuarios", Description = "Gestión de usuarios", Icon = "groups_2", Url = "/dashboard/seguridad/users", ModuleId = 5 },
+              new Form { Id = 21, Name = "Roles", Description = "Gestión de roles", Icon = "add_moderator", Url = "/dashboard/seguridad/roles", ModuleId = 5 },
+              new Form { Id = 22, Name = "Gestión de Permisos", Description = "Permisos por formulario", Icon = "folder_managed", Url = "/dashboard/seguridad/permission-forms", ModuleId = 5 },
+              new Form { Id = 23, Name = "Permisos", Description = "Catálogo de permisos", Icon = "lock_open_circle", Url = "/dashboard/seguridad/permissions", ModuleId = 5 },
+              new Form { Id = 24, Name = "Formularios", Description = "Catálogo de formularios", Icon = "lists", Url = "/dashboard/seguridad/forms", ModuleId = 5 },
+              new Form { Id = 25, Name = "Módulos", Description = "Catálogo de módulos", Icon = "dashboard_2", Url = "/dashboard/seguridad/modules", ModuleId = 5 }
           );
 
         }

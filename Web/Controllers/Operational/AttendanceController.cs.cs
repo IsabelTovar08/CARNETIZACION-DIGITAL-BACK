@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Business.Interfaces.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Reports;
 using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -171,6 +172,33 @@ namespace Web.Controllers.Operational
             {
                 success = true,
                 message = result.Message,
+                data = result
+            });
+        }
+
+        /// <summary>
+        /// 🚀 NUEVO: Reporte sin paginación (evento, persona, rango de fechas).
+        /// </summary>
+        [HttpPost("report")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetReport([FromBody] ReportFilterDto filters, CancellationToken ct = default)
+        {
+            var result = await _attendanceBusiness.GetReportAsync(filters, ct);
+
+            if (result == null || result.Count == 0)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = "Sin resultados para los filtros aplicados.",
+                    data = Array.Empty<object>()
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                total = result.Count,
                 data = result
             });
         }

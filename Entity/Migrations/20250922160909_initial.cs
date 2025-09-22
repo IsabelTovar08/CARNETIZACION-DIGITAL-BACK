@@ -299,36 +299,6 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ImportBatchRows",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ImportBatchId = table.Column<int>(type: "int", nullable: false),
-                    RowNumber = table.Column<int>(type: "int", nullable: false),
-                    Success = table.Column<bool>(type: "bit", nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PersonId = table.Column<int>(type: "int", nullable: true),
-                    PersonDivisionProfileId = table.Column<int>(type: "int", nullable: true),
-                    CardId = table.Column<int>(type: "int", nullable: true),
-                    UpdatedPhoto = table.Column<bool>(type: "bit", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ImportBatchRows", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ImportBatchRows_ImportBatches_ImportBatchId",
-                        column: x => x.ImportBatchId,
-                        principalTable: "ImportBatches",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Forms",
                 schema: "ModelSecurity",
                 columns: table => new
@@ -1106,6 +1076,48 @@ namespace Entity.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ImportBatchRows",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ImportBatchId = table.Column<int>(type: "int", nullable: false),
+                    RowNumber = table.Column<int>(type: "int", nullable: false),
+                    Success = table.Column<bool>(type: "bit", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: true),
+                    PersonDivisionProfileId = table.Column<int>(type: "int", nullable: true),
+                    CardId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedPhoto = table.Column<bool>(type: "bit", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ImportBatchRows", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ImportBatchRows_Cards_CardId",
+                        column: x => x.CardId,
+                        principalSchema: "Organizational",
+                        principalTable: "Cards",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ImportBatchRows_ImportBatches_ImportBatchId",
+                        column: x => x.ImportBatchId,
+                        principalTable: "ImportBatches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ImportBatchRows_PersonDivisionProfiles_PersonDivisionProfileId",
+                        column: x => x.PersonDivisionProfileId,
+                        principalSchema: "Organizational",
+                        principalTable: "PersonDivisionProfiles",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "Areas",
@@ -1339,18 +1351,19 @@ namespace Entity.Migrations
                     { 10, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de tipos de evento", "category", 3, "Tipos de Evento", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/event-types" },
                     { 11, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Administración de puntos de acceso", "sensor_door", 3, "Puntos de Acceso", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/access-points" },
                     { 12, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Registro y consulta de asistencias", "how_to_reg", 3, "Asistencias", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/attendance" },
-                    { 13, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Estados del sistema", "check_circle_unread", 4, "Estados", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/status" },
-                    { 14, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Tipos y categorías del sistema", "category", 4, "Tipos y Categorías", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/types-category" },
-                    { 15, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Configuración del Menú del sistema", "background_dot_small", 4, "Menu", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/menu" },
-                    { 16, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de departamentos", "flag", 4, "Departamentos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/location/department" },
-                    { 17, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de municipios", "place", 4, "Municipios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/location/municipality" },
-                    { 18, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de personas", "person_pin_circle", 5, "Personas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/people" },
-                    { 19, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de usuarios", "groups_2", 5, "Usuarios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/users" },
-                    { 20, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de roles", "add_moderator", 5, "Roles", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/roles" },
-                    { 21, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Permisos por formulario", "folder_managed", 5, "Gestión de Permisos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/permission-forms" },
-                    { 22, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de permisos", "lock_open_circle", 5, "Permisos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/permissions" },
-                    { 23, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de formularios", "lists", 5, "Formularios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/forms" },
-                    { 24, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de módulos", "dashboard_2", 5, "Módulos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/modules" }
+                    { 13, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Registro y consulta de generación masiva de carnets", "badge", 3, "Emisión de Carnet", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/card-issuance" },
+                    { 14, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Estados del sistema", "check_circle_unread", 4, "Estados", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/status" },
+                    { 15, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Tipos y categorías del sistema", "category", 4, "Tipos y Categorías", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/types-category" },
+                    { 16, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Configuración del Menú del sistema", "background_dot_small", 4, "Menu", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/menu" },
+                    { 17, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de departamentos", "flag", 4, "Departamentos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/location/department" },
+                    { 18, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de municipios", "place", 4, "Municipios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/location/municipality" },
+                    { 19, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de personas", "person_pin_circle", 5, "Personas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/people" },
+                    { 20, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de usuarios", "groups_2", 5, "Usuarios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/users" },
+                    { 21, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de roles", "add_moderator", 5, "Roles", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/roles" },
+                    { 22, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Permisos por formulario", "folder_managed", 5, "Gestión de Permisos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/permission-forms" },
+                    { 23, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de permisos", "lock_open_circle", 5, "Permisos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/permissions" },
+                    { 24, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de formularios", "lists", 5, "Formularios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/forms" },
+                    { 25, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de módulos", "dashboard_2", 5, "Módulos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/modules" }
                 });
 
             migrationBuilder.InsertData(
@@ -1463,14 +1476,15 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "PersonDivisionProfiles",
-                columns: new[] { "Id", "Code", "CreateAt", "InternalDivisionId", "PersonId", "ProfileId", "UpdateAt" },
-                values: new object[] { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
-
-            migrationBuilder.InsertData(
-                schema: "Organizational",
-                table: "PersonDivisionProfiles",
                 columns: new[] { "Id", "Code", "CreateAt", "InternalDivisionId", "IsCurrentlySelected", "PersonId", "ProfileId", "UpdateAt" },
-                values: new object[] { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 2, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[,]
+                {
+                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 2, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 5, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 6, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 7, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
@@ -1770,9 +1784,19 @@ namespace Entity.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ImportBatchRows_CardId",
+                table: "ImportBatchRows",
+                column: "CardId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ImportBatchRows_ImportBatchId",
                 table: "ImportBatchRows",
                 column: "ImportBatchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ImportBatchRows_PersonDivisionProfileId",
+                table: "ImportBatchRows",
+                column: "PersonDivisionProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InternalDivisions_AreaCategoryId",
@@ -2035,10 +2059,6 @@ namespace Entity.Migrations
                 schema: "Operational");
 
             migrationBuilder.DropTable(
-                name: "Cards",
-                schema: "Organizational");
-
-            migrationBuilder.DropTable(
                 name: "EventTargetAudience",
                 schema: "Organizational");
 
@@ -2074,11 +2094,7 @@ namespace Entity.Migrations
                 schema: "Operational");
 
             migrationBuilder.DropTable(
-                name: "CardTemplates",
-                schema: "Operational");
-
-            migrationBuilder.DropTable(
-                name: "PersonDivisionProfiles",
+                name: "Cards",
                 schema: "Organizational");
 
             migrationBuilder.DropTable(
@@ -2109,19 +2125,15 @@ namespace Entity.Migrations
                 schema: "Operational");
 
             migrationBuilder.DropTable(
-                name: "InternalDivisions",
-                schema: "Organizational");
+                name: "CardTemplates",
+                schema: "Operational");
 
             migrationBuilder.DropTable(
-                name: "Profiles",
+                name: "PersonDivisionProfiles",
                 schema: "Organizational");
 
             migrationBuilder.DropTable(
                 name: "Modules",
-                schema: "ModelSecurity");
-
-            migrationBuilder.DropTable(
-                name: "People",
                 schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
@@ -2135,6 +2147,18 @@ namespace Entity.Migrations
             migrationBuilder.DropTable(
                 name: "Statuses",
                 schema: "Parameter");
+
+            migrationBuilder.DropTable(
+                name: "InternalDivisions",
+                schema: "Organizational");
+
+            migrationBuilder.DropTable(
+                name: "People",
+                schema: "ModelSecurity");
+
+            migrationBuilder.DropTable(
+                name: "Profiles",
+                schema: "Organizational");
 
             migrationBuilder.DropTable(
                 name: "Areas",
