@@ -4,8 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Web.Extensions;
+<<<<<<< HEAD
 using QuestPDF.Infrastructure;   //  Para QuestPDF
 using OfficeOpenXml;            //  Para EPPlus <= 7.x
+=======
+using Web.Realtime.Hubs;
+>>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
 
 namespace Web
 {
@@ -88,9 +92,19 @@ namespace Web
 
             var app = builder.Build();
 
+            app.MapHub<NotificationHub>("/hubs/notifications");
+
             // Configure the HTTP request pipeline.
+<<<<<<< HEAD
             app.UseSwagger();
             app.UseSwaggerUI();
+=======
+            //if (app.Environment.IsDevelopment())
+            //{
+            app.UseSwagger();
+                app.UseSwaggerUI();
+            //}
+>>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
 
             app.UseHttpsRedirection();
             app.UseCors();

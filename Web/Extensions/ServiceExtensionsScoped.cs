@@ -1,5 +1,6 @@
 ﻿using Business.Classes;
 using Business.Classes.Base;
+using Business.Implementations.Notifications;
 using Business.Implementations.Operational;
 using Business.Implementations.Operational;
 using Business.Implementations.Operational;
@@ -121,6 +122,7 @@ using Microsoft.Identity.Client.Extensions.Msal;
 using Utilities.Helpers.Excel;
 using Utilities.Notifications.Implementations;
 using Web.Auth;
+using Web.Realtime.Dispatchers;
 
 namespace Web.Extensions
 {
@@ -231,10 +233,17 @@ namespace Web.Extensions
             services.AddScoped<IMessageSender, WhatsAppMessageSender>();
 
             services.AddScoped<INotify, Notifier>();
-            services.AddScoped<IMessageSender, TelegramMessageSender>();
+            services.AddScoped<INotificationDispatcher, SignalRNotificationDispatcher>();
 
             services.AddScoped<INotificationData, NotificationData>();
             services.AddScoped<INotificationBusiness, NotificationsBusiness>();
+
+            services.AddScoped<INotificationsReceivedData, NotificationsReceivedData>();
+            services.AddScoped<INotificationReceivedBusiness, NotificationReceivedBusiness>();
+
+            services.AddScoped<IModificationRequestData, ModificationRequestData>();
+            services.AddScoped<IModificationRequestBusiness, ModificationRequestBusiness>();
+
 
             //InternaDivision
             services.AddScoped<IInternalDivisionData ,InternalDivisionData>();
@@ -317,6 +326,10 @@ namespace Web.Extensions
             services.AddScoped<ICurrentUser, CurrentUser>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
+
+            services.AddSignalR();
 
 
 

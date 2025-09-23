@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Business.Interfaces.Enums;
 using Entity.DTOs.Enums;
-using Utilities.Enums.Extensions;
+using Entity.Enums.Extensions;
+using Entity.Enums.Specifics;
 using Utilities.Enums.Specifics;
 
 namespace Business.Services.Enums
@@ -54,6 +55,42 @@ namespace Business.Services.Enums
                                 Name = i.Name,
                                 Acronym = null,
                                 Code = Enum.GetName(typeof(AccessPointType), i.Id)
+                            })
+                    );
+
+                case "notification-status":
+                    return Task.FromResult(
+                        EnumExtensions.ToItems<NotificationStatus>()
+                            .Select(i => new EnumOptionDto
+                            {
+                                Id = i.Id,
+                                Name = i.Name,
+                                Acronym = null,
+                                Code = Enum.GetName(typeof(NotificationStatus), i.Id)
+                            })
+                    );
+
+                case "notification-type":
+                    return Task.FromResult(
+                        EnumExtensions.ToItems<NotificationType>()
+                            .Select(i => new EnumOptionDto
+                            {
+                                Id = i.Id,
+                                Name = i.Name,
+                                Acronym = null,
+                                Code = Enum.GetName(typeof(NotificationType), i.Id)
+                            })
+                    );
+
+                case "modification-request-status":
+                    return Task.FromResult(
+                        EnumExtensions.ToItems<ModificationRequestStatus>()
+                            .Select(i => new EnumOptionDto
+                            {
+                                Id = i.Id,
+                                Name = i.Name,
+                                Acronym = null,
+                                Code = Enum.GetName(typeof(ModificationRequestStatus), i.Id)
                             })
                     );
 

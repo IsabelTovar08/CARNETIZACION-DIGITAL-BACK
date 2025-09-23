@@ -11,6 +11,9 @@ namespace Entity.Models.Organizational.Assignment
         public string QRCode { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime ExpirationDate { get; set; }
+
+        // Identificador único para validar
+        public Guid UniqueId { get; set; }
         public int StatusId { get; set; }
         public int CardTemplateId { get; set; }
 

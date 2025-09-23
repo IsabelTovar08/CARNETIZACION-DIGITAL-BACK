@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Utilities.Enums.Attributes
+namespace Entity.Enums.Attributes
 {
     /// <summary>
     /// Atributo para enriquecer enums con Nombre y, opcionalmente, Sigla (acrónimo).

@@ -1,4 +1,6 @@
-﻿namespace Entity.DTOs.Notifications
+﻿using Utilities.Enums.Specifics;
+
+namespace Entity.DTOs.Notifications
 {
     public class NotificationReceivedDto
     {
@@ -7,6 +9,8 @@
         public DateTime? ReadDate { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public int NotificationId { get; set; }
+        public string StatusName { get; set; } 
+
         public int UserId { get; set; }
         public bool IsDeleted { get; set; } = false;
     }

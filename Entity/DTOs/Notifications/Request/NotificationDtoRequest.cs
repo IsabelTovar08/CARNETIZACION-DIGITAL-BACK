@@ -11,20 +11,14 @@ namespace Entity.DTOs.Notifications.Request
     public class NotificationDtoRequest : BaseDtoRequest
     {
         [Required]
-        public int PersonId { get; set; }
-
-        [Required]
-        public int StatusId { get; set; }
-
-        [Required]
         [MaxLength(250)]
         public string Title { get; set; }
-
+        [Required]
         [MaxLength(1000)]
         public string Message { get; set; }
 
-        public bool IsRead { get; set; } = false;
+        [Required]
+        public int NotificationTypeId { get; set; }
 
-        public bool IsDeleted { get; set; } = false;
     }
 }

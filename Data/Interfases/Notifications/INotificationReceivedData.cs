@@ -10,5 +10,6 @@ namespace Data.Interfases.Notifications
 {
     public interface INotificationsReceivedData : ICrudBase<NotificationReceived>
     {
+        Task<IEnumerable<NotificationReceived>> GetByUserAsync(int userId);
     }
 }

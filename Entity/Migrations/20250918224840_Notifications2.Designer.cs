@@ -4,6 +4,7 @@ using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250918224840_Notifications2")]
+    partial class Notifications2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1134,12 +1137,9 @@ namespace Entity.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-<<<<<<< HEAD
-=======
                     b.Property<int?>("CustomTypeId")
                         .HasColumnType("int");
 
->>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1161,11 +1161,7 @@ namespace Entity.Migrations
 
                     b.HasKey("Id");
 
-<<<<<<< HEAD
-                    b.HasIndex("NotificationTypeId");
-=======
                     b.HasIndex("CustomTypeId");
->>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
 
                     b.ToTable("Notification", "Notifications");
 
@@ -1264,11 +1260,7 @@ namespace Entity.Migrations
                             NotificationId = 2,
                             ReadDate = new DateTime(2025, 7, 28, 10, 15, 0, 0, DateTimeKind.Unspecified),
                             SendDate = new DateTime(2025, 7, 28, 9, 35, 0, 0, DateTimeKind.Unspecified),
-<<<<<<< HEAD
-                            StatusId = 2,
-=======
                             StatusId = 1,
->>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserId = 2
                         });
@@ -1564,12 +1556,9 @@ namespace Entity.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
-<<<<<<< HEAD
-=======
                     b.Property<Guid>("UniqueId")
                         .HasColumnType("uniqueidentifier");
 
->>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("datetime2");
 
@@ -1596,10 +1585,7 @@ namespace Entity.Migrations
                             PersonDivissionProfileId = 1,
                             QRCode = "QR12345",
                             StatusId = 1,
-<<<<<<< HEAD
-=======
                             UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
->>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -3968,19 +3954,9 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>
                 {
-<<<<<<< HEAD
-                    b.HasOne("Entity.Models.Parameter.CustomType", "NotificationType")
-                        .WithMany("Notifications")
-                        .HasForeignKey("NotificationTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("NotificationType");
-=======
                     b.HasOne("Entity.Models.Parameter.CustomType", null)
                         .WithMany("Notifications")
                         .HasForeignKey("CustomTypeId");
->>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
                 });
 
             modelBuilder.Entity("Entity.Models.Notifications.NotificationReceived", b =>
@@ -3991,17 +3967,10 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-<<<<<<< HEAD
-                    b.HasOne("Entity.Models.Parameter.Status", "Status")
-                        .WithMany("NotificatiosReceived")
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-=======
                     b.HasOne("Entity.Models.Parameter.Status", null)
                         .WithMany("NotificatiosReceived")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
                         .IsRequired();
 
                     b.HasOne("Entity.Models.User", "User")
@@ -4012,11 +3981,6 @@ namespace Entity.Migrations
 
                     b.Navigation("Notification");
 
-<<<<<<< HEAD
-                    b.Navigation("Status");
-
-=======
->>>>>>> c457c1c7b78469c3c729fa49507b4369ed5dccdf
                     b.Navigation("User");
                 });
 

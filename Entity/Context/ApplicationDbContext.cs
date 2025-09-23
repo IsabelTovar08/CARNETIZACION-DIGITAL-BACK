@@ -20,6 +20,7 @@ using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 
 namespace Entity.Context
@@ -139,6 +140,18 @@ namespace Entity.Context
                 b.HasIndex(x => x.EventId);
             });
             // ========================================================================================
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties()
+                             .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?)))
+                {
+                    property.SetValueConverter(
+                        new ValueConverter<DateTime, DateTime>(
+                            v => v.ToUniversalTime(),
+                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+                }
+            }
 
             // Si tienes varias configuraciones en tu proyecto
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
