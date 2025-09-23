@@ -317,7 +317,7 @@ namespace Business.Classes
 
         public async Task<PersonDto?> GetMyPersonAsync()
         {
-            var userIdStr = _currentUser.UserId;
+            var userIdStr = _currentUser.UserIdRaw;
             if (userIdStr == "unknown")
                 throw new UnauthorizedAccessException("Usuario no identificado.");
 

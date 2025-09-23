@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Utilities.Enums.Attributes;
+using Entity.Enums.Attributes;
 
-namespace Utilities.Enums.Extensions
+namespace Entity.Enums.Extensions
 {
     public static class EnumExtensions
     {

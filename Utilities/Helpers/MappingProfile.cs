@@ -18,6 +18,8 @@ using Entity.DTOs.Parameter;
 using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
 using Entity.DTOs.Specifics;
+using Entity.Enums.Extensions;
+using Entity.Enums.Specifics;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
@@ -28,6 +30,7 @@ using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
+using Utilities.Enums.Specifics;
 
 namespace Utilities.Helper
 {
@@ -315,7 +318,9 @@ namespace Utilities.Helper
 
             //Notifications
             CreateMap<Notification, NotificationDto>()
-                 .ReverseMap();
+                .ForMember(d => d.NotificationTypeName,
+                    opt => opt.MapFrom(s => ((NotificationType)s.NotificationTypeId).ToString())) 
+                .ReverseMap();
 
             CreateMap<Notification, NotificationDtoRequest>()
                 .ReverseMap();
@@ -325,6 +330,22 @@ namespace Utilities.Helper
                 .ReverseMap();
 
             CreateMap<NotificationReceived, NotificationReceivedDtoRequest>()
+                .ReverseMap();
+
+            CreateMap<NotificationReceived, NotificationReceivedDto>()
+                .ReverseMap();
+
+
+            CreateMap<ModificationRequest, ModificationRequestDtoResponse>()
+            .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => (int)src.Field))
+            .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Field.GetDisplayName()))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.GetDisplayName()))
+            .ReverseMap();
+
+            // De Create DTO a Entity
+            CreateMap<ModificationRequestDtoRequest, ModificationRequest>()
+                .ForMember(dest => dest.RequestDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => ModificationRequestStatus.Pending))
                 .ReverseMap();
 
             // Attendance

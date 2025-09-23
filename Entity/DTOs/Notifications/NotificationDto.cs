@@ -12,9 +12,8 @@ namespace Entity.DTOs.Notifications
     {
         public string Title { get; set; }
         public string Message { get; set; }
-        public DateTime? CreatedDate { get; set; }
         public int NotificationTypeId { get; set; }
 
-
+        public string NotificationTypeName { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Utilities.Enums.Attributes;
+using Entity.Enums.Attributes;
 
 namespace Utilities.Enums.Specifics
 {

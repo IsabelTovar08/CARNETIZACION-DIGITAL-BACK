@@ -65,7 +65,7 @@ namespace Business.Services.Excel
 
             // Metadatos de la operación
             var fileName = _excel.GetFileName(excelStream);
-            var startedBy = _currentUser.UserName ?? _currentUser.UserId;
+            var startedBy = _currentUser.UserName ?? _currentUser.UserIdRaw;
 
             var ctxJson = JsonSerializer.Serialize(new
             {

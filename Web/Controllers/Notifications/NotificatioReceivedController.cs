@@ -15,7 +15,5 @@ namespace Web.Controllers.Notifications
         {
             _business = business;
         }
-
-        // Aquí puedes agregar métodos específicos para NotificationReceived si los necesitas
     }
 }
