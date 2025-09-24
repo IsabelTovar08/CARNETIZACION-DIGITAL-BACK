@@ -8,6 +8,8 @@ namespace Entity.DTOs.Operational.Response
     {
         public string? Description { get; set; }
 
+        public string Name { get; set; } = default!;
+
         public int EventId { get; set; }
         public string? EventName { get; set; }
 

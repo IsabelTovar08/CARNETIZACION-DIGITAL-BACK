@@ -9,8 +9,8 @@ namespace Entity.DTOs.Operational.Request
         [RegularExpression(@"(^$|.*\S.*)", ErrorMessage = "La descripción no puede estar compuesta únicamente por espacios en blanco.")]
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "El identificador del evento es obligatorio.")]
-        [Range(1, int.MaxValue, ErrorMessage = "El identificador del evento debe ser un número entero mayor que 0.")]
+        //[Required(ErrorMessage = "El identificador del evento es obligatorio.")]
+        //[Range(1, int.MaxValue, ErrorMessage = "El identificador del evento debe ser un número entero mayor que 0.")]
         public int EventId { get; set; }
 
         [Required(ErrorMessage = "El identificador del tipo es obligatorio.")]

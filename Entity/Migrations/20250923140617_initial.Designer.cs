@@ -4,6 +4,7 @@ using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250923140617_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1134,12 +1137,6 @@ namespace Entity.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-<<<<<<< HEAD
-                    b.Property<int?>("CustomTypeId")
-                        .HasColumnType("int");
-
-=======
->>>>>>> feature/marcos/HU-03
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1161,11 +1158,7 @@ namespace Entity.Migrations
 
                     b.HasKey("Id");
 
-<<<<<<< HEAD
-                    b.HasIndex("CustomTypeId");
-=======
                     b.HasIndex("NotificationTypeId");
->>>>>>> feature/marcos/HU-03
 
                     b.ToTable("Notification", "Notifications");
 
@@ -1264,11 +1257,7 @@ namespace Entity.Migrations
                             NotificationId = 2,
                             ReadDate = new DateTime(2025, 7, 28, 10, 15, 0, 0, DateTimeKind.Unspecified),
                             SendDate = new DateTime(2025, 7, 28, 9, 35, 0, 0, DateTimeKind.Unspecified),
-<<<<<<< HEAD
-                            StatusId = 1,
-=======
                             StatusId = 2,
->>>>>>> feature/marcos/HU-03
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserId = 2
                         });
@@ -1446,8 +1435,6 @@ namespace Entity.Migrations
                         });
                 });
 
-<<<<<<< HEAD
-=======
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
                 {
                     b.Property<int>("EventId")
@@ -1478,7 +1465,6 @@ namespace Entity.Migrations
                     b.ToTable("EventAccessPoints", "Operational");
                 });
 
->>>>>>> feature/marcos/HU-03
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
                 {
                     b.Property<int>("Id")
@@ -1496,12 +1482,6 @@ namespace Entity.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-=======
->>>>>>> feature/marcos/HU-03
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -1522,11 +1502,6 @@ namespace Entity.Migrations
 
                     b.HasKey("Id");
 
-<<<<<<< HEAD
-                    b.HasIndex("EventId");
-
-=======
->>>>>>> feature/marcos/HU-03
                     b.HasIndex("TypeId");
 
                     b.ToTable("AccessPoints", "Operational");
@@ -1537,10 +1512,6 @@ namespace Entity.Migrations
                             Id = 1,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Acceso norte del evento",
-<<<<<<< HEAD
-                            EventId = 1,
-=======
->>>>>>> feature/marcos/HU-03
                             IsDeleted = false,
                             Name = "Punto Norte",
                             TypeId = 1,
@@ -1551,10 +1522,6 @@ namespace Entity.Migrations
                             Id = 2,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Acceso sur del evento",
-<<<<<<< HEAD
-                            EventId = 1,
-=======
->>>>>>> feature/marcos/HU-03
                             IsDeleted = false,
                             Name = "Punto Sur",
                             TypeId = 2,
@@ -1565,10 +1532,6 @@ namespace Entity.Migrations
                             Id = 3,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Acceso principal",
-<<<<<<< HEAD
-                            EventId = 2,
-=======
->>>>>>> feature/marcos/HU-03
                             IsDeleted = false,
                             Name = "Punto Principal",
                             TypeId = 1,
@@ -1612,12 +1575,6 @@ namespace Entity.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
-<<<<<<< HEAD
-                    b.Property<Guid>("UniqueId")
-                        .HasColumnType("uniqueidentifier");
-
-=======
->>>>>>> feature/marcos/HU-03
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("datetime2");
 
@@ -1644,10 +1601,6 @@ namespace Entity.Migrations
                             PersonDivissionProfileId = 1,
                             QRCode = "QR12345",
                             StatusId = 1,
-<<<<<<< HEAD
-                            UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
-=======
->>>>>>> feature/marcos/HU-03
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -2045,11 +1998,6 @@ namespace Entity.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-<<<<<<< HEAD
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-=======
                     b.Property<int?>("InternalDivisionId")
                         .HasColumnType("int");
 
@@ -2062,7 +2010,6 @@ namespace Entity.Migrations
                     b.Property<int?>("ProfileId")
                         .HasColumnType("int");
 
->>>>>>> feature/marcos/HU-03
                     b.Property<int>("ReferenceId")
                         .HasColumnType("int");
 
@@ -2076,11 +2023,6 @@ namespace Entity.Migrations
 
                     b.HasIndex("EventId");
 
-<<<<<<< HEAD
-                    b.HasIndex("TypeId");
-
-                    b.ToTable("EventTargetAudience", "Organizational");
-=======
                     b.HasIndex("InternalDivisionId");
 
                     b.HasIndex("OrganizationalUnitId");
@@ -2090,7 +2032,6 @@ namespace Entity.Migrations
                     b.HasIndex("TypeId");
 
                     b.ToTable("EventTargetAudiences", "Operational");
->>>>>>> feature/marcos/HU-03
 
                     b.HasData(
                         new
@@ -4043,11 +3984,6 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Notifications.Notification", b =>
                 {
-<<<<<<< HEAD
-                    b.HasOne("Entity.Models.Parameter.CustomType", null)
-                        .WithMany("Notifications")
-                        .HasForeignKey("CustomTypeId");
-=======
                     b.HasOne("Entity.Models.Parameter.CustomType", "NotificationType")
                         .WithMany("Notifications")
                         .HasForeignKey("NotificationTypeId")
@@ -4055,7 +3991,6 @@ namespace Entity.Migrations
                         .IsRequired();
 
                     b.Navigation("NotificationType");
->>>>>>> feature/marcos/HU-03
                 });
 
             modelBuilder.Entity("Entity.Models.Notifications.NotificationReceived", b =>
@@ -4066,17 +4001,10 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-<<<<<<< HEAD
-                    b.HasOne("Entity.Models.Parameter.Status", null)
-                        .WithMany("NotificatiosReceived")
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-=======
                     b.HasOne("Entity.Models.Parameter.Status", "Status")
                         .WithMany("NotificatiosReceived")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Restrict)
->>>>>>> feature/marcos/HU-03
                         .IsRequired();
 
                     b.HasOne("Entity.Models.User", "User")
@@ -4087,11 +4015,8 @@ namespace Entity.Migrations
 
                     b.Navigation("Notification");
 
-<<<<<<< HEAD
-=======
                     b.Navigation("Status");
 
->>>>>>> feature/marcos/HU-03
                     b.Navigation("User");
                 });
 
@@ -4118,12 +4043,6 @@ namespace Entity.Migrations
                     b.Navigation("PersonDivisionProfile");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
-                {
-                    b.HasOne("Entity.Models.Organizational.Event", "Event")
-                        .WithMany("AccessPoints")
-=======
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
                 {
                     b.HasOne("Entity.Models.Organizational.AccessPoint", "AccessPoint")
@@ -4134,13 +4053,10 @@ namespace Entity.Migrations
 
                     b.HasOne("Entity.Models.Organizational.Event", "Event")
                         .WithMany("EventAccessPoints")
->>>>>>> feature/marcos/HU-03
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-<<<<<<< HEAD
-=======
                     b.Navigation("AccessPoint");
 
                     b.Navigation("Event");
@@ -4148,7 +4064,6 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
                 {
->>>>>>> feature/marcos/HU-03
                     b.HasOne("Entity.Models.Parameter.CustomType", "AccessPointType")
                         .WithMany("AccessPoints")
                         .HasForeignKey("TypeId")
@@ -4156,11 +4071,6 @@ namespace Entity.Migrations
                         .IsRequired();
 
                     b.Navigation("AccessPointType");
-<<<<<<< HEAD
-
-                    b.Navigation("Event");
-=======
->>>>>>> feature/marcos/HU-03
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Assignment.Card", b =>
@@ -4275,8 +4185,6 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-<<<<<<< HEAD
-=======
                     b.HasOne("Entity.Models.Organizational.Structure.InternalDivision", "InternalDivision")
                         .WithMany()
                         .HasForeignKey("InternalDivisionId")
@@ -4292,7 +4200,6 @@ namespace Entity.Migrations
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Restrict);
 
->>>>>>> feature/marcos/HU-03
                     b.HasOne("Entity.Models.Parameter.CustomType", "CustomType")
                         .WithMany()
                         .HasForeignKey("TypeId")
@@ -4302,15 +4209,12 @@ namespace Entity.Migrations
                     b.Navigation("CustomType");
 
                     b.Navigation("Event");
-<<<<<<< HEAD
-=======
 
                     b.Navigation("InternalDivision");
 
                     b.Navigation("OrganizationalUnit");
 
                     b.Navigation("Profile");
->>>>>>> feature/marcos/HU-03
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Location.City", b =>
@@ -4519,11 +4423,8 @@ namespace Entity.Migrations
                     b.Navigation("AttendancesEntry");
 
                     b.Navigation("AttendancesExit");
-<<<<<<< HEAD
-=======
 
                     b.Navigation("EventAccessPoints");
->>>>>>> feature/marcos/HU-03
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Assignment.PersonDivisionProfile", b =>
@@ -4539,11 +4440,7 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Organizational.Event", b =>
                 {
-<<<<<<< HEAD
-                    b.Navigation("AccessPoints");
-=======
                     b.Navigation("EventAccessPoints");
->>>>>>> feature/marcos/HU-03
 
                     b.Navigation("EventTargetAudiences");
                 });

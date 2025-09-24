@@ -1,4 +1,5 @@
 ﻿using Entity.DTOs.Base;
+using Entity.DTOs.Operational.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +26,7 @@ namespace Entity.DTOs.Operational
         public bool Ispublic { get; set; }
         public int StatusId { get; set; }
         public string StatusName { get; set; }
+
+        public List<AccessPointDtoResponsee> AccessPoints { get; set; } = new();
     }
 }

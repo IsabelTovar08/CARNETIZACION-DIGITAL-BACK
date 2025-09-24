@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Entity.Models.Base;
+﻿using Entity.Models.Base;
+using Entity.Models.Operational;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
+using System;
+using System.Collections.Generic;
 namespace Entity.Models.Organizational
 {
     public class Event : GenericModel
@@ -24,11 +25,12 @@ namespace Entity.Models.Organizational
         public int EventTypeId { get; set; }
         public EventType? EventType { get; set; }
 
-        public List<AccessPoint>? AccessPoints { get; set; }
 
-        public List<EventTargetAudience>? EventTargetAudiences { get; set; }
+        public ICollection<EventTargetAudience> EventTargetAudiences { get; set; } = new List<EventTargetAudience>();
         public Status? Status { get; set; }
         public Schedule? Shedule { get; set; }
+        public ICollection<EventAccessPoint> EventAccessPoints { get; set; } = new List<EventAccessPoint>();
+
 
 
     }

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
+using Entity.DataInit.Operational;
 using Entity.DataInit.Parameter;
 using Entity.Models;
 using Entity.Models.Auth;
@@ -22,6 +16,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Entity.Context
 {
@@ -86,6 +87,7 @@ namespace Entity.Context
 
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<AccessPoint> AccessPoints { get; set; }
+        public DbSet<EventAccessPoint> EventAccessPoints { get; set; }
 
         //Others
         public DbSet<Status> Statuses { get; set; }
@@ -105,12 +107,12 @@ namespace Entity.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Conversión para TimeOnly → TimeSpan (compatible con tipo SQL "time")
+            // Conversión para TimeOnly → TimeSpan
             modelBuilder.Entity<Schedule>()
                 .Property(s => s.StartTime)
                 .HasConversion(
-                    v => v.ToTimeSpan(),                // Para guardar como SQL time
-                    v => TimeOnly.FromTimeSpan(v));     // Para leer como TimeOnly
+                    v => v.ToTimeSpan(),
+                    v => TimeOnly.FromTimeSpan(v));
 
             modelBuilder.Entity<Schedule>()
                 .Property(s => s.EndTime)
@@ -118,15 +120,31 @@ namespace Entity.Context
                     v => v.ToTimeSpan(),
                     v => TimeOnly.FromTimeSpan(v));
 
-            // ======================== ÍNDICES DE RENDIMIENTO (OPTIMIZACIÓN) ========================
-            // Attendance: filtros más frecuentes y escenarios de "entrada abierta".
+            modelBuilder.Entity<EventAccessPoint>(eb =>
+            {
+                eb.ToTable("EventAccessPoints", "Operational");
+
+                eb.HasKey(eap => new { eap.EventId, eap.AccessPointId }); // Clave compuesta
+
+                eb.HasOne(eap => eap.Event)
+                  .WithMany(e => e.EventAccessPoints)
+                  .HasForeignKey(eap => eap.EventId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+                eb.HasOne(eap => eap.AccessPoint)
+                  .WithMany(ap => ap.EventAccessPoints)
+                  .HasForeignKey(eap => eap.AccessPointId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            });
+
+
+            // ================= ÍNDICES OPTIMIZACIÓN =================
             modelBuilder.Entity<Attendance>(b =>
             {
                 b.HasIndex(x => x.PersonId);
                 b.HasIndex(x => x.TimeOfEntry);
                 b.HasIndex(x => x.TimeOfExit);
                 b.HasIndex(x => x.IsDeleted);
-
                 // Compuesto: acelerar consultas de "abierto" (TimeOfExit == null) por persona.
                 b.HasIndex(x => new { x.PersonId, x.TimeOfExit });
 
@@ -134,12 +152,31 @@ namespace Entity.Context
                 // b.HasIndex(x => x.PersonId).HasFilter("[TimeOfExit] IS NULL AND [IsDeleted] = 0");
             });
 
-            // AccessPoint: filtrar rápidamente por evento (se usa en reportes/consultas)
-            modelBuilder.Entity<AccessPoint>(b =>
+            // Otras configuraciones del ensamblado
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+            // EventTargetAudience
+            modelBuilder.Entity<EventTargetAudience>(eb =>
             {
-                b.HasIndex(x => x.EventId);
+                eb.ToTable("EventTargetAudiences", "Operational");
+
+                eb.HasOne(e => e.Profile)
+                  .WithMany()
+                  .HasForeignKey(e => e.ProfileId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+                eb.HasOne(e => e.OrganizationalUnit)
+                  .WithMany()
+                  .HasForeignKey(e => e.OrganizationalUnitId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+                eb.HasOne(e => e.InternalDivision)
+                  .WithMany()
+                  .HasForeignKey(e => e.InternalDivisionId)
+                  .OnDelete(DeleteBehavior.Restrict);
             });
-            // ========================================================================================
+
+           
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
@@ -153,8 +190,8 @@ namespace Entity.Context
                 }
             }
 
-            // Si tienes varias configuraciones en tu proyecto
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+            //// Si tienes varias configuraciones en tu proyecto
+            //modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
 
         /// <summary>
