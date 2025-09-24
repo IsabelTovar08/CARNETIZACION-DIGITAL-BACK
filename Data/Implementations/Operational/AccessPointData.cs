@@ -20,7 +20,18 @@ namespace Data.Implementations.Operational
 
         public override async Task<IEnumerable<AccessPoint>> GetAllAsync()
         {
-            return await _context.Set<AccessPoint>().Include(x => x.AccessPointType).Include(x => x.Event).ToListAsync();
+            return await _context.Set<AccessPoint>()
+             .Include(x => x.AccessPointType)
+             .Include(x => x.EventAccessPoints)
+                 .ThenInclude(eap => eap.Event)
+             .ToListAsync();
+
+        }
+
+        public async Task BulkInsertAsync(IEnumerable<AccessPoint> accessPoints)
+        {
+            await _context.Set<AccessPoint>().AddRangeAsync(accessPoints);
+            await _context.SaveChangesAsync();
         }
     }
 }

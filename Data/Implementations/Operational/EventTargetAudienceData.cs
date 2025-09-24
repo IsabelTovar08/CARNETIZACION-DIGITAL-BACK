@@ -23,5 +23,12 @@ namespace Data.Implementations.Operational
         {
             return await _context.Set<EventTargetAudience>().Include(x => x.CustomType).Include(x => x.Event).ToListAsync();
         }
+
+        public async Task BulkInsertAsync(IEnumerable<EventTargetAudience> audiences)
+        {
+            await _context.EventTargetAudiences.AddRangeAsync(audiences);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
