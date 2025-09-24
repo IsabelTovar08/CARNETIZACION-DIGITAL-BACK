@@ -43,18 +43,18 @@ namespace Business.Implementations.Operational
             var savedEvent = await _data.SaveAsync(ev);
 
             // 2) Crear AccessPoints nuevos si vienen en el DTO
-            var accessPoints = new List<AccessPoint>();
+            var createdAccessPoints = new List<AccessPoint>();
             if (dto.AccessPoints?.Any() == true)
             {
-                accessPoints = dto.AccessPoints
+                createdAccessPoints = dto.AccessPoints
                     .Select(apDto => _mapper.Map<AccessPoint>(apDto))
                     .ToList();
 
                 // Guardar primero los access points (así obtienen su Id)
-                await _apData.BulkInsertAsync(accessPoints);
+                await _apData.BulkInsertAsync(createdAccessPoints);
 
                 // Crear vínculos Event ↔ AccessPoint
-                var links = accessPoints.Select(ap => new EventAccessPoint
+                var links = createdAccessPoints.Select(ap => new EventAccessPoint
                 {
                     EventId = savedEvent.Id,
                     AccessPointId = ap.Id
