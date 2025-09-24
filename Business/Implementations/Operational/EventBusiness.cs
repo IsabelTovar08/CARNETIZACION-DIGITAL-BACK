@@ -38,24 +38,32 @@ namespace Business.Implementations.Operational
 
         public async Task<int> CreateEventAsync(CreateEventRequest dto)
         {
+            // 1) Crear evento
             var ev = _mapper.Map<Event>(dto.Event);
-
-            // Guardar evento primero
             var savedEvent = await _data.SaveAsync(ev);
 
-            // rear relaciones con AccessPoints existentes
+            // 2) Crear AccessPoints nuevos si vienen en el DTO
+            var accessPoints = new List<AccessPoint>();
             if (dto.AccessPoints?.Any() == true)
             {
-                var links = dto.AccessPoints.Select(apId => new EventAccessPoint
+                accessPoints = dto.AccessPoints
+                    .Select(apDto => _mapper.Map<AccessPoint>(apDto))
+                    .ToList();
+
+                // Guardar primero los access points (así obtienen su Id)
+                await _apData.BulkInsertAsync(accessPoints);
+
+                // Crear vínculos Event ↔ AccessPoint
+                var links = accessPoints.Select(ap => new EventAccessPoint
                 {
                     EventId = savedEvent.Id,
-                    AccessPointId = apId.Id
+                    AccessPointId = ap.Id
                 }).ToList();
 
                 await _data.BulkInsertEventAccessPointsAsync(links);
             }
 
-            // Mapear audiencias
+            // 3) Mapear audiencias
             var audiences = new List<EventTargetAudience>();
 
             if (dto.ProfileIds?.Any() == true)
@@ -93,6 +101,7 @@ namespace Business.Implementations.Operational
 
             return savedEvent.Id;
         }
+
 
 
         public async Task<EventDetailsDtoResponse?> GetEventFullDetailsAsync(int eventId)
