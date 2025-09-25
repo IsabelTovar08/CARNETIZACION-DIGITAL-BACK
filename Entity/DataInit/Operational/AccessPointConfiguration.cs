@@ -20,7 +20,6 @@ namespace Entity.DataInit.Operational
                     Id = 1,
                     Name = "Punto Norte",
                     Description = "Acceso norte del evento",
-                    EventId = 1,
                     TypeId = 1
                 },
                 new AccessPoint
@@ -28,7 +27,6 @@ namespace Entity.DataInit.Operational
                     Id = 2,
                     Name = "Punto Sur",
                     Description = "Acceso sur del evento",
-                    EventId = 1,
                     TypeId = 2
                 },
                 new AccessPoint
@@ -36,7 +34,6 @@ namespace Entity.DataInit.Operational
                     Id = 3,
                     Name = "Punto Principal",
                     Description = "Acceso principal",
-                    EventId = 2,
                     TypeId = 1
                 }
             );
@@ -44,25 +41,17 @@ namespace Entity.DataInit.Operational
             builder.Property(x => x.IsDeleted)
                    .HasDefaultValue(false);
 
-            // Relación con CustomType
             builder.HasOne(ap => ap.AccessPointType)
                    .WithMany()
                    .HasForeignKey(ap => ap.TypeId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            // Relación con Event
-            builder.HasOne(ap => ap.Event)
-                   .WithMany(e => e.AccessPoints)
-                   .HasForeignKey(ap => ap.EventId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
-            // Columna grande para el Base64 del QR
             builder.Property(ap => ap.QrCode)
-       .HasColumnType("nvarchar(max)")
-       .IsRequired(false);
-
+                   .HasColumnType("nvarchar(max)")
+                   .IsRequired(false);
 
             builder.ToTable("AccessPoints", schema: "Operational");
         }
+
     }
 }

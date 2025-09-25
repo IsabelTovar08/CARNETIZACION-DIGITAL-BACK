@@ -255,7 +255,34 @@ namespace Utilities.Helper
 
             //Event
             CreateMap<Event, EventDtoResponse>()
-           .ReverseMap();
+             .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
+                 s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
+                 {
+                     Id = eap.AccessPoint.Id,
+                     Name = eap.AccessPoint.Name,
+                     Description = eap.AccessPoint.Description,
+                     TypeId = eap.AccessPoint.TypeId,
+                     Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null
+                 })
+             ));
+
+            CreateMap<Event, EventDetailsDtoResponse>()
+             .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
+                 s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
+                 {
+                     Id = eap.AccessPoint.Id,
+                     Name = eap.AccessPoint.Name,
+                     Description = eap.AccessPoint.Description,
+                     TypeId = eap.AccessPoint.TypeId,
+                     Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null
+                 })
+             ))
+             .ForMember(d => d.Audiences, opt => opt.MapFrom(s => s.EventTargetAudiences));
+
+            CreateMap<EventDtoRequest, Event>()
+            .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
+            .ForMember(d => d.Id, o => o.Ignore());
+
 
             //EventType
             CreateMap<EventType, EventTypeDtoRequest>().ReverseMap();
@@ -281,17 +308,25 @@ namespace Utilities.Helper
 
 
 
+
             //AccessPoints
+            CreateMap<AccessPointDtoRequest, AccessPoint>()
+             .ForMember(d => d.Id, o => o.Ignore())
+             .ForMember(d => d.AccessPointType, o => o.Ignore());
+
             CreateMap<AccessPoint, AccessPointDtoRequest>().ReverseMap();
 
             // ENTIDAD -> DTO
             CreateMap<AccessPoint, AccessPointDtoResponsee>()
-                .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.Event != null ? s.Event.Name : null))
-                .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null));
+             .ForMember(d => d.EventId, opt => opt.MapFrom(s =>
+                 s.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()))
+             .ForMember(d => d.EventName, opt => opt.MapFrom(s =>
+                 s.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()))
+             .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null));
+
 
             // DTO -> ENTIDAD
             CreateMap<AccessPointDtoResponsee, AccessPoint>()
-                .ForMember(d => d.Event, opt => opt.Ignore())
                 .ForMember(d => d.AccessPointType, opt => opt.Ignore());
 
 
@@ -307,11 +342,13 @@ namespace Utilities.Helper
             CreateMap<EventTargetAudience, EventTargetAudienceDtoRequest>().ReverseMap();
 
             CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
-                .ForMember(d => d.EventName,
-                 opt => opt.MapFrom(s => s.Event != null ? s.Event.Name : null))
-                .ForMember(d => d.ReferenceName,
-                 opt => opt.MapFrom(s => s.CustomType != null ? s.CustomType.Name : null))
-                .ReverseMap();
+             .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.Event.Name))
+             .ForMember(d => d.ReferenceName, opt => opt.MapFrom(s =>
+                 s.TypeId == 1 && s.Profile != null ? s.Profile.Name :
+                 s.TypeId == 2 && s.OrganizationalUnit != null ? s.OrganizationalUnit.Name :
+                 s.TypeId == 3 && s.InternalDivision != null ? s.InternalDivision.Name :
+                 null
+             ));
 
             CreateMap<Schedule, ScheduleDtoRequest>()
                 .ReverseMap();
@@ -359,8 +396,14 @@ namespace Utilities.Helper
                     opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Name : null))
                 .ForMember(dest => dest.AccessPointOfExitName,
                     opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Name : null))
-                .ForMember(dest => dest.EventName,
-                    opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Event.Name : null))
+               .ForMember(dest => dest.EventName,
+                opt => opt.MapFrom(src =>
+                    src.AccessPointEntry != null
+                        ? src.AccessPointEntry.EventAccessPoints
+                            .Select(eap => eap.Event.Name)
+                            .FirstOrDefault()
+                        : null
+                ))
 
                 // ➕ Formateo de fechas a string (cultura es-CO). Sin helpers externos.
                 .ForMember(dest => dest.TimeOfEntryStr,

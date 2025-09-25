@@ -23,8 +23,12 @@ namespace Data.Implementations.Operational
         {
             return await _context.Set<Attendance>()
                 .Include(x => x.AccessPointEntry)
-                .Include(x => x.AccessPointExit).ThenInclude(x => x.Event)
-                .Include(x => x.Person)
+                    .ThenInclude(ap => ap.EventAccessPoints)
+                    .ThenInclude(eap => eap.Event)
+                .Include(x => x.AccessPointExit).
+                    ThenInclude(ap => ap.EventAccessPoints)
+                        .ThenInclude(eap =>eap.Event)
+
                 .ToListAsync();
         }
 
@@ -62,9 +66,13 @@ namespace Data.Implementations.Operational
             var q = _context.Set<Attendance>()
                 .AsNoTracking()
                 .Include(a => a.Person)
-                .Include(a => a.AccessPointEntry).ThenInclude(ap => ap.Event)
-                .Include(a => a.AccessPointExit).ThenInclude(ap => ap.Event)
-                .Where(a => !a.IsDeleted);
+                .Include(a => a.AccessPointEntry)
+                .ThenInclude(ap => ap.EventAccessPoints)
+                    .ThenInclude(eap => eap.Event)
+                .Include(a => a.AccessPointExit)
+                    .ThenInclude(ap => ap.EventAccessPoints)
+                        .ThenInclude(eap => eap.Event)
+                 .Where(a => !a.IsDeleted);
 
             if (personId.HasValue)
                 q = q.Where(a => a.PersonId == personId.Value);
@@ -72,8 +80,10 @@ namespace Data.Implementations.Operational
             if (eventId.HasValue)
             {
                 q = q.Where(a =>
-                    (a.AccessPointEntry != null && a.AccessPointEntry.EventId == eventId.Value) ||
-                    (a.AccessPointExit != null && a.AccessPointExit.EventId == eventId.Value));
+                 (a.AccessPointEntry != null && a.AccessPointEntry.EventAccessPoints.Any(eap => eap.EventId == eventId.Value)) ||
+                 (a.AccessPointExit != null && a.AccessPointExit.EventAccessPoints.Any(eap => eap.EventId == eventId.Value))
+             );
+
             }
 
             if (fromUtc.HasValue) q = q.Where(a => a.TimeOfEntry >= fromUtc.Value);
@@ -94,34 +104,6 @@ namespace Data.Implementations.Operational
 
             var items = await q.Skip(skip).Take(pageSize).ToListAsync(ct);
             return (items, total);
-        }
-
-        //NUEVO: Reporte sin paginación
-        public async Task<IList<Attendance>> GetReportAsync(
-            int? eventId, int? personId, DateTime? startDate, DateTime? endDate,
-            CancellationToken ct = default)
-        {
-            var q = _context.Set<Attendance>()
-                .AsNoTracking()
-                .Include(a => a.Person)
-                .Include(a => a.AccessPointEntry).ThenInclude(ap => ap.Event)
-                .Include(a => a.AccessPointExit).ThenInclude(ap => ap.Event)
-                .Where(a => !a.IsDeleted);
-
-            if (personId.HasValue)
-                q = q.Where(a => a.PersonId == personId.Value);
-
-            if (eventId.HasValue)
-            {
-                q = q.Where(a =>
-                    (a.AccessPointEntry != null && a.AccessPointEntry.EventId == eventId.Value) ||
-                    (a.AccessPointExit != null && a.AccessPointExit.EventId == eventId.Value));
-            }
-
-            if (startDate.HasValue) q = q.Where(a => a.TimeOfEntry >= startDate.Value);
-            if (endDate.HasValue) q = q.Where(a => a.TimeOfEntry <= endDate.Value);
-
-            return await q.OrderBy(a => a.TimeOfEntry).ToListAsync(ct);
         }
     }
 }

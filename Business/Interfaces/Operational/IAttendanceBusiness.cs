@@ -22,6 +22,6 @@ namespace Business.Interfaces.Operational
             CancellationToken ct = default);
 
         // NUEVO: Reporte sin paginación
-        Task<IList<AttendanceDtoResponse>> GetReportAsync(ReportFilterDto filters, CancellationToken ct = default);
+        //Task<IList<AttendanceDtoResponse>> GetReportAsync(ReportFilterDto filters, CancellationToken ct = default);
     }
 }

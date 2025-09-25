@@ -29,8 +29,8 @@ namespace Data.Interfases.Operational
             CancellationToken ct = default);
 
         // NUEVO: Reporte filtrado sin paginación
-        Task<IList<Attendance>> GetReportAsync(
-            int? eventId, int? personId, DateTime? startDate, DateTime? endDate,
-            CancellationToken ct = default);
+        //Task<IList<Attendance>> GetReportAsync(
+        //    int? eventId, int? personId, DateTime? startDate, DateTime? endDate,
+        //    CancellationToken ct = default);
     }
 }

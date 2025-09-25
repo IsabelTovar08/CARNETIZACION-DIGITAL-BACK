@@ -10,5 +10,6 @@ namespace Data.Interfases.Operational
 {
     public interface IEventTargetAudienceData : ICrudBase<EventTargetAudience>
     {
+        Task BulkInsertAsync(IEnumerable<EventTargetAudience> audiences);
     }
 }

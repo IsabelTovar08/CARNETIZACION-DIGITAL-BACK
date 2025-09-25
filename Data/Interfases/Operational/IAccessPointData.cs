@@ -10,5 +10,6 @@ namespace Data.Interfases.Operational
 {
     public interface IAccessPointData : ICrudBase<AccessPoint>
     {
+        Task BulkInsertAsync(IEnumerable<AccessPoint> accessPoints);
     }
 }

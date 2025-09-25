@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250924031656_docker")]
-    partial class docker
+    [Migration("20250924184445_Event")]
+    partial class Event
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1438,6 +1438,36 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AccessPointId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("EventId", "AccessPointId");
+
+                    b.HasIndex("AccessPointId");
+
+                    b.ToTable("EventAccessPoints", "Operational");
+                });
+
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
                 {
                     b.Property<int>("Id")
@@ -1454,9 +1484,6 @@ namespace Entity.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -1478,8 +1505,6 @@ namespace Entity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
-
                     b.HasIndex("TypeId");
 
                     b.ToTable("AccessPoints", "Operational");
@@ -1490,7 +1515,6 @@ namespace Entity.Migrations
                             Id = 1,
                             CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Acceso norte del evento",
-                            EventId = 1,
                             IsDeleted = false,
                             Name = "Punto Norte",
                             TypeId = 1,
@@ -1501,7 +1525,6 @@ namespace Entity.Migrations
                             Id = 2,
                             CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Acceso sur del evento",
-                            EventId = 1,
                             IsDeleted = false,
                             Name = "Punto Sur",
                             TypeId = 2,
@@ -1512,7 +1535,6 @@ namespace Entity.Migrations
                             Id = 3,
                             CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Acceso principal",
-                            EventId = 2,
                             IsDeleted = false,
                             Name = "Punto Principal",
                             TypeId = 1,
@@ -1983,8 +2005,17 @@ namespace Entity.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("InternalDivisionId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("OrganizationalUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProfileId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ReferenceId")
                         .HasColumnType("int");
@@ -1999,9 +2030,15 @@ namespace Entity.Migrations
 
                     b.HasIndex("EventId");
 
+                    b.HasIndex("InternalDivisionId");
+
+                    b.HasIndex("OrganizationalUnitId");
+
+                    b.HasIndex("ProfileId");
+
                     b.HasIndex("TypeId");
 
-                    b.ToTable("EventTargetAudience", "Organizational");
+                    b.ToTable("EventTargetAudiences", "Operational");
 
                     b.HasData(
                         new
@@ -4007,14 +4044,27 @@ namespace Entity.Migrations
                     b.Navigation("PersonDivisionProfile");
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
+            modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
                 {
+                    b.HasOne("Entity.Models.Organizational.AccessPoint", "AccessPoint")
+                        .WithMany("EventAccessPoints")
+                        .HasForeignKey("AccessPointId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Entity.Models.Organizational.Event", "Event")
-                        .WithMany("AccessPoints")
+                        .WithMany("EventAccessPoints")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("AccessPoint");
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
+                {
                     b.HasOne("Entity.Models.Parameter.CustomType", "AccessPointType")
                         .WithMany("AccessPoints")
                         .HasForeignKey("TypeId")
@@ -4022,8 +4072,6 @@ namespace Entity.Migrations
                         .IsRequired();
 
                     b.Navigation("AccessPointType");
-
-                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Assignment.Card", b =>
@@ -4138,6 +4186,21 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Entity.Models.Organizational.Structure.InternalDivision", "InternalDivision")
+                        .WithMany()
+                        .HasForeignKey("InternalDivisionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Entity.Models.Organizational.Structure.OrganizationalUnit", "OrganizationalUnit")
+                        .WithMany()
+                        .HasForeignKey("OrganizationalUnitId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Entity.Models.Organizational.Assignment.Profiles", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Entity.Models.Parameter.CustomType", "CustomType")
                         .WithMany()
                         .HasForeignKey("TypeId")
@@ -4147,6 +4210,12 @@ namespace Entity.Migrations
                     b.Navigation("CustomType");
 
                     b.Navigation("Event");
+
+                    b.Navigation("InternalDivision");
+
+                    b.Navigation("OrganizationalUnit");
+
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Location.City", b =>
@@ -4355,6 +4424,8 @@ namespace Entity.Migrations
                     b.Navigation("AttendancesEntry");
 
                     b.Navigation("AttendancesExit");
+
+                    b.Navigation("EventAccessPoints");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Assignment.PersonDivisionProfile", b =>
@@ -4370,7 +4441,7 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Organizational.Event", b =>
                 {
-                    b.Navigation("AccessPoints");
+                    b.Navigation("EventAccessPoints");
 
                     b.Navigation("EventTargetAudiences");
                 });

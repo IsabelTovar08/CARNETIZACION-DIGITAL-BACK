@@ -174,19 +174,19 @@ namespace Business.Implementations.Operational
         /// <summary>
         /// 🚀 NUEVO: Reporte sin paginación (evento, persona, rango de fechas).
         /// </summary>
-        public async Task<IList<AttendanceDtoResponse>> GetReportAsync(ReportFilterDto filters, CancellationToken ct = default)
-        {
-            var list = await _attendanceData.GetReportAsync(filters.EventId, filters.PersonId, filters.StartDate, filters.EndDate, ct);
-            var dtos = list.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
+        //public async Task<IList<AttendanceDtoResponse>> GetReportAsync(ReportFilterDto filters, CancellationToken ct = default)
+        //{
+        //    var list = await _attendanceData.GetReportAsync(filters.EventId, filters.PersonId, filters.StartDate, filters.EndDate, ct);
+        //    var dtos = list.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
 
-            foreach (var it in dtos)
-            {
-                it.TimeOfEntryStr = it.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
-                if (it.TimeOfExit.HasValue)
-                    it.TimeOfExitStr = it.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
-            }
+        //    foreach (var it in dtos)
+        //    {
+        //        it.TimeOfEntryStr = it.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
+        //        if (it.TimeOfExit.HasValue)
+        //            it.TimeOfExitStr = it.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
+        //    }
 
-            return dtos;
-        }
+        //    return dtos;
+        //}
     }
 }
