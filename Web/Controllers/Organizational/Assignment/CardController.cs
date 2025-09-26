@@ -9,8 +9,7 @@ namespace Web.Controllers.Organizational.Assignment
 {
     public class CardController : GenericController<Card, CardDtoRequest, CardDto>
     {
-        public CardController(ICardBusiness business, ILogger<CardController> logger)
-            : base(business, logger)
+        public CardController(IBaseBusiness <Card, CardDtoRequest, CardDto> business, ILogger<CardController> logger) : base(business, logger)
         { 
         }
     }

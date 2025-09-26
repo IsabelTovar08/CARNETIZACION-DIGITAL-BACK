@@ -288,6 +288,24 @@ namespace Utilities.Helper
             CreateMap<EventType, EventTypeDtoRequest>().ReverseMap();
             CreateMap<EventType, EventTypeDtoResponse>().ReverseMap();
 
+            //EventAccessPoint
+            // Modelo → DTO Response
+            CreateMap<EventAccessPoint, EventAccessPointDto>()
+                .ForMember(dest => dest.EventName,
+                    opt => opt.MapFrom(src => src.Event != null ? src.Event.Name : string.Empty))
+                .ForMember(dest => dest.AccessPointName,
+                    opt => opt.MapFrom(src => src.AccessPoint != null ? src.AccessPoint.Name : string.Empty));
+                
+
+            // DTO Request → Modelo
+            CreateMap<EventAccessPointDtoRequest, EventAccessPoint>().ReverseMap();
+
+            // DTO Response → Modelo 
+            CreateMap<EventAccessPoint, EventAccessPointDto>()
+                .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.Event.Name))
+                .ForMember(dest => dest.AccessPointName, opt => opt.MapFrom(src => src.AccessPoint != null ? src.AccessPoint.Name : string.Empty))
+                .ReverseMap();
+
             //InternalDivision
             CreateMap<InternalDivision, InternalDivisionDto>()
                 .ForMember(d => d.OrganizationalUnitName, o => o.MapFrom(s => s.OrganizationalUnit.Name))
@@ -352,6 +370,8 @@ namespace Utilities.Helper
 
             CreateMap<Schedule, ScheduleDtoRequest>()
                 .ReverseMap();
+
+            //EventAccessPoint
 
             //Notifications
             CreateMap<Notification, NotificationDto>()
