@@ -628,10 +628,6 @@
           <EntitySet Name="Events" EntityType="DbModel.Event" />
           <EntitySet Name="EventsTypes" EntityType="DbModel.EventType" />
           <EntitySet Name="AccessPoints" EntityType="DbModel.AccessPoint" />
-          <AssociationSet Name="AccessPointEvent" Association="DbModel.AccessPointEvent">
-            <End Role="AccessPoint" EntitySet="AccessPoints" />
-            <End Role="Event" EntitySet="Events" />
-          </AssociationSet>
           <EntitySet Name="Attendances" EntityType="DbModel.Attendance" />
           <AssociationSet Name="AttendanceAccessPoint" Association="DbModel.AttendanceAccessPoint">
             <End Role="Attendance" EntitySet="Attendances" />
@@ -720,6 +716,15 @@
           <AssociationSet Name="MenuStructureForm" Association="DbModel.MenuStructureForm">
             <End Role="MenuStructure" EntitySet="MenuStructures" />
             <End Role="Form" EntitySet="Forms" />
+          </AssociationSet>
+          <EntitySet Name="EventAcessPoints" EntityType="DbModel.EventAcessPoint" />
+          <AssociationSet Name="EventEventAcessPoint" Association="DbModel.EventEventAcessPoint">
+            <End Role="Event" EntitySet="Events" />
+            <End Role="EventAcessPoint" EntitySet="EventAcessPoints" />
+          </AssociationSet>
+          <AssociationSet Name="AccessPointEventAcessPoint" Association="DbModel.AccessPointEventAcessPoint">
+            <End Role="AccessPoint" EntitySet="AccessPoints" />
+            <End Role="EventAcessPoint" EntitySet="EventAcessPoints" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Role">
@@ -982,7 +987,6 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="AccessPoint" Relationship="DbModel.AccessPointEvent" FromRole="Event" ToRole="AccessPoint" />
           <Property Name="Date" Type="DateTime" Nullable="false" />
           <NavigationProperty Name="EventTypeId" Relationship="DbModel.EventEventType" FromRole="Event" ToRole="EventType" />
           <Property Name="Name" Type="String" Nullable="false" />
@@ -994,6 +998,7 @@
           <Property Name="EvendEnd" Type="String" Nullable="false" />
           <Property Name="IsPublic" Type="String" Nullable="false" />
           <NavigationProperty Name="EventTargetAudience" Relationship="DbModel.EventTargetAudienceEvent" FromRole="Event" ToRole="EventTargetAudience" />
+          <NavigationProperty Name="EventAcessPoints" Relationship="DbModel.EventEventAcessPoint" FromRole="Event" ToRole="EventAcessPoint" />
         </EntityType>
         <EntityType Name="EventType">
           <Key>
@@ -1011,16 +1016,12 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Type" Type="String" Nullable="false" />
-          <NavigationProperty Name="EventId" Relationship="DbModel.AccessPointEvent" FromRole="AccessPoint" ToRole="Event" />
           <NavigationProperty Name="Attendance" Relationship="DbModel.AttendanceAccessPoint" FromRole="AccessPoint" ToRole="Attendance" />
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <Property Name="Description" Type="String" Nullable="false" />
+          <NavigationProperty Name="EventAcessPoints" Relationship="DbModel.AccessPointEventAcessPoint" FromRole="AccessPoint" ToRole="EventAcessPoint" />
         </EntityType>
-        <Association Name="AccessPointEvent">
-          <End Type="DbModel.AccessPoint" Role="AccessPoint" Multiplicity="*" />
-          <End Type="DbModel.Event" Role="Event" Multiplicity="1" />
-        </Association>
         <EntityType Name="Attendance">
           <Key>
             <PropertyRef Name="Id" />
@@ -1251,6 +1252,40 @@
             </Principal>
             <Dependent Role="Form">
               <PropertyRef Name="MenuStructureId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="EventAcessPoint">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="EventId" Relationship="DbModel.EventEventAcessPoint" FromRole="EventAcessPoint" ToRole="Event" />
+          <Property Name="EventId1" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="AccessPointId" Relationship="DbModel.AccessPointEventAcessPoint" FromRole="EventAcessPoint" ToRole="AccessPoint" />
+          <Property Name="AccessPointId1" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="EventEventAcessPoint">
+          <End Type="DbModel.Event" Role="Event" Multiplicity="1" />
+          <End Type="DbModel.EventAcessPoint" Role="EventAcessPoint" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Event">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="EventAcessPoint">
+              <PropertyRef Name="EventId1" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="AccessPointEventAcessPoint">
+          <End Type="DbModel.AccessPoint" Role="AccessPoint" Multiplicity="1" />
+          <End Type="DbModel.EventAcessPoint" Role="EventAcessPoint" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AccessPoint">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="EventAcessPoint">
+              <PropertyRef Name="AccessPointId1" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1550,14 +1585,6 @@
         <ScalarProperty Name="Id" ColumnName="BranchId_Id" />
       </EndProperty>
       <EndProperty Name="DivisionBranch">
-        <ScalarProperty Name="Id" ColumnName="Id" />
-      </EndProperty>
-    </AssociationSetMapping>
-    <AssociationSetMapping Name="AccessPointEvent" TypeName="DbModel.AccessPointEvent" StoreEntitySet="AccessPoints">
-      <EndProperty Name="Event">
-        <ScalarProperty Name="Id" ColumnName="EventId_Id" />
-      </EndProperty>
-      <EndProperty Name="AccessPoint">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

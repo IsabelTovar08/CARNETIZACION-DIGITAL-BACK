@@ -1,4 +1,5 @@
 ﻿using Business.Classes;
+using Business.Interfaces.Security;
 using Business.Interfases;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
@@ -17,7 +18,7 @@ namespace Web.Controllers.ModelSecurity
         private readonly IBaseBusiness<Role, RoleDtoRequest, RolDto> _business;
 
         
-        public RolController(IBaseBusiness<Role, RoleDtoRequest, RolDto> business, ILogger<RolController> logger)
+        public RolController(IRoleBusiness business, ILogger<RolController> logger)
             : base(business, logger)
         {
             _business = business;

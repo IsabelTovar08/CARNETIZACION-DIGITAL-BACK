@@ -1,0 +1,343 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>
+        {{ if title != null && title != "" }}
+        {{ title }}
+        {{ else }}
+        Bienvenido(a) — {{ if company_name != null && company_name != "" }}{{ company_name }}{{ else }}Sistema de Carnetización Digital{{ end }}
+        {{ end }}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(59,130,246,.15);
+            border: 1px solid #e0f2fe;
+        }
+
+        .header {
+            background: linear-gradient(135deg,#3b82f6 0%,#1e40af 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle,rgba(255,255,255,0.1) 0%, transparent 70%);
+                animation: rotate 20s linear infinite;
+            }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0)
+            }
+
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: rgba(255,255,255,.9);
+            font-size: 16px;
+        }
+
+        /* === Content === */
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .welcome-text {
+            margin-bottom: 30px;
+        }
+
+            .welcome-text h2 {
+                color: #1e293b;
+                font-size: 22px;
+                margin-bottom: 12px;
+                font-weight: 600;
+            }
+
+            .welcome-text p {
+                color: #64748b;
+                font-size: 16px;
+                line-height: 1.6;
+            }
+
+        .credentials-box {
+            background: linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid #93c5fd;
+            text-align: left;
+        }
+
+        .credentials-title {
+            color: #1e40af;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .credential-item {
+            background: #fff;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 6px 16px rgba(59,130,246,.12);
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+        }
+
+        .credential-label {
+            font-size: 12px;
+            color: #1e40af;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 8px;
+        }
+
+        .credential-value {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+            background: #fff;
+            letter-spacing: .5px;
+            word-break: break-all;
+        }
+
+        .security-info {
+            background: linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+            .security-info h4 {
+                color: #92400e;
+                margin-bottom: 8px;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .security-info p {
+                color: #78350f;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+        .cta-button {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg,#3b82f6 0%,#1e40af 100%);
+            color: #fff;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: transform .2s, box-shadow .2s;
+            box-shadow: 0 12px 24px rgba(59,130,246,.25);
+            border: 2px solid #3b82f6;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 18px 32px rgba(59,130,246,.35);
+            }
+
+        .support-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .footer {
+            background: #1e293b;
+            color: #fff;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+            .footer p {
+                font-size: 13px;
+                opacity: .8;
+                margin-bottom: 8px;
+            }
+
+            .footer .company-info {
+                font-weight: 600;
+                color: #60a5fa;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>
+                    {{ if header_emoji != null && header_emoji != "" }}{{ header_emoji }}{{ else }}🎉{{ end }}
+                    {{ if title != null && title != "" }}
+                    {{ title }}
+                    {{ else }}
+                    ¡Bienvenido(a) {{ if user_name != null && user_name != "" }}{{ user_name }}{{ else }}Usuario{{ end }}!
+                    {{ end }}
+                </h1>
+                <p>
+                    {{ if company_name != null && company_name != "" }}
+                    {{ company_name }}
+                    {{ else }}
+                    Sistema de Carnetización Digital
+                    {{ end }}
+                </p>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="welcome-text">
+                <h2>
+                    {{ if welcome_title != null && welcome_title != "" }}
+                    {{ welcome_title }}
+                    {{ else }}
+                    Tu cuenta ha sido creada exitosamente
+                    {{ end }}
+                </h2>
+                <p>
+                    {{ if welcome_message != null && welcome_message != "" }}
+                    {{ welcome_message }}
+                    {{ else }}
+                    Nos alegra tenerte con nosotros. A continuación encontrarás tus datos principales de acceso.
+                    {{ end }}
+                </p>
+            </div>
+
+            <div class="credentials-box">
+                <div class="credentials-title">🔐 Detalles de Acceso</div>
+
+                <!-- Email / Usuario -->
+                {{ if email != null && email != "" }}
+                <div class="credential-item">
+                    <div class="credential-label">Usuario / Email</div>
+                    <div class="credential-value">{{ email }}</div>
+                </div>
+                {{ end }}
+
+                {{ if temp_password != null && temp_password != "" }}
+                <div class="credential-item">
+                    <div class="credential-label">Contraseña Temporal</div>
+                    <div class="credential-value">{{ temp_password }}</div>
+                </div>
+                {{ end }}
+
+                {{ if code != null && code != "" }}
+                <div class="credential-item">
+                    <div class="credential-label">Contraseña / Código</div>
+                    <div class="credential-value">{{ code }}</div>
+                </div>
+                {{ end }}
+
+                {{ if login_url != null && login_url != "" }}
+                <div class="credential-item">
+                    <div class="credential-label">URL de Acceso</div>
+                    <div class="credential-value">{{ login_url }}</div>
+                </div>
+                {{ end }}
+            </div>
+
+            <div class="security-info">
+                <h4>⚠️ Recomendación de seguridad</h4>
+                <p>
+                    Por tu seguridad, te recomendamos cambiar la contraseña temporal en tu primer inicio de sesión y no compartir tus credenciales con terceros.
+                </p>
+            </div>
+
+            <div class="cta-button">
+                {{ if action_url != null && action_url != "" }}
+                <a href="{{ action_url }}" class="btn">Acceder al Sistema</a>
+                {{ else }}
+                {{ if login_url != null && login_url != "" }}
+                <a href="{{ login_url }}" class="btn">Acceder al Sistema</a>
+                {{ else }}
+                <a href="#" class="btn">Acceder al Sistema</a>
+                {{ end }}
+                {{ end }}
+            </div>
+            <div class="support-info">
+                <p>
+                    ¿Necesitas ayuda? Nuestro equipo de soporte está listo para asistirte.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="company-info">
+                {{ if company_name != null && company_name != "" }}
+                {{ company_name }}
+                {{ else }}
+                Sistema de Carnetización Digital
+                {{ end }}
+            </p>
+            <p>
+                {{ if footer_text != null && footer_text != "" }}
+                {{ footer_text }}
+                {{ else }}
+                Este es un correo automático, por favor no respondas a este mensaje.
+                {{ end }}
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -12,7 +12,7 @@ namespace Entity.Models.Organizational.Assignment
         public Person Person { get; set; }
 
         public int ProfileId { get; set; }
-        public Profile Profile { get; set; }
+        public Profiles Profile { get; set; }
 
         public int InternalDivisionId { get; set; }
         public InternalDivision InternalDivision { get; set; }

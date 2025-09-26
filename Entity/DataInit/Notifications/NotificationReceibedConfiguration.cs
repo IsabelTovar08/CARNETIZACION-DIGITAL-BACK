@@ -19,7 +19,7 @@ namespace Entity.DataInit.Notifications
                    Id = 1,
                    NotificationId = 1, // Verificación de cuenta
                    UserId = 1,
-                   StatusId = 1, // Enviado
+                   //StatusId = 1, // Enviado
                    SendDate = new DateTime(2025, 7, 27, 10, 5, 0),
                    ReadDate = null,
                    ExpirationDate = new DateTime(2025, 8, 1),
@@ -30,7 +30,7 @@ namespace Entity.DataInit.Notifications
                    Id = 2,
                    NotificationId = 2, // Invitación a evento
                    UserId = 2,
-                   StatusId = 2, // Leído
+                   //StatusId = 2, // Leído
                    SendDate = new DateTime(2025, 7, 28, 9, 35, 0),
                    ReadDate = new DateTime(2025, 7, 28, 10, 15, 0),
                    ExpirationDate = new DateTime(2025, 8, 5),
@@ -49,10 +49,10 @@ namespace Entity.DataInit.Notifications
                 .HasForeignKey(nr => nr.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(nr => nr.Status)
-                .WithMany()
-                .HasForeignKey(nr => nr.StatusId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasOne(nr => nr.Status)
+            //    .WithMany()
+            //    .HasForeignKey(nr => nr.StatusId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             builder.ToTable("NotificationReceived", schema: "Notifications");
         }

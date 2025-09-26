@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Implementations.Organizational.Location
 {
-    public class CityData : CrudBase<City>, ICityData
+    public class CityData : BaseData<City>, ICityData
     {
         public CityData(ApplicationDbContext context, ILogger<City> logger) : base(context, logger)
         {

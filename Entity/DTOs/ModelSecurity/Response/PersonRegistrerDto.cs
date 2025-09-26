@@ -10,5 +10,6 @@ namespace Entity.DTOs.ModelSecurity.Response
     {
         public PersonDto Person { get; set; }
         public UserDTO User { get; set; }
+        public bool EmailSent { get; set; }
     }
 }

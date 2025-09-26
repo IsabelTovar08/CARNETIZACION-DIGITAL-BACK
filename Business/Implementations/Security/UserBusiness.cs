@@ -6,11 +6,14 @@ using Data.Classes.Specifics;
 using Data.Interfases;
 using Data.Interfases.Security;
 using Entity.DTOs;
+using Entity.DTOs.Auth;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
+using Utilities.Helper;
 using static Utilities.Helper.EncryptedPassword;
 
 namespace Business.Classes
@@ -78,6 +81,8 @@ namespace Business.Classes
                 throw new ExternalServiceException("Base de datos", "No se pudo crear el usuario.");
             }
         }
+
+        //verifica si el correo ya esta en uso
         private async Task EnsureEmailIsUnique(string email)
         {
             if (await _userData.FindByEmail(email) != null)
@@ -86,6 +91,7 @@ namespace Business.Classes
             }
         }
 
+        //envio del correo electronico con un mensaje de bienvenida
         private async Task SendWelcomeEmailAsync(User user)
         {
             try
@@ -122,6 +128,91 @@ namespace Business.Classes
             {
                 _logger.LogError(ex, "Error al asignar el rol por defecto para el nuevo usuario.");
                 return false;
+            }
+        }
+        public async Task<List<string>> GetUserRolesById(int userId)
+        {
+           return await _userData.GetUserRolesByIdAsync(userId);
+        }
+
+
+        public async Task<UserMeDto?> GetByIdForMe(int userId, List<string> roles)
+        {
+            // Define aquí qué roles SON "web" y NO deben traer perfil
+            bool isWebRole = roles.Any(r =>
+                r.Equals("AdminOrg", StringComparison.OrdinalIgnoreCase) ||
+                r.Equals("Backoffice", StringComparison.OrdinalIgnoreCase) ||
+                r.Equals("AdminWeb", StringComparison.OrdinalIgnoreCase));
+
+            bool includeProfile = !isWebRole;
+
+            // Trae la entidad con o sin includes, según el rol
+            var user = await _userData.GetByIdForMeAsync(userId, true);
+            if (user == null) return null;
+
+            // Mapeo completo con AutoMapper
+            var dto = _mapper.Map<UserMeDto>(user);
+
+            // Por contrato: si es rol web, CurrentProfile debe ir null
+            if (!includeProfile) dto.CurrentProfile = null;
+
+            return dto;
+        }
+
+        public async Task<User?> GetUserByIdAsync(int userId)
+        {
+            try
+            {
+                var user = await _userData.GetByIdAsync(userId);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el usuario por Id.");
+                throw new ExternalServiceException("Base de datos", "No se pudo obtener el usuario.");
+            }
+        }
+
+        public async Task<UserProfileDto?> GetProfileAsync(int userId)
+        {
+            try
+            {
+                var user = await _userData.GetByIdWithPersonAsync(userId);
+                if (user == null) return null;
+
+                return _mapper.Map<UserProfileDto>(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el perfil del usuario con Id {UserId}", userId);
+                throw new ExternalServiceException("Base de datos", "No se pudo obtener el perfil del usuario.");
+            }
+        }
+
+        public async Task<UserProfileDto?> UpdateProfileAsync(int userId, UserProfileRequestDto dto)
+        {
+            try
+            {
+                var user = await _userData.GetByIdWithPersonAsync(userId);
+                if (user == null) return null;
+
+                if (user.Person != null)
+                {
+                    user.Person.FirstName = dto.FirstName;
+                    user.Person.LastName = dto.LastName;
+                    user.Person.SecondLastName = dto.SecondLastName;
+                    user.Person.Phone = dto.Phone;
+                    user.Person.Email = dto.Email;
+                }
+
+                await _userData.UpdateAsync(user);
+
+                return _mapper.Map<UserProfileDto>(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar el perfil del usuario {UserId}", userId);
+                throw new ExternalServiceException("Base de datos", "No se pudo actualizar el perfil del usuario.");
             }
         }
 

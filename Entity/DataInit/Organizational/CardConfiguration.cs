@@ -22,6 +22,7 @@ namespace Entity.DataInit.Organizational
                     ExpirationDate = DateTime.Parse("2025-01-01"),
                     StatusId = 1,
                     PersonDivissionProfileId = 1,
+                    CardTemplateId = 1,
                     IsDeleted = false
                 }
             );

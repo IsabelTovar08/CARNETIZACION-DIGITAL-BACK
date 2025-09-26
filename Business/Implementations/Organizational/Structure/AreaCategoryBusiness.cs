@@ -7,8 +7,8 @@ using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Organizational.Structure;
 using Data.Interfases;
-using Entity.DTOs.Organizational.Request.Structure;
-using Entity.DTOs.Organizational.Response.Structure;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Response;
 using Entity.Models.Organizational.Structure;
 using Microsoft.Extensions.Logging;
 

@@ -9,5 +9,6 @@ namespace Data.Interfases.Security
 {
     public interface IRoleData: ICrudBase<Role>
     {
+        Task<bool> UserIsSuperAdminAsync(List<string> roleIds);
     }
 }

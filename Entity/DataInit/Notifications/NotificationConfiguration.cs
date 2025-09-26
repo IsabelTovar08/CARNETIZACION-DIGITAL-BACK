@@ -45,10 +45,10 @@ namespace Entity.DataInit.Notifications
             builder.Property(n => n.CreateDate)
                 .HasColumnType("datetime");
 
-            builder.HasOne(n => n.NotificationType)
-                .WithMany()
-                .HasForeignKey(n => n.NotificationTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasOne(n => n.NotificationType)
+            //    .WithMany()
+            //    .HasForeignKey(n => n.NotificationTypeId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(n => n.NotificationReceiveds)
                 .WithOne(nr => nr.Notification)

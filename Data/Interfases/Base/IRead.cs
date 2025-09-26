@@ -11,7 +11,7 @@ namespace Data.Interfases
         Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(int id);
 
-        //Task<IEnumerable<T>> GetAllActiveAsync();
+        Task<IEnumerable<T>> GetActiveAsync();
         //Task<T?> GetByIdActiveAsync(int id);
 
     }

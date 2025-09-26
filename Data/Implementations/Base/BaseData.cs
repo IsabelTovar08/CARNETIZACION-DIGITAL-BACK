@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,12 @@ namespace Data.Classes.Base
             _context = context;
             _logger = logger;
         }
+
+        public BaseData(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         public override async Task<IEnumerable<T>> GetAllAsync()
         {
             try
@@ -35,6 +42,20 @@ namespace Data.Classes.Base
                 throw;
             }
         }
+
+        public override async Task<IEnumerable<T>> GetActiveAsync()
+        {
+            try
+            {
+                return await _context.Set<T>().Where(x => !x.IsDeleted).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener todos los registros de la entidad {typeof(T).Name}");
+                throw;
+            }
+        }
+
 
         public override async Task<T?> GetByIdAsync(int id)
         {
@@ -123,6 +144,34 @@ namespace Data.Classes.Base
             }
         }
 
-        
+        public override async Task<bool> ExistsByAsync(Expression<Func<T, object>> fieldSelector,object? value)
+        {
+            if (fieldSelector == null)
+                throw new ArgumentNullException(nameof(fieldSelector));
+
+            // extraer nombre de la propiedad
+            Expression body = fieldSelector.Body is UnaryExpression u && u.NodeType == ExpressionType.Convert
+                ? u.Operand
+                : fieldSelector.Body;
+
+            if (body is not MemberExpression m)
+                throw new ArgumentException("Selector must be a simple property access, e.g., x => x.Property.");
+
+            string propName = m.Member.Name;
+            string p = propName;
+            object? v = value;
+
+            return await _context.Set<T>()
+                .AsNoTracking()
+                .Where(e => EF.Property<object>(e, p) == v)
+                .AnyAsync();
+        }
+
+
+        public override Task<bool> ExistsCodeAsync(string code, int excludeId)
+        {
+            return _context.Set<T>().AnyAsync(x => x.Code == code && x.Id != excludeId && !x.IsDeleted);
+        }
+
     }
 }

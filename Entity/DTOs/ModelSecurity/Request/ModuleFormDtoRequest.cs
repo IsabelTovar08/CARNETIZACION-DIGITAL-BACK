@@ -3,11 +3,14 @@ using Entity.DTOs.Base;
 
 namespace Entity.DTOs.ModelSecurity.Request
 {
-    public class ModuleFormDtoRequest : BaseDTO
+    public class ModuleFormDtoRequest : BaseDtoRequest
     {
-        [Required]
+        [Required(ErrorMessage = "El identificador del módulo es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El identificador del módulo debe ser un número entero mayor que 0.")]
         public int ModuleId { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "El identificador del formulario es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El identificador del formulario debe ser un número entero mayor que 0.")]
         public int FormId { get; set; }
     }
 }

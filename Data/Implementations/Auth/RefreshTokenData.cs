@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Implementations.Auth
 {
-    public class RefreshTokenData : CrudBase<RefreshToken>, IRefreshTokenData
+    public class RefreshTokenData : BaseData<RefreshToken>, IRefreshTokenData
     {
         public RefreshTokenData(ApplicationDbContext context, ILogger<RefreshToken> logger) : base(context, logger)
         {

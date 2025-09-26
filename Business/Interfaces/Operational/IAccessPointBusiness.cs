@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Business.Interfases;
-using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
 
 namespace Business.Interfaces.Operational
 {
-    public interface IAccessPointBusiness : IBaseBusiness<AccessPoint, AccessPointDto, AccessPointDto>
+    public interface IAccessPointBusiness : IBaseBusiness<AccessPoint, AccessPointDtoRequest, AccessPointDtoResponsee>
     {
+        Task<AccessPointDtoResponsee?> RegisterAsync(AccessPointDtoRequest dto);
+
+        /// <summary>
+        /// Registrar asistencia mediante escaneo de QR.
+        /// </summary>
+        Task<AttendanceDtoResponse?> RegisterAttendanceByQrAsync(string qrCode, int personId);
     }
 }

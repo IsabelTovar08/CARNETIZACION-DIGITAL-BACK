@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Utilities.Helper
 {
@@ -12,7 +13,7 @@ namespace Utilities.Helper
                 return password;
             }
 
-            return BCrypt.Net.BCrypt.HashPassword(password);
+            return BCrypt.Net.BCrypt.HashPassword(password,workFactor: 12);
         }
 
         public static bool VerifyPassword(string plainPassword, string hashedPassword)

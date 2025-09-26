@@ -20,13 +20,40 @@ namespace Entity.DataInit.Organizational
                     PersonId = 1,
                     ProfileId = 1, // Estudiante
                     InternalDivisionId = 1,
-                    IsCurrentlySelected = false,
+                    IsCurrentlySelected = true,
                     IsDeleted = false
                 },
                 new PersonDivisionProfile
                 {
                     Id = 2,
                     PersonId = 2,
+                    ProfileId = 2, // Profesor
+                    InternalDivisionId = 1,
+                    IsCurrentlySelected = true,
+                    IsDeleted = false
+                },
+                new PersonDivisionProfile
+                {
+                    Id = 3,
+                    PersonId = 5,
+                    ProfileId = 2, // Profesor
+                    InternalDivisionId = 1,
+                    IsCurrentlySelected = true,
+                    IsDeleted = false
+                },
+                new PersonDivisionProfile
+                {
+                    Id = 4,
+                    PersonId = 6,
+                    ProfileId = 2, // Profesor
+                    InternalDivisionId = 1,
+                    IsCurrentlySelected = true,
+                    IsDeleted = false
+                },
+                new PersonDivisionProfile
+                {
+                    Id = 5,
+                    PersonId = 7,
                     ProfileId = 2, // Profesor
                     InternalDivisionId = 1,
                     IsCurrentlySelected = true,

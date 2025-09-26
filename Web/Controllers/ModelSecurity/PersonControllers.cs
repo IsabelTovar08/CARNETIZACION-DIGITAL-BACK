@@ -17,7 +17,7 @@ namespace Web.Controllers.ModelSecurity
     public class PersonController : GenericController<Person, PersonDtoRequest, PersonDto>
     {
         protected readonly IPersonBusiness _personBusiness;
-        public PersonController(IPersonBusiness business, ILogger<PersonController> logger, IPersonBusiness personBusiness) : base(business, logger)
+        public PersonController(IPersonBusiness personBusiness, ILogger<PersonController> logger) : base(personBusiness, logger)
         {
             _personBusiness = personBusiness;
         }
@@ -28,5 +28,107 @@ namespace Web.Controllers.ModelSecurity
             var result = await _personBusiness.SavePersonAndUser(person);
             return Ok(result);
         }
+
+
+        [HttpPost("{id:int}/photo")]
+        public async Task<IActionResult> UploadPhoto(int id, [FromForm] UploadFile photo)
+        {
+            var file = photo.file;
+            if (file == null || file.Length == 0)
+                return BadRequest(new { status = false, message = "File is required" });
+
+            await using var stream = file.OpenReadStream();
+
+            (string url, string path) = await _personBusiness.UpsertPersonPhotoAsync(
+                id,
+                stream,
+                file.ContentType,
+                file.FileName);
+
+            return Ok(new
+            {
+                status = true,
+                message = "Photo updated",
+                data = new { personId = id, photoUrl = url, photoPath = path }
+            });
+        }
+
+        [HttpGet("personal-info/{id:int}")]
+        public async Task<IActionResult> PersonaInfo(int id)
+        {
+            if (id == null || id == 0)
+                return BadRequest(new { status = false, message = "Ingresa un id válido" });
+
+
+            PersonInfoDto? personalInfo = await _personBusiness.GetPersonInfoAsync(id);
+
+            return Ok(new
+            {
+                status = true,
+                message = "Información obtenida",
+                data = personalInfo
+            });
+        }
+
+        [HttpGet("me/person")]
+        [Authorize]
+        public async Task<IActionResult> GetMyPerson()
+        {
+            try
+            {
+                var dto = await _personBusiness.GetMyPersonAsync();
+
+                if (dto == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "No se encontró información de la persona asociada al usuario actual.",
+                        data = (object?)null
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Información de la persona obtenida correctamente.",
+                    data = dto
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "No se pudo identificar al usuario actual. Verifique el token.",
+                    data = (object?)null
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = ex.Message, // "No se encontró la persona asociada al usuario actual."
+                    data = (object?)null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al obtener información de la persona.");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Ocurrió un error interno al obtener la información de la persona.",
+                    data = (object?)null
+                });
+            }
+        }
+
+    }
+
+    public class UploadFile
+    {
+        public IFormFile file { get; set; }
     }
 }

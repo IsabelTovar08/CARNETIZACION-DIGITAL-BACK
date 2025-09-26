@@ -7,7 +7,7 @@ using Entity.DTOs.Base;
 
 namespace Entity.DTOs.Parameter.Response
 {
-    public class CustomTypeSpecific : GenericBaseDto
+    public class CustomTypeSpecific : GenericDto
     {
         public string? Description { get; set; }
     }

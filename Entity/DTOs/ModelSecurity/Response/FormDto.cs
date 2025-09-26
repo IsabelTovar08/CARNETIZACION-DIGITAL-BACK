@@ -3,7 +3,7 @@ using Entity.DTOs.Base;
 
 namespace Entity.DTOs.ModelSecurity.Response
 {
-    public class FormDto : GenericBaseDto
+    public class FormDto : GenericDto
     {
         public string? Description { get; set; }
         public string? Icon { get; set; }

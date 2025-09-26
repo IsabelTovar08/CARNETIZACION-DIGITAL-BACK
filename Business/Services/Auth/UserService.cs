@@ -84,21 +84,7 @@ namespace Business.Services.Auth
             }
 
 
-            public async Task<User?> ValidateUserAsync(string email, string password)
-            {
-                var user = await _context.Set<User>()
-                    .Include(u => u.Person)
-                     .FirstOrDefaultAsync(u =>
-                            !u.IsDeleted &&
-                            (u.Person.Email == email || u.UserName == email)
-                        );
-
-            if (user == null)
-                    return null;
-
-                bool isValid = VerifyPassword(password, user.Password); 
-                return isValid ? user : null;
-            }
+            
 
         
     }

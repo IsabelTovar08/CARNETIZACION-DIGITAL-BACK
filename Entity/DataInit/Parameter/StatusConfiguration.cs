@@ -33,9 +33,9 @@ namespace Entity.DataInit.Parameter
             builder.Property(s => s.IsDeleted).HasDefaultValue(false);
 
             // Relaciones uno a muchos
-            builder.HasMany(s => s.NotificatiosReceived)
-                   .WithOne(n => n.Status)
-                   .HasForeignKey(n => n.StatusId);
+            //builder.HasMany(s => s.NotificatiosReceived)
+            //       .WithOne(n => n.Status)
+            //       .HasForeignKey(n => n.StatusId);
 
             builder.HasMany(s => s.cards)
                    .WithOne(c => c.Status)

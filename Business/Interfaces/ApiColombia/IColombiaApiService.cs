@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Entity.DTOs.Organizational.Response.Location;
+using Entity.DTOs.Organizational.Location.Response;
 
 namespace Business.Interfaces.ApiColombia
 {
     public interface IColombiaApiService
     {
-        Task<List<DepartmentDto>> GetDepartmentsAsync();
-        Task<List<CityDto>> GetCityesByDepartmentsAsync(int deparmentId);
+        Task<List<DepartmentDtoResponse>> GetDepartmentsAsync();
+        Task<List<CityDtoResponse>> GetCityesByDepartmentsAsync(int deparmentId);
     }
 }
 

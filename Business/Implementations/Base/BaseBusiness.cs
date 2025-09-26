@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Business.Interfases;
+using Business.Services.CodeGenerator;
 using Data.Interfases;
 using Entity.DTOs.Base;
 using Entity.Models.Base;
@@ -15,16 +17,21 @@ using Utilities.Exeptions;
 
 namespace Business.Classes.Base
 {
-    public class BaseBusiness<T, DCreate, D> : ABaseBusiness<T, DCreate, D> where T : BaseModel where D  : class
+    public class BaseBusiness<T, DCreate, D> : ABaseBusiness<T, DCreate, D>
+        where T : BaseModel
+        where D : class
     {
         protected readonly ICrudBase<T> _data;
         protected readonly ILogger<T> _logger;
         protected readonly IMapper _mapper;
-        public BaseBusiness(ICrudBase<T> data, ILogger<T> logger, IMapper mapper) 
+        private readonly ICodeGeneratorService<T> _codeService;
+
+        public BaseBusiness(ICrudBase<T> data, ILogger<T> logger, IMapper mapper, ICodeGeneratorService<T>? codeService = null)
         {
             _data = data;
             _mapper = mapper;
             _logger = logger;
+            _codeService = codeService ?? new CodeGeneratorService<T>(); ;
         }
 
         /// <summary>
@@ -34,7 +41,16 @@ namespace Business.Classes.Base
         {
             try
             {
-                BaseModel newEntity = _mapper.Map<T>(entity);
+                Validate(entity);
+
+                T newEntity = _mapper.Map<T>(entity);
+
+                await ValidateAsync(newEntity);
+
+                await _codeService.EnsureCodeAsync(newEntity,(codeCandidate, currentId) => ExistsCodeAsync(codeCandidate, currentId));
+
+                newEntity.CreateAt = DateTime.UtcNow;
+
                 newEntity = await _data.SaveAsync((T)newEntity);
                 return _mapper.Map<D>(newEntity);
             }
@@ -42,7 +58,6 @@ namespace Business.Classes.Base
             {
                 throw;
             }
-
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al crear {typeof(T).Name}");
@@ -76,7 +91,6 @@ namespace Business.Classes.Base
         /// <summary>
         /// Obtiene todos los registros.
         /// </summary>
-        /// 
         public override async Task<IEnumerable<D>> GetAll()
         {
             try
@@ -90,7 +104,24 @@ namespace Business.Classes.Base
                 _logger.LogError(ex, $"Error al obtener todos los {typeof(T).Name}");
                 throw new ExternalServiceException("Base de datos", $"Error al obtener todos los {typeof(T).Name}", ex);
             }
-            
+        }
+
+        /// <summary>
+        /// Obtiene todos los registros activos.
+        /// </summary>
+        public override async Task<IEnumerable<D>> GetActive()
+        {
+            try
+            {
+                IEnumerable<T> list = await _data.GetActiveAsync();
+                IEnumerable<D> listDto = _mapper.Map<IEnumerable<D>>(list);
+                return listDto.ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener todos los {typeof(T).Name}");
+                throw new ExternalServiceException("Base de datos", $"Error al obtener todos los {typeof(T).Name}", ex);
+            }
         }
 
         /// <summary>
@@ -139,13 +170,18 @@ namespace Business.Classes.Base
         }
 
         /// <summary>
-        /// Actualiza una nueva entidad.
+        /// Actualiza una entidad existente.
         /// </summary>
         public override async Task<D?> Update(DCreate entity)
         {
             try
             {
+                //await ValidateAsync(entity);
+
                 BaseModel newEntity = _mapper.Map<T>(entity);
+
+                newEntity.UpdateAt = DateTime.UtcNow;
+
                 await _data.UpdateAsync((T)newEntity);
                 return _mapper.Map<D>(newEntity);
             }
@@ -153,7 +189,6 @@ namespace Business.Classes.Base
             {
                 throw;
             }
-           
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al actualizar {typeof(T).Name}");
@@ -162,8 +197,33 @@ namespace Business.Classes.Base
         }
 
 
-       
+        public override async Task ValidateAsync(T entity)
+        {
+            // obtener valor de Name desde la instancia (T no expone Name en el base)
+            var nameProp = entity.GetType().GetProperty("Name");
+            if (nameProp == null) return; // si no existe Name, no valida
+            var nameValue = nameProp.GetValue(entity);
 
+            // construir x => (object)x.Name  (MemberExpression + Convert) para cumplir tu ExistsByAsync
+            var p = Expression.Parameter(typeof(T), "x");
+            var member = Expression.Property(p, "Name");
+            var body = Expression.Convert(member, typeof(object));
+            var selector = Expression.Lambda<Func<T, object>>(body, p);
 
+            if (await _data.ExistsByAsync(selector, nameValue))
+                throw new ValidationException("Name", "El nombre ya está registrado.");
+        }
+
+        public override void Validate(DCreate d)
+        {
+            if (d == null)
+                throw new ValidationException("la entidad no puede ser nula.");
+
+        }
+
+        public override Task<bool> ExistsCodeAsync(string code, int excludeId)
+        {
+            return _data.ExistsCodeAsync(code, excludeId);
+        }
     }
 }

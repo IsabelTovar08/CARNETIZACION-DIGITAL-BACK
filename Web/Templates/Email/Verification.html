@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ if title != null && title != "" }}{{ title }}{{ else }}Código de Verificación{{ end }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+            background: linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);
+            padding: 20px;
+            min-height: 100vh
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(59,130,246,.15);
+            border: 1px solid #e0f2fe
+        }
+
+        .header {
+            background: linear-gradient(135deg,#3b82f6 0%,#1e40af 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden
+        }
+
+            .header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);
+                animation: rotate 20s linear infinite
+            }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0)
+            }
+
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 600
+        }
+
+        .header p {
+            color: rgba(255,255,255,.9);
+            font-size: 16px
+        }
+
+        .content {
+            padding: 40px 30px;
+            text-align: center
+        }
+
+        .verification-text {
+            margin-bottom: 30px
+        }
+
+            .verification-text h2 {
+                color: #1e293b;
+                font-size: 22px;
+                margin-bottom: 15px;
+                font-weight: 600
+            }
+
+            .verification-text p {
+                color: #64748b;
+                font-size: 16px;
+                line-height: 1.6
+            }
+
+        .code-container {
+            background: linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid #93c5fd;
+            position: relative
+        }
+
+        .code-label {
+            color: #1e40af;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+
+        .verification-code {
+            font-family: 'Courier New',monospace;
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e40af;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            letter-spacing: 8px;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 10px 25px rgba(59,130,246,.2);
+            margin: 15px 0;
+            word-spacing: 10px
+        }
+
+        .timer-info {
+            background: linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0
+        }
+
+            .timer-info h4 {
+                color: #92400e;
+                margin-bottom: 8px;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px
+            }
+
+            .timer-info p {
+                color: #78350f;
+                font-size: 14px;
+                line-height: 1.5
+            }
+
+        .instructions {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 4px solid #3b82f6
+        }
+
+            .instructions h4 {
+                color: #334155;
+                margin-bottom: 12px;
+                font-size: 16px
+            }
+
+            .instructions ol {
+                text-align: left;
+                color: #475569;
+                font-size: 14px;
+                line-height: 1.6
+            }
+
+            .instructions li {
+                margin-bottom: 8px
+            }
+
+        .support-info {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 14px
+        }
+
+        .footer {
+            background: #1e293b;
+            color: #fff;
+            padding: 25px 30px;
+            text-align: center
+        }
+
+            .footer p {
+                font-size: 13px;
+                opacity: .8;
+                margin-bottom: 8px
+            }
+
+            .footer .company-info {
+                font-weight: 600;
+                color: #60a5fa
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>
+                    {{ if header_emoji != null && header_emoji != "" }}{{ header_emoji }}{{ else }}🔐{{ end }}
+                    {{ if title != null && title != "" }}{{ title }}{{ else }}Código de Verificación{{ end }}
+                </h1>
+                <p>{{ if subtitle != null && subtitle != "" }}{{ subtitle }}{{ else }}Sistema de Carnetización Digital{{ end }}</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="verification-text">
+                <h2>{{ if verify_title != null && verify_title != "" }}{{ verify_title }}{{ else }}Verifica tu identidad{{ end }}</h2>
+                <p>{{ if verify_message != null && verify_message != "" }}{{ verify_message }}{{ else }}Hemos enviado un código de verificación para confirmar tu acceso al sistema. Introduce el siguiente código para continuar:{{ end }}</p>
+            </div>
+
+            <div class="code-container">
+                <div class="code-label">{{ if code_label != null && code_label != "" }}{{ code_label }}{{ else }}Tu código de verificación{{ end }}</div>
+                <div class="verification-code">{{ verification_code | string.upcase }}</div>
+            </div>
+
+            <div class="timer-info">
+                <h4>
+                    {{ if timer_emoji != null && timer_emoji != "" }}{{ timer_emoji }}{{ else }}⏰{{ end }}
+                    {{ if timer_title != null && timer_title != "" }}{{ timer_title }}{{ else }}Tiempo de expiración{{ end }}
+                </h4>
+                <p>
+                    {{ if timer_text != null && timer_text != "" }}
+                    {{ timer_text }}
+                    {{ else }}
+                    Este código es válido por {{ if expiry_minutes != null && expiry_minutes != 0 }}{{ expiry_minutes }}{{ else }}10{{ end }} minutos desde el momento de envío. Si no lo utilizas en ese tiempo, deberás solicitar un nuevo código.
+                    {{ end }}
+                </p>
+            </div>
+
+            <div class="instructions">
+                <h4>{{ if instructions_title != null && instructions_title != "" }}{{ instructions_title }}{{ else }}📋 Instrucciones:{{ end }}</h4>
+                <ol>
+                    {{ if instructions && instructions.size > 0 }}
+                    {{ for step in instructions }}
+                    <li>{{ step }}</li>
+                    {{ end }}
+                    {{ else }}
+                    <li>Regresa a la ventana del navegador donde iniciaste sesión</li>
+                    <li>Introduce el código de 6 dígitos en el campo correspondiente</li>
+                    <li>Haz clic en "Verificar" para continuar</li>
+                    <li>Si el código ha expirado, solicita uno nuevo</li>
+                    {{ end }}
+                </ol>
+            </div>
+
+            <div class="support-info">
+                <p>
+                    <strong>{{ if support_title != null && support_title != "" }}{{ support_title }}{{ else }}¿No solicitaste este código?{{ end }}</strong><br>
+                    {{ if support_text != null && support_text != "" }}{{ support_text }}{{ else }}Si no iniciaste sesión, ignora este correo. Tu cuenta permanecerá segura.{{ end }}
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="company-info">{{ if company_name != null && company_name != "" }}{{ company_name }}{{ else }}Sistema de Carnetización Digital{{ end }}</p>
+            <p>{{ if footer_text != null && footer_text != "" }}{{ footer_text }}{{ else }}Este es un correo automático, por favor no respondas a este mensaje.{{ end }}</p>
+        </div>
+    </div>
+</body>
+</html>

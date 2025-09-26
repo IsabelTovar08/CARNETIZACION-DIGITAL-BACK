@@ -1,53 +1,128 @@
 ﻿using Business.Classes;
 using Business.Classes.Base;
+using Business.Implementations.Notifications;
+using Business.Implementations.Operational;
+using Business.Implementations.Operational;
+using Business.Implementations.Operational;
+using Business.Implementations.Organizational.Assignment;
+using Business.Implementations.Organizational.Assignment;
+using Business.Implementations.Organizational.Assignment;
 using Business.Implementations.Organizational.Location;
+using Business.Implementations.Organizational.Structure;
+using Business.Implementations.Organizational.Structure;
+using Business.Implementations.Organizational.Structure;
 using Business.Implementations.Parameters;
+using Business.Implementations.Storage;
 using Business.Interfaces.ApiColombia;
+using Business.Interfaces.Auth;
+using Business.Interfaces.Auth;
+using Business.Interfaces.Auth;
+using Business.Interfaces.Enums;
+using Business.Interfaces.Logging;
+using Business.Interfaces.Notifications;
+using Business.Interfaces.Notifications;
+using Business.Interfaces.Notifications;
+using Business.Interfaces.Operational;
+using Business.Interfaces.Operational;
+using Business.Interfaces.Operational;
+using Business.Interfaces.Organizational.Assignment;
+using Business.Interfaces.Organizational.Assignment;
+using Business.Interfaces.Organizational.Assignment;
+using Business.Interfaces.Organizational.Structure;
+using Business.Interfaces.Organizational.Structure;
+using Business.Interfaces.Organizational.Structure;
 using Business.Interfaces.Parameters;
 using Business.Interfaces.Security;
+using Business.Interfaces.Storage;
 using Business.Interfases;
 using Business.Interfases.Organizational.Location;
+using Business.Interfases.Storage;
 using Business.Services.ApiColombia;
 using Business.Services.Auth;
+using Business.Services.CodeGenerator;
+using Business.Services.Enums;
+using Business.Services.Excel;
 using Business.Services.JWT;
+using Business.Services.Logging;
+using Business.Services.Storage;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
+using Data.Implementations.Auth;
+using Data.Implementations.Auth;
+using Data.Implementations.Auth;
+using Data.Implementations.Logging;
+using Data.Implementations.Notifications;
+using Data.Implementations.Notifications;
+using Data.Implementations.Notifications;
+using Data.Implementations.Operational;
+using Data.Implementations.Operational;
+using Data.Implementations.Operational;
+using Data.Implementations.Organizational.Assignment;
+using Data.Implementations.Organizational.Assignment;
+using Data.Implementations.Organizational.Assignment;
 using Data.Implementations.Organizational.Location;
+using Data.Implementations.Organizational.Structure;
+using Data.Implementations.Organizational.Structure;
+using Data.Implementations.Organizational.Structure;
 using Data.Implementations.Parameters;
+using Data.Implementations.Transaction;
+using Data.Interfaces.Security;
+using Data.Interfaces.Security;
+using Data.Interfaces.Security;
 using Data.Interfases;
+using Data.Interfases.Auth;
+using Data.Interfases.Auth;
+using Data.Interfases.Auth;
+using Data.Interfases.Logging;
+using Data.Interfases.Notifications;
+using Data.Interfases.Notifications;
+using Data.Interfases.Notifications;
+using Data.Interfases.Operational;
+using Data.Interfases.Operational;
+using Data.Interfases.Operational;
+using Data.Interfases.Organizational.Assignment;
+using Data.Interfases.Organizational.Assignment;
+using Data.Interfases.Organizational.Assignment;
 using Data.Interfases.Organizational.Location;
+using Data.Interfases.Organizational.Structure;
+using Data.Interfases.Organizational.Structure;
+using Data.Interfases.Organizational.Structure;
 using Data.Interfases.Parameters;
 using Data.Interfases.Security;
+using Data.Interfases.Transaction;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
-using Entity.DTOs.Organizational.Request.Structure;
-using Entity.DTOs.Organizational.Response.Structure;
+using Entity.DTOs.Operational;
+using Entity.DTOs.Operational;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Request;
+using Entity.DTOs.Organizational.Structure.Response;
+using Entity.DTOs.Organizational.Structure.Response;
+using Entity.DTOs.Organizational.Structure.Response;
 using Entity.DTOs.Parameter;
+using Entity.DTOs.Parameter.Request;
+using Entity.DTOs.Parameter.Request;
+using Entity.DTOs.Parameter.Request;
+using Entity.DTOs.Parameter.Response;
+using Entity.DTOs.Parameter.Response;
+using Entity.DTOs.Parameter.Response;
 using Entity.Models;
+using Entity.Models.Auth;
+using Entity.Models.Auth;
+using Entity.Models.Auth;
 using Entity.Models.ModelSecurity;
 using Entity.Models.Notifications;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client.Extensions.Msal;
+using Utilities.Helpers.Excel;
 using Utilities.Notifications.Implementations;
-using Entity.DTOs.Parameter.Request;
-using Entity.DTOs.Parameter.Response;
-using Data.Implementations.Security;
-using Business.Implementations.Security;
-using Data.Interfaces.Security;
-using Data.Implementations.Organizational.Structure;
-using Data.Interfases.Operational;
-using Data.Implementations.Operational;
-using Business.Interfaces.Operational;
-using Business.Implementations.Operational;
-using Business.Interfaces.Auth;
-using Entity.Models.Auth;
-using Data.Implementations.Auth;
-using Data.Interfases.Auth;
-using Business.Implementations.Organizational.Structure;
-using Business.Interfaces.Organizational.Structure;
-using Data.Interfases.Organizational.Structure;
+using Web.Auth;
+using Web.Realtime.Dispatchers;
 
 namespace Web.Extensions
 {
@@ -65,16 +140,18 @@ namespace Web.Extensions
             services.AddScoped<IPersonBusiness, PersonBusiness>();
 
             //Rol 
-            //services.AddScoped<ICrudBase<Role>, RoleData>();
-            //services.AddScoped<RoleBusiness>();
+            services.AddScoped<IRoleData, RoleData>();
+            services.AddScoped<IRoleBusiness ,RoleBusiness>();
 
             //Form 
             services.AddScoped<ICrudBase<Form>, FormData>();
             services.AddScoped<FormBusiness>();
 
             //Module
-            services.AddScoped<ICrudBase<Module>, ModuleData>();
-            services.AddScoped<ModuleBusiness>();
+            services.AddScoped<IModuleData, ModuleData>();
+            services.AddScoped<IModuleBusiness, ModuleBusiness>();
+
+            services.AddScoped<IMenuService, MenuService>();
 
 
             //Permission 
@@ -89,11 +166,6 @@ namespace Web.Extensions
             //UserRol 
             services.AddScoped<IUserRoleData, UserRolesData>();
             services.AddScoped<IUserRoleBusiness, UserRoleBusiness>();
-
-
-            //Menu
-            services.AddScoped<IMenuStructureData, MenuStructureData>();
-            services.AddScoped<IMenuStructureBusiness, MenuStructureBusiness>();
 
 
             //CustomType 
@@ -124,9 +196,24 @@ namespace Web.Extensions
             services.AddScoped<IEventTypeData, EventTypeData>();
             services.AddScoped<IEventTypeBusiness, EventTypeBusiness>();
 
+            //EventAccessPoint
+            services.AddScoped<IEventAccessPointData, EventAccessPointData>();
+            services.AddScoped<IEventAccessPointBusiness, EventAccessPointBusiness>();
+
+
             //AccessPoint 
             services.AddScoped<IAccessPointData, AccessPointData>();
             services.AddScoped<IAccessPointBusiness, AccessPointBusiness>();
+
+            // Attendance
+            services.AddScoped<IAttendanceData, AttendanceData>();
+            services.AddScoped<IAttendanceBusiness, AttendanceBusiness>();
+
+
+
+            // Event-target
+            services.AddScoped<IEventTargetAudienceData, EventTargetAudienceData>();
+            services.AddScoped<IEventTargetAudienceBusiness, EventTargetAudienceBusiness>();
 
 
 
@@ -139,6 +226,11 @@ namespace Web.Extensions
             services.AddScoped<IRefreshTokenData, RefreshTokenData>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
+            services.AddScoped<ICodeGenerator, FiveDigitCodeGenerator>();
+            services.AddScoped<ICodeHasher, HmacCodeHasher>();
+            services.AddSingleton<IClock, SystemClock>();
+            services.AddScoped<UserVerificationService, UserVerificationService>();
+
 
 
             //Notificatios 
@@ -146,24 +238,107 @@ namespace Web.Extensions
             services.AddScoped<IMessageSender, WhatsAppMessageSender>();
 
             services.AddScoped<INotify, Notifier>();
-            services.AddScoped<IMessageSender, TelegramMessageSender>();
+            services.AddScoped<INotificationDispatcher, SignalRNotificationDispatcher>();
+
+            services.AddScoped<INotificationData, NotificationData>();
+            services.AddScoped<INotificationBusiness, NotificationsBusiness>();
+
+            services.AddScoped<INotificationsReceivedData, NotificationsReceivedData>();
+            services.AddScoped<INotificationReceivedBusiness, NotificationReceivedBusiness>();
+
+            services.AddScoped<IModificationRequestData, ModificationRequestData>();
+            services.AddScoped<IModificationRequestBusiness, ModificationRequestBusiness>();
+
 
             //InternaDivision
-            services.AddScoped<InternalDivisionData>();
+            services.AddScoped<IInternalDivisionData ,InternalDivisionData>();
+            services.AddScoped<IInternalDivisionBusiness, InternalDivisionBusiness>();
+
             services.AddScoped<OrganizationalUnitBusiness>();
             services.AddScoped<IBaseBusiness<OrganizationalUnit, OrganizationalUnitDtoRequest, OrganizationalUnitDto>,
             OrganizationalUnitBusiness>();
 
+            services.AddScoped<IOrganizationData, OrganizationData>();
+            services.AddScoped<IOrganizationBusiness, OrganizationBusiness>();
+
+            //OrganizationUnit
+            services.AddScoped<IOrganizationnalUnitData, OrganizationnalUnitData>();
+            services.AddScoped<IOrganizationUnitBusiness, OrganizationalUnitBusiness>();
+
+            //OrganizationalUnitBranch
+            services.AddScoped<IOrganizationalUnitBranchData, OrganizationalUnitBranchData>();
+            services.AddScoped<IOrganizationalUnitBranchBusiness, OrganizationalUnitBranchBusiness>(); 
 
             //Buscar La cantidad de branch que tienen una sola organizacion
             services.AddScoped<OrganizationalUnitBranchData>();
 
+            //Card
+            services.AddScoped<ICardData, CardData>();
+            services.AddScoped<ICardBusiness, CardBusiness>();
+
+            //Card Templates
+            services.AddScoped<ICardTemplateData, CardTemplateData>();
+            services.AddScoped<ICardTemplateBusiness, CardTemplateBusiness>();
+
             //Area categoria
             services.AddScoped<IAreaCategoryData, AreaCategoryData>();
             services.AddScoped<ICategoryAreaBusiness, AreaCategoryBusiness>();
-            
-            
-            
+
+            //Schedule
+            services.AddScoped<IScheduleData, ScheduleData>();
+            services.AddScoped<IScheduleBusiness, ScheduleBusiness>();
+
+            //PersonDivisionProfile
+            services.AddScoped<IPersonDivisionProfileData, PersonDivisionProfileData>();
+            services.AddScoped<IPersonDivisionProfileBusiness, PersonDivisionProfileBusiness>();
+
+            //Profiles
+            services.AddScoped<IProfileData, ProfileData>();
+            services.AddScoped<IProfileBusiness, ProfileBusiness>();
+
+            //Branch
+            services.AddScoped<IBranchData, BranchData>();
+            services.AddScoped<IBranchBusiness, BranchBusiness>();
+
+            services.AddScoped<IExcelPersonParser, ExcelPersonParser>();
+            services.AddScoped<IExcelBulkImporter, ExcelBulkImporter>();
+
+
+            services.AddScoped<IUserVerificationService, UserVerificationService>();
+
+
+
+            //Enums
+            services.AddScoped<IEnumCatalogService, EnumCatalogService>();
+
+            services.AddScoped<IFileStorageService, SupabaseStorageService>();
+
+            services.AddScoped(typeof(ICodeGeneratorService<>), typeof(CodeGeneratorService<>));
+
+            // storage route images
+            services.AddScoped<IAssetUploader, AssetUploader>();
+            services.AddScoped<IExcelReaderHelper, ClosedXmlExcelReaderHelper>();
+
+
+            // Data
+            services.AddScoped<IImportBatchData, ImportBatchData>();
+            services.AddScoped<IImportBatchRowData, ImportBatchRowData>();
+
+            // Business
+            services.AddScoped<IImportHistoryBusiness, ImportHistoryBusiness>();
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
+
+            services.AddSignalR();
+
+
+
+
             return services;
         }
     }
