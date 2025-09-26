@@ -27,7 +27,7 @@ namespace Data.Implementations.Operational
                     .ThenInclude(eap => eap.Event)
                 .Include(x => x.AccessPointExit).
                     ThenInclude(ap => ap.EventAccessPoints)
-                        .ThenInclude(eap =>eap.Event)
+                        .ThenInclude(eap => eap.Event)
 
                 .ToListAsync();
         }

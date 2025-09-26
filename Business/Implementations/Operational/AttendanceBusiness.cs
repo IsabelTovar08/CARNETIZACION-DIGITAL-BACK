@@ -11,6 +11,7 @@ using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Operational.Request;
 using System.Threading;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Business.Implementations.Operational
 {
@@ -176,11 +177,27 @@ namespace Business.Implementations.Operational
 
             var list = entities.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
 
-            // completar strings amigables
+            // completar strings amigables y EventName
             foreach (var it in list)
             {
                 it.TimeOfEntryStr = it.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
-                if (it.TimeOfExit.HasValue) it.TimeOfExitStr = it.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
+                if (it.TimeOfExit.HasValue)
+                    it.TimeOfExitStr = it.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
+
+                // Buscar nombre de evento a través de AccessPoints
+                var entity = entities.FirstOrDefault(e => e.Id == it.Id);
+                if (entity != null)
+                {
+                    var evFromEntry = entity.AccessPointEntry?.EventAccessPoints
+                        .Select(eap => eap.Event?.Name)
+                        .FirstOrDefault();
+
+                    var evFromExit = entity.AccessPointExit?.EventAccessPoints
+                        .Select(eap => eap.Event?.Name)
+                        .FirstOrDefault();
+
+                    it.EventName = evFromEntry ?? evFromExit;
+                }
             }
 
             return (list, total);

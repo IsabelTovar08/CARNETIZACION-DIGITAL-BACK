@@ -417,13 +417,16 @@ namespace Utilities.Helper
                 .ForMember(dest => dest.AccessPointOfExitName,
                     opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Name : null))
                .ForMember(dest => dest.EventName,
-                opt => opt.MapFrom(src =>
-                    src.AccessPointEntry != null
-                        ? src.AccessPointEntry.EventAccessPoints
-                            .Select(eap => eap.Event.Name)
-                            .FirstOrDefault()
-                        : null
-                ))
+                    opt => opt.MapFrom(src =>
+                    src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
+                  ? src.AccessPointEntry.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
+            : (
+                src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
+                    ? src.AccessPointExit.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
+                    : null
+            )
+    ))
+
 
                 // ➕ Formateo de fechas a string (cultura es-CO). Sin helpers externos.
                 .ForMember(dest => dest.TimeOfEntryStr,

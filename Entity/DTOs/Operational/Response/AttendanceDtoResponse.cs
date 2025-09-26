@@ -20,6 +20,8 @@ namespace Entity.DTOs.Operational.Response
         public int? AccessPointOfExit { get; set; }
         public string? AccessPointOfExitName { get; set; }
 
+        public int? EventId { get; set; }
+
         public string? EventName { get; set; }
 
         /// <summary>
