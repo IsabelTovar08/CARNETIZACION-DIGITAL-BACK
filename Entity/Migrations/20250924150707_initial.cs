@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class Notifications2 : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -442,6 +442,34 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AccessPoints",
+                schema: "Operational",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeId = table.Column<int>(type: "int", nullable: false),
+                    QrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccessPoints", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AccessPoints_CustomTypes_TypeId",
+                        column: x => x.TypeId,
+                        principalSchema: "Parameter",
+                        principalTable: "CustomTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Notification",
                 schema: "Notifications",
                 columns: table => new
@@ -608,6 +636,50 @@ namespace Entity.Migrations
                         column: x => x.OrganizationId,
                         principalSchema: "Organizational",
                         principalTable: "Organizations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Attendances",
+                schema: "Operational",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TimeOfEntry = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TimeOfExit = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AccessPointOfEntry = table.Column<int>(type: "int", nullable: true),
+                    AccessPointOfExit = table.Column<int>(type: "int", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    QrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attendances", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Attendances_AccessPoints_AccessPointOfEntry",
+                        column: x => x.AccessPointOfEntry,
+                        principalSchema: "Operational",
+                        principalTable: "AccessPoints",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendances_AccessPoints_AccessPointOfExit",
+                        column: x => x.AccessPointOfExit,
+                        principalSchema: "Operational",
+                        principalTable: "AccessPoints",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendances_People_PersonId",
+                        column: x => x.PersonId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "People",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -877,34 +949,30 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AccessPoints",
+                name: "EventAccessPoints",
                 schema: "Operational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EventId = table.Column<int>(type: "int", nullable: false),
-                    TypeId = table.Column<int>(type: "int", nullable: false),
-                    QrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccessPointId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccessPoints", x => x.Id);
+                    table.PrimaryKey("PK_EventAccessPoints", x => new { x.EventId, x.AccessPointId });
                     table.ForeignKey(
-                        name: "FK_AccessPoints_CustomTypes_TypeId",
-                        column: x => x.TypeId,
-                        principalSchema: "Parameter",
-                        principalTable: "CustomTypes",
+                        name: "FK_EventAccessPoints_AccessPoints_AccessPointId",
+                        column: x => x.AccessPointId,
+                        principalSchema: "Operational",
+                        principalTable: "AccessPoints",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_AccessPoints_Events_EventId",
+                        name: "FK_EventAccessPoints_Events_EventId",
                         column: x => x.EventId,
                         principalSchema: "Operational",
                         principalTable: "Events",
@@ -913,8 +981,8 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventTargetAudience",
-                schema: "Organizational",
+                name: "EventTargetAudiences",
+                schema: "Operational",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -922,6 +990,9 @@ namespace Entity.Migrations
                     TypeId = table.Column<int>(type: "int", nullable: false),
                     ReferenceId = table.Column<int>(type: "int", nullable: false),
                     EventId = table.Column<int>(type: "int", nullable: false),
+                    ProfileId = table.Column<int>(type: "int", nullable: true),
+                    OrganizationalUnitId = table.Column<int>(type: "int", nullable: true),
+                    InternalDivisionId = table.Column<int>(type: "int", nullable: true),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -929,21 +1000,42 @@ namespace Entity.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventTargetAudience", x => x.Id);
+                    table.PrimaryKey("PK_EventTargetAudiences", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EventTargetAudience_CustomTypes_TypeId",
+                        name: "FK_EventTargetAudiences_CustomTypes_TypeId",
                         column: x => x.TypeId,
                         principalSchema: "Parameter",
                         principalTable: "CustomTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_EventTargetAudience_Events_EventId",
+                        name: "FK_EventTargetAudiences_Events_EventId",
                         column: x => x.EventId,
                         principalSchema: "Operational",
                         principalTable: "Events",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventTargetAudiences_InternalDivisions_InternalDivisionId",
+                        column: x => x.InternalDivisionId,
+                        principalSchema: "Organizational",
+                        principalTable: "InternalDivisions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EventTargetAudiences_OrganizationalUnits_OrganizationalUnitId",
+                        column: x => x.OrganizationalUnitId,
+                        principalSchema: "Organizational",
+                        principalTable: "OrganizationalUnits",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EventTargetAudiences_Profiles_ProfileId",
+                        column: x => x.ProfileId,
+                        principalSchema: "Organizational",
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -984,50 +1076,6 @@ namespace Entity.Migrations
                         column: x => x.ProfileId,
                         principalSchema: "Organizational",
                         principalTable: "Profiles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Attendances",
-                schema: "Operational",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TimeOfEntry = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TimeOfExit = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AccessPointOfEntry = table.Column<int>(type: "int", nullable: true),
-                    AccessPointOfExit = table.Column<int>(type: "int", nullable: true),
-                    PersonId = table.Column<int>(type: "int", nullable: false),
-                    QrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Attendances", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Attendances_AccessPoints_AccessPointOfEntry",
-                        column: x => x.AccessPointOfEntry,
-                        principalSchema: "Operational",
-                        principalTable: "AccessPoints",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Attendances_AccessPoints_AccessPointOfExit",
-                        column: x => x.AccessPointOfExit,
-                        principalSchema: "Operational",
-                        principalTable: "AccessPoints",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Attendances_People_PersonId",
-                        column: x => x.PersonId,
-                        principalSchema: "ModelSecurity",
-                        principalTable: "People",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1125,18 +1173,18 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "IsDeleted", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Área relacionada con sistemas, informática y desarrollo tecnológico", false, "Tecnología", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Área enfocada en estudios sociales, filosofía, literatura y cultura", false, "Humanidades", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Área de física, química, biología y otras ciencias naturales", false, "Ciencias", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Área dedicada a la enseñanza y formación académica", false, "Educación", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Área de gestión institucional y procesos administrativos", false, "Administración", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Área relacionada con sistemas, informática y desarrollo tecnológico", false, "Tecnología", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Área enfocada en estudios sociales, filosofía, literatura y cultura", false, "Humanidades", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Área de física, química, biología y otras ciencias naturales", false, "Ciencias", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Área dedicada a la enseñanza y formación académica", false, "Educación", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Área de gestión institucional y procesos administrativos", false, "Administración", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "CardTemplates",
                 columns: new[] { "Id", "BackBackgroundUrl", "BackElementsJson", "Code", "CreateAt", "FrontBackgroundUrl", "FrontElementsJson", "Name", "UpdateAt" },
-                values: new object[] { 1, "https://drgxicjtijjdhrvsjgvd.supabase.co/storage/v1/object/public/Templates/ladotrasero.svg", "\r\n                    {\r\n                        \"title\": { \"x\": 91, \"y\": 202 },\r\n                        \"guides\": { \"x\": 36, \"y\": 371 },\r\n                        \"address\": { \"x\": 43, \"y\": 568 },\r\n                        \"phoneNumber\": { \"x\": 269, \"y\": 568 },\r\n                        \"email\": { \"x\": 271, \"y\": 590 }\r\n                    }", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "https://drgxicjtijjdhrvsjgvd.supabase.co/storage/v1/object/public/Templates/ladoprincipal.svg", "\r\n                    {\r\n                        \"qr\": { \"x\": 332, \"y\": 48 },\r\n                        \"underQrText\": { \"x\": 302, \"y\": 115 },\r\n                        \"companyName\": { \"x\": 70, \"y\": 78 },\r\n                        \"logo\": { \"x\": 7, \"y\": 97 },\r\n                        \"userPhoto\": { \"x\": -16, \"y\": -1 },\r\n                        \"name\": { \"x\": 240, \"y\": 209 },\r\n                        \"profile\": { \"x\": 240, \"y\": 333 },\r\n                        \"categoryArea\": { \"x\": 138, \"y\": 371 },\r\n                        \"phoneNumber\": { \"x\": 46, \"y\": 502 },\r\n                        \"bloodTypeValue\": { \"x\": 379, \"y\": 462 },\r\n                        \"email\": { \"x\": 144, \"y\": 560 },\r\n                        \"cardId\": { \"x\": 164, \"y\": 603 }\r\n                    }", "Plantilla Básica", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 1, "https://drgxicjtijjdhrvsjgvd.supabase.co/storage/v1/object/public/Templates/ladotrasero.svg", "\r\n                    {\r\n                        \"title\": { \"x\": 91, \"y\": 202 },\r\n                        \"guides\": { \"x\": 36, \"y\": 371 },\r\n                        \"address\": { \"x\": 43, \"y\": 568 },\r\n                        \"phoneNumber\": { \"x\": 269, \"y\": 568 },\r\n                        \"email\": { \"x\": 271, \"y\": 590 }\r\n                    }", null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "https://drgxicjtijjdhrvsjgvd.supabase.co/storage/v1/object/public/Templates/ladoprincipal.svg", "\r\n                    {\r\n                        \"qr\": { \"x\": 332, \"y\": 48 },\r\n                        \"underQrText\": { \"x\": 302, \"y\": 115 },\r\n                        \"companyName\": { \"x\": 70, \"y\": 78 },\r\n                        \"logo\": { \"x\": 7, \"y\": 97 },\r\n                        \"userPhoto\": { \"x\": -16, \"y\": -1 },\r\n                        \"name\": { \"x\": 240, \"y\": 209 },\r\n                        \"profile\": { \"x\": 240, \"y\": 333 },\r\n                        \"categoryArea\": { \"x\": 138, \"y\": 371 },\r\n                        \"phoneNumber\": { \"x\": 46, \"y\": 502 },\r\n                        \"bloodTypeValue\": { \"x\": 379, \"y\": 462 },\r\n                        \"email\": { \"x\": 144, \"y\": 560 },\r\n                        \"cardId\": { \"x\": 164, \"y\": 603 }\r\n                    }", "Plantilla Básica", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "Organizational",
@@ -1144,9 +1192,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "DeparmentId", "DepartmentId", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, "Bogotá", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, null, "Medellín", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, null, "Cali", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, null, "Bogotá", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2, null, "Medellín", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 3, null, "Cali", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1155,9 +1203,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Cundinamarca", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Antioquia", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Valle del Cauca", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Cundinamarca", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Antioquia", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Valle del Cauca", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1166,13 +1214,13 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "IsDeleted", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Eventos de bienvenida institucional", false, "Bienvenida", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Reuniones privadas para planificación interna", false, "Planificación", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sesiones de formación para empleados o estudiantes", false, "Capacitación", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Espacios destinados a la concentración y repaso académico", false, "Jornada de Estudio", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Actividades laborales organizadas por jornada", false, "Jornada de Trabajo", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Eventos prácticos y participativos", false, "Taller", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Reuniones de carácter informal o comunitario", false, "Encuentro", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Eventos de bienvenida institucional", false, "Bienvenida", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Reuniones privadas para planificación interna", false, "Planificación", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sesiones de formación para empleados o estudiantes", false, "Capacitación", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Espacios destinados a la concentración y repaso académico", false, "Jornada de Estudio", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Actividades laborales organizadas por jornada", false, "Jornada de Trabajo", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Eventos prácticos y participativos", false, "Taller", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 7, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Reuniones de carácter informal o comunitario", false, "Encuentro", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1181,11 +1229,11 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "Icon", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Grupo principal de navegación", "home", "Menú Principal", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Dominio Organizacional", "apartment", "Organizacional", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Dominio Operacional", "event_available", "Operacional", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Parámetros y configuración", "settings_applications", "Parámetros", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Dominio de seguridad", "admin_panel_settings", "Seguridad", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Grupo principal de navegación", "home", "Menú Principal", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Dominio Organizacional", "apartment", "Organizacional", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Dominio Operacional", "event_available", "Operacional", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Parámetros y configuración", "settings_applications", "Parámetros", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Dominio de seguridad", "admin_panel_settings", "Seguridad", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1194,8 +1242,8 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "CreateDate", "CustomTypeId", "IsDeleted", "Message", "NotificationTypeId", "Title", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 7, 27, 10, 0, 0, 0, DateTimeKind.Unspecified), null, false, "Por favor verifica tu cuenta haciendo clic en el enlace enviado.", 1, "Verificación de cuenta", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 7, 28, 9, 30, 0, 0, DateTimeKind.Unspecified), null, false, "Estás invitado al evento de bienvenida. Confirma tu asistencia.", 2, "Invitación a evento", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 7, 27, 15, 0, 0, 0, DateTimeKind.Utc), null, false, "Por favor verifica tu cuenta haciendo clic en el enlace enviado.", 1, "Verificación de cuenta", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 7, 28, 14, 30, 0, 0, DateTimeKind.Utc), null, false, "Estás invitado al evento de bienvenida. Confirma tu asistencia.", 2, "Invitación a evento", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1204,9 +1252,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "BranchId", "Code", "CreateAt", "Description", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "Facultad de Ingeniería", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "Facultad de Ciencias Económicas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "Facultad de Artes", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, "Facultad de Ingeniería", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, "Facultad de Ciencias Económicas", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, "Facultad de Artes", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1215,13 +1263,13 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Address", "BloodTypeId", "CityId", "Code", "CreateAt", "DocumentNumber", "DocumentTypeId", "Email", "FirstName", "LastName", "MiddleName", "Phone", "PhotoPath", "PhotoUrl", "SecondLastName", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "1234567890", null, null, "Demo", "Funcionario", null, "3200001111", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "9876543210", null, null, "Laura", "Estudiante", null, "3100002222", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "1122334455", null, null, "Ana", "Administrador", null, "3001234567", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "9988776655", null, null, "José", "Usuario", null, "3151234567", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "1234561630", null, null, "María", "Tovar", null, "3200056311", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 6, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "1245567890", null, null, "Camilo", "Charry", null, "3200014311", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 7, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "1235267890", null, null, "Marcos", "Alvarez", null, "320026111", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "1234567890", null, null, "Demo", "Funcionario", null, "3200001111", null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "9876543210", null, null, "Laura", "Estudiante", null, "3100002222", null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "1122334455", null, null, "Ana", "Administrador", null, "3001234567", null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "9988776655", null, null, "José", "Usuario", null, "3151234567", null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "1234561630", null, null, "María", "Tovar", null, "3200056311", null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 6, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "1245567890", null, null, "Camilo", "Charry", null, "3200014311", null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 7, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "1235267890", null, null, "Marcos", "Alvarez", null, "320026111", null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1230,9 +1278,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Puede crear nuevos registros", "crear", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Puede editar registros existentes", "editar", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Puede validar datos (correo, QR)", "validar", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Puede crear nuevos registros", "crear", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Puede editar registros existentes", "editar", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Puede validar datos (correo, QR)", "validar", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1241,11 +1289,11 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Perfil para estudiantes de la institución", "Estudiante", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Perfil para docentes o instructores", "Profesor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Perfil para personal administrativo", "Administrativo", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Perfil para pasantes o practicantes", "Pasante", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Perfil para usuarios externos o visitantes", "Invitado", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Perfil para estudiantes de la institución", "Estudiante", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Perfil para docentes o instructores", "Profesor", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Perfil para personal administrativo", "Administrativo", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Perfil para pasantes o practicantes", "Pasante", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Perfil para usuarios externos o visitantes", "Invitado", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1254,12 +1302,12 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "HasAllPermissions", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Acceso total al sistema.", true, "SuperAdmin", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Administra carnets y eventos de su organización.", false, "OrgAdmin", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestiona únicamente los eventos (creación, control y reportes).", false, "Supervisor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Funcionario (docentes, coordinadores, etc.) con visualización de su propio carnet.", false, "Administrativo", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Consulta su propio carnet y asistencia.", false, "Estudiante", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Acceso mínimo/público.", false, "Usuario", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Acceso total al sistema.", true, "SuperAdmin", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Administra carnets y eventos de su organización.", false, "OrgAdmin", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Gestiona únicamente los eventos (creación, control y reportes).", false, "Supervisor", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Funcionario (docentes, coordinadores, etc.) con visualización de su propio carnet.", false, "Administrativo", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Consulta su propio carnet y asistencia.", false, "Estudiante", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Acceso mínimo/público.", false, "Usuario", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1268,18 +1316,18 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Activo", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Inactivo", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Pendiente", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Procesando", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Rechazado", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Entregado", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Leída", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 8, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "En curso", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 9, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Finalizado", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 10, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Cancelado", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 11, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Expirado", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 12, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Renovado", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Activo", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Inactivo", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Pendiente", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Procesando", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Rechazado", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Entregado", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 7, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Leída", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 8, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "En curso", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 9, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Finalizado", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 10, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Cancelado", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 11, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Expirado", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 12, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Renovado", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1288,12 +1336,12 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Name", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Organización", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Punto de acceso", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Notificación", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Tipo de documento", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Tipo de sangre", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Filtros para eventos privados", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Organización", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Punto de acceso", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Notificación", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Tipo de documento", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Tipo de sangre", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Filtros para eventos privados", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1302,47 +1350,47 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "Name", "TypeCategoryId", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Cédula de ciudadanía", "CC", 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Cédula de extranjería", "CE", 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Tarjeta de identidad", "TI", 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Pasaporte", "PA", 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Número de Identificación Tributaria", "NIT", 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sangre tipo O positivo", "O+", 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sangre tipo O negativo", "O-", 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 8, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sangre tipo A positivo", "A+", 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 9, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sangre tipo A negativo", "A-", 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 10, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sangre tipo B positivo", "B+", 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 11, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sangre tipo B negativo", "B-", 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 12, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sangre tipo AB positivo", "AB+", 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 13, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sangre tipo AB negativo", "AB-", 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 14, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Organización tipo empresa", "Empresa", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 15, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Organización tipo colegio", "Colegio", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 16, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Organización tipo universidad", "Universidad", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 17, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Organización sede principal", "Sede Principal", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 18, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Organización tipo sucursal", "Sucursal", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 19, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Notificación para verificación de identidad o datos", "Verificación", 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 20, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Notificación de invitación a evento o sistema", "Invitación", 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 21, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Notificación de recordatorio de evento o tarea", "Recordatorio", 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 22, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Notificación de alerta por evento crítico", "Alerta", 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 23, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Punto de acceso solo de entrada", "Entrada", 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 24, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Punto de acceso solo de salida", "Salida", 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 25, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Punto de acceso bidireccional", "Entrada y salida", 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 26, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Descripción", "Division", 6, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 27, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Descripción", "Profile", 6, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 28, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Descripción", "Perfil", 6, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Cédula de ciudadanía", "CC", 4, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Cédula de extranjería", "CE", 4, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Tarjeta de identidad", "TI", 4, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Pasaporte", "PA", 4, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Número de Identificación Tributaria", "NIT", 4, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sangre tipo O positivo", "O+", 5, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 7, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sangre tipo O negativo", "O-", 5, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 8, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sangre tipo A positivo", "A+", 5, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 9, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sangre tipo A negativo", "A-", 5, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 10, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sangre tipo B positivo", "B+", 5, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 11, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sangre tipo B negativo", "B-", 5, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 12, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sangre tipo AB positivo", "AB+", 5, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 13, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Sangre tipo AB negativo", "AB-", 5, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 14, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Organización tipo empresa", "Empresa", 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 15, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Organización tipo colegio", "Colegio", 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 16, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Organización tipo universidad", "Universidad", 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 17, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Organización sede principal", "Sede Principal", 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 18, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Organización tipo sucursal", "Sucursal", 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 19, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Notificación para verificación de identidad o datos", "Verificación", 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 20, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Notificación de invitación a evento o sistema", "Invitación", 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 21, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Notificación de recordatorio de evento o tarea", "Recordatorio", 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 22, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Notificación de alerta por evento crítico", "Alerta", 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 23, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Punto de acceso solo de entrada", "Entrada", 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 24, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Punto de acceso solo de salida", "Salida", 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 25, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Punto de acceso bidireccional", "Entrada y salida", 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 26, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Descripción", "Division", 6, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 27, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Descripción", "Profile", 6, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 28, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Descripción", "Perfil", 6, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Events",
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "EventEnd", "EventStart", "EventTypeId", "IsPublic", "Name", "ScheduleDate", "ScheduleTime", "SheduleId", "StatusId", "UpdateAt" },
-                values: new object[] { 1, "TECH2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2023, 7, 30, 14, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 7, 30, 10, 0, 0, 0, DateTimeKind.Unspecified), 1, true, "Conferencia de Tecnología", new DateTime(2023, 7, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1900, 1, 1, 10, 0, 0, 0, DateTimeKind.Unspecified), null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 1, "TECH2025", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2023, 7, 30, 19, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 7, 30, 15, 0, 0, 0, DateTimeKind.Utc), 1, true, "Conferencia de Tecnología", new DateTime(2023, 7, 30, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1900, 1, 1, 15, 0, 0, 0, DateTimeKind.Utc), null, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Events",
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "EventEnd", "EventStart", "EventTypeId", "Name", "ScheduleDate", "ScheduleTime", "SheduleId", "StatusId", "UpdateAt" },
-                values: new object[] { 2, "SALUD2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2023, 8, 5, 12, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 8, 5, 9, 0, 0, 0, DateTimeKind.Unspecified), 2, "Charla de Salud", new DateTime(2023, 8, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1900, 1, 1, 9, 0, 0, 0, DateTimeKind.Unspecified), null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 2, "SALUD2025", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2023, 8, 5, 17, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 8, 5, 14, 0, 0, 0, DateTimeKind.Utc), 2, "Charla de Salud", new DateTime(2023, 8, 5, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1900, 1, 1, 14, 0, 0, 0, DateTimeKind.Utc), null, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
@@ -1350,31 +1398,31 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "Icon", "ModuleId", "Name", "UpdateAt", "Url" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Panel principal", "home", 1, "Inicio", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard" },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Centro de ayuda y documentación", "help", 1, "Ayuda", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/ayuda" },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Vista general de la estructura", "dashboard_customize", 2, "Resumen", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/structure" },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Administración de sucursales", "store", 2, "Sucursales", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/structure/branch" },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de unidades organizativas", "schema", 2, "Unidades Organizativas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/structure/unit" },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Administración de divisiones internas", "account_tree", 2, "Divisiones Internas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/structure/internal-division" },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Perfiles de las personas en el sistema", "badge", 2, "Perfiles", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/profile" },
-                    { 8, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Configuración de horarios/jornadas", "schedule", 2, "Jornadas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/structure/schedule" },
-                    { 9, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de eventos", "event", 3, "Eventos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/events" },
-                    { 10, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de tipos de evento", "category", 3, "Tipos de Evento", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/event-types" },
-                    { 11, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Administración de puntos de acceso", "sensor_door", 3, "Puntos de Acceso", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/access-points" },
-                    { 12, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Registro y consulta de asistencias", "how_to_reg", 3, "Asistencias", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/attendance" },
-                    { 13, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Registro y consulta de generación masiva de carnets", "badge", 3, "Emisión de Carnet", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/operational/card-issuance" },
-                    { 14, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Estados del sistema", "check_circle_unread", 4, "Estados", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/status" },
-                    { 15, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Tipos y categorías del sistema", "category", 4, "Tipos y Categorías", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/types-category" },
-                    { 16, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Configuración del Menú del sistema", "background_dot_small", 4, "Menu", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/parametros/menu" },
-                    { 17, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de departamentos", "flag", 4, "Departamentos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/location/department" },
-                    { 18, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de municipios", "place", 4, "Municipios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/organizational/location/municipality" },
-                    { 19, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de personas", "person_pin_circle", 5, "Personas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/people" },
-                    { 20, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de usuarios", "groups_2", 5, "Usuarios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/users" },
-                    { 21, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de roles", "add_moderator", 5, "Roles", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/roles" },
-                    { 22, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Permisos por formulario", "folder_managed", 5, "Gestión de Permisos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/permission-forms" },
-                    { 23, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de permisos", "lock_open_circle", 5, "Permisos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/permissions" },
-                    { 24, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de formularios", "lists", 5, "Formularios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/forms" },
-                    { 25, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Catálogo de módulos", "dashboard_2", 5, "Módulos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "/dashboard/seguridad/modules" }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Panel principal", "home", 1, "Inicio", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard" },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Centro de ayuda y documentación", "help", 1, "Ayuda", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/ayuda" },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Vista general de la estructura", "dashboard_customize", 2, "Resumen", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/organizational/structure" },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Administración de sucursales", "store", 2, "Sucursales", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/organizational/structure/branch" },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Gestión de unidades organizativas", "schema", 2, "Unidades Organizativas", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/organizational/structure/unit" },
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Administración de divisiones internas", "account_tree", 2, "Divisiones Internas", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/organizational/structure/internal-division" },
+                    { 7, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Perfiles de las personas en el sistema", "badge", 2, "Perfiles", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/organizational/profile" },
+                    { 8, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Configuración de horarios/jornadas", "schedule", 2, "Jornadas", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/organizational/structure/schedule" },
+                    { 9, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Gestión de eventos", "event", 3, "Eventos", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/operational/events" },
+                    { 10, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Catálogo de tipos de evento", "category", 3, "Tipos de Evento", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/operational/event-types" },
+                    { 11, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Administración de puntos de acceso", "sensor_door", 3, "Puntos de Acceso", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/operational/access-points" },
+                    { 12, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Registro y consulta de asistencias", "how_to_reg", 3, "Asistencias", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/operational/attendance" },
+                    { 13, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Registro y consulta de generación masiva de carnets", "badge", 3, "Emisión de Carnet", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/operational/card-issuance" },
+                    { 14, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Estados del sistema", "check_circle_unread", 4, "Estados", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/parametros/status" },
+                    { 15, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Tipos y categorías del sistema", "category", 4, "Tipos y Categorías", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/parametros/types-category" },
+                    { 16, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Configuración del Menú del sistema", "background_dot_small", 4, "Menu", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/parametros/menu" },
+                    { 17, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Catálogo de departamentos", "flag", 4, "Departamentos", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/organizational/location/department" },
+                    { 18, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Catálogo de municipios", "place", 4, "Municipios", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/organizational/location/municipality" },
+                    { 19, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Gestión de personas", "person_pin_circle", 5, "Personas", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/people" },
+                    { 20, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Gestión de usuarios", "groups_2", 5, "Usuarios", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/users" },
+                    { 21, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Gestión de roles", "add_moderator", 5, "Roles", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/roles" },
+                    { 22, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Permisos por formulario", "folder_managed", 5, "Gestión de Permisos", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/permission-forms" },
+                    { 23, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Catálogo de permisos", "lock_open_circle", 5, "Permisos", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/permissions" },
+                    { 24, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Catálogo de formularios", "lists", 5, "Formularios", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/forms" },
+                    { 25, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Catálogo de módulos", "dashboard_2", 5, "Módulos", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/modules" }
                 });
 
             migrationBuilder.InsertData(
@@ -1383,11 +1431,11 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "AreaCategoryId", "BranchId", "Code", "CreateAt", "Description", "Name", "OrganizationalUnitId", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, 1, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "División académica enfocada en ingeniería de software y sistemas.", "Escuela de Sistemas", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, 1, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "División académica centrada en ingeniería civil y estructuras.", "Escuela de Civil", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, 4, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Encargado de contabilidad, auditoría y normativas contables.", "Departamento de Contaduría", 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, 4, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Área enfocada en teoría económica, micro y macroeconomía.", "Departamento de Economía", 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, 2, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Formación profesional en teoría musical, instrumentos y composición.", "Escuela de Música", 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, 1, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "División académica enfocada en ingeniería de software y sistemas.", "Escuela de Sistemas", 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 1, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "División académica centrada en ingeniería civil y estructuras.", "Escuela de Civil", 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, 4, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Encargado de contabilidad, auditoría y normativas contables.", "Departamento de Contaduría", 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 4, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Área enfocada en teoría económica, micro y macroeconomía.", "Departamento de Economía", 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, 2, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Formación profesional en teoría musical, instrumentos y composición.", "Escuela de Música", 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1396,11 +1444,11 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "FormId", "Icon", "IsDeleted", "ModuleId", "OrderIndex", "ParentMenuId", "Title", "Type", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, false, 1, 1, null, null, "group", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, false, 2, 2, null, null, "group", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, false, 3, 3, null, null, "group", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, false, 4, 4, null, null, "group", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, false, 5, 5, null, null, "group", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, null, false, 1, 1, null, null, "group", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, null, false, 2, 2, null, null, "group", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, null, false, 3, 3, null, null, "group", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, null, false, 4, 4, null, null, "group", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, null, false, 5, 5, null, null, "group", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1409,10 +1457,10 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "Code", "CreateAt", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "UpdateAt", "UserName" },
                 values: new object[,]
                 {
-                    { 1, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "123", 1, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin" },
-                    { 2, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Marcos2025", 7, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "marcosrojasalvarez09172007@gmail.com" },
-                    { 3, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "isa123", 5, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "isabeltovarp.18@gmail.com" },
-                    { 4, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Katalin@01", 6, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "cachape64@gmail.com" }
+                    { 1, true, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, "123", 1, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "admin" },
+                    { 2, true, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, "Marcos2025", 7, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "marcosrojasalvarez09172007@gmail.com" },
+                    { 3, true, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, "isa123", 5, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "isabeltovarp.18@gmail.com" },
+                    { 4, true, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, "Katalin@01", 6, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "cachape64@gmail.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -1421,31 +1469,31 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "UpdateAt", "UserName" },
                 values: new object[,]
                 {
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "L4d!Estudiante2025", 2, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Adm!nCarnet2025", 3, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Usr!Carnet2025", 4, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null }
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, "L4d!Estudiante2025", 2, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null },
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, "Adm!nCarnet2025", 3, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null },
+                    { 7, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, "Usr!Carnet2025", 4, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null }
                 });
 
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "AccessPoints",
-                columns: new[] { "Id", "Code", "CreateAt", "Description", "EventId", "Name", "QrCode", "TypeId", "UpdateAt" },
+                columns: new[] { "Id", "Code", "CreateAt", "Description", "Name", "QrCode", "TypeId", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Acceso norte del evento", 1, "Punto Norte", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Acceso sur del evento", 1, "Punto Sur", null, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Acceso principal", 2, "Punto Principal", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Acceso norte del evento", "Punto Norte", null, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Acceso sur del evento", "Punto Sur", null, 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Acceso principal", "Punto Principal", null, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
-                schema: "Organizational",
-                table: "EventTargetAudience",
-                columns: new[] { "Id", "Code", "CreateAt", "EventId", "IsDeleted", "ReferenceId", "TypeId", "UpdateAt" },
+                schema: "Operational",
+                table: "EventTargetAudiences",
+                columns: new[] { "Id", "Code", "CreateAt", "EventId", "InternalDivisionId", "IsDeleted", "OrganizationalUnitId", "ProfileId", "ReferenceId", "TypeId", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, false, 1, 6, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, false, 2, 6, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, false, 3, 6, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, null, false, null, null, 1, 6, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, null, false, null, null, 2, 6, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2, null, false, null, null, 3, 6, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1454,13 +1502,13 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "FormId", "Icon", "IsDeleted", "ModuleId", "OrderIndex", "ParentMenuId", "Title", "Type", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, false, null, 1, 1, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, null, false, null, 2, 1, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 8, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "account_tree", false, null, 1, 2, "Estructura Organizativa", "collapse", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 15, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "event_available", false, null, 1, 3, "Eventos y Control de Acceso", "collapse", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 20, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "settings_applications", false, null, 1, 4, "Configuración General", "collapse", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 21, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "location_on", false, null, 2, 4, "Ubicación", "collapse", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 27, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "admin_panel_settings", false, null, 1, 5, "Gestión de Seguridad", "collapse", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, null, false, null, 1, 1, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 7, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2, null, false, null, 2, 1, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 8, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, "account_tree", false, null, 1, 2, "Estructura Organizativa", "collapse", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 15, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, "event_available", false, null, 1, 3, "Eventos y Control de Acceso", "collapse", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 20, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, "settings_applications", false, null, 1, 4, "Configuración General", "collapse", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 21, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, "location_on", false, null, 2, 4, "Ubicación", "collapse", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 27, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, "admin_panel_settings", false, null, 1, 5, "Gestión de Seguridad", "collapse", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1469,8 +1517,8 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "ExpirationDate", "IsDeleted", "NotificationId", "ReadDate", "SendDate", "StatusId", "UpdateAt", "UserId" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, null, new DateTime(2025, 7, 27, 10, 5, 0, 0, DateTimeKind.Unspecified), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 8, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 2, new DateTime(2025, 7, 28, 10, 15, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 7, 28, 9, 35, 0, 0, DateTimeKind.Unspecified), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2 }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 8, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 1, null, new DateTime(2025, 7, 27, 15, 5, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1 },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 8, 5, 5, 0, 0, 0, DateTimeKind.Utc), false, 2, new DateTime(2025, 7, 28, 15, 15, 0, 0, DateTimeKind.Utc), new DateTime(2025, 7, 28, 14, 35, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -1479,9 +1527,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "Logo", "Name", "TypeId", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Institución de educación superior", "logo_unal.png", "Universidad Nacional", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Centro de atención médica", "logo_hsj.png", "Hospital San José", 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Fundación sin ánimo de lucro", "logo_fundacion.png", "Fundación Futuro", 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Institución de educación superior", "logo_unal.png", "Universidad Nacional", 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Centro de atención médica", "logo_hsj.png", "Hospital San José", 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "Fundación sin ánimo de lucro", "logo_fundacion.png", "Fundación Futuro", 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1490,11 +1538,11 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "InternalDivisionId", "IsCurrentlySelected", "PersonId", "ProfileId", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 2, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 5, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 6, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, true, 7, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, true, 1, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, true, 2, 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, true, 5, 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, true, 6, 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, true, 7, 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1503,9 +1551,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "FormId", "PermissionId", "RolId", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 1, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 3, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, 2, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, 1, 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2, 3, 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 3, 2, 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1514,13 +1562,13 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "IsDeleted", "RolId", "UpdateAt", "UserId" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2 },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3 },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4 },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2 },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3 },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4 }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1 },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2 },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 3 },
+                    { 4, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 4, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 4 },
+                    { 5, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2 },
+                    { 6, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 3 },
+                    { 7, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 4 }
                 });
 
             migrationBuilder.InsertData(
@@ -1529,8 +1577,8 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "AccessPointOfEntry", "AccessPointOfExit", "Code", "CreateAt", "PersonId", "QrCode", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, null, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, 1, 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, null, new DateTime(2023, 1, 1, 13, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 17, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 1, 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2, null, new DateTime(2023, 1, 1, 14, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 18, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1539,15 +1587,15 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Address", "CityId", "Code", "CreateAt", "Email", "Location", "Name", "OrganizationId", "Phone", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, "Calle 1 # 2-34", 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "principal@org.com", "Centro", "Sucursal Principal", 1, "123456789", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, "Carrera 45 # 67-89", 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "norte@org.com", "Zona Norte", "Sucursal Norte", 1, "987654321", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, "Calle 1 # 2-34", 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "principal@org.com", "Centro", "Sucursal Principal", 1, "123456789", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, "Carrera 45 # 67-89", 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), "norte@org.com", "Zona Norte", "Sucursal Norte", 1, "987654321", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "Cards",
                 columns: new[] { "Id", "CardTemplateId", "Code", "CreateAt", "CreationDate", "ExpirationDate", "IsDeleted", "PersonDivissionProfileId", "QRCode", "StatusId", "UniqueId", "UpdateAt" },
-                values: new object[] { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, "QR12345", 1, new Guid("00000000-0000-0000-0000-000000000000"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { 1, 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 1, "QR12345", 1, new Guid("00000000-0000-0000-0000-000000000000"), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "Parameter",
@@ -1555,28 +1603,28 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "FormId", "Icon", "IsDeleted", "ModuleId", "OrderIndex", "ParentMenuId", "Title", "Type", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 9, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, null, false, null, 1, 8, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 10, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, null, false, null, 2, 8, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 11, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, null, false, null, 3, 8, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 12, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, null, false, null, 4, 8, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 13, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 7, null, false, null, 5, 8, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 14, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 8, null, false, null, 6, 8, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 16, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 9, null, false, null, 1, 15, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 17, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 10, null, false, null, 2, 15, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 18, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 11, null, false, null, 3, 15, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 19, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 12, null, false, null, 4, 15, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 22, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 13, null, false, null, 1, 20, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 23, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 14, null, false, null, 2, 20, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 24, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 15, null, false, null, 3, 20, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 25, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 16, null, false, null, 1, 21, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 26, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, null, false, null, 2, 21, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 28, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 18, null, false, null, 1, 27, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 29, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 19, null, false, null, 2, 27, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 30, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 20, null, false, null, 3, 27, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 31, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 21, null, false, null, 4, 27, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 32, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 22, null, false, null, 5, 27, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 33, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 23, null, false, null, 6, 27, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 34, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 24, null, false, null, 7, 27, null, "item", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 9, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 3, null, false, null, 1, 8, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 10, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 4, null, false, null, 2, 8, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 11, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 5, null, false, null, 3, 8, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 12, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 6, null, false, null, 4, 8, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 13, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 7, null, false, null, 5, 8, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 14, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 8, null, false, null, 6, 8, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 16, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 9, null, false, null, 1, 15, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 17, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 10, null, false, null, 2, 15, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 18, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 11, null, false, null, 3, 15, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 19, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 12, null, false, null, 4, 15, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 22, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 13, null, false, null, 1, 20, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 23, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 14, null, false, null, 2, 20, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 24, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 15, null, false, null, 3, 20, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 25, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 16, null, false, null, 1, 21, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 26, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 17, null, false, null, 2, 21, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 28, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 18, null, false, null, 1, 27, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 29, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 19, null, false, null, 2, 27, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 30, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 20, null, false, null, 3, 27, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 31, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 21, null, false, null, 4, 27, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 32, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 22, null, false, null, 5, 27, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 33, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 23, null, false, null, 6, 27, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 34, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 24, null, false, null, 7, 27, null, "item", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1585,9 +1633,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Code", "CreateAt", "EndTime", "Name", "OrganizationId", "StartTime", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", 1, new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", 1, new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", 1, new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", 1, new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", 1, new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", 1, new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1596,17 +1644,11 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "BranchId", "Code", "CreateAt", "OrganizationUnitId", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 3, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AccessPoints_EventId",
-                schema: "Operational",
-                table: "AccessPoints",
-                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccessPoints_TypeId",
@@ -1735,6 +1777,12 @@ namespace Entity.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventAccessPoints_AccessPointId",
+                schema: "Operational",
+                table: "EventAccessPoints",
+                column: "AccessPointId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_EventTypeId",
                 schema: "Operational",
                 table: "Events",
@@ -1753,15 +1801,33 @@ namespace Entity.Migrations
                 column: "StatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventTargetAudience_EventId",
-                schema: "Organizational",
-                table: "EventTargetAudience",
+                name: "IX_EventTargetAudiences_EventId",
+                schema: "Operational",
+                table: "EventTargetAudiences",
                 column: "EventId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventTargetAudience_TypeId",
-                schema: "Organizational",
-                table: "EventTargetAudience",
+                name: "IX_EventTargetAudiences_InternalDivisionId",
+                schema: "Operational",
+                table: "EventTargetAudiences",
+                column: "InternalDivisionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventTargetAudiences_OrganizationalUnitId",
+                schema: "Operational",
+                table: "EventTargetAudiences",
+                column: "OrganizationalUnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventTargetAudiences_ProfileId",
+                schema: "Operational",
+                table: "EventTargetAudiences",
+                column: "ProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventTargetAudiences_TypeId",
+                schema: "Operational",
+                table: "EventTargetAudiences",
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
@@ -2060,8 +2126,12 @@ namespace Entity.Migrations
                 schema: "Operational");
 
             migrationBuilder.DropTable(
-                name: "EventTargetAudience",
-                schema: "Organizational");
+                name: "EventAccessPoints",
+                schema: "Operational");
+
+            migrationBuilder.DropTable(
+                name: "EventTargetAudiences",
+                schema: "Operational");
 
             migrationBuilder.DropTable(
                 name: "ImportBatchRows");
@@ -2095,6 +2165,10 @@ namespace Entity.Migrations
                 schema: "Operational");
 
             migrationBuilder.DropTable(
+                name: "Events",
+                schema: "Operational");
+
+            migrationBuilder.DropTable(
                 name: "Cards",
                 schema: "Organizational");
 
@@ -2122,8 +2196,12 @@ namespace Entity.Migrations
                 schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
-                name: "Events",
+                name: "EventTypes",
                 schema: "Operational");
+
+            migrationBuilder.DropTable(
+                name: "Schedules",
+                schema: "Organizational");
 
             migrationBuilder.DropTable(
                 name: "CardTemplates",
@@ -2134,20 +2212,12 @@ namespace Entity.Migrations
                 schema: "Organizational");
 
             migrationBuilder.DropTable(
-                name: "Modules",
-                schema: "ModelSecurity");
-
-            migrationBuilder.DropTable(
-                name: "EventTypes",
-                schema: "Operational");
-
-            migrationBuilder.DropTable(
-                name: "Schedules",
-                schema: "Organizational");
-
-            migrationBuilder.DropTable(
                 name: "Statuses",
                 schema: "Parameter");
+
+            migrationBuilder.DropTable(
+                name: "Modules",
+                schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
                 name: "InternalDivisions",
