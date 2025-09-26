@@ -416,18 +416,26 @@ namespace Utilities.Helper
                     opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Name : null))
                 .ForMember(dest => dest.AccessPointOfExitName,
                     opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Name : null))
-               .ForMember(dest => dest.EventName,
+                .ForMember(dest => dest.EventName,
                     opt => opt.MapFrom(src =>
-                    src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
-                  ? src.AccessPointEntry.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
-            : (
-                src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
-                    ? src.AccessPointExit.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
-                    : null
-            )
-    ))
-
-
+                        src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
+                            ? src.AccessPointEntry.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
+                            : (
+                                src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
+                                    ? src.AccessPointExit.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
+                                    : null
+                            )
+                    ))
+                .ForMember(dest => dest.EventId,
+                    opt => opt.MapFrom(src =>
+                        src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
+                            ? src.AccessPointEntry.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()
+                            : (
+                                src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
+                                    ? src.AccessPointExit.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()
+                                    : (int?)null
+                            )
+                    ))
                 // ➕ Formateo de fechas a string (cultura es-CO). Sin helpers externos.
                 .ForMember(dest => dest.TimeOfEntryStr,
                     opt => opt.MapFrom(src => src.TimeOfEntry.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))))
@@ -435,11 +443,11 @@ namespace Utilities.Helper
                     opt => opt.MapFrom(src => src.TimeOfExit.HasValue
                         ? src.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))
                         : null))
-
                 .ReverseMap()
                     .ForMember(dest => dest.Person, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointExit, opt => opt.Ignore());
+
 
             CreateMap<User, UserProfileDto>()
                 .ForMember(d => d.FirstName, opt => opt.MapFrom(s => s.Person.FirstName))
