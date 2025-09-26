@@ -11,6 +11,9 @@ using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Operational.Request;
 using System.Threading;
 using System.Linq;
+using System.Collections.Generic; // 👈 agregado
+using Business.Interfaces.Services; // 👈 agregado
+using Entity.DTOs.Operational.Export; // 👈 agregado
 
 namespace Business.Implementations.Operational
 {
@@ -19,16 +22,19 @@ namespace Business.Implementations.Operational
         private readonly IAttendanceData _attendanceData;
         private readonly ILogger<Attendance> _logger;
         private readonly IMapper _mapper;
+        private readonly IExportService _exportService; // 👈 agregado
 
         public AttendanceBusiness(
             IAttendanceData data,
             ILogger<Attendance> logger,
-            IMapper mapper
+            IMapper mapper,
+            IExportService exportService // 👈 agregado
         ) : base(data, logger, mapper)
         {
             _attendanceData = data;
             _logger = logger;
             _mapper = mapper;
+            _exportService = exportService;
         }
 
         /// <summary>
@@ -45,29 +51,25 @@ namespace Business.Implementations.Operational
 
             try
             {
-                // Normalización de AccessPoints (0 o negativos -> null)
                 if (dto.AccessPointOfEntry.HasValue && dto.AccessPointOfEntry.Value <= 0)
                     dto.AccessPointOfEntry = null;
                 if (dto.AccessPointOfExit.HasValue && dto.AccessPointOfExit.Value <= 0)
                     dto.AccessPointOfExit = null;
 
-                // ¿Existe asistencia abierta?
                 var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, CancellationToken.None);
 
                 if (open == null)
                 {
-                    // ➜ ENTRADA (crear)
                     if (dto.TimeOfEntry == default)
                         dto.TimeOfEntry = DateTime.Now;
 
-                    dto.TimeOfExit = null; // no se registra aún
+                    dto.TimeOfExit = null;
                     var created = await Save(dto);
                     _logger.LogInformation($"Entrada registrada. PersonId={dto.PersonId}, AttendanceId={created.Id}");
                     return created;
                 }
                 else
                 {
-                    // ➜ SALIDA (actualizar por data layer)
                     var now = DateTime.Now;
                     if (now < open.TimeOfEntry) now = open.TimeOfEntry;
 
@@ -89,9 +91,6 @@ namespace Business.Implementations.Operational
             }
         }
 
-        /// <summary>
-        /// REGISTRA SOLO LA ENTRADA (falla si ya existe una abierta).
-        /// </summary>
         public async Task<AttendanceDtoResponse> RegisterEntryAsync(
             AttendanceDtoRequestSpecific dto,
             CancellationToken ct = default)
@@ -115,14 +114,11 @@ namespace Business.Implementations.Operational
                 AccessPointOfExit = null
             };
 
-            var created = await Save(req); // creación
+            var created = await Save(req);
             _logger.LogInformation("Entrada registrada (endpoint específico). PersonId={PersonId}, AttendanceId={AttendanceId}", dto.PersonId, created.Id);
             return created!;
         }
 
-        /// <summary>
-        /// REGISTRA SOLO LA SALIDA (falla si no hay entrada abierta).
-        /// </summary>
         public async Task<AttendanceDtoResponse> RegisterExitAsync(
             AttendanceDtoRequestSpecific dto,
             CancellationToken ct = default)
@@ -141,7 +137,6 @@ namespace Business.Implementations.Operational
                 ? dto.AccessPoint
                 : (open.AccessPointOfExit ?? open.AccessPointOfEntry);
 
-            // Actualizar por data layer (evita conflicto de tracking y crea UPDATE real)
             var updatedEntity = await _attendanceData.UpdateExitAsync(open.Id, time, apOut, ct);
             var updated = _mapper.Map<AttendanceDtoResponse>(updatedEntity);
 
@@ -165,7 +160,6 @@ namespace Business.Implementations.Operational
             return Convert.ToBase64String(qrBytes);
         }
 
-        //NUEVO MÉTODO: búsqueda con filtros y paginación
         public async Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
@@ -176,7 +170,6 @@ namespace Business.Implementations.Operational
 
             var list = entities.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
 
-            // completar strings amigables
             foreach (var it in list)
             {
                 it.TimeOfEntryStr = it.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
@@ -184,6 +177,39 @@ namespace Business.Implementations.Operational
             }
 
             return (list, total);
+        }
+
+        // ============================================================
+        // 📌 NUEVOS MÉTODOS DE EXPORTACIÓN
+        // ============================================================
+        public async Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default)
+        {
+            var exportList = data.Select(a => new AttendanceExportDto
+            {
+                Person = a.PersonFullName,
+                Event = a.EventName ?? "",
+                Entry = a.TimeOfEntryStr ?? a.TimeOfEntry.ToString("dd/MM/yyyy HH:mm"),
+                Exit = a.TimeOfExitStr ?? a.TimeOfExit?.ToString("dd/MM/yyyy HH:mm"),
+                EntryPoint = a.AccessPointOfEntryName ?? "",
+                ExitPoint = a.AccessPointOfExitName ?? ""
+            });
+
+            return await _exportService.ExportToPdfAsync(exportList, "Reporte de Asistencias", ct);
+        }
+
+        public async Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default)
+        {
+            var exportList = data.Select(a => new AttendanceExportDto
+            {
+                Person = a.PersonFullName,
+                Event = a.EventName ?? "",
+                Entry = a.TimeOfEntryStr ?? a.TimeOfEntry.ToString("dd/MM/yyyy HH:mm"),
+                Exit = a.TimeOfExitStr ?? a.TimeOfExit?.ToString("dd/MM/yyyy HH:mm"),
+                EntryPoint = a.AccessPointOfEntryName ?? "",
+                ExitPoint = a.AccessPointOfExitName ?? ""
+            });
+
+            return await _exportService.ExportToExcelAsync(exportList, "Reporte de Asistencias", ct);
         }
     }
 }

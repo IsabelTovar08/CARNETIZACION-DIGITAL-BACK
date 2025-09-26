@@ -1,5 +1,4 @@
-
-using Entity.DTOs.Notifications;
+﻿using Entity.DTOs.Notifications;
 using Entity.DTOs.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,12 +6,18 @@ using Microsoft.OpenApi.Models;
 using Web.Extensions;
 using Web.Realtime.Hubs;
 
+// 👇 agregado para configurar QuestPDF
+using QuestPDF.Infrastructure;
+
 namespace Web
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            // 👇 licencia gratuita de QuestPDF (Community)
+            QuestPDF.Settings.License = LicenseType.Community;
+
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
             // Add services to the container.
@@ -29,7 +34,7 @@ namespace Web
                 // Definir el esquema Bearer
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "Autenticaci�n JWT con esquema Bearer. **Pega solo el token (sin 'Bearer ')**.",
+                    Description = "Autenticación JWT con esquema Bearer. **Pega solo el token (sin 'Bearer ')**.",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
@@ -56,9 +61,9 @@ namespace Web
 
             builder.Services.AddSwaggerGen();
 
-
             // servicios y data
             builder.Services.AddProjectServices();
+
             //Cors
             builder.Services.AddCorsConfiguration(configuration);
 
@@ -67,25 +72,22 @@ namespace Web
 
             // JWT
             builder.Services.AddJwtAuthentication(configuration);
-            //Conexi�n 
+            //Conexión 
             builder.Services.AddDatabaseConfiguration(configuration);
-
 
             //Mail 
             builder.Services.Configure<EmailSettings>(
-            builder.Configuration.GetSection("EmailSettings"));
+                builder.Configuration.GetSection("EmailSettings"));
 
             //Telegram 
             builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
 
-
             builder.Services.Configure<TwilioSettings>(
                 builder.Configuration.GetSection("Twilio"));
 
-            // Supabase para almacenar im�genes 
+            // Supabase para almacenar imágenes 
             builder.Services.Configure<SupabaseOptions>(builder.Configuration.GetSection("Supabase"));
             builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Upload"));
-
 
             var app = builder.Build();
 
@@ -95,7 +97,7 @@ namespace Web
             //if (app.Environment.IsDevelopment())
             //{
             app.UseSwagger();
-                app.UseSwaggerUI();
+            app.UseSwaggerUI();
             //}
 
             app.UseHttpsRedirection();

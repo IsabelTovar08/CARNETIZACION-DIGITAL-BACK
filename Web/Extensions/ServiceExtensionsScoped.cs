@@ -123,6 +123,11 @@ using Utilities.Helpers.Excel;
 using Utilities.Notifications.Implementations;
 using Web.Auth;
 using Web.Realtime.Dispatchers;
+using Business.Interfaces.Services;
+using Business.Services.Export;
+using Business.Interfaces.Services;
+using Business.Services.Export;
+
 
 namespace Web.Extensions
 {
@@ -326,6 +331,15 @@ namespace Web.Extensions
             services.AddScoped<ICurrentUser, CurrentUser>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            //Excel helpers
+            services.AddScoped<IExcelPersonParser, ExcelPersonParser>();
+            services.AddScoped<IExcelBulkImporter, ExcelBulkImporter>();
+
+
+            // Export (PDF y Excel genérico)
+            services.AddScoped<IExportService, ExportService>();
+
 
 
 

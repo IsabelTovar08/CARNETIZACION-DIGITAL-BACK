@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Web.Controllers.Base;
+using System.Collections.Generic; // 👈 agregado
 
 namespace Web.Controllers.Operational
 {
@@ -119,7 +120,7 @@ namespace Web.Controllers.Operational
             }
         }
 
-        //NUEVO ENDPOINT: CONSULTA Y FILTRO
+        // NUEVO ENDPOINT: CONSULTA Y FILTRO
         /// <summary>
         /// Consulta y filtra registros de asistencia con paginación.
         /// Query params: personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize.
@@ -173,6 +174,38 @@ namespace Web.Controllers.Operational
                 message = result.Message,
                 data = result
             });
+        }
+
+        // ============================================================
+        // 📌 NUEVOS ENDPOINTS DE EXPORTACIÓN
+        // ============================================================
+
+        /// <summary>
+        /// Exporta los registros de asistencia a PDF.
+        /// </summary>
+        [HttpGet("export/pdf")]
+        [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExportPdf(CancellationToken ct)
+        {
+            var (items, _) = await _attendanceBusiness.SearchAsync(
+                null, null, null, null, "TimeOfEntry", "DESC", 1, 1000, ct);
+
+            var fileBytes = await _attendanceBusiness.ExportToPdfAsync(items, ct);
+            return File(fileBytes, "application/pdf", "Asistencias.pdf");
+        }
+
+        /// <summary>
+        /// Exporta los registros de asistencia a Excel.
+        /// </summary>
+        [HttpGet("export/excel")]
+        [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExportExcel(CancellationToken ct)
+        {
+            var (items, _) = await _attendanceBusiness.SearchAsync(
+                null, null, null, null, "TimeOfEntry", "DESC", 1, 1000, ct);
+
+            var fileBytes = await _attendanceBusiness.ExportToExcelAsync(items, ct);
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Asistencias.xlsx");
         }
     }
 }

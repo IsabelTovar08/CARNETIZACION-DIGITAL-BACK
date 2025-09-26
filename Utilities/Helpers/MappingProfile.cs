@@ -46,37 +46,33 @@ namespace Utilities.Helper
                 .ReverseMap();
             CreateMap<Person, PersonDtoRequest>().ReverseMap();
 
-
             CreateMap<Person, PersonInfoDto>()
-            // Info básica de la persona
-            .ForMember(d => d.PersonalInfo, o => o.MapFrom(s => s))
+                // Info básica de la persona
+                .ForMember(d => d.PersonalInfo, o => o.MapFrom(s => s))
 
-            // División actual (IsCurrentlySelected)
-            .ForMember(d => d.DivissionId, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Id))
-            .ForMember(d => d.DivissionName, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Name))
+                // División actual (IsCurrentlySelected)
+                .ForMember(d => d.DivissionId, o => o.MapFrom(s =>
+                    s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Id))
+                .ForMember(d => d.DivissionName, o => o.MapFrom(s =>
+                    s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Name))
 
-            // Unidad
-            .ForMember(d => d.UnitId, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Id))
-            .ForMember(d => d.UnitName, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Name))
+                // Unidad
+                .ForMember(d => d.UnitId, o => o.MapFrom(s =>
+                    s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Id))
+                .ForMember(d => d.UnitName, o => o.MapFrom(s =>
+                    s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Name))
 
-            // Organización (desde Branch → Organization)
-            .ForMember(d => d.OrganizationId, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
-                    .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
-                    .Select(oub => oub.Branch.Organization.Id)
-                    .FirstOrDefault()))
-            .ForMember(d => d.OrganizationName, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
-                    .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
-                    .Select(oub => oub.Branch.Organization.Name)
-                    .FirstOrDefault()));
-
-
-
+                // Organización (desde Branch → Organization)
+                .ForMember(d => d.OrganizationId, o => o.MapFrom(s =>
+                    s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
+                        .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
+                        .Select(oub => oub.Branch.Organization.Id)
+                        .FirstOrDefault()))
+                .ForMember(d => d.OrganizationName, o => o.MapFrom(s =>
+                    s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
+                        .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
+                        .Select(oub => oub.Branch.Organization.Name)
+                        .FirstOrDefault()));
 
             //Mapeo de la entidad Rol 
             CreateMap<Role, RolDto>().ReverseMap();
@@ -106,17 +102,15 @@ namespace Utilities.Helper
 
             CreateMap<User, UserDtoRequest>().ReverseMap();
 
-
             CreateMap<User, UserMeDto>()
-            // ⬇️ AQUÍ el cambio clave: pasa Rol ENTIDAD, no Name string
-            .ForMember(d => d.PhotoUrl, opt => opt.MapFrom(s => s.Person.PhotoUrl))
-            .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.UserRoles.Select(ur => ur.Rol)))
-            .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
-        s.UserRoles
-         .SelectMany(ur => ur.Rol.RolFormPermissions.Select(rp => rp.Permission))
-         .DistinctBy(p => p.Id)))
-            .ForMember(d => d.CurrentProfile, opt => opt.MapFrom(s =>
-                s.Person.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)));
+                .ForMember(d => d.PhotoUrl, opt => opt.MapFrom(s => s.Person.PhotoUrl))
+                .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.UserRoles.Select(ur => ur.Rol)))
+                .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
+                    s.UserRoles
+                     .SelectMany(ur => ur.Rol.RolFormPermissions.Select(rp => rp.Permission))
+                     .DistinctBy(p => p.Id)))
+                .ForMember(d => d.CurrentProfile, opt => opt.MapFrom(s =>
+                    s.Person.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)));
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()
@@ -135,12 +129,11 @@ namespace Utilities.Helper
 
             //Menu
             CreateMap<MenuStructure, MenuStructureDto>()
-            .ForMember(d => d.Title,
-                o => o.MapFrom(s => !string.IsNullOrWhiteSpace(s.Title) ? s.Title : (s.FormId != null ? s.Form.Name : s.Module.Name)))
-            .ForMember(d => d.Url, o => o.MapFrom(s => s.Form != null ? s.Form.Url : null))
-            .ForMember(d => d.Icon, o => o.MapFrom(s => !string.IsNullOrWhiteSpace(s.Icon) ? s.Icon : (s.FormId != null ? s.Form.Icon : s.Module.Icon)))
-            .ForMember(d => d.Classes, o => o.MapFrom(s => s.Type == "item" ? "nav-item" : null))
-            .ForMember(d => d.Children, o => o.MapFrom(s => s.Children.OrderBy(c => c.OrderIndex)));
+                .ForMember(d => d.Title,
+                    o => o.MapFrom(s => !string.IsNullOrWhiteSpace(s.Title) ? s.Title : (s.FormId != null ? s.Form.Name : s.Module.Name)))
+                .ForMember(d => d.Url, o => o.MapFrom(s => s.Form != null ? s.Form.Url : null))
+                .ForMember(d => d.Icon, o => o.MapFrom(s => !string.IsNullOrWhiteSpace(s.Icon) ? s.Icon : (s.FormId != null ? s.Form.Icon : s.Module.Icon)))
+                .ForMember(d => d.Children, o => o.MapFrom(s => s.Children.OrderBy(c => c.OrderIndex)));
 
             CreateMap<MenuStructure, MenuStructureRequest>().ReverseMap();
 
@@ -191,7 +184,6 @@ namespace Utilities.Helper
             .ForMember(d => d.ProfileId, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Id))
             .ForMember(d => d.ProfileName, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Name))
             .ForMember(d => d.AreaCategoryName, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.AreaCategory.Name))
-
             .ReverseMap()
                 .ForMember(s => s.Status, o => o.Ignore())
                 .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
@@ -283,7 +275,6 @@ namespace Utilities.Helper
             .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
             .ForMember(d => d.Id, o => o.Ignore());
 
-
             //EventType
             CreateMap<EventType, EventTypeDtoRequest>().ReverseMap();
             CreateMap<EventType, EventTypeDtoResponse>().ReverseMap();
@@ -306,9 +297,6 @@ namespace Utilities.Helper
             CreateMap<OrganizationalUnitBranch, OrganizationalUnitBranchDtoRequest>()
                 .ReverseMap();
 
-
-
-
             //AccessPoints
             CreateMap<AccessPointDtoRequest, AccessPoint>()
              .ForMember(d => d.Id, o => o.Ignore())
@@ -324,11 +312,9 @@ namespace Utilities.Helper
                  s.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()))
              .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null));
 
-
             // DTO -> ENTIDAD
             CreateMap<AccessPointDtoResponsee, AccessPoint>()
                 .ForMember(d => d.AccessPointType, opt => opt.Ignore());
-
 
             //Schedule
             CreateMap<Schedule, ScheduleDto>()
@@ -356,7 +342,7 @@ namespace Utilities.Helper
             //Notifications
             CreateMap<Notification, NotificationDto>()
                 .ForMember(d => d.NotificationTypeName,
-                    opt => opt.MapFrom(s => ((NotificationType)s.NotificationTypeId).ToString())) 
+                    opt => opt.MapFrom(s => ((NotificationType)s.NotificationTypeId).ToString()))
                 .ReverseMap();
 
             CreateMap<Notification, NotificationDtoRequest>()
@@ -372,88 +358,60 @@ namespace Utilities.Helper
             CreateMap<NotificationReceived, NotificationReceivedDto>()
                 .ReverseMap();
 
-
             CreateMap<ModificationRequest, ModificationRequestDtoResponse>()
-            .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => (int)src.Field))
-            .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Field.GetDisplayName()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.GetDisplayName()))
-            .ReverseMap();
+                .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => (int)src.Field))
+                .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Field.GetDisplayName()))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.GetDisplayName()))
+                .ReverseMap();
 
-            // De Create DTO a Entity
             CreateMap<ModificationRequestDtoRequest, ModificationRequest>()
                 .ForMember(dest => dest.RequestDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => ModificationRequestStatus.Pending))
                 .ReverseMap();
 
             // Attendance
-
             CreateMap<Attendance, AttendanceDtoRequest>().ReverseMap();
 
             CreateMap<Attendance, AttendanceDtoResponse>()
                 .ForMember(dest => dest.PersonFullName,
-                    opt => opt.MapFrom(src => src.Person != null ? src.Person.FirstName + " " + src.Person.LastName : string.Empty))
+                    opt => opt.MapFrom(src => src.Person != null
+                        ? src.Person.FirstName + " " + src.Person.LastName
+                        : string.Empty))
                 .ForMember(dest => dest.AccessPointOfEntryName,
-                    opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Name : null))
+                    opt => opt.MapFrom(src => src.AccessPointEntry != null
+                        ? src.AccessPointEntry.Name
+                        : null))
                 .ForMember(dest => dest.AccessPointOfExitName,
-                    opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Name : null))
-               .ForMember(dest => dest.EventName,
-                opt => opt.MapFrom(src =>
-                    src.AccessPointEntry != null
-                        ? src.AccessPointEntry.EventAccessPoints
-                            .Select(eap => eap.Event.Name)
-                            .FirstOrDefault()
-                        : null
-                ))
-
-                // ➕ Formateo de fechas a string (cultura es-CO). Sin helpers externos.
-                .ForMember(dest => dest.TimeOfEntryStr,
-                    opt => opt.MapFrom(src => src.TimeOfEntry.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))))
-                .ForMember(dest => dest.TimeOfExitStr,
-                    opt => opt.MapFrom(src => src.TimeOfExit.HasValue
-                        ? src.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))
+                    opt => opt.MapFrom(src => src.AccessPointExit != null
+                        ? src.AccessPointExit.Name
                         : null))
 
+                // AQUÍ VA EL CÓDIGO CONSUMIBLE DE EVENTOS
+                .ForMember(dest => dest.EventName,
+                    opt => opt.MapFrom(src =>
+                        src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
+                            ? src.AccessPointEntry.EventAccessPoints
+                                .Select(eap => eap.Event.Name)
+                                .FirstOrDefault()
+                        : (src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
+                            ? src.AccessPointExit.EventAccessPoints
+                                .Select(eap => eap.Event.Name)
+                                .FirstOrDefault()
+                            : "Sin evento")
+                    ))
+
+                .ForMember(dest => dest.TimeOfEntryStr,
+                    opt => opt.MapFrom(src => src.TimeOfEntry.ToString("dd/MM/yyyy HH:mm",
+                        new System.Globalization.CultureInfo("es-CO"))))
+                .ForMember(dest => dest.TimeOfExitStr,
+                    opt => opt.MapFrom(src => src.TimeOfExit.HasValue
+                        ? src.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm",
+                            new System.Globalization.CultureInfo("es-CO"))
+                        : null))
                 .ReverseMap()
                     .ForMember(dest => dest.Person, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())
                     .ForMember(dest => dest.AccessPointExit, opt => opt.Ignore());
-
-            CreateMap<User, UserProfileDto>()
-                .ForMember(d => d.FirstName, opt => opt.MapFrom(s => s.Person.FirstName))
-                .ForMember(d => d.LastName, opt => opt.MapFrom(s => s.Person.LastName))
-                .ForMember(d => d.SecondLastName, opt => opt.MapFrom(s => s.Person.SecondLastName))
-                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Person.Email))
-                .ForMember(d => d.Phone, opt => opt.MapFrom(s => s.Person.Phone));
-
-            CreateMap<UserProfileRequestDto, User>()
-                .ForPath(dest => dest.Person.Email, opt => opt.MapFrom(src => src.Email))
-                .ForPath(dest => dest.Person.FirstName, opt => opt.MapFrom(src => src.FirstName))
-                .ForPath(dest => dest.Person.LastName, opt => opt.MapFrom(src => src.LastName))
-                .ForPath(dest => dest.Person.SecondLastName, opt => opt.MapFrom(src => src.SecondLastName))
-                .ForPath(dest => dest.Person.Phone, opt => opt.MapFrom(src => src.Phone));
-
-
-            CreateMap<ImportBatchStartDto, ImportBatch>().ReverseMap();
-
-            CreateMap<ImportBatchRowDto, ImportBatchRow>().ReverseMap();
-
-            // Mapear ImportBatch -> ImportBatchDto
-            CreateMap<ImportBatch, ImportBatchDto>();
-
-            // Mapear ImportBatchRow -> ImportBatchRowDetailDto
-            CreateMap<ImportBatchRow, ImportBatchRowDetailDto>();
-
-            CreateMap<ImportBatchRow, ImportBatchRowTableDto>()
-                .ForMember(d => d.Photo, opt => opt.MapFrom(src => src.PersonDivisionProfile.Person!.PhotoUrl))
-                .ForMember(d => d.Name, opt => opt.MapFrom(src =>
-                    src.PersonDivisionProfile.Person != null ? $"{src.PersonDivisionProfile.Person.FirstName} {src.PersonDivisionProfile.Person.LastName}" : "N/A"))
-                .ForMember(d => d.Org, opt => opt.MapFrom(src =>
-                    src.PersonDivisionProfile!.InternalDivision!.OrganizationalUnit!.Name))
-                .ForMember(d => d.Division, opt => opt.MapFrom(src =>
-                    src.PersonDivisionProfile!.InternalDivision!.Name))
-                .ForMember(d => d.State, opt => opt.MapFrom(src =>
-                    src.Card != null ? src.Card.Status!.Name : (src.Success ? "Activo" : "Error")))
-                .ForMember(d => d.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted));
         }
     }
 }

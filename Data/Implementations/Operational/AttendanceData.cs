@@ -24,11 +24,11 @@ namespace Data.Implementations.Operational
             return await _context.Set<Attendance>()
                 .Include(x => x.AccessPointEntry)
                     .ThenInclude(ap => ap.EventAccessPoints)
-                    .ThenInclude(eap => eap.Event)
-                .Include(x => x.AccessPointExit).
-                    ThenInclude(ap => ap.EventAccessPoints)
-                        .ThenInclude(eap =>eap.Event)
-
+                        .ThenInclude(eap => eap.Event)   // 👈 traer eventos de entrada
+                .Include(x => x.AccessPointExit)
+                    .ThenInclude(ap => ap.EventAccessPoints)
+                        .ThenInclude(eap => eap.Event)   // 👈 traer eventos de salida
+                .Include(x => x.Person)                  // 👈 incluir persona
                 .ToListAsync();
         }
 
@@ -37,6 +37,13 @@ namespace Data.Implementations.Operational
             // AsNoTracking para evitar conflictos de tracking cuando luego actualizamos
             return await _context.Set<Attendance>()
                 .AsNoTracking()
+                .Include(a => a.Person)
+                .Include(a => a.AccessPointEntry)
+                    .ThenInclude(ap => ap.EventAccessPoints)
+                        .ThenInclude(eap => eap.Event)
+                .Include(a => a.AccessPointExit)
+                    .ThenInclude(ap => ap.EventAccessPoints)
+                        .ThenInclude(eap => eap.Event)
                 .Where(a => !a.IsDeleted
                             && a.PersonId == personId
                             && a.TimeOfExit == null)
@@ -60,7 +67,7 @@ namespace Data.Implementations.Operational
             return entity;
         }
 
-        //NUEVO: consulta con filtros y paginación
+        // NUEVO: consulta con filtros y paginación
         public async Task<(IList<Attendance> Items, int Total)> QueryAsync(
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
@@ -70,12 +77,12 @@ namespace Data.Implementations.Operational
                 .AsNoTracking() // ⚡ performance para lectura
                 .Include(a => a.Person)
                 .Include(a => a.AccessPointEntry)
-                .ThenInclude(ap => ap.EventAccessPoints)
-                    .ThenInclude(eap => eap.Event)
+                    .ThenInclude(ap => ap.EventAccessPoints)
+                        .ThenInclude(eap => eap.Event)   // 👈 evento en entrada
                 .Include(a => a.AccessPointExit)
                     .ThenInclude(ap => ap.EventAccessPoints)
-                        .ThenInclude(eap => eap.Event)
-                 .Where(a => !a.IsDeleted);
+                        .ThenInclude(eap => eap.Event)   // 👈 evento en salida
+                .Where(a => !a.IsDeleted);
 
             if (personId.HasValue)
                 q = q.Where(a => a.PersonId == personId.Value);
@@ -84,10 +91,9 @@ namespace Data.Implementations.Operational
             if (eventId.HasValue)
             {
                 q = q.Where(a =>
-                 (a.AccessPointEntry != null && a.AccessPointEntry.EventAccessPoints.Any(eap => eap.EventId == eventId.Value)) ||
-                 (a.AccessPointExit != null && a.AccessPointExit.EventAccessPoints.Any(eap => eap.EventId == eventId.Value))
-             );
-
+                    (a.AccessPointEntry != null && a.AccessPointEntry.EventAccessPoints.Any(eap => eap.EventId == eventId.Value)) ||
+                    (a.AccessPointExit != null && a.AccessPointExit.EventAccessPoints.Any(eap => eap.EventId == eventId.Value))
+                );
             }
 
             if (fromUtc.HasValue) q = q.Where(a => a.TimeOfEntry >= fromUtc.Value);

@@ -27,5 +27,12 @@ namespace Business.Interfaces.Operational
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
             CancellationToken ct = default);
+
+        // 👇 NUEVOS MÉTODOS DE EXPORTACIÓN
+        /// <summary>Exporta una lista de asistencias a PDF en formato byte[].</summary>
+        Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
+
+        /// <summary>Exporta una lista de asistencias a Excel en formato byte[].</summary>
+        Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
     }
 }
