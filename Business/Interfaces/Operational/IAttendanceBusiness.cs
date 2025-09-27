@@ -27,5 +27,13 @@ namespace Business.Interfaces.Operational
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
             CancellationToken ct = default);
+
+        // <sumary>
+        /// pdf y excel export
+        /// </sumary>
+
+        Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
+        Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
+
     }
 }

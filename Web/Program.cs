@@ -1,4 +1,3 @@
-
 using Entity.DTOs.Notifications;
 using Entity.DTOs.Options;
 using Microsoft.Extensions.Configuration;
@@ -7,12 +6,18 @@ using Microsoft.OpenApi.Models;
 using Web.Extensions;
 using Web.Realtime.Hubs;
 
+//   using de QuestPDF
+using QuestPDF.Infrastructure;
+
 namespace Web
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            // Configuración de licencia para QuestPDF
+            QuestPDF.Settings.License = LicenseType.Community;
+
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
             // Add services to the container.
@@ -56,7 +61,6 @@ namespace Web
 
             builder.Services.AddSwaggerGen();
 
-
             // servicios y data
             builder.Services.AddProjectServices();
             //Cors
@@ -70,14 +74,12 @@ namespace Web
             //Conexión 
             builder.Services.AddDatabaseConfiguration(configuration);
 
-
             //Mail 
             builder.Services.Configure<EmailSettings>(
-            builder.Configuration.GetSection("EmailSettings"));
+                builder.Configuration.GetSection("EmailSettings"));
 
             //Telegram 
             builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
-
 
             builder.Services.Configure<TwilioSettings>(
                 builder.Configuration.GetSection("Twilio"));
@@ -86,17 +88,13 @@ namespace Web
             builder.Services.Configure<SupabaseOptions>(builder.Configuration.GetSection("Supabase"));
             builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Upload"));
 
-
             var app = builder.Build();
 
             app.MapHub<NotificationHub>("/hubs/notifications");
 
             // Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment())
-            //{
             app.UseSwagger();
-                app.UseSwaggerUI();
-            //}
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 

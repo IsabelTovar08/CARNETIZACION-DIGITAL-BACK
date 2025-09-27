@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Web.Controllers.Base;
+using System.Linq; // necesario para ToList()
 
 namespace Web.Controllers.Operational
 {
@@ -35,7 +36,6 @@ namespace Web.Controllers.Operational
         /// <summary>
         /// Registra asistencia por escaneo (móvil) y retorna la asistencia creada.
         /// </summary>
-        /// <param name="dto">Datos mínimos: PersonId y AccessPoint (entrada/salida).</param>
         [HttpPost("scan")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
@@ -65,7 +65,6 @@ namespace Web.Controllers.Operational
 
         /// <summary>
         /// REGISTRA SOLO LA ENTRADA usando AttendanceDtoRequestSpecific.
-        /// Falla si ya existe una entrada abierta para la persona.
         /// </summary>
         [HttpPost("register-entry")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
@@ -93,7 +92,6 @@ namespace Web.Controllers.Operational
 
         /// <summary>
         /// REGISTRA SOLO LA SALIDA usando AttendanceDtoRequestSpecific.
-        /// Falla si no existe una entrada abierta para la persona.
         /// </summary>
         [HttpPost("register-exit")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
@@ -119,11 +117,7 @@ namespace Web.Controllers.Operational
             }
         }
 
-        //NUEVO ENDPOINT: CONSULTA Y FILTRO
-        /// <summary>
-        /// Consulta y filtra registros de asistencia con paginación.
-        /// Query params: personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize.
-        /// </summary>
+        // NUEVO ENDPOINT: CONSULTA Y FILTRO
         [HttpGet("search")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         public async Task<IActionResult> Search(
@@ -149,7 +143,6 @@ namespace Web.Controllers.Operational
         /// <summary>
         /// Registra asistencia a un evento a través de un código QR.
         /// </summary>
-        /// <param name="dto">Debe traer PersonId y QrCode.</param>
         [HttpPost("register-by-qr")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
@@ -173,6 +166,55 @@ namespace Web.Controllers.Operational
                 message = result.Message,
                 data = result
             });
+        }
+
+        // =========================================================
+        // NUEVOS ENDPOINTS: EXPORTACIÓN PDF y EXCEL
+        // =========================================================
+
+        /// <summary>
+        /// Exporta asistencias a PDF (filtrando opcionalmente por persona, evento y rango de fechas).
+        /// </summary>
+        [HttpGet("export/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExportPdf(
+            [FromQuery] int? personId,
+            [FromQuery] int? eventId,
+            [FromQuery] DateTime? fromUtc,
+            [FromQuery] DateTime? toUtc,
+            [FromQuery] string? sortBy = "TimeOfEntry",
+            [FromQuery] string? sortDir = "DESC",
+            CancellationToken ct = default)
+        {
+            var (items, _) = await _attendanceBusiness.SearchAsync(
+                personId, eventId, fromUtc, toUtc, sortBy, sortDir, 1, int.MaxValue, ct);
+
+            var file = await _attendanceBusiness.ExportToPdfAsync(items.ToList(), ct);
+
+            return File(file, "application/pdf", $"Reporte_Asistencias_{DateTime.Now:yyyyMMddHHmm}.pdf");
+        }
+
+        /// <summary>
+        /// Exporta asistencias a Excel (filtrando opcionalmente por persona, evento y rango de fechas).
+        /// </summary>
+        [HttpGet("export/excel")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExportExcel(
+            [FromQuery] int? personId,
+            [FromQuery] int? eventId,
+            [FromQuery] DateTime? fromUtc,
+            [FromQuery] DateTime? toUtc,
+            [FromQuery] string? sortBy = "TimeOfEntry",
+            [FromQuery] string? sortDir = "DESC",
+            CancellationToken ct = default)
+        {
+            var (items, _) = await _attendanceBusiness.SearchAsync(
+                personId, eventId, fromUtc, toUtc, sortBy, sortDir, 1, int.MaxValue, ct);
+
+            var file = await _attendanceBusiness.ExportToExcelAsync(items.ToList(), ct);
+
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Reporte_Asistencias_{DateTime.Now:yyyyMMddHHmm}.xlsx");
         }
     }
 }

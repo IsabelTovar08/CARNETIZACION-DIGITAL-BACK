@@ -12,6 +12,7 @@ using Entity.DTOs.Operational.Request;
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
+using Utilities.Helpers; // ✅ cambio aquí
 
 namespace Business.Implementations.Operational
 {
@@ -166,7 +167,7 @@ namespace Business.Implementations.Operational
             return Convert.ToBase64String(qrBytes);
         }
 
-        //NUEVO MÉTODO: búsqueda con filtros y paginación
+        // NUEVO MÉTODO: búsqueda con filtros y paginación
         public async Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
@@ -201,6 +202,19 @@ namespace Business.Implementations.Operational
             }
 
             return (list, total);
+        }
+
+        // NUEVOS MÉTODOS DE EXPORTACIÓN (usando ExportHelper)
+        public async Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default)
+        {
+            return await Task.Run(() =>
+                ExportHelper.ExportAttendancesToPdf(data, "Reporte de Asistencias"), ct);
+        }
+
+        public async Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default)
+        {
+            return await Task.Run(() =>
+                ExportHelper.ExportAttendancesToExcel(data, "Asistencias"), ct);
         }
     }
 }
