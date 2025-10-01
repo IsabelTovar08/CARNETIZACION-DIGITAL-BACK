@@ -2812,6 +2812,9 @@ namespace Entity.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Days")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
 

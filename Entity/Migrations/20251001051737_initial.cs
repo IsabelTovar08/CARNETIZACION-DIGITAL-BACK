@@ -622,6 +622,7 @@ namespace Entity.Migrations
                     StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     OrganizationId = table.Column<int>(type: "int", nullable: false),
+                    Days = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1630,12 +1631,12 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "Schedules",
-                columns: new[] { "Id", "Code", "CreateAt", "EndTime", "Name", "OrganizationId", "StartTime", "UpdateAt" },
+                columns: new[] { "Id", "Code", "CreateAt", "Days", "EndTime", "Name", "OrganizationId", "StartTime", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", 1, new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", 1, new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
-                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", 1, new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", 1, new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", 1, new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", 1, new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
