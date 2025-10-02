@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Utilities.Exeptions;
 using Web.Controllers.Base;
 
-
 namespace Web.Controllers.ModelSecurity
 {
     public class PersonController : GenericController<Person, PersonDtoRequest, PersonDto>
@@ -28,7 +27,6 @@ namespace Web.Controllers.ModelSecurity
             var result = await _personBusiness.SavePersonAndUser(person);
             return Ok(result);
         }
-
 
         [HttpPost("{id:int}/photo")]
         public async Task<IActionResult> UploadPhoto(int id, [FromForm] UploadFile photo)
@@ -58,7 +56,6 @@ namespace Web.Controllers.ModelSecurity
         {
             if (id == null || id == 0)
                 return BadRequest(new { status = false, message = "Ingresa un id válido" });
-
 
             PersonInfoDto? personalInfo = await _personBusiness.GetPersonInfoAsync(id);
 
@@ -109,7 +106,7 @@ namespace Web.Controllers.ModelSecurity
                 return NotFound(new
                 {
                     success = false,
-                    message = ex.Message, // "No se encontró la persona asociada al usuario actual."
+                    message = ex.Message,
                     data = (object?)null
                 });
             }
@@ -125,6 +122,29 @@ namespace Web.Controllers.ModelSecurity
             }
         }
 
+        // 🔹 NUEVO ENDPOINT: búsqueda con filtros y paginación
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(
+            [FromQuery] int? internalDivisionId,
+            [FromQuery] int? organizationalUnitId,
+            [FromQuery] int? profileId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            CancellationToken ct = default)
+        {
+            var (items, total) = await _personBusiness.QueryWithFiltersAsync(
+                internalDivisionId, organizationalUnitId, profileId, page, pageSize, ct);
+
+            return Ok(new
+            {
+                success = true,
+                message = total > 0 ? "Personas obtenidas correctamente." : "No se encontraron personas con los filtros aplicados.",
+                data = items,
+                total,
+                page,
+                pageSize
+            });
+        }
     }
 
     public class UploadFile

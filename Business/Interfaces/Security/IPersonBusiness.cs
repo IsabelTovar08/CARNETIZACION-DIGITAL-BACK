@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Business.Interfases;
 using Entity.DTOs.ModelSecurity.Request;
@@ -30,5 +30,20 @@ namespace Business.Interfaces.Security
         Task<PersonOrganizationalInfoDto?> GetOrganizationalInfoAsync(int personId);
         Task<PersonDto?> GetMyPersonAsync();
         //Task<PersonDto?> GetPersonByUserIdAsync(int userId);
+
+        /// <summary>
+        /// Filtro + paginación de personas:
+        /// - Solo personas no eliminadas
+        /// - Con al menos un PersonDivisionProfile que tenga asociado un Card (carnet)
+        /// - Filtros opcionales por división interna, unidad organizativa y perfil
+        /// </summary>
+        Task<(IList<PersonDto> Items, int Total)> QueryWithFiltersAsync(
+            int? internalDivisionId,
+            int? organizationalUnitId,
+            int? profileId,
+            int page,
+            int pageSize,
+            CancellationToken ct = default
+        );
     }
 }

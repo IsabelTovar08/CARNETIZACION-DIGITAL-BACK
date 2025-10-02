@@ -38,13 +38,29 @@ namespace Utilities.Helper
     {
         public MappingProfile()
         {
-            //Mapeo de la entidad Person 
             CreateMap<Person, PersonDto>()
-                .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
-                .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType.Name))
-                .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
-                .ReverseMap();
-            CreateMap<Person, PersonDtoRequest>().ReverseMap();
+     .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
+     .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType.Name))
+     .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
+
+     // 🔹 División actual
+     .ForMember(dest => dest.InternalDivisionName,
+         opt => opt.MapFrom(src =>
+             src.PersonDivisionProfile
+                 .Where(pdp => pdp.IsCurrentlySelected)
+                 .Select(pdp => pdp.InternalDivision.Name)
+                 .FirstOrDefault()))
+
+    
+
+
+     // 🔹 Si tiene carnet
+     .ForMember(dest => dest.HasCard,
+         opt => opt.MapFrom(src =>
+             src.PersonDivisionProfile.Any(pdp => pdp.Card != null)))
+
+     .ReverseMap();
+
 
 
             CreateMap<Person, PersonInfoDto>()
