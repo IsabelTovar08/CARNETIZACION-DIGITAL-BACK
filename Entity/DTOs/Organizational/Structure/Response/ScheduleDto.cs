@@ -12,8 +12,8 @@ namespace Entity.DTOs.Organizational.Structure.Response
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
 
-        public int OrganizationId { get; set; }
-        public string? OrganizationName { get; set; }
+        //public int OrganizationId { get; set; }
+        //public string? OrganizationName { get; set; }
 
     }
 }

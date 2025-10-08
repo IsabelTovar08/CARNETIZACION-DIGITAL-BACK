@@ -1898,6 +1898,9 @@ namespace Entity.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Days")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -1928,11 +1931,11 @@ namespace Entity.Migrations
                     b.Property<DateTime?>("ScheduleDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ScheduleId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ScheduleTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("SheduleId")
-                        .HasColumnType("int");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
@@ -1944,7 +1947,7 @@ namespace Entity.Migrations
 
                     b.HasIndex("EventTypeId");
 
-                    b.HasIndex("SheduleId");
+                    b.HasIndex("ScheduleId");
 
                     b.HasIndex("StatusId");
 
@@ -2812,9 +2815,6 @@ namespace Entity.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Days")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
 
@@ -2827,9 +2827,6 @@ namespace Entity.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
 
@@ -2837,8 +2834,6 @@ namespace Entity.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrganizationId");
 
                     b.ToTable("Schedules", "Organizational");
 
@@ -2850,7 +2845,6 @@ namespace Entity.Migrations
                             EndTime = new TimeSpan(0, 18, 0, 0, 0),
                             IsDeleted = false,
                             Name = "Horario Jornada A",
-                            OrganizationId = 1,
                             StartTime = new TimeSpan(0, 7, 0, 0, 0),
                             UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -2861,7 +2855,6 @@ namespace Entity.Migrations
                             EndTime = new TimeSpan(0, 17, 0, 0, 0),
                             IsDeleted = false,
                             Name = "Horario Jornada B",
-                            OrganizationId = 1,
                             StartTime = new TimeSpan(0, 8, 0, 0, 0),
                             UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -2872,7 +2865,6 @@ namespace Entity.Migrations
                             EndTime = new TimeSpan(0, 19, 0, 0, 0),
                             IsDeleted = false,
                             Name = "Horario Jornada C",
-                            OrganizationId = 1,
                             StartTime = new TimeSpan(0, 6, 30, 0, 0),
                             UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -4163,7 +4155,7 @@ namespace Entity.Migrations
 
                     b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Shedule")
                         .WithMany()
-                        .HasForeignKey("SheduleId");
+                        .HasForeignKey("ScheduleId");
 
                     b.HasOne("Entity.Models.Parameter.Status", "Status")
                         .WithMany("Events")
@@ -4304,17 +4296,6 @@ namespace Entity.Migrations
                     b.Navigation("Branch");
 
                     b.Navigation("OrganizationUnit");
-                });
-
-            modelBuilder.Entity("Entity.Models.Organizational.Structure.Schedule", b =>
-                {
-                    b.HasOne("Entity.Models.Organizational.Structure.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Organization");
                 });
 
             modelBuilder.Entity("Entity.Models.Parameter.CustomType", b =>

@@ -22,5 +22,5 @@ namespace Utilities.Validations
             var hoy = DateTime.Today;
             return fecha.Date == hoy; 
         }
-    }
+    }  
 }

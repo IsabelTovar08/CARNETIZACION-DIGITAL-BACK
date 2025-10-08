@@ -237,6 +237,26 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Schedules",
+                schema: "Organizational",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schedules", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Statuses",
                 schema: "Parameter",
                 columns: table => new
@@ -323,6 +343,54 @@ namespace Entity.Migrations
                         column: x => x.ModuleId,
                         principalSchema: "ModelSecurity",
                         principalTable: "Modules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Events",
+                schema: "Operational",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ScheduleDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ScheduleTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EventStart = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EventEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ScheduleId = table.Column<int>(type: "int", nullable: true),
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    EventTypeId = table.Column<int>(type: "int", nullable: false),
+                    Days = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Events_EventTypes_EventTypeId",
+                        column: x => x.EventTypeId,
+                        principalSchema: "Operational",
+                        principalTable: "EventTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Events_Schedules_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalSchema: "Organizational",
+                        principalTable: "Schedules",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Events_Statuses_StatusId",
+                        column: x => x.StatusId,
+                        principalSchema: "Parameter",
+                        principalTable: "Statuses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -575,6 +643,38 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventAccessPoints",
+                schema: "Operational",
+                columns: table => new
+                {
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    AccessPointId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventAccessPoints", x => new { x.EventId, x.AccessPointId });
+                    table.ForeignKey(
+                        name: "FK_EventAccessPoints_AccessPoints_AccessPointId",
+                        column: x => x.AccessPointId,
+                        principalSchema: "Operational",
+                        principalTable: "AccessPoints",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EventAccessPoints_Events_EventId",
+                        column: x => x.EventId,
+                        principalSchema: "Operational",
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Branches",
                 schema: "Organizational",
                 columns: table => new
@@ -605,35 +705,6 @@ namespace Entity.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Branches_Organizations_OrganizationId",
-                        column: x => x.OrganizationId,
-                        principalSchema: "Organizational",
-                        principalTable: "Organizations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Schedules",
-                schema: "Organizational",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    OrganizationId = table.Column<int>(type: "int", nullable: false),
-                    Days = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Schedules", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Schedules_Organizations_OrganizationId",
                         column: x => x.OrganizationId,
                         principalSchema: "Organizational",
                         principalTable: "Organizations",
@@ -748,53 +819,6 @@ namespace Entity.Migrations
                         principalSchema: "Organizational",
                         principalTable: "Branches",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Events",
-                schema: "Operational",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ScheduleDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ScheduleTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EventStart = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EventEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    SheduleId = table.Column<int>(type: "int", nullable: true),
-                    IsPublic = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    StatusId = table.Column<int>(type: "int", nullable: false),
-                    EventTypeId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Events", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Events_EventTypes_EventTypeId",
-                        column: x => x.EventTypeId,
-                        principalSchema: "Operational",
-                        principalTable: "EventTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Events_Schedules_SheduleId",
-                        column: x => x.SheduleId,
-                        principalSchema: "Organizational",
-                        principalTable: "Schedules",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Events_Statuses_StatusId",
-                        column: x => x.StatusId,
-                        principalSchema: "Parameter",
-                        principalTable: "Statuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -945,38 +969,6 @@ namespace Entity.Migrations
                         column: x => x.OrganizationUnitId,
                         principalSchema: "Organizational",
                         principalTable: "OrganizationalUnits",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EventAccessPoints",
-                schema: "Operational",
-                columns: table => new
-                {
-                    EventId = table.Column<int>(type: "int", nullable: false),
-                    AccessPointId = table.Column<int>(type: "int", nullable: false),
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EventAccessPoints", x => new { x.EventId, x.AccessPointId });
-                    table.ForeignKey(
-                        name: "FK_EventAccessPoints_AccessPoints_AccessPointId",
-                        column: x => x.AccessPointId,
-                        principalSchema: "Operational",
-                        principalTable: "AccessPoints",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_EventAccessPoints_Events_EventId",
-                        column: x => x.EventId,
-                        principalSchema: "Operational",
-                        principalTable: "Events",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1312,6 +1304,17 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.InsertData(
+                schema: "Organizational",
+                table: "Schedules",
+                columns: new[] { "Id", "Code", "CreateAt", "EndTime", "Name", "StartTime", "UpdateAt" },
+                values: new object[,]
+                {
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
                 schema: "Parameter",
                 table: "Statuses",
                 columns: new[] { "Id", "Code", "CreateAt", "Name", "UpdateAt" },
@@ -1384,14 +1387,14 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Events",
-                columns: new[] { "Id", "Code", "CreateAt", "Description", "EventEnd", "EventStart", "EventTypeId", "IsPublic", "Name", "ScheduleDate", "ScheduleTime", "SheduleId", "StatusId", "UpdateAt" },
-                values: new object[] { 1, "TECH2025", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2023, 7, 30, 19, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 7, 30, 15, 0, 0, 0, DateTimeKind.Utc), 1, true, "Conferencia de Tecnología", new DateTime(2023, 7, 30, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1900, 1, 1, 15, 0, 0, 0, DateTimeKind.Utc), null, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) });
+                columns: new[] { "Id", "Code", "CreateAt", "Days", "Description", "EventEnd", "EventStart", "EventTypeId", "IsPublic", "Name", "ScheduleDate", "ScheduleId", "ScheduleTime", "StatusId", "UpdateAt" },
+                values: new object[] { 1, "TECH2025", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, null, new DateTime(2023, 7, 30, 19, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 7, 30, 15, 0, 0, 0, DateTimeKind.Utc), 1, true, "Conferencia de Tecnología", new DateTime(2023, 7, 30, 5, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(1900, 1, 1, 15, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Events",
-                columns: new[] { "Id", "Code", "CreateAt", "Description", "EventEnd", "EventStart", "EventTypeId", "Name", "ScheduleDate", "ScheduleTime", "SheduleId", "StatusId", "UpdateAt" },
-                values: new object[] { 2, "SALUD2025", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2023, 8, 5, 17, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 8, 5, 14, 0, 0, 0, DateTimeKind.Utc), 2, "Charla de Salud", new DateTime(2023, 8, 5, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(1900, 1, 1, 14, 0, 0, 0, DateTimeKind.Utc), null, 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) });
+                columns: new[] { "Id", "Code", "CreateAt", "Days", "Description", "EventEnd", "EventStart", "EventTypeId", "Name", "ScheduleDate", "ScheduleId", "ScheduleTime", "StatusId", "UpdateAt" },
+                values: new object[] { 2, "SALUD2025", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, null, new DateTime(2023, 8, 5, 17, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 8, 5, 14, 0, 0, 0, DateTimeKind.Utc), 2, "Charla de Salud", new DateTime(2023, 8, 5, 5, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(1900, 1, 1, 14, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
@@ -1630,17 +1633,6 @@ namespace Entity.Migrations
 
             migrationBuilder.InsertData(
                 schema: "Organizational",
-                table: "Schedules",
-                columns: new[] { "Id", "Code", "CreateAt", "Days", "EndTime", "Name", "OrganizationId", "StartTime", "UpdateAt" },
-                values: new object[,]
-                {
-                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", 1, new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", 1, new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
-                    { 3, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", 1, new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
-                });
-
-            migrationBuilder.InsertData(
-                schema: "Organizational",
                 table: "OrganizationalUnitBranches",
                 columns: new[] { "Id", "BranchId", "Code", "CreateAt", "OrganizationUnitId", "UpdateAt" },
                 values: new object[,]
@@ -1790,10 +1782,10 @@ namespace Entity.Migrations
                 column: "EventTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_SheduleId",
+                name: "IX_Events_ScheduleId",
                 schema: "Operational",
                 table: "Events",
-                column: "SheduleId");
+                column: "ScheduleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_StatusId",
@@ -2069,12 +2061,6 @@ namespace Entity.Migrations
                 table: "RolFormPermissions",
                 columns: new[] { "RolId", "FormId", "PermissionId" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Schedules_OrganizationId",
-                schema: "Organizational",
-                table: "Schedules",
-                column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Statuses_Name",

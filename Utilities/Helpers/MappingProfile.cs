@@ -255,16 +255,19 @@ namespace Utilities.Helper
 
             //Event
             CreateMap<Event, EventDtoResponse>()
-             .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
-                 s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
-                 {
-                     Id = eap.AccessPoint.Id,
-                     Name = eap.AccessPoint.Name,
-                     Description = eap.AccessPoint.Description,
-                     TypeId = eap.AccessPoint.TypeId,
-                     Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null
-                 })
+            .ForMember(d => d.Ispublic, o => o.MapFrom(s => s.IsPublic))
+            .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
+                s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
+                {
+                    Id = eap.AccessPoint.Id,
+                    Name = eap.AccessPoint.Name,
+                    Description = eap.AccessPoint.Description,
+                    TypeId = eap.AccessPoint.TypeId,
+                    Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null
+                })
+
              ));
+
 
             CreateMap<Event, EventDetailsDtoResponse>()
              .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
@@ -281,6 +284,7 @@ namespace Utilities.Helper
 
             CreateMap<EventDtoRequest, Event>()
             .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
+            .ForMember(d => d.Days, o => o.MapFrom(s => s.Days != null ? string.Join(",", s.Days) : null))
             .ForMember(d => d.Id, o => o.Ignore());
 
 
@@ -349,12 +353,10 @@ namespace Utilities.Helper
 
 
             //Schedule
-            CreateMap<Schedule, ScheduleDto>()
-             .ForMember(d => d.OrganizationName,
-                 opt => opt.MapFrom(s => s.Organization != null ? s.Organization.Name : null));
+            CreateMap<Schedule, ScheduleDto>().ReverseMap();
 
             CreateMap<Schedule, ScheduleDtoRequest>()
-                .ReverseMap();
+               .ReverseMap();
 
             // EventTargetAudience
             CreateMap<EventTargetAudience, EventTargetAudienceDtoRequest>().ReverseMap();
@@ -368,8 +370,7 @@ namespace Utilities.Helper
                  null
              ));
 
-            CreateMap<Schedule, ScheduleDtoRequest>()
-                .ReverseMap();
+           
 
             //EventAccessPoint
 
