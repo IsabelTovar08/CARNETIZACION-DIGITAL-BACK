@@ -34,5 +34,11 @@ namespace Web.Auth
         public string? UserName =>
             _http.HttpContext?.User?.Identity?.Name ??
             _http.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+
+        /// <summary>
+        /// Devuelve el valor del claim especificado o null si no existe.
+        /// </summary>
+        public string? GetClaim(string claimType) =>
+            _http.HttpContext?.User?.FindFirst(claimType)?.Value;
     }
 }

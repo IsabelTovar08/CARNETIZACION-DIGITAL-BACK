@@ -30,5 +30,11 @@ namespace Business.Interfaces.Security
         Task<PersonOrganizationalInfoDto?> GetOrganizationalInfoAsync(int personId);
         Task<PersonDto?> GetMyPersonAsync();
         //Task<PersonDto?> GetPersonByUserIdAsync(int userId);
+
+        /// <summary>
+        /// Devuelve los datos (DTO) de la persona asociada al token del usuario actual.
+        /// Retorna null si no hay usuario autenticado o la persona no existe.
+        /// </summary>
+        Task<PersonDto?> GetCurrentPersonAsync();
     }
 }

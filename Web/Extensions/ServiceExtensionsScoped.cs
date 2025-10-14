@@ -196,6 +196,11 @@ namespace Web.Extensions
             services.AddScoped<IEventTypeData, EventTypeData>();
             services.AddScoped<IEventTypeBusiness, EventTypeBusiness>();
 
+            //EventAccessPoint
+            services.AddScoped<IEventAccessPointData, EventAccessPointData>();
+            services.AddScoped<IEventAccessPointBusiness, EventAccessPointBusiness>();
+
+
             //AccessPoint 
             services.AddScoped<IAccessPointData, AccessPointData>();
             services.AddScoped<IAccessPointBusiness, AccessPointBusiness>();
