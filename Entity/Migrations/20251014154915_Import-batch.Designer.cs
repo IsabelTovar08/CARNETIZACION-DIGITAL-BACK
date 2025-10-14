@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250924184445_Event")]
-    partial class Event
+    [Migration("20251014154915_Import-batch")]
+    partial class Importbatch
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1184,7 +1184,7 @@ namespace Entity.Migrations
                             CreateDate = new DateTime(2025, 7, 28, 14, 30, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Message = "Estás invitado al evento de bienvenida. Confirma tu asistencia.",
-                            NotificationTypeId = 2,
+                            NotificationTypeId = 1,
                             Title = "Invitación a evento",
                             UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -1222,6 +1222,9 @@ namespace Entity.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StatusId1")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("datetime2");
 
@@ -1232,7 +1235,7 @@ namespace Entity.Migrations
 
                     b.HasIndex("NotificationId");
 
-                    b.HasIndex("StatusId");
+                    b.HasIndex("StatusId1");
 
                     b.HasIndex("UserId");
 
@@ -1260,7 +1263,7 @@ namespace Entity.Migrations
                             NotificationId = 2,
                             ReadDate = new DateTime(2025, 7, 28, 15, 15, 0, 0, DateTimeKind.Utc),
                             SendDate = new DateTime(2025, 7, 28, 14, 35, 0, 0, DateTimeKind.Utc),
-                            StatusId = 1,
+                            StatusId = 2,
                             UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 2
                         });
@@ -1302,8 +1305,11 @@ namespace Entity.Migrations
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("StartedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("StartedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StartedByUserId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SuccessCount")
                         .HasColumnType("int");
@@ -1315,6 +1321,8 @@ namespace Entity.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StartedByUserId");
 
                     b.ToTable("ImportBatches");
                 });
@@ -1575,6 +1583,9 @@ namespace Entity.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SheduleId")
+                        .HasColumnType("int");
+
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
@@ -1591,6 +1602,8 @@ namespace Entity.Migrations
                     b.HasIndex("PersonDivissionProfileId")
                         .IsUnique();
 
+                    b.HasIndex("SheduleId");
+
                     b.HasIndex("StatusId");
 
                     b.ToTable("Cards", "Organizational");
@@ -1606,6 +1619,7 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             PersonDivissionProfileId = 1,
                             QRCode = "QR12345",
+                            SheduleId = 0,
                             StatusId = 1,
                             UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
                             UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
@@ -4006,9 +4020,7 @@ namespace Entity.Migrations
 
                     b.HasOne("Entity.Models.Parameter.Status", null)
                         .WithMany("NotificatiosReceived")
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StatusId1");
 
                     b.HasOne("Entity.Models.User", "User")
                         .WithMany()
@@ -4019,6 +4031,15 @@ namespace Entity.Migrations
                     b.Navigation("Notification");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Entity.Models.Operational.BulkLoading.ImportBatch", b =>
+                {
+                    b.HasOne("Entity.Models.User", "StartedByUser")
+                        .WithMany("ImportBatches")
+                        .HasForeignKey("StartedByUserId");
+
+                    b.Navigation("StartedByUser");
                 });
 
             modelBuilder.Entity("Entity.Models.Operational.BulkLoading.ImportBatchRow", b =>
@@ -4088,6 +4109,12 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Shedule")
+                        .WithMany()
+                        .HasForeignKey("SheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Entity.Models.Parameter.Status", "Status")
                         .WithMany("cards")
                         .HasForeignKey("StatusId")
@@ -4097,6 +4124,8 @@ namespace Entity.Migrations
                     b.Navigation("CardTemplate");
 
                     b.Navigation("PersonDivisionProfile");
+
+                    b.Navigation("Shedule");
 
                     b.Navigation("Status");
                 });
@@ -4521,6 +4550,8 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.User", b =>
                 {
+                    b.Navigation("ImportBatches");
+
                     b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618

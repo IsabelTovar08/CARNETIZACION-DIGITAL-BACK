@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Entity.Models.Notifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Utilities.Enums.Specifics;
 
 namespace Entity.DataInit.Notifications
 {
@@ -19,7 +20,7 @@ namespace Entity.DataInit.Notifications
                    Id = 1,
                    NotificationId = 1, // Verificación de cuenta
                    UserId = 1,
-                   //StatusId = 1, // Enviado
+                   StatusId = NotificationStatus.Sent, // Enviado
                    SendDate = new DateTime(2025, 7, 27, 10, 5, 0),
                    ReadDate = null,
                    ExpirationDate = new DateTime(2025, 8, 1),
@@ -30,7 +31,7 @@ namespace Entity.DataInit.Notifications
                    Id = 2,
                    NotificationId = 2, // Invitación a evento
                    UserId = 2,
-                   //StatusId = 2, // Leído
+                   StatusId = NotificationStatus.Read, // Leído
                    SendDate = new DateTime(2025, 7, 28, 9, 35, 0),
                    ReadDate = new DateTime(2025, 7, 28, 10, 15, 0),
                    ExpirationDate = new DateTime(2025, 8, 5),

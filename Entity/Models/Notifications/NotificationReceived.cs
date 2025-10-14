@@ -8,7 +8,7 @@ namespace Entity.Models.Notifications
 
     public class NotificationReceived : BaseModel
     {
-        public int StatusId { get; set; } = (int)NotificationStatus.Pending;
+        public NotificationStatus StatusId { get; set; }
         public DateTime? SendDate { get; set; }
         public DateTime? ReadDate { get; set; }
         public DateTime? ExpirationDate { get; set; }

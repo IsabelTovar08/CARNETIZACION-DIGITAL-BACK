@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Entity.Models.Base;
 using Entity.Models.Operational;
+using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 
 namespace Entity.Models.Organizational.Assignment
@@ -16,6 +17,7 @@ namespace Entity.Models.Organizational.Assignment
         public Guid UniqueId { get; set; }
         public int StatusId { get; set; }
         public int CardTemplateId { get; set; }
+        public int SheduleId { get; set; }
 
 
         public int PersonDivissionProfileId { get; set; }
@@ -23,6 +25,7 @@ namespace Entity.Models.Organizational.Assignment
         public Status Status { get; set; }
 
         public CardTemplate CardTemplate { get; set; }
+        public Schedule Shedule { get; set; }
 
     }
 }

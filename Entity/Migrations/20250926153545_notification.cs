@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class Event : Migration
+    public partial class notification : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -107,31 +107,6 @@ namespace Entity.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EventTypes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ImportBatches",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Source = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TotalRows = table.Column<int>(type: "int", nullable: false),
-                    SuccessCount = table.Column<int>(type: "int", nullable: false),
-                    ErrorCount = table.Column<int>(type: "int", nullable: false),
-                    ContextJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ImportBatches", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -797,6 +772,38 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ImportBatches",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Source = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartedBy = table.Column<int>(type: "int", nullable: true),
+                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TotalRows = table.Column<int>(type: "int", nullable: false),
+                    SuccessCount = table.Column<int>(type: "int", nullable: false),
+                    ErrorCount = table.Column<int>(type: "int", nullable: false),
+                    ContextJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartedByUserId = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ImportBatches", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ImportBatches_Users_StartedByUserId",
+                        column: x => x.StartedByUserId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "NotificationReceived",
                 schema: "Notifications",
                 columns: table => new
@@ -809,6 +816,7 @@ namespace Entity.Migrations
                     ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NotificationId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
+                    StatusId1 = table.Column<int>(type: "int", nullable: true),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -825,12 +833,11 @@ namespace Entity.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_NotificationReceived_Statuses_StatusId",
-                        column: x => x.StatusId,
+                        name: "FK_NotificationReceived_Statuses_StatusId1",
+                        column: x => x.StatusId1,
                         principalSchema: "Parameter",
                         principalTable: "Statuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_NotificationReceived_Users_UserId",
                         column: x => x.UserId,
@@ -1243,7 +1250,7 @@ namespace Entity.Migrations
                 values: new object[,]
                 {
                     { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 7, 27, 15, 0, 0, 0, DateTimeKind.Utc), null, false, "Por favor verifica tu cuenta haciendo clic en el enlace enviado.", 1, "Verificación de cuenta", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 7, 28, 14, 30, 0, 0, DateTimeKind.Utc), null, false, "Estás invitado al evento de bienvenida. Confirma tu asistencia.", 2, "Invitación a evento", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 7, 28, 14, 30, 0, 0, DateTimeKind.Utc), null, false, "Estás invitado al evento de bienvenida. Confirma tu asistencia.", 1, "Invitación a evento", new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1514,11 +1521,11 @@ namespace Entity.Migrations
             migrationBuilder.InsertData(
                 schema: "Notifications",
                 table: "NotificationReceived",
-                columns: new[] { "Id", "Code", "CreateAt", "ExpirationDate", "IsDeleted", "NotificationId", "ReadDate", "SendDate", "StatusId", "UpdateAt", "UserId" },
+                columns: new[] { "Id", "Code", "CreateAt", "ExpirationDate", "IsDeleted", "NotificationId", "ReadDate", "SendDate", "StatusId", "StatusId1", "UpdateAt", "UserId" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 8, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 1, null, new DateTime(2025, 7, 27, 15, 5, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1 },
-                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 8, 5, 5, 0, 0, 0, DateTimeKind.Utc), false, 2, new DateTime(2025, 7, 28, 15, 15, 0, 0, DateTimeKind.Utc), new DateTime(2025, 7, 28, 14, 35, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2 }
+                    { 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 8, 1, 5, 0, 0, 0, DateTimeKind.Utc), false, 1, null, new DateTime(2025, 7, 27, 15, 5, 0, 0, DateTimeKind.Utc), 1, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 1 },
+                    { 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 8, 5, 5, 0, 0, 0, DateTimeKind.Utc), false, 2, new DateTime(2025, 7, 28, 15, 15, 0, 0, DateTimeKind.Utc), new DateTime(2025, 7, 28, 14, 35, 0, 0, DateTimeKind.Utc), 2, null, new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc), 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -1851,6 +1858,11 @@ namespace Entity.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ImportBatches_StartedByUserId",
+                table: "ImportBatches",
+                column: "StartedByUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ImportBatchRows_CardId",
                 table: "ImportBatchRows",
                 column: "CardId");
@@ -1928,10 +1940,10 @@ namespace Entity.Migrations
                 column: "NotificationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationReceived_StatusId",
+                name: "IX_NotificationReceived_StatusId1",
                 schema: "Notifications",
                 table: "NotificationReceived",
-                column: "StatusId");
+                column: "StatusId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotificationReceived_UserId",
@@ -2192,10 +2204,6 @@ namespace Entity.Migrations
                 schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
-                name: "Users",
-                schema: "ModelSecurity");
-
-            migrationBuilder.DropTable(
                 name: "EventTypes",
                 schema: "Operational");
 
@@ -2216,6 +2224,10 @@ namespace Entity.Migrations
                 schema: "Parameter");
 
             migrationBuilder.DropTable(
+                name: "Users",
+                schema: "ModelSecurity");
+
+            migrationBuilder.DropTable(
                 name: "Modules",
                 schema: "ModelSecurity");
 
@@ -2224,12 +2236,12 @@ namespace Entity.Migrations
                 schema: "Organizational");
 
             migrationBuilder.DropTable(
-                name: "People",
-                schema: "ModelSecurity");
-
-            migrationBuilder.DropTable(
                 name: "Profiles",
                 schema: "Organizational");
+
+            migrationBuilder.DropTable(
+                name: "People",
+                schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
                 name: "Areas",

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Entity.Models.Notifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Utilities.Enums.Specifics;
 
 namespace Entity.DataInit.Notifications
 {
@@ -20,7 +21,7 @@ namespace Entity.DataInit.Notifications
                    Title = "Verificación de cuenta",
                    Message = "Por favor verifica tu cuenta haciendo clic en el enlace enviado.",
                    CreateDate = new DateTime(2025, 7, 27, 10, 0, 0),
-                   NotificationTypeId = 1,
+                   NotificationTypeId = NotificationType.System,
                    IsDeleted = false
                },
                new Notification
@@ -29,7 +30,7 @@ namespace Entity.DataInit.Notifications
                    Title = "Invitación a evento",
                    Message = "Estás invitado al evento de bienvenida. Confirma tu asistencia.",
                    CreateDate = new DateTime(2025, 7, 28, 9, 30, 0),
-                   NotificationTypeId = 2,
+                   NotificationTypeId = NotificationType.System,
                    IsDeleted = false
                }
            );

@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Business.Interfaces.Auth;
 using Business.Interfaces.Logging;
+using Business.Interfaces.Notifications;
 using Business.Interfaces.Organizational.Assignment;
 using Business.Interfaces.Security;
 using Data.Interfases.Transaction;
@@ -11,6 +12,7 @@ using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Specifics;
+using Entity.Enums.Specifics;
 using Microsoft.Extensions.Logging;
 using Utilities.Helpers.Excel;
 using Utilities.Helpers.Images;
@@ -31,6 +33,8 @@ namespace Business.Services.Excel
         private readonly IImportHistoryBusiness _history;
         private readonly ICurrentUser _currentUser;
         private readonly IExcelReaderHelper _excel;
+        private readonly INotificationBusiness _notificationsBusiness;
+
 
         public ExcelBulkImporter(
             ILogger<ExcelBulkImporter> logger,
@@ -41,7 +45,9 @@ namespace Business.Services.Excel
             IUnitOfWork uow,
             IImportHistoryBusiness history,
             ICurrentUser currentUser,
-            IExcelReaderHelper excelReaderHelper)
+            IExcelReaderHelper excelReaderHelper,
+            INotificationBusiness notificationsBusiness
+            )
         {
             _logger = logger;
             _parser = parser;
@@ -52,6 +58,7 @@ namespace Business.Services.Excel
             _history = history;
             _currentUser = currentUser;
             _excel = excelReaderHelper;
+            _notificationsBusiness = notificationsBusiness;
         }
 
         /// <summary>
@@ -65,7 +72,7 @@ namespace Business.Services.Excel
 
             // Metadatos de la operación
             var fileName = _excel.GetFileName(excelStream);
-            var startedBy = _currentUser.UserName ?? _currentUser.UserIdRaw;
+            int startedBy = _currentUser.UserId;
 
             var ctxJson = JsonSerializer.Serialize(new
             {
@@ -212,6 +219,10 @@ namespace Business.Services.Excel
             });
 
             result.TableRows = tableRows;
+            // 🚀 Enviar notificación de carga masiva exitosa
+            await _notificationsBusiness.SendTemplateAsync(
+                NotificationTemplateType.BulkImportSuccess,
+                parsed.Count, fileName);
             return result;
         }
 

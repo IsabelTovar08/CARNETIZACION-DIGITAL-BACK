@@ -39,6 +39,7 @@ namespace Data.Implementations.Logging
         {
             return await _context.Set<ImportBatch>()
                 .AsNoTracking()
+                 .Include(b => b.StartedByUser)
                 .OrderByDescending(b => b.StartedAt)
                 .ToListAsync();
         }

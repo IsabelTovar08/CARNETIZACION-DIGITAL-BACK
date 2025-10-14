@@ -20,5 +20,9 @@ namespace Data.Interfases.Operational
         Task BulkInsertAccessPointsAsync(IEnumerable<AccessPoint> accessPoints);
         Task SaveAccessPointsAsync(IEnumerable<AccessPoint> accessPoints);
 
+        /// <summary>
+        /// Consulta el número de eventos disponibles
+        /// </summary>
+        Task<int> GetAvailableEventsCountAsync();
     }
 }

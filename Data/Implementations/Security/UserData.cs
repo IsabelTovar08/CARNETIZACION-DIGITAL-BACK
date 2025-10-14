@@ -62,8 +62,7 @@ namespace Data.Classes.Specifics
                     .Include(u => u.Person.PersonDivisionProfile.Where(pdp => pdp.IsCurrentlySelected))
                         .ThenInclude(pdp => pdp.Profile)
                     .Include(u => u.Person.PersonDivisionProfile.Where(pdp => pdp.IsCurrentlySelected))
-                        .ThenInclude(pdp => pdp.InternalDivision); // o Division, según tu modelo
-                                                                   // 👈 NO hagas: .ThenInclude(pdp => pdp.Person) ni .ThenInclude(...Person.City)
+                        .ThenInclude(pdp => pdp.InternalDivision); 
             }
 
             return await query.FirstOrDefaultAsync();

@@ -10,7 +10,7 @@ namespace Entity.DTOs.Specifics
     {
         public string Source { get; set; } = "Excel";
         public string? FileName { get; set; }
-        public string? StartedBy { get; set; }
+        public int? StartedBy { get; set; }
         public int TotalRows { get; set; }
         public string? ContextJson { get; set; }
     }

@@ -94,6 +94,30 @@ namespace Data.Implementations.Operational
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Consulta el número de eventos disponibles
+        /// </summary>
+        public async Task<int> GetAvailableEventsCountAsync()
+        {
+            try
+            {
+                var now = DateTime.UtcNow;
+
+                var total = await _context.Set<Event>()
+                    .AsNoTracking()
+                    .Where(e => !e.IsDeleted
+                                && e.StatusId == 1 // asumiendo que 1 = Activo
+                                && (e.EventEnd == null || e.EventEnd >= now))
+                    .CountAsync();
+
+                return total;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el número de eventos disponibles");
+                throw;
+            }
+        }
     }
 
 }

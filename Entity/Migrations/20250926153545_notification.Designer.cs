@@ -4,6 +4,7 @@ using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250926153545_notification")]
+    partial class notification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1580,9 +1583,6 @@ namespace Entity.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SheduleId")
-                        .HasColumnType("int");
-
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
@@ -1599,8 +1599,6 @@ namespace Entity.Migrations
                     b.HasIndex("PersonDivissionProfileId")
                         .IsUnique();
 
-                    b.HasIndex("SheduleId");
-
                     b.HasIndex("StatusId");
 
                     b.ToTable("Cards", "Organizational");
@@ -1616,7 +1614,6 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             PersonDivissionProfileId = 1,
                             QRCode = "QR12345",
-                            SheduleId = 0,
                             StatusId = 1,
                             UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
                             UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
@@ -4033,7 +4030,7 @@ namespace Entity.Migrations
             modelBuilder.Entity("Entity.Models.Operational.BulkLoading.ImportBatch", b =>
                 {
                     b.HasOne("Entity.Models.User", "StartedByUser")
-                        .WithMany("ImportBatches")
+                        .WithMany()
                         .HasForeignKey("StartedByUserId");
 
                     b.Navigation("StartedByUser");
@@ -4106,12 +4103,6 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Shedule")
-                        .WithMany()
-                        .HasForeignKey("SheduleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Entity.Models.Parameter.Status", "Status")
                         .WithMany("cards")
                         .HasForeignKey("StatusId")
@@ -4121,8 +4112,6 @@ namespace Entity.Migrations
                     b.Navigation("CardTemplate");
 
                     b.Navigation("PersonDivisionProfile");
-
-                    b.Navigation("Shedule");
 
                     b.Navigation("Status");
                 });
@@ -4547,8 +4536,6 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.User", b =>
                 {
-                    b.Navigation("ImportBatches");
-
                     b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618

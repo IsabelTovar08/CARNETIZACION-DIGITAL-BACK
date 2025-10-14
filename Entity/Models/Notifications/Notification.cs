@@ -13,7 +13,7 @@ namespace Entity.Models.Notifications
         public DateTime? CreateDate { get; set; }
 
         // Relaciones
-        public int NotificationTypeId { get; set; }
+        public NotificationType NotificationTypeId { get; set; }
         public List<NotificationReceived> NotificationReceiveds { get; set; }
     }
 }

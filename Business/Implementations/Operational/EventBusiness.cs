@@ -110,5 +110,32 @@ namespace Business.Implementations.Operational
 
             return _mapper.Map<EventDetailsDtoResponse>(entity);
         }
+
+
+        /// <summary>
+        /// Retorna el número de eventos disponibles
+        /// </summary>
+        public async Task<int> GetAvailableEventsCountAsync()
+        {
+            try
+            {
+                var total = await _data.GetAvailableEventsCountAsync();
+
+                if (total < 0)
+                    throw new InvalidOperationException("El número de eventos no puede ser negativo");
+
+                return total;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Validación fallida al obtener eventos disponibles");
+                throw; 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado en Business al obtener eventos disponibles");
+                throw; 
+            }
+        }
     }
 }
