@@ -33,6 +33,7 @@ using Business.Interfaces.Organizational.Structure;
 using Business.Interfaces.Organizational.Structure;
 using Business.Interfaces.Parameters;
 using Business.Interfaces.Security;
+using Business.Interfaces.Services;
 using Business.Interfaces.Storage;
 using Business.Interfases;
 using Business.Interfases.Organizational.Location;
@@ -42,6 +43,7 @@ using Business.Services.Auth;
 using Business.Services.CodeGenerator;
 using Business.Services.Enums;
 using Business.Services.Excel;
+using Business.Services.Export;
 using Business.Services.JWT;
 using Business.Services.Logging;
 using Business.Services.Storage;
@@ -331,6 +333,12 @@ namespace Web.Extensions
             services.AddScoped<ICurrentUser, CurrentUser>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
+            // PDF Y EXCEL
+
+            services.AddScoped<IExportService, ExportService>();
+
 
 
 

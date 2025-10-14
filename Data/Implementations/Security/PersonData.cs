@@ -8,12 +8,20 @@ using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Data.Classes.Specifics
 {
     public class PersonData : BaseData<Person>, IPersonData
     {
         private readonly IUserData _userData;
-        public PersonData(ApplicationDbContext context, ILogger<Person> logger, IUserData userData) : base(context, logger)
+
+        public PersonData(ApplicationDbContext context, ILogger<Person> logger, IUserData userData)
+            : base(context, logger)
         {
             _userData = userData;
         }
@@ -26,9 +34,12 @@ namespace Data.Classes.Specifics
                 .Include(p => p.BloodType)
                 .ToListAsync();
         }
+
         public async Task<Person?> FindByIdentification(string identification)
         {
-            return await _context.Set<Person>().Where(u => !u.IsDeleted).FirstOrDefaultAsync(p => p.DocumentNumber == identification);
+            return await _context.Set<Person>()
+                .Where(u => !u.IsDeleted)
+                .FirstOrDefaultAsync(p => p.DocumentNumber == identification);
         }
 
         public async Task<Person?> GetPersonInfo(int id)
@@ -101,6 +112,7 @@ namespace Data.Classes.Specifics
                 })
                 .FirstOrDefaultAsync();
         }
+
         public async Task<Person?> GetPersonByUserIdAsync(int userId)
         {
             return await _context.Users
@@ -110,5 +122,64 @@ namespace Data.Classes.Specifics
                 .FirstOrDefaultAsync();
         }
 
+        /// <summary>
+        /// Filtro + paginación:
+        /// - Solo personas no eliminadas
+        /// - Con al menos un PersonDivisionProfile con un Card
+        /// - Filtros opcionales por división interna, unidad organizativa y perfil
+        /// </summary>
+        public async Task<(IList<Person> Items, int Total)> QueryWithFiltersAsync(
+            int? internalDivisionId,
+            int? organizationalUnitId,
+            int? profileId,
+            int page,
+            int pageSize,
+            CancellationToken ct = default)
+        {
+            var q = _context.Set<Person>()
+                .AsNoTracking()
+                // Incluir relaciones relevantes
+                .Include(p => p.PersonDivisionProfile)
+                    .ThenInclude(pdp => pdp.InternalDivision)
+                        .ThenInclude(id => id.OrganizationalUnit)
+                .Include(p => p.PersonDivisionProfile)
+                    .ThenInclude(pdp => pdp.Profile)
+                .Include(p => p.PersonDivisionProfile)
+                    .ThenInclude(pdp => pdp.Card) // carnet singular
+                                                  // Reglas de negocio
+                .Where(p => !p.IsDeleted)
+                .Where(p => p.PersonDivisionProfile.Any(pdp => pdp.Card != null));
+
+            // Filtros opcionales
+            if (internalDivisionId.HasValue)
+                q = q.Where(p => p.PersonDivisionProfile
+                    .Any(pdp => pdp.InternalDivisionId == internalDivisionId.Value));
+
+            if (organizationalUnitId.HasValue)
+                q = q.Where(p => p.PersonDivisionProfile
+                    .Any(pdp => pdp.InternalDivision.OrganizationalUnitId == organizationalUnitId.Value));
+
+            if (profileId.HasValue)
+                q = q.Where(p => p.PersonDivisionProfile
+                    .Any(pdp => pdp.ProfileId == profileId.Value));
+
+            // Total antes de paginar
+            int total = await q.CountAsync(ct);
+
+            // Paginación defensiva
+            page = page <= 0 ? 1 : page;
+            pageSize = pageSize <= 0 ? 20 : pageSize;
+            int skip = (page - 1) * pageSize;
+
+            // Orden básico (alfabético por nombre completo)
+            var items = await q
+                .OrderBy(p => p.FirstName)
+                .ThenBy(p => p.LastName)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToListAsync(ct);
+
+            return (items, total);
+        }
     }
 }

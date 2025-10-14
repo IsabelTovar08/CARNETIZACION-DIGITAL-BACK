@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Reports;
+using Utilities.Helpers; // ✅ cambio aquí
 
 namespace Business.Implementations.Operational
 {
@@ -187,22 +188,17 @@ namespace Business.Implementations.Operational
             return (dtos, total);
         }
 
-        /// <summary>
-        /// 🚀 NUEVO: Reporte sin paginación (evento, persona, rango de fechas).
-        /// </summary>
-        //public async Task<IList<AttendanceDtoResponse>> GetReportAsync(ReportFilterDto filters, CancellationToken ct = default)
-        //{
-        //    var list = await _attendanceData.GetReportAsync(filters.EventId, filters.PersonId, filters.StartDate, filters.EndDate, ct);
-        //    var dtos = list.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
+        // NUEVOS MÉTODOS DE EXPORTACIÓN (usando ExportHelper)
+        public async Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default)
+        {
+            return await Task.Run(() =>
+                ExportHelper.ExportAttendancesToPdf(data, "Reporte de Asistencias"), ct);
+        }
 
-        //    foreach (var it in dtos)
-        //    {
-        //        it.TimeOfEntryStr = it.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
-        //        if (it.TimeOfExit.HasValue)
-        //            it.TimeOfExitStr = it.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
-        //    }
-
-        //    return dtos;
-        //}
+        public async Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default)
+        {
+            return await Task.Run(() =>
+                ExportHelper.ExportAttendancesToExcel(data, "Asistencias"), ct);
+        }
     }
 }

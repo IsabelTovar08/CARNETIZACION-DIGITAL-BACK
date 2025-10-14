@@ -8,15 +8,17 @@ using QuestPDF.Infrastructure;   //  Para QuestPDF
 using OfficeOpenXml;            //  Para EPPlus <= 7.x
 using Web.Realtime.Hubs;
 
+//   using de QuestPDF
+using QuestPDF.Infrastructure;
+
 namespace Web
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            //  Declarar licencias
+            // Configuración de licencia para QuestPDF
             QuestPDF.Settings.License = LicenseType.Community;
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
@@ -32,7 +34,7 @@ namespace Web
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "Autenticación JWT con esquema Bearer. **Pega solo el token (sin 'Bearer ')**.",
+                    Description = "Autenticaci�n JWT con esquema Bearer. **Pega solo el token (sin 'Bearer ')**.",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
@@ -56,7 +58,9 @@ namespace Web
                 });
             });
 
-            // Servicios personalizados y configuración
+            builder.Services.AddSwaggerGen();
+
+            // servicios y data
             builder.Services.AddProjectServices();
             builder.Services.AddCorsConfiguration(configuration);
 
@@ -66,10 +70,10 @@ namespace Web
             // JWT
             builder.Services.AddJwtAuthentication(configuration);
 
-            // Conexión a DB
+            // Conexi�n a DB
             builder.Services.AddDatabaseConfiguration(configuration);
 
-            // Mail
+            //Mail 
             builder.Services.Configure<EmailSettings>(
                 builder.Configuration.GetSection("EmailSettings"));
 
@@ -81,11 +85,9 @@ namespace Web
             builder.Services.Configure<TwilioSettings>(
                 builder.Configuration.GetSection("Twilio"));
 
-            // Supabase para almacenar imágenes 
-            builder.Services.Configure<SupabaseOptions>(
-                builder.Configuration.GetSection("Supabase"));
-            builder.Services.Configure<UploadOptions>(
-                builder.Configuration.GetSection("Upload"));
+            // Supabase para almacenar im�genes 
+            builder.Services.Configure<SupabaseOptions>(builder.Configuration.GetSection("Supabase"));
+            builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Upload"));
 
             var app = builder.Build();
 
@@ -94,11 +96,6 @@ namespace Web
             // Configure the HTTP request pipeline.
             app.UseSwagger();
             app.UseSwaggerUI();
-            //if (app.Environment.IsDevelopment())
-            //{
-            app.UseSwagger();
-                app.UseSwaggerUI();
-            //}
 
             app.UseHttpsRedirection();
             app.UseCors();

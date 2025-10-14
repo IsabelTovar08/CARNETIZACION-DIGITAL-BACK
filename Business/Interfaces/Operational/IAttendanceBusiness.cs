@@ -21,7 +21,12 @@ namespace Business.Interfaces.Operational
             string? sortBy, string? sortDir, int page, int pageSize,
             CancellationToken ct = default);
 
-        // NUEVO: Reporte sin paginación
-        //Task<IList<AttendanceDtoResponse>> GetReportAsync(ReportFilterDto filters, CancellationToken ct = default);
+        // <sumary>
+        /// pdf y excel export
+        /// </sumary>
+
+        Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
+        Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
+
     }
 }
