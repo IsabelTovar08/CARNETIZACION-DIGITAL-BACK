@@ -104,7 +104,7 @@ namespace Business.Services.Auth
                 ? TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time")
                 : TimeZoneInfo.FindSystemTimeZoneById("America/Bogota");
 
-            var now = TimeZoneInfo.ConvertTime(_clock.UtcNow, tz);
+            var now = _clock.UtcNow;
 
             var user = await _userData.GetByIdAsync(userId);
             if (user is null) return VerifyResult.Fail("Usuario no existe.");

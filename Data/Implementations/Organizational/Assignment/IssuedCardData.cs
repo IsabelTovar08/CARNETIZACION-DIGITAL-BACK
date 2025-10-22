@@ -46,5 +46,13 @@ namespace Data.Implementations.Organizational.Assignment
             await _context.SaveChangesAsync();
             return card;
         }
+
+
+        public override Task<IssuedCard> SaveAsync(IssuedCard entity)
+        {
+            entity.QRCode = "123";
+            entity.UniqueId = new Guid();
+            return base.SaveAsync(entity);
+        }
     }
 }

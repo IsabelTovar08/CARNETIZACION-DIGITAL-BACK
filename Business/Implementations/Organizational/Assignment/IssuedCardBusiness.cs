@@ -18,9 +18,9 @@ namespace Business.Implementations.Organizational.Assignment
     public class IssuedCardBusiness : BaseBusiness<IssuedCard, IssuedCardDtoRequest, IssuedCardDto>, IIssuedCardBusiness
     {
         public readonly IIssuedCardData _issuedCardData;
-        public IssuedCardBusiness(ICrudBase<IssuedCard> data, ILogger<IssuedCard> logger, IMapper mapper, IIssuedCardData issuedCardData) : base(data, logger, mapper)
+        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper) : base(data, logger, mapper)
         {
-            _issuedCardData = issuedCardData;
+            _issuedCardData = data;
         }
 
         /// <summary>

@@ -168,14 +168,14 @@ namespace Business.Services.Excel
                     });
                     pdpId = pdpSaved.Id;
 
-                    // === STEP 3: Subir foto ===
-                    if (row.PhotoBytes is { Length: > 0 })
-                    {
-                        var (ext, contentType) = ImageFormatValidator.EnsureSupported(row.PhotoBytes, row.PhotoExtension);
-                        using var ms = new MemoryStream(row.PhotoBytes);
-                        await _personBusiness.UpsertPersonPhotoAsync(personId.Value, ms, contentType, $"excel-upload{ext}");
-                        rowRes.UpdatedPhoto = true;
-                    }
+                    //// === STEP 3: Subir foto ===
+                    //if (row.PhotoBytes is { Length: > 0 })
+                    //{
+                    //    var (ext, contentType) = ImageFormatValidator.EnsureSupported(row.PhotoBytes, row.PhotoExtension);
+                    //    using var ms = new MemoryStream(row.PhotoBytes);
+                    //    await _personBusiness.UpsertPersonPhotoAsync(personId.Value, ms, contentType, $"excel-upload{ext}");
+                    //    rowRes.UpdatedPhoto = true;
+                    //}
 
                     // === STEP 4: Generar PDF del carnet individual ===
                     try
@@ -190,7 +190,7 @@ namespace Business.Services.Excel
                             CategoryArea = ctx.InternalDivisionCode ?? "",
                             CompanyName = ctx.OrganizationCode ?? "",
                             UserPhotoUrl = personCreated.Person.PhotoUrl ?? "",
-                            LogoUrl = "https://tuempresa.com/logo.png",
+                            LogoUrl = "https://carnetgo.com/logo.png",
                             QrUrl = ""
                         };
 
@@ -259,7 +259,7 @@ namespace Business.Services.Excel
                         Success = rowRes.Success,
                         Message = rowRes.Message,
                         PersonId = personId,
-                        PersonDivisionProfileId = pdpId,
+                        IssuedCardId = pdpId,
                         CardId = cardConfigId,
                         UpdatedPhoto = rowRes.UpdatedPhoto
                     });

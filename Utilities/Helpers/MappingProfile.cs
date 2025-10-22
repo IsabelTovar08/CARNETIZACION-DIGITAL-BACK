@@ -43,6 +43,7 @@ namespace Utilities.Helper
      .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType.Name))
      .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
 
+
      // 🔹 División actual
      .ForMember(dest => dest.InternalDivisionName,
          opt => opt.MapFrom(src =>
@@ -61,6 +62,7 @@ namespace Utilities.Helper
 
      .ReverseMap();
 
+            CreateMap<PersonDtoRequest, Person>().ReverseMap();
 
 
             CreateMap<Person, PersonInfoDto>()

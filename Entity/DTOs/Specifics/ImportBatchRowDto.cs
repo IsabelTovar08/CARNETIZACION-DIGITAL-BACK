@@ -16,6 +16,7 @@ namespace Entity.DTOs.Specifics
         public int? PersonDivisionProfileId { get; set; }
         public int? CardId { get; set; }
         public bool UpdatedPhoto { get; set; }
+        public int? IssuedCardId { get; set; }
     }
 
 }
