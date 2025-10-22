@@ -8,7 +8,7 @@ namespace Entity.Models.Parameter
     public class Status : GenericModel
     {
         public List<NotificationReceived> NotificatiosReceived { get; set; }
-        public List<Card> cards { get; set; }
+        public List<IssuedCard> IssuedCards { get; set; }
         public List<Event> Events { get; set; }
     }
 }

@@ -36,8 +36,8 @@ namespace Data.Implementations.Notifications
                     NotificationId = nr.Notification.Id,
                     Title = nr.Notification.Title,
                     Message = nr.Notification.Message,
-                    NotificationTypeName = ((NotificationType)nr.Notification.NotificationTypeId).ToString(),
-                    StatusId = nr.StatusId,
+                    NotificationTypeName = ((NotificationType)nr.Notification.NotificationType).ToString(),
+                    StatusId = nr.Status,
                     SendDate = nr.SendDate,
                     ReadDate = nr.ReadDate
                 })

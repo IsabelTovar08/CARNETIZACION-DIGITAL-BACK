@@ -25,11 +25,6 @@ namespace Data.Classes.Base
             _logger = logger;
         }
 
-        public BaseData(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         public override async Task<IEnumerable<T>> GetAllAsync()
         {
             try

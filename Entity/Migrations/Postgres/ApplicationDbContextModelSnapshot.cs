@@ -3,12 +3,12 @@ using System;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Entity.Migrations
+namespace Entity.Migrations.Postgres
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -18,53 +18,53 @@ namespace Entity.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.7")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Entity.Models.Auth.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("Expires")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("JwtId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ReplacedByTokenHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("Revoked")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("character varying(128)");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -78,44 +78,44 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Icon")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<int>("ModuleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
+                        .HasColumnType("character varying(120)");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasColumnType("character varying(300)");
 
                     b.HasKey("Id");
 
@@ -133,735 +133,290 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Panel principal",
                             Icon = "home",
                             IsDeleted = false,
                             ModuleId = 1,
                             Name = "Inicio",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard"
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Centro de ayuda y documentación",
                             Icon = "help",
                             IsDeleted = false,
                             ModuleId = 1,
                             Name = "Ayuda",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/ayuda"
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Vista general de la estructura",
                             Icon = "dashboard_customize",
                             IsDeleted = false,
                             ModuleId = 2,
                             Name = "Resumen",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/organizational/structure"
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Administración de sucursales",
                             Icon = "store",
                             IsDeleted = false,
                             ModuleId = 2,
                             Name = "Sucursales",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/organizational/structure/branch"
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Gestión de unidades organizativas",
                             Icon = "schema",
                             IsDeleted = false,
                             ModuleId = 2,
                             Name = "Unidades Organizativas",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/organizational/structure/unit"
                         },
                         new
                         {
                             Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Administración de divisiones internas",
-                            Icon = "account_tree",
-                            IsDeleted = false,
-                            ModuleId = 2,
-                            Name = "Divisiones Internas",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Url = "/dashboard/organizational/structure/internal-division"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Perfiles de las personas en el sistema",
                             Icon = "badge",
                             IsDeleted = false,
                             ModuleId = 2,
                             Name = "Perfiles",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Url = "/dashboard/organizational/profile"
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Url = "/dashboard/organizational/structure/profile"
                         },
                         new
                         {
-                            Id = 8,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 7,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Configuración de horarios/jornadas",
                             Icon = "schedule",
                             IsDeleted = false,
                             ModuleId = 2,
                             Name = "Jornadas",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/organizational/structure/schedule"
                         },
                         new
                         {
-                            Id = 9,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 8,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Gestión de eventos",
                             Icon = "event",
                             IsDeleted = false,
                             ModuleId = 3,
                             Name = "Eventos",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/operational/events"
                         },
                         new
                         {
-                            Id = 10,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 9,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Catálogo de tipos de evento",
                             Icon = "category",
                             IsDeleted = false,
                             ModuleId = 3,
                             Name = "Tipos de Evento",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/operational/event-types"
                         },
                         new
                         {
-                            Id = 11,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 10,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Administración de puntos de acceso",
                             Icon = "sensor_door",
                             IsDeleted = false,
                             ModuleId = 3,
                             Name = "Puntos de Acceso",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/operational/access-points"
                         },
                         new
                         {
-                            Id = 12,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 11,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Registro y consulta de asistencias",
                             Icon = "how_to_reg",
                             IsDeleted = false,
                             ModuleId = 3,
                             Name = "Asistencias",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/operational/attendance"
                         },
                         new
                         {
-                            Id = 13,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 12,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Registro y consulta de generación masiva de carnets",
                             Icon = "badge",
                             IsDeleted = false,
                             ModuleId = 3,
                             Name = "Emisión de Carnet",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/operational/card-issuance"
                         },
                         new
                         {
-                            Id = 14,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 13,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Estados del sistema",
                             Icon = "check_circle_unread",
                             IsDeleted = false,
                             ModuleId = 4,
                             Name = "Estados",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/parametros/status"
                         },
                         new
                         {
-                            Id = 15,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 14,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Tipos y categorías del sistema",
                             Icon = "category",
                             IsDeleted = false,
                             ModuleId = 4,
                             Name = "Tipos y Categorías",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/parametros/types-category"
                         },
                         new
                         {
-                            Id = 16,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Configuración del Menú del sistema",
-                            Icon = "background_dot_small",
-                            IsDeleted = false,
-                            ModuleId = 4,
-                            Name = "Menu",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Url = "/dashboard/parametros/menu"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 15,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Catálogo de departamentos",
                             Icon = "flag",
                             IsDeleted = false,
                             ModuleId = 4,
                             Name = "Departamentos",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/organizational/location/department"
                         },
                         new
                         {
-                            Id = 18,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 16,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Catálogo de municipios",
                             Icon = "place",
                             IsDeleted = false,
                             ModuleId = 4,
                             Name = "Municipios",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/organizational/location/municipality"
                         },
                         new
                         {
-                            Id = 19,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 17,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Gestión de personas",
                             Icon = "person_pin_circle",
                             IsDeleted = false,
                             ModuleId = 5,
                             Name = "Personas",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/seguridad/people"
                         },
                         new
                         {
-                            Id = 20,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 18,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Gestión de usuarios",
                             Icon = "groups_2",
                             IsDeleted = false,
                             ModuleId = 5,
                             Name = "Usuarios",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/seguridad/users"
                         },
                         new
                         {
-                            Id = 21,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 19,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Gestión de roles",
                             Icon = "add_moderator",
                             IsDeleted = false,
                             ModuleId = 5,
                             Name = "Roles",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/seguridad/roles"
                         },
                         new
                         {
-                            Id = 22,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 20,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Permisos por formulario",
                             Icon = "folder_managed",
                             IsDeleted = false,
                             ModuleId = 5,
                             Name = "Gestión de Permisos",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/seguridad/permission-forms"
                         },
                         new
                         {
-                            Id = 23,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 21,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Catálogo de permisos",
                             Icon = "lock_open_circle",
                             IsDeleted = false,
                             ModuleId = 5,
                             Name = "Permisos",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/seguridad/permissions"
                         },
                         new
                         {
-                            Id = 24,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 22,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Catálogo de formularios",
                             Icon = "lists",
                             IsDeleted = false,
                             ModuleId = 5,
                             Name = "Formularios",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/seguridad/forms"
                         },
                         new
                         {
-                            Id = 25,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 23,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Catálogo de módulos",
                             Icon = "dashboard_2",
                             IsDeleted = false,
                             ModuleId = 5,
                             Name = "Módulos",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/seguridad/modules"
-                        });
-                });
-
-            modelBuilder.Entity("Entity.Models.ModelSecurity.MenuStructure", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("FormId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ModuleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ParentMenuId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FormId");
-
-                    b.HasIndex("ModuleId");
-
-                    b.HasIndex("ParentMenuId", "OrderIndex");
-
-                    b.ToTable("MenuStructures", "Parameter", t =>
-                        {
-                            t.HasCheckConstraint("CK_MenuStructures_Type", "[Type] IN ('group','collapse','item')");
-                        });
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            ModuleId = 1,
-                            OrderIndex = 1,
-                            Type = "group",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            ModuleId = 2,
-                            OrderIndex = 2,
-                            Type = "group",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            ModuleId = 3,
-                            OrderIndex = 3,
-                            Type = "group",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            ModuleId = 4,
-                            OrderIndex = 4,
-                            Type = "group",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            ModuleId = 5,
-                            OrderIndex = 5,
-                            Type = "group",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 1,
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 1,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 2,
-                            IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 1,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Icon = "account_tree",
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 2,
-                            Title = "Estructura Organizativa",
-                            Type = "collapse",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 3,
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 8,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 4,
-                            IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 8,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 11,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 5,
-                            IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 8,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 12,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 6,
-                            IsDeleted = false,
-                            OrderIndex = 4,
-                            ParentMenuId = 8,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 13,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 7,
-                            IsDeleted = false,
-                            OrderIndex = 5,
-                            ParentMenuId = 8,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 14,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 8,
-                            IsDeleted = false,
-                            OrderIndex = 6,
-                            ParentMenuId = 8,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 15,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Icon = "event_available",
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 3,
-                            Title = "Eventos y Control de Acceso",
-                            Type = "collapse",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 16,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 9,
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 15,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 17,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 10,
-                            IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 15,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 18,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 11,
-                            IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 15,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 19,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 12,
-                            IsDeleted = false,
-                            OrderIndex = 4,
-                            ParentMenuId = 15,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 20,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Icon = "settings_applications",
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 4,
-                            Title = "Configuración General",
-                            Type = "collapse",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 21,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Icon = "location_on",
-                            IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 4,
-                            Title = "Ubicación",
-                            Type = "collapse",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 22,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 13,
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 20,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 23,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 14,
-                            IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 20,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 24,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 15,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Consulta de generación masiva de carnets",
+                            Icon = "groups",
                             IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 20,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 25,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 16,
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 21,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 26,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 17,
-                            IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 21,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 27,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            Icon = "admin_panel_settings",
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 5,
-                            Title = "Gestión de Seguridad",
-                            Type = "collapse",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 28,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 18,
-                            IsDeleted = false,
-                            OrderIndex = 1,
-                            ParentMenuId = 27,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 29,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 19,
-                            IsDeleted = false,
-                            OrderIndex = 2,
-                            ParentMenuId = 27,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 30,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 20,
-                            IsDeleted = false,
-                            OrderIndex = 3,
-                            ParentMenuId = 27,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 31,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 21,
-                            IsDeleted = false,
-                            OrderIndex = 4,
-                            ParentMenuId = 27,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 32,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 22,
-                            IsDeleted = false,
-                            OrderIndex = 5,
-                            ParentMenuId = 27,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 33,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 23,
-                            IsDeleted = false,
-                            OrderIndex = 6,
-                            ParentMenuId = 27,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 34,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            FormId = 24,
-                            IsDeleted = false,
-                            OrderIndex = 7,
-                            ParentMenuId = 27,
-                            Type = "item",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            ModuleId = 3,
+                            Name = "Gestión de personas",
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Url = "/dashboard/operational/people-management"
                         });
                 });
 
@@ -869,64 +424,64 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("BloodTypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("CityId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DocumentNumber")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("DocumentTypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MiddleName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PhotoPath")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PhotoUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SecondLastName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -935,8 +490,7 @@ namespace Entity.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("DocumentNumber")
-                        .IsUnique()
-                        .HasFilter("[DocumentNumber] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("DocumentTypeId");
 
@@ -946,79 +500,79 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentNumber = "1234567890",
                             FirstName = "Demo",
                             IsDeleted = false,
                             LastName = "Funcionario",
                             Phone = "3200001111",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentNumber = "9876543210",
                             FirstName = "Laura",
                             IsDeleted = false,
                             LastName = "Estudiante",
                             Phone = "3100002222",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentNumber = "1122334455",
                             FirstName = "Ana",
                             IsDeleted = false,
                             LastName = "Administrador",
                             Phone = "3001234567",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentNumber = "9988776655",
                             FirstName = "José",
                             IsDeleted = false,
                             LastName = "Usuario",
                             Phone = "3151234567",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentNumber = "1234561630",
                             FirstName = "María",
                             IsDeleted = false,
                             LastName = "Tovar",
                             Phone = "3200056311",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentNumber = "1245567890",
                             FirstName = "Camilo",
                             IsDeleted = false,
                             LastName = "Charry",
                             Phone = "3200014311",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 7,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentNumber = "1235267890",
                             FirstName = "Marcos",
                             IsDeleted = false,
                             LastName = "Alvarez",
                             Phone = "320026111",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -1026,36 +580,36 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Icon")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
+                        .HasColumnType("character varying(120)");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1068,52 +622,52 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Grupo principal de navegación",
                             Icon = "home",
                             IsDeleted = false,
                             Name = "Menú Principal",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Dominio Organizacional",
                             Icon = "apartment",
                             IsDeleted = false,
                             Name = "Organizacional",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Dominio Operacional",
                             Icon = "event_available",
                             IsDeleted = false,
                             Name = "Operacional",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Parámetros y configuración",
                             Icon = "settings_applications",
                             IsDeleted = false,
                             Name = "Parámetros",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Dominio de seguridad",
                             Icon = "admin_panel_settings",
                             IsDeleted = false,
                             Name = "Seguridad",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -1121,201 +675,153 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("CustomTypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("character varying(1000)");
 
-                    b.Property<int>("NotificationTypeId")
+                    b.Property<int>("NotificationType")
                         .HasColumnType("int");
+
+                    b.Property<string>("RedirectUrl")
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomTypeId");
 
                     b.ToTable("Notification", "Notifications");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            CreateDate = new DateTime(2025, 7, 27, 15, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            Message = "Por favor verifica tu cuenta haciendo clic en el enlace enviado.",
-                            NotificationTypeId = 1,
-                            Title = "Verificación de cuenta",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            CreateDate = new DateTime(2025, 7, 28, 14, 30, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            Message = "Estás invitado al evento de bienvenida. Confirma tu asistencia.",
-                            NotificationTypeId = 1,
-                            Title = "Invitación a evento",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
-                        });
                 });
 
             modelBuilder.Entity("Entity.Models.Notifications.NotificationReceived", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("NotificationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ReadDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("SendDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("StatusId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StatusId1")
-                        .HasColumnType("int");
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NotificationId");
 
-                    b.HasIndex("StatusId1");
+                    b.HasIndex("StatusId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("NotificationReceived", "Notifications");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            ExpirationDate = new DateTime(2025, 8, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            NotificationId = 1,
-                            SendDate = new DateTime(2025, 7, 27, 15, 5, 0, 0, DateTimeKind.Utc),
-                            StatusId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            UserId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            ExpirationDate = new DateTime(2025, 8, 5, 5, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            NotificationId = 2,
-                            ReadDate = new DateTime(2025, 7, 28, 15, 15, 0, 0, DateTimeKind.Utc),
-                            SendDate = new DateTime(2025, 7, 28, 14, 35, 0, 0, DateTimeKind.Utc),
-                            StatusId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            UserId = 2
-                        });
                 });
 
             modelBuilder.Entity("Entity.Models.Operational.BulkLoading.ImportBatch", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ContextJson")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("EndedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("ErrorCount")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Source")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("StartedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("StartedBy")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("StartedByUserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("SuccessCount")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("TotalRows")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1328,53 +834,54 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CardId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("ImportBatchId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("IssuedCardId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("PersonDivisionProfileId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("PersonId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("RowNumber")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Success")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("UpdatedPhoto")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CardId");
-
                     b.HasIndex("ImportBatchId");
 
-                    b.HasIndex("PersonDivisionProfileId");
+                    b.HasIndex("IssuedCardId");
 
                     b.ToTable("ImportBatchRows");
                 });
@@ -1383,43 +890,43 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BackBackgroundUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("BackElementsJson")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FrontBackgroundUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FrontElementsJson")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1434,37 +941,37 @@ namespace Entity.Migrations
                             Id = 1,
                             BackBackgroundUrl = "https://drgxicjtijjdhrvsjgvd.supabase.co/storage/v1/object/public/Templates/ladotrasero.svg",
                             BackElementsJson = "\r\n                    {\r\n                        \"title\": { \"x\": 91, \"y\": 202 },\r\n                        \"guides\": { \"x\": 36, \"y\": 371 },\r\n                        \"address\": { \"x\": 43, \"y\": 568 },\r\n                        \"phoneNumber\": { \"x\": 269, \"y\": 568 },\r\n                        \"email\": { \"x\": 271, \"y\": 590 }\r\n                    }",
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FrontBackgroundUrl = "https://drgxicjtijjdhrvsjgvd.supabase.co/storage/v1/object/public/Templates/ladoprincipal.svg",
                             FrontElementsJson = "\r\n                    {\r\n                        \"qr\": { \"x\": 332, \"y\": 48 },\r\n                        \"underQrText\": { \"x\": 302, \"y\": 115 },\r\n                        \"companyName\": { \"x\": 70, \"y\": 78 },\r\n                        \"logo\": { \"x\": 7, \"y\": 97 },\r\n                        \"userPhoto\": { \"x\": -16, \"y\": -1 },\r\n                        \"name\": { \"x\": 240, \"y\": 209 },\r\n                        \"profile\": { \"x\": 240, \"y\": 333 },\r\n                        \"categoryArea\": { \"x\": 138, \"y\": 371 },\r\n                        \"phoneNumber\": { \"x\": 46, \"y\": 502 },\r\n                        \"bloodTypeValue\": { \"x\": 379, \"y\": 462 },\r\n                        \"email\": { \"x\": 144, \"y\": 560 },\r\n                        \"cardId\": { \"x\": 164, \"y\": 603 }\r\n                    }",
                             IsDeleted = false,
                             Name = "Plantilla Básica",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
                 {
                     b.Property<int>("EventId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("AccessPointId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("EventId", "AccessPointId");
 
@@ -1477,36 +984,36 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("QrCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("TypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1518,213 +1025,231 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Acceso norte del evento",
                             IsDeleted = false,
                             Name = "Punto Norte",
                             TypeId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Acceso sur del evento",
                             IsDeleted = false,
                             Name = "Punto Sur",
                             TypeId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Acceso principal",
                             IsDeleted = false,
                             Name = "Punto Principal",
                             TypeId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Card", b =>
+            modelBuilder.Entity("Entity.Models.Organizational.Assignment.CardConfiguration", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CardTemplateId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("PersonDivissionProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("QRCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("SheduleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UniqueId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ValidTo")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CardTemplateId");
 
-                    b.HasIndex("PersonDivissionProfileId")
-                        .IsUnique();
-
                     b.HasIndex("SheduleId");
 
-                    b.HasIndex("StatusId");
-
-                    b.ToTable("Cards", "Organizational");
+                    b.ToTable("CardConfigurations", "Organizational");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             CardTemplateId = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            CreationDate = new DateTime(2024, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            ExpirationDate = new DateTime(2025, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
-                            PersonDivissionProfileId = 1,
-                            QRCode = "QR12345",
-                            SheduleId = 0,
-                            StatusId = 1,
-                            UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            SheduleId = 1,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ValidFrom = new DateTime(2025, 7, 27, 10, 0, 0, 0, DateTimeKind.Utc),
+                            ValidTo = new DateTime(2027, 7, 27, 10, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.PersonDivisionProfile", b =>
+            modelBuilder.Entity("Entity.Models.Organizational.Assignment.IssuedCard", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CardId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("InternalDivisionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsCurrentlySelected")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("PdfUrl")
+                        .HasColumnType("text");
+
                     b.Property<int>("PersonId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ProfileId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    b.Property<string>("QRCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CardId");
 
                     b.HasIndex("InternalDivisionId");
 
                     b.HasIndex("ProfileId");
 
+                    b.HasIndex("StatusId");
+
                     b.HasIndex("PersonId", "ProfileId", "InternalDivisionId")
                         .IsUnique();
 
-                    b.ToTable("PersonDivisionProfiles", "Organizational");
+                    b.ToTable("IssuedCards", "Organizational");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CardId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             InternalDivisionId = 1,
                             IsCurrentlySelected = true,
                             IsDeleted = false,
                             PersonId = 1,
                             ProfileId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            QRCode = "QR-0001",
+                            StatusId = 1,
+                            UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CardId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             InternalDivisionId = 1,
                             IsCurrentlySelected = true,
                             IsDeleted = false,
                             PersonId = 2,
                             ProfileId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            QRCode = "QR-0002",
+                            StatusId = 1,
+                            UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CardId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             InternalDivisionId = 1,
                             IsCurrentlySelected = true,
                             IsDeleted = false,
                             PersonId = 5,
                             ProfileId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            QRCode = "QR-0003",
+                            StatusId = 1,
+                            UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CardId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             InternalDivisionId = 1,
                             IsCurrentlySelected = true,
                             IsDeleted = false,
                             PersonId = 6,
                             ProfileId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            QRCode = "QR-0004",
+                            StatusId = 1,
+                            UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CardId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             InternalDivisionId = 1,
                             IsCurrentlySelected = true,
                             IsDeleted = false,
                             PersonId = 7,
                             ProfileId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            QRCode = "QR-0005",
+                            StatusId = 1,
+                            UniqueId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -1732,30 +1257,30 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1768,47 +1293,47 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Perfil para estudiantes de la institución",
                             IsDeleted = false,
                             Name = "Estudiante",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Perfil para docentes o instructores",
                             IsDeleted = false,
                             Name = "Profesor",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Perfil para personal administrativo",
                             IsDeleted = false,
                             Name = "Administrativo",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Perfil para pasantes o practicantes",
                             IsDeleted = false,
                             Name = "Pasante",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Perfil para usuarios externos o visitantes",
                             IsDeleted = false,
                             Name = "Invitado",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -1816,41 +1341,41 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AccessPointOfEntry")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("AccessPointOfExit")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<int>("PersonId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("QrCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("TimeOfEntry")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("TimeOfExit")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1858,15 +1383,7 @@ namespace Entity.Migrations
 
                     b.HasIndex("AccessPointOfExit");
 
-                    b.HasIndex("IsDeleted");
-
                     b.HasIndex("PersonId");
-
-                    b.HasIndex("TimeOfEntry");
-
-                    b.HasIndex("TimeOfExit");
-
-                    b.HasIndex("PersonId", "TimeOfExit");
 
                     b.ToTable("Attendances", "Operational");
 
@@ -1876,24 +1393,24 @@ namespace Entity.Migrations
                             Id = 1,
                             AccessPointOfEntry = 1,
                             AccessPointOfExit = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             PersonId = 1,
-                            TimeOfEntry = new DateTime(2023, 1, 1, 13, 0, 0, 0, DateTimeKind.Utc),
-                            TimeOfExit = new DateTime(2023, 1, 1, 17, 0, 0, 0, DateTimeKind.Utc),
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            TimeOfEntry = new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc),
+                            TimeOfExit = new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
                             AccessPointOfEntry = 1,
                             AccessPointOfExit = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             PersonId = 2,
-                            TimeOfEntry = new DateTime(2023, 1, 1, 14, 30, 0, 0, DateTimeKind.Utc),
-                            TimeOfExit = new DateTime(2023, 1, 1, 18, 45, 0, 0, DateTimeKind.Utc),
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            TimeOfEntry = new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc),
+                            TimeOfExit = new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -1901,61 +1418,61 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Days")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("EventEnd")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("EventStart")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EventTypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<bool>("IsPublic")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("ScheduleDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("ScheduleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ScheduleTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("StatusId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1972,33 +1489,33 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             Code = "TECH2025",
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            EventEnd = new DateTime(2023, 7, 30, 19, 0, 0, 0, DateTimeKind.Utc),
-                            EventStart = new DateTime(2023, 7, 30, 15, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EventEnd = new DateTime(2023, 7, 30, 14, 0, 0, 0, DateTimeKind.Utc),
+                            EventStart = new DateTime(2023, 7, 30, 10, 0, 0, 0, DateTimeKind.Utc),
                             EventTypeId = 1,
                             IsDeleted = false,
                             IsPublic = true,
                             Name = "Conferencia de Tecnología",
-                            ScheduleDate = new DateTime(2023, 7, 30, 5, 0, 0, 0, DateTimeKind.Utc),
-                            ScheduleTime = new DateTime(1900, 1, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+                            ScheduleDate = new DateTime(2023, 7, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ScheduleTime = new DateTime(1900, 1, 1, 10, 0, 0, 0, DateTimeKind.Utc),
                             StatusId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
                             Code = "SALUD2025",
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            EventEnd = new DateTime(2023, 8, 5, 17, 0, 0, 0, DateTimeKind.Utc),
-                            EventStart = new DateTime(2023, 8, 5, 14, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EventEnd = new DateTime(2023, 8, 5, 12, 0, 0, 0, DateTimeKind.Utc),
+                            EventStart = new DateTime(2023, 8, 5, 9, 0, 0, 0, DateTimeKind.Utc),
                             EventTypeId = 2,
                             IsDeleted = false,
                             IsPublic = false,
                             Name = "Charla de Salud",
-                            ScheduleDate = new DateTime(2023, 8, 5, 5, 0, 0, 0, DateTimeKind.Utc),
-                            ScheduleTime = new DateTime(1900, 1, 1, 14, 0, 0, 0, DateTimeKind.Utc),
+                            ScheduleDate = new DateTime(2023, 8, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ScheduleTime = new DateTime(1900, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc),
                             StatusId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2006,39 +1523,39 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EventId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("InternalDivisionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int?>("OrganizationalUnitId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("ProfileId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ReferenceId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("TypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2052,38 +1569,38 @@ namespace Entity.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("EventTargetAudiences", "Operational");
+                    b.ToTable("EventTargetAudience", "Organizational");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EventId = 1,
                             IsDeleted = false,
                             ReferenceId = 1,
                             TypeId = 6,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EventId = 1,
                             IsDeleted = false,
                             ReferenceId = 2,
                             TypeId = 6,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EventId = 2,
                             IsDeleted = false,
                             ReferenceId = 3,
                             TypeId = 6,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2091,28 +1608,28 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2122,65 +1639,65 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Eventos de bienvenida institucional",
                             IsDeleted = false,
                             Name = "Bienvenida",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Reuniones privadas para planificación interna",
                             IsDeleted = false,
                             Name = "Planificación",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sesiones de formación para empleados o estudiantes",
                             IsDeleted = false,
                             Name = "Capacitación",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Espacios destinados a la concentración y repaso académico",
                             IsDeleted = false,
                             Name = "Jornada de Estudio",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Actividades laborales organizadas por jornada",
                             IsDeleted = false,
                             Name = "Jornada de Trabajo",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Eventos prácticos y participativos",
                             IsDeleted = false,
                             Name = "Taller",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 7,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Reuniones de carácter informal o comunitario",
                             IsDeleted = false,
                             Name = "Encuentro",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2188,33 +1705,33 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DeparmentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2229,29 +1746,29 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DeparmentId = 1,
                             IsDeleted = false,
                             Name = "Bogotá",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DeparmentId = 2,
                             IsDeleted = false,
                             Name = "Medellín",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DeparmentId = 3,
                             IsDeleted = false,
                             Name = "Cali",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2259,27 +1776,27 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2292,26 +1809,26 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Cundinamarca",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Antioquia",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Valle del Cauca",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2319,28 +1836,28 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2350,47 +1867,47 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Área relacionada con sistemas, informática y desarrollo tecnológico",
                             IsDeleted = false,
                             Name = "Tecnología",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Área enfocada en estudios sociales, filosofía, literatura y cultura",
                             IsDeleted = false,
                             Name = "Humanidades",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Área de física, química, biología y otras ciencias naturales",
                             IsDeleted = false,
                             Name = "Ciencias",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Área dedicada a la enseñanza y formación académica",
                             IsDeleted = false,
                             Name = "Educación",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Área de gestión institucional y procesos administrativos",
                             IsDeleted = false,
                             Name = "Administración",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2398,48 +1915,48 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("CityId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Location")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2458,28 +1975,28 @@ namespace Entity.Migrations
                             Id = 1,
                             Address = "Calle 1 # 2-34",
                             CityId = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "principal@org.com",
                             IsDeleted = false,
                             Location = "Centro",
                             Name = "Sucursal Principal",
                             OrganizationId = 1,
                             Phone = "123456789",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
                             Address = "Carrera 45 # 67-89",
                             CityId = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "norte@org.com",
                             IsDeleted = false,
                             Location = "Zona Norte",
                             Name = "Sucursal Norte",
                             OrganizationId = 1,
                             Phone = "987654321",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2487,39 +2004,39 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AreaCategoryId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("BranchId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<int>("OrganizationalUnitId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2539,56 +2056,56 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             AreaCategoryId = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "División académica enfocada en ingeniería de software y sistemas.",
                             IsDeleted = false,
                             Name = "Escuela de Sistemas",
                             OrganizationalUnitId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
                             AreaCategoryId = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "División académica centrada en ingeniería civil y estructuras.",
                             IsDeleted = false,
                             Name = "Escuela de Civil",
                             OrganizationalUnitId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
                             AreaCategoryId = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Encargado de contabilidad, auditoría y normativas contables.",
                             IsDeleted = false,
                             Name = "Departamento de Contaduría",
                             OrganizationalUnitId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
                             AreaCategoryId = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Área enfocada en teoría económica, micro y macroeconomía.",
                             IsDeleted = false,
                             Name = "Departamento de Economía",
                             OrganizationalUnitId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
                             AreaCategoryId = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Formación profesional en teoría musical, instrumentos y composición.",
                             IsDeleted = false,
                             Name = "Escuela de Música",
                             OrganizationalUnitId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2596,36 +2113,36 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Logo")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<int>("TypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2640,35 +2157,35 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Institución de educación superior",
                             IsDeleted = false,
                             Logo = "logo_unal.png",
                             Name = "Universidad Nacional",
                             TypeId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Centro de atención médica",
                             IsDeleted = false,
                             Logo = "logo_hsj.png",
                             Name = "Hospital San José",
                             TypeId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Fundación sin ánimo de lucro",
                             IsDeleted = false,
                             Logo = "logo_fundacion.png",
                             Name = "Fundación Futuro",
                             TypeId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2676,33 +2193,33 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("BranchId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2717,26 +2234,26 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Facultad de Ingeniería",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Facultad de Ciencias Económicas",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Facultad de Artes",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2744,29 +2261,29 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BranchId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<int>("OrganizationUnitId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2781,37 +2298,37 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             BranchId = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             OrganizationUnitId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
                             BranchId = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             OrganizationUnitId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
                             BranchId = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             OrganizationUnitId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
                             BranchId = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             OrganizationUnitId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2819,33 +2336,33 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
+                        .HasColumnType("interval");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
+                        .HasColumnType("interval");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2855,32 +2372,32 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EndTime = new TimeSpan(0, 18, 0, 0, 0),
                             IsDeleted = false,
                             Name = "Horario Jornada A",
                             StartTime = new TimeSpan(0, 7, 0, 0, 0),
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EndTime = new TimeSpan(0, 17, 0, 0, 0),
                             IsDeleted = false,
                             Name = "Horario Jornada B",
                             StartTime = new TimeSpan(0, 8, 0, 0, 0),
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EndTime = new TimeSpan(0, 19, 0, 0, 0),
                             IsDeleted = false,
                             Name = "Horario Jornada C",
                             StartTime = new TimeSpan(0, 6, 30, 0, 0),
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -2888,34 +2405,34 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<int>("TypeCategoryId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -2930,282 +2447,282 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Cédula de ciudadanía",
                             IsDeleted = false,
                             Name = "CC",
                             TypeCategoryId = 4,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Cédula de extranjería",
                             IsDeleted = false,
                             Name = "CE",
                             TypeCategoryId = 4,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Tarjeta de identidad",
                             IsDeleted = false,
                             Name = "TI",
                             TypeCategoryId = 4,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Pasaporte",
                             IsDeleted = false,
                             Name = "PA",
                             TypeCategoryId = 4,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Número de Identificación Tributaria",
                             IsDeleted = false,
                             Name = "NIT",
                             TypeCategoryId = 4,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sangre tipo O positivo",
                             IsDeleted = false,
                             Name = "O+",
                             TypeCategoryId = 5,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 7,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sangre tipo O negativo",
                             IsDeleted = false,
                             Name = "O-",
                             TypeCategoryId = 5,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 8,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sangre tipo A positivo",
                             IsDeleted = false,
                             Name = "A+",
                             TypeCategoryId = 5,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 9,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sangre tipo A negativo",
                             IsDeleted = false,
                             Name = "A-",
                             TypeCategoryId = 5,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 10,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sangre tipo B positivo",
                             IsDeleted = false,
                             Name = "B+",
                             TypeCategoryId = 5,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 11,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sangre tipo B negativo",
                             IsDeleted = false,
                             Name = "B-",
                             TypeCategoryId = 5,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 12,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sangre tipo AB positivo",
                             IsDeleted = false,
                             Name = "AB+",
                             TypeCategoryId = 5,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 13,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sangre tipo AB negativo",
                             IsDeleted = false,
                             Name = "AB-",
                             TypeCategoryId = 5,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 14,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Organización tipo empresa",
                             IsDeleted = false,
                             Name = "Empresa",
                             TypeCategoryId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 15,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Organización tipo colegio",
                             IsDeleted = false,
                             Name = "Colegio",
                             TypeCategoryId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 16,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Organización tipo universidad",
                             IsDeleted = false,
                             Name = "Universidad",
                             TypeCategoryId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 17,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Organización sede principal",
                             IsDeleted = false,
                             Name = "Sede Principal",
                             TypeCategoryId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 18,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Organización tipo sucursal",
                             IsDeleted = false,
                             Name = "Sucursal",
                             TypeCategoryId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 19,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Notificación para verificación de identidad o datos",
                             IsDeleted = false,
                             Name = "Verificación",
                             TypeCategoryId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 20,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Notificación de invitación a evento o sistema",
                             IsDeleted = false,
                             Name = "Invitación",
                             TypeCategoryId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 21,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Notificación de recordatorio de evento o tarea",
                             IsDeleted = false,
                             Name = "Recordatorio",
                             TypeCategoryId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 22,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Notificación de alerta por evento crítico",
                             IsDeleted = false,
                             Name = "Alerta",
                             TypeCategoryId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 23,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Punto de acceso solo de entrada",
                             IsDeleted = false,
                             Name = "Entrada",
                             TypeCategoryId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 24,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Punto de acceso solo de salida",
                             IsDeleted = false,
                             Name = "Salida",
                             TypeCategoryId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 25,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Punto de acceso bidireccional",
                             IsDeleted = false,
                             Name = "Entrada y salida",
                             TypeCategoryId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 26,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Descripción",
                             IsDeleted = false,
                             Name = "Division",
                             TypeCategoryId = 6,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 27,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Descripción",
                             IsDeleted = false,
                             Name = "Profile",
                             TypeCategoryId = 6,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 28,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Descripción",
                             IsDeleted = false,
                             Name = "Perfil",
                             TypeCategoryId = 6,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -3213,27 +2730,27 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -3246,98 +2763,98 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Activo",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Inactivo",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Pendiente",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Procesando",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Rechazado",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Entregado",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 7,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Leída",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 8,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "En curso",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 9,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Finalizado",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 10,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Cancelado",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 11,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Expirado",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 12,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Renovado",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -3345,27 +2862,27 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -3378,50 +2895,50 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Organización",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Punto de acceso",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Notificación",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Tipo de documento",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Tipo de sangre",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Name = "Filtros para eventos privados",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -3429,30 +2946,30 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -3465,29 +2982,29 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Puede crear nuevos registros",
                             IsDeleted = false,
                             Name = "crear",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Puede editar registros existentes",
                             IsDeleted = false,
                             Name = "editar",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Puede validar datos (correo, QR)",
                             IsDeleted = false,
                             Name = "validar",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -3495,32 +3012,32 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("FormId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<int>("PermissionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("RolId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -3537,32 +3054,32 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FormId = 1,
                             IsDeleted = false,
                             PermissionId = 1,
                             RolId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FormId = 2,
                             IsDeleted = false,
                             PermissionId = 3,
                             RolId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FormId = 3,
                             IsDeleted = false,
                             PermissionId = 2,
                             RolId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -3570,33 +3087,33 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("HasAllPermissions")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -3609,62 +3126,62 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Acceso total al sistema.",
                             HasAllPermissions = true,
                             IsDeleted = false,
                             Name = "SuperAdmin",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Administra carnets y eventos de su organización.",
                             HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "OrgAdmin",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Gestiona únicamente los eventos (creación, control y reportes).",
                             HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "Supervisor",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Funcionario (docentes, coordinadores, etc.) con visualización de su propio carnet.",
                             HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "Administrativo",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Consulta su propio carnet y asistencia.",
                             HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "Estudiante",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Acceso mínimo/público.",
                             HasAllPermissions = false,
                             IsDeleted = false,
                             Name = "Usuario",
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -3672,68 +3189,68 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Active")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("PersonId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("RefreshTokenExpiryTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ResetCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ResetCodeExpiration")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TempCodeAttempts")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("TempCodeConsumedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset?>("TempCodeCreatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset?>("TempCodeExpiresAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("TempCodeHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset?>("TempCodeResendBlockedUntil")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -3741,8 +3258,7 @@ namespace Entity.Migrations
                         .IsUnique();
 
                     b.HasIndex("UserName")
-                        .IsUnique()
-                        .HasFilter("[UserName] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Users", "ModelSecurity");
 
@@ -3751,89 +3267,89 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             Active = true,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            DateCreated = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Password = "123",
                             PersonId = 1,
                             TempCodeAttempts = 0,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "admin"
                         },
                         new
                         {
                             Id = 2,
                             Active = true,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            DateCreated = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Password = "Marcos2025",
                             PersonId = 7,
                             TempCodeAttempts = 0,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "marcosrojasalvarez09172007@gmail.com"
                         },
                         new
                         {
                             Id = 3,
                             Active = true,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            DateCreated = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Password = "isa123",
                             PersonId = 5,
                             TempCodeAttempts = 0,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "isabeltovarp.18@gmail.com"
                         },
                         new
                         {
                             Id = 4,
                             Active = true,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            DateCreated = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Password = "Katalin@01",
                             PersonId = 6,
                             TempCodeAttempts = 0,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "cachape64@gmail.com"
                         },
                         new
                         {
                             Id = 5,
                             Active = false,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            DateCreated = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Password = "L4d!Estudiante2025",
                             PersonId = 2,
                             TempCodeAttempts = 0,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 6,
                             Active = false,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            DateCreated = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Password = "Adm!nCarnet2025",
                             PersonId = 3,
                             TempCodeAttempts = 0,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = 7,
                             Active = false,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-                            DateCreated = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Password = "Usr!Carnet2025",
                             PersonId = 4,
                             TempCodeAttempts = 0,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc)
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -3841,27 +3357,27 @@ namespace Entity.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("RolId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -3876,64 +3392,64 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             RolId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             RolId = 2,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 2
                         },
                         new
                         {
                             Id = 3,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             RolId = 3,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 3
                         },
                         new
                         {
                             Id = 4,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             RolId = 4,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 4
                         },
                         new
                         {
                             Id = 5,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             RolId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 2
                         },
                         new
                         {
                             Id = 6,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             RolId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 3
                         },
                         new
                         {
                             Id = 7,
-                            CreateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             RolId = 1,
-                            UpdateAt = new DateTime(1, 1, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 4
                         });
                 });
@@ -3947,30 +3463,6 @@ namespace Entity.Migrations
                         .IsRequired();
 
                     b.Navigation("Module");
-                });
-
-            modelBuilder.Entity("Entity.Models.ModelSecurity.MenuStructure", b =>
-                {
-                    b.HasOne("Entity.Models.Form", "Form")
-                        .WithMany()
-                        .HasForeignKey("FormId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Entity.Models.Module", "Module")
-                        .WithMany()
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Entity.Models.ModelSecurity.MenuStructure", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentMenuId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Form");
-
-                    b.Navigation("Module");
-
-                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Entity.Models.ModelSecurity.Person", b =>
@@ -4012,7 +3504,7 @@ namespace Entity.Migrations
 
                     b.HasOne("Entity.Models.Parameter.Status", null)
                         .WithMany("NotificatiosReceived")
-                        .HasForeignKey("StatusId1");
+                        .HasForeignKey("StatusId");
 
                     b.HasOne("Entity.Models.User", "User")
                         .WithMany()
@@ -4036,25 +3528,21 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Models.Operational.BulkLoading.ImportBatchRow", b =>
                 {
-                    b.HasOne("Entity.Models.Organizational.Assignment.Card", "Card")
-                        .WithMany()
-                        .HasForeignKey("CardId");
-
                     b.HasOne("Entity.Models.Operational.BulkLoading.ImportBatch", "Batch")
                         .WithMany("Rows")
                         .HasForeignKey("ImportBatchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Assignment.PersonDivisionProfile", "PersonDivisionProfile")
+                    b.HasOne("Entity.Models.Organizational.Assignment.IssuedCard", "IssuedCard")
                         .WithMany()
-                        .HasForeignKey("PersonDivisionProfileId");
+                        .HasForeignKey("IssuedCardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Batch");
 
-                    b.Navigation("Card");
-
-                    b.Navigation("PersonDivisionProfile");
+                    b.Navigation("IssuedCard");
                 });
 
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
@@ -4087,18 +3575,12 @@ namespace Entity.Migrations
                     b.Navigation("AccessPointType");
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.Card", b =>
+            modelBuilder.Entity("Entity.Models.Organizational.Assignment.CardConfiguration", b =>
                 {
                     b.HasOne("Entity.Models.Operational.CardTemplate", "CardTemplate")
                         .WithMany()
                         .HasForeignKey("CardTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entity.Models.Organizational.Assignment.PersonDivisionProfile", "PersonDivisionProfile")
-                        .WithOne("Card")
-                        .HasForeignKey("Entity.Models.Organizational.Assignment.Card", "PersonDivissionProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Shedule")
@@ -4107,23 +3589,19 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Parameter.Status", "Status")
-                        .WithMany("cards")
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("CardTemplate");
 
-                    b.Navigation("PersonDivisionProfile");
-
                     b.Navigation("Shedule");
-
-                    b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.PersonDivisionProfile", b =>
+            modelBuilder.Entity("Entity.Models.Organizational.Assignment.IssuedCard", b =>
                 {
+                    b.HasOne("Entity.Models.Organizational.Assignment.CardConfiguration", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Entity.Models.Organizational.Structure.InternalDivision", "InternalDivision")
                         .WithMany()
                         .HasForeignKey("InternalDivisionId")
@@ -4131,22 +3609,32 @@ namespace Entity.Migrations
                         .IsRequired();
 
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
-                        .WithMany("PersonDivisionProfile")
+                        .WithMany("IssuedCard")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Entity.Models.Organizational.Assignment.Profiles", "Profile")
-                        .WithMany("PersonDivisionProfiles")
+                        .WithMany("IssuedCards")
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Entity.Models.Parameter.Status", "Status")
+                        .WithMany("IssuedCards")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Card");
 
                     b.Navigation("InternalDivision");
 
                     b.Navigation("Person");
 
                     b.Navigation("Profile");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Attendance", b =>
@@ -4209,18 +3697,15 @@ namespace Entity.Migrations
 
                     b.HasOne("Entity.Models.Organizational.Structure.InternalDivision", "InternalDivision")
                         .WithMany()
-                        .HasForeignKey("InternalDivisionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("InternalDivisionId");
 
                     b.HasOne("Entity.Models.Organizational.Structure.OrganizationalUnit", "OrganizationalUnit")
                         .WithMany()
-                        .HasForeignKey("OrganizationalUnitId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("OrganizationalUnitId");
 
                     b.HasOne("Entity.Models.Organizational.Assignment.Profiles", "Profile")
                         .WithMany()
-                        .HasForeignKey("ProfileId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ProfileId");
 
                     b.HasOne("Entity.Models.Parameter.CustomType", "CustomType")
                         .WithMany()
@@ -4400,16 +3885,11 @@ namespace Entity.Migrations
                     b.Navigation("RolFormPermissions");
                 });
 
-            modelBuilder.Entity("Entity.Models.ModelSecurity.MenuStructure", b =>
-                {
-                    b.Navigation("Children");
-                });
-
             modelBuilder.Entity("Entity.Models.ModelSecurity.Person", b =>
                 {
                     b.Navigation("Attendances");
 
-                    b.Navigation("PersonDivisionProfile");
+                    b.Navigation("IssuedCard");
 
                     b.Navigation("User");
                 });
@@ -4438,15 +3918,9 @@ namespace Entity.Migrations
                     b.Navigation("EventAccessPoints");
                 });
 
-            modelBuilder.Entity("Entity.Models.Organizational.Assignment.PersonDivisionProfile", b =>
-                {
-                    b.Navigation("Card")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profiles", b =>
                 {
-                    b.Navigation("PersonDivisionProfiles");
+                    b.Navigation("IssuedCards");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Event", b =>
@@ -4507,9 +3981,9 @@ namespace Entity.Migrations
                 {
                     b.Navigation("Events");
 
-                    b.Navigation("NotificatiosReceived");
+                    b.Navigation("IssuedCards");
 
-                    b.Navigation("cards");
+                    b.Navigation("NotificatiosReceived");
                 });
 
             modelBuilder.Entity("Entity.Models.Parameter.TypeCategory", b =>

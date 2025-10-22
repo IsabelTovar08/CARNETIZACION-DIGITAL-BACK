@@ -45,7 +45,7 @@ namespace Data.Classes.Specifics
         public async Task<Person?> GetPersonInfo(int id)
         {
             return await _context.Set<Person>()
-                .Include(u => u.PersonDivisionProfile.Where(up => up.IsCurrentlySelected))
+                .Include(u => u.IssuedCard.Where(up => up.IsCurrentlySelected))
                     .ThenInclude(pdp => pdp.InternalDivision)
                         .ThenInclude(id => id.OrganizationalUnit)
                             .ThenInclude(ou => ou.OrganizationalUnitBranches)
@@ -94,17 +94,17 @@ namespace Data.Classes.Specifics
                 .Where(p => p.Id == personId && !p.IsDeleted)
                 .Select(p => new PersonOrganizationalInfoDto
                 {
-                    InternalDivissionCode = p.PersonDivisionProfile
+                    InternalDivissionCode = p.IssuedCard
                         .Where(x => x.IsCurrentlySelected)
                         .Select(x => x.InternalDivision.Code)
                         .FirstOrDefault(),
 
-                    OrganizationUnitCode = p.PersonDivisionProfile
+                    OrganizationUnitCode = p.IssuedCard
                         .Where(x => x.IsCurrentlySelected)
                         .Select(x => x.InternalDivision.OrganizationalUnit.Code)
                         .FirstOrDefault(),
 
-                    OrganizationCode = p.PersonDivisionProfile
+                    OrganizationCode = p.IssuedCard
                         .Where(x => x.IsCurrentlySelected)
                         .SelectMany(x => x.InternalDivision.OrganizationalUnit.OrganizationalUnitBranches)
                         .Select(oub => oub.Branch.Organization.Code)
@@ -139,28 +139,28 @@ namespace Data.Classes.Specifics
             var q = _context.Set<Person>()
                 .AsNoTracking()
                 // Incluir relaciones relevantes
-                .Include(p => p.PersonDivisionProfile)
+                .Include(p => p.IssuedCard)
                     .ThenInclude(pdp => pdp.InternalDivision)
                         .ThenInclude(id => id.OrganizationalUnit)
-                .Include(p => p.PersonDivisionProfile)
+                .Include(p => p.IssuedCard)
                     .ThenInclude(pdp => pdp.Profile)
-                .Include(p => p.PersonDivisionProfile)
+                .Include(p => p.IssuedCard)
                     .ThenInclude(pdp => pdp.Card) // carnet singular
                                                   // Reglas de negocio
                 .Where(p => !p.IsDeleted)
-                .Where(p => p.PersonDivisionProfile.Any(pdp => pdp.Card != null));
+                .Where(p => p.IssuedCard.Any(pdp => pdp.Card != null));
 
             // Filtros opcionales
             if (internalDivisionId.HasValue)
-                q = q.Where(p => p.PersonDivisionProfile
+                q = q.Where(p => p.IssuedCard
                     .Any(pdp => pdp.InternalDivisionId == internalDivisionId.Value));
 
             if (organizationalUnitId.HasValue)
-                q = q.Where(p => p.PersonDivisionProfile
+                q = q.Where(p => p.IssuedCard
                     .Any(pdp => pdp.InternalDivision.OrganizationalUnitId == organizationalUnitId.Value));
 
             if (profileId.HasValue)
-                q = q.Where(p => p.PersonDivisionProfile
+                q = q.Where(p => p.IssuedCard
                     .Any(pdp => pdp.ProfileId == profileId.Value));
 
             // Total antes de paginar

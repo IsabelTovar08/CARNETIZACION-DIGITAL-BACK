@@ -23,8 +23,7 @@ namespace Entity.Models.Operational.BulkLoading
         public int? CardId { get; set; }
         public bool UpdatedPhoto { get; set; }
 
-        public PersonDivisionProfile PersonDivisionProfile { get; set; }
-        public Card Card { get; set; }
+        public IssuedCard IssuedCard { get; set; }
 
     }
 }

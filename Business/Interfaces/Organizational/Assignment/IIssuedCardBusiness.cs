@@ -10,7 +10,11 @@ using System.Threading.Tasks;
 
 namespace Business.Interfaces.Organizational.Assignment
 {
-    public interface IPersonDivisionProfileBusiness : IBaseBusiness<PersonDivisionProfile, PersonDivisionProfileDtoRequest, PersonDivisionProfileDto>
+    public interface IIssuedCardBusiness : IBaseBusiness<IssuedCard, IssuedCardDtoRequest, IssuedCardDto>
     {
+        /// <summary>
+        /// Actualiza la URL pública del PDF del carnet en la base de datos.
+        /// </summary>
+        Task<IssuedCardDto> UpdatePdfUrlAsync(int cardId, string pdfUrl);
     }
 }

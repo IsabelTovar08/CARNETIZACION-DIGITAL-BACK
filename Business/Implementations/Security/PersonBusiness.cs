@@ -339,7 +339,7 @@ namespace Business.Classes
             var items = entities.Select(e => _mapper.Map<PersonDto>(e)).ToList();
             return (items, total);
         }
-    }
+    
         public async Task<PersonDto?> GetCurrentPersonAsync()
         {
             try

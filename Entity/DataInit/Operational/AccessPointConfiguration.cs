@@ -46,10 +46,6 @@ namespace Entity.DataInit.Operational
                    .HasForeignKey(ap => ap.TypeId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Property(ap => ap.QrCode)
-                   .HasColumnType("nvarchar(max)")
-                   .IsRequired(false);
-
             builder.ToTable("AccessPoints", schema: "Operational");
         }
 

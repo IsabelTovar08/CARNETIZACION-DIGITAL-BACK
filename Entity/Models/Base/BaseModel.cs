@@ -11,8 +11,8 @@ namespace Entity.Models.Base
         public int Id { get; set; }
         public string? Code { get; set; }
         public bool IsDeleted { get; set; } = false;
-        public DateTime CreateAt { get; set; } 
-        public DateTime UpdateAt { get; set; } 
+        public DateTime? CreateAt { get; set; } 
+        public DateTime? UpdateAt { get; set; } 
 
     }
 }

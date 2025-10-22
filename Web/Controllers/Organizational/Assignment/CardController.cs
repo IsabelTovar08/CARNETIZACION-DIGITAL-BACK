@@ -9,7 +9,7 @@ using Web.Controllers.Base;
 
 namespace Web.Controllers.Organizational.Assignment
 {
-    public class CardController : GenericController<Card, CardDtoRequest, CardDto>
+    public class CardController : GenericController<CardConfiguration, CardConfigurationDtoRequest, CardConfigurationDto>
     {
         protected readonly ICardBusiness _cardBusiness;
         public CardController(ICardBusiness business, ILogger<CardController> logger, ICardBusiness cardBusiness)
@@ -21,64 +21,64 @@ namespace Web.Controllers.Organizational.Assignment
         /// <summary>
         /// Retorna carnets emitidos agrupados por Unidad Organizativa.
         /// </summary>
-        [HttpGet("by-unit")]
-        public async Task<IActionResult> GetByUnitAsync()
-        {
-            try
-            {
-                var result = await _cardBusiness.GetCarnetsByOrganizationalUnitAsync();
-                var total = await _cardBusiness.GetTotalNumberOfIDCardsAsync();
+        //[HttpGet("by-unit")]
+        //public async Task<IActionResult> GetByUnitAsync()
+        //{
+        //    try
+        //    {
+        //        var result = await _cardBusiness.GetCarnetsByOrganizationalUnitAsync();
+        //        var total = await _cardBusiness.GetTotalNumberOfIDCardsAsync();
 
-                return Ok(ApiResponse<object>.Ok(new
-                {
-                    Total = total,
-                    Data = result
-                }, "Carnets agrupados por unidad organizativa obtenidos correctamente"));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener carnets por unidad organizativa");
-                return BadRequest(ApiResponse<object>.Fail("Error al obtener carnets por unidad organizativa", new[] { ex.Message }));
-            }
-        }
+        //        return Ok(ApiResponse<object>.Ok(new
+        //        {
+        //            Total = total,
+        //            Data = result
+        //        }, "Carnets agrupados por unidad organizativa obtenidos correctamente"));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al obtener carnets por unidad organizativa");
+        //        return BadRequest(ApiResponse<object>.Fail("Error al obtener carnets por unidad organizativa", new[] { ex.Message }));
+        //    }
+        //}
 
-        /// <summary>
-        /// Retorna carnets emitidos agrupados por División Interna de una Unidad.
-        /// </summary>
-        [HttpGet("by-unit/{organizationalUnitId}/divisions")]
-        public async Task<IActionResult> GetByInternalDivisionAsync(int organizationalUnitId)
-        {
-            try
-            {
-                var result = await _cardBusiness.GetCarnetsByInternalDivisionAsync(organizationalUnitId);
+        ///// <summary>
+        ///// Retorna carnets emitidos agrupados por División Interna de una Unidad.
+        ///// </summary>
+        //[HttpGet("by-unit/{organizationalUnitId}/divisions")]
+        //public async Task<IActionResult> GetByInternalDivisionAsync(int organizationalUnitId)
+        //{
+        //    try
+        //    {
+        //        var result = await _cardBusiness.GetCarnetsByInternalDivisionAsync(organizationalUnitId);
 
-                return Ok(ApiResponse<object>.Ok(result, "Carnets agrupados por divisiones internas obtenidos correctamente"));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error al obtener carnets por divisiones internas en unidad {organizationalUnitId}");
-                return BadRequest(ApiResponse<object>.Fail("Error al obtener carnets por divisiones internas", new[] { ex.Message }));
-            }
-        }
+        //        return Ok(ApiResponse<object>.Ok(result, "Carnets agrupados por divisiones internas obtenidos correctamente"));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, $"Error al obtener carnets por divisiones internas en unidad {organizationalUnitId}");
+        //        return BadRequest(ApiResponse<object>.Fail("Error al obtener carnets por divisiones internas", new[] { ex.Message }));
+        //    }
+        //}
 
-        /// <summary>
-        /// Retorna carnets emitidos agrupados por Jornada (Schedule en Card).
-        /// </summary>
-        [HttpGet("by-shedule")]
-        public async Task<IActionResult> GetBySheduleAsync()
-        {
-            try
-            {
-                var result = await _cardBusiness.GetCarnetsBySheduleAsync();
+        ///// <summary>
+        ///// Retorna carnets emitidos agrupados por Jornada (Schedule en Card).
+        ///// </summary>
+        //[HttpGet("by-shedule")]
+        //public async Task<IActionResult> GetBySheduleAsync()
+        //{
+        //    try
+        //    {
+        //        var result = await _cardBusiness.GetCarnetsBySheduleAsync();
 
-                return Ok(ApiResponse<object>.Ok(result, "Carnets agrupados por jornada obtenidos correctamente"));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener carnets por jornada");
-                return BadRequest(ApiResponse<object>.Fail("Error al obtener carnets por jornada", new[] { ex.Message }));
-            }
-        }
+        //        return Ok(ApiResponse<object>.Ok(result, "Carnets agrupados por jornada obtenidos correctamente"));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al obtener carnets por jornada");
+        //        return BadRequest(ApiResponse<object>.Fail("Error al obtener carnets por jornada", new[] { ex.Message }));
+        //    }
+        //}
 
         /// <summary>
         /// Retorna el total general de carnets emitidos en el sistema.

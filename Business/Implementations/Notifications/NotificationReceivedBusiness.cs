@@ -44,10 +44,10 @@ namespace Business.Implementations.Notifications
         public async Task MarkAsReadAsync(int notificationReceivedId)
         {
             NotificationReceived? entity = await _notificationReceivedData.GetByIdAsync(notificationReceivedId);
-            if (entity != null && !entity.IsDeleted && entity.StatusId != NotificationStatus.Read)
+            if (entity != null && !entity.IsDeleted && entity.Status != NotificationStatus.Read)
             {
                 entity.ReadDate = System.DateTime.UtcNow;
-                entity.StatusId = NotificationStatus.Read;
+                entity.Status = NotificationStatus.Read;  
                 await _notificationReceivedData.UpdateAsync(entity);
             }
         }
@@ -61,10 +61,10 @@ namespace Business.Implementations.Notifications
 
             foreach (var entity in list)
             {
-                if (entity.StatusId != NotificationStatus.Read)
+                if (entity.Status != NotificationStatus.Read)
                 {
                     entity.ReadDate = System.DateTime.UtcNow;
-                    entity.StatusId = NotificationStatus.Read;
+                    entity.Status = NotificationStatus.Read;
                     await _notificationReceivedData.UpdateAsync(entity);
                 }
             }

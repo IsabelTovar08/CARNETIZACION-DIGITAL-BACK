@@ -152,15 +152,14 @@ namespace Business.Implementations.Operational
         /// Búsqueda de asistencias con filtros y paginación.
         /// </summary>
         public async Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
-            int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
-            string? sortBy, string? sortDir, int page, int pageSize,
-            CancellationToken ct = default)
+    int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
+    string? sortBy, string? sortDir, int page, int pageSize,
+    CancellationToken ct = default)
         {
-            var (items, total) = await _attendanceData.QueryAsync(
-                personId, eventId, fromUtc, toUtc,
-                sortBy, sortDir, page, pageSize, ct);
+            var (entities, total) = await _attendanceData.QueryAsync(
+                personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize, ct);
 
-            var dtos = items.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
+            var list = entities.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
 
             // completar strings amigables y EventName
             foreach (var it in list)
@@ -185,7 +184,7 @@ namespace Business.Implementations.Operational
                 }
             }
 
-            return (dtos, total);
+            return (list, total);
         }
 
         // NUEVOS MÉTODOS DE EXPORTACIÓN (usando ExportHelper)

@@ -17,75 +17,75 @@ using Microsoft.Extensions.Logging;
 
 namespace Business.Implementations.Organizational.Assignment
 {
-    public class CardBusiness : BaseBusiness<Card, CardDtoRequest, CardDto>, ICardBusiness
+    public class CardBusiness : BaseBusiness<CardConfiguration, CardConfigurationDtoRequest, CardConfigurationDto>, ICardBusiness
     {
-        public readonly ICardData _cardData;
-        public CardBusiness(ICardData data, ILogger<Card> logger, IMapper mapper, ICardData cardData) : base(data, logger, mapper)
+        public readonly ICardConfigurationData _cardData;
+        public CardBusiness(ICardConfigurationData data, ILogger<CardConfiguration> logger, IMapper mapper, ICardConfigurationData cardData) : base(data, logger, mapper)
         {
             _cardData = cardData;
         }
 
-        public override Task<CardDto> Save(CardDtoRequest entity)
+        public override Task<CardConfigurationDto> Save(CardConfigurationDtoRequest entity)
         {
-            
+
             return base.Save(entity);
         }
 
         /// <summary>
         /// Obtiene el listado de carnets emitidos agrupados por Unidad Organizativa.
         /// </summary>
-        public async Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync()
-        {
-            try
-            {
-                var result = await _cardData.GetCarnetsByOrganizationalUnitAsync();
+        //public async Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync()
+        //{
+        //    try
+        //    {
+        //        var result = await _cardData.getTotalNumberOfIDCardConfigurations();
 
-                if (result == null || result.Count == 0)
-                    throw new Exception("No se encontraron carnets por unidad organizativa.");
+        //        if (result == null || result.Count == 0)
+        //            throw new Exception("No se encontraron carnets por unidad organizativa.");
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error en la capa de negocio al consultar carnets por unidad organizativa.", ex);
-            }
-        }
+        //        return result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Error en la capa de negocio al consultar carnets por unidad organizativa.", ex);
+        //    }
+        //}
 
         /// <summary>
         /// Obtiene carnets emitidos agrupados por División Interna de una Unidad.
         /// </summary>
-        public async Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId)
-        {
-            try
-            {
-                return await _cardData.GetCarnetsByInternalDivisionAsync(organizationalUnitId);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error en la capa de negocio al consultar carnets por división interna.", ex);
-            }
-        }
+        //public async Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId)
+        //{
+        //    try
+        //    {
+        //        return await _cardData.getTotalNumberOfIDCardConfigurations(organizationalUnitId);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Error en la capa de negocio al consultar carnets por división interna.", ex);
+        //    }
+        //}
 
 
-        /// <summary>
-        /// Obtiene el listado de carnets emitidos agrupados por Jornada (Schedule en Card).
-        /// </summary>
-        public async Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync()
-        {
-            try
-            {
-                var result = await _cardData.GetCarnetsBySheduleAsync();
+        ///// <summary>
+        ///// Obtiene el listado de carnets emitidos agrupados por Jornada (Schedule en Card).
+        ///// </summary>
+        //public async Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync()
+        //{
+        //    try
+        //    {
+        //        var result = await _cardData.GetCarnetsBySheduleAsync();
 
-                if (result == null || result.Count == 0)
-                    throw new Exception("No se encontraron carnets por jornada.");
+        //        if (result == null || result.Count == 0)
+        //            throw new Exception("No se encontraron carnets por jornada.");
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error en la capa de negocio al consultar carnets por jornada.", ex);
-            }
-        }
+        //        return result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Error en la capa de negocio al consultar carnets por jornada.", ex);
+        //    }
+        //}
 
         /// <summary>
         /// Retorna el total de carnets activos (no eliminados)
@@ -95,7 +95,7 @@ namespace Business.Implementations.Organizational.Assignment
         {
             try
             {
-                return await _cardData.getTotalNumberOfIDCards();
+                return await _cardData.getTotalNumberOfIDCardConfigurations();
             }
             catch (Exception ex)
             {

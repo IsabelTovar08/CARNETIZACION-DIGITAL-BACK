@@ -37,7 +37,7 @@ namespace Entity.DataInit.Parameter
             //       .WithOne(n => n.Status)
             //       .HasForeignKey(n => n.StatusId);
 
-            builder.HasMany(s => s.cards)
+            builder.HasMany(s => s.IssuedCards)
                    .WithOne(c => c.Status)
                    .HasForeignKey(c => c.StatusId);
 

@@ -129,6 +129,8 @@ namespace Web.Controllers.ModelSecurity
         [Authorize] // Ajusta si este endpoint debe ser público
         public async Task<IActionResult> PersonaInfo(int id)
         {
+            try
+            {
             if (id == null || id == 0)
                 return BadRequest(new { status = false, message = "Ingresa un id válido" });
 
@@ -185,7 +187,7 @@ namespace Web.Controllers.ModelSecurity
                 _Ilogger.LogInformation(knf, "Persona no encontrada para el usuario actual.");
                 return NotFound(ApiResponse<object>.Fail(knf.Message));
             }
-            catch (ExternalServiceException esex)
+            catch (ExternalServiceException ex)
             {
                 return NotFound(new
                 {

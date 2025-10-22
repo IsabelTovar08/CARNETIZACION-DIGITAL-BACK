@@ -6,9 +6,9 @@ using Web.Controllers.Base;
 
 namespace Web.Controllers.Organizational.Assignment
 {
-    public class PersonDivisionProfileController : GenericController<PersonDivisionProfile, PersonDivisionProfileDtoRequest, PersonDivisionProfileDto>
+    public class IssuedCardController : GenericController<IssuedCard, IssuedCardDtoRequest, IssuedCardDto>
     {
-        public PersonDivisionProfileController(IBaseBusiness<PersonDivisionProfile, PersonDivisionProfileDtoRequest, PersonDivisionProfileDto> business, ILogger<PersonDivisionProfileController> logger) : base(business, logger)
+        public IssuedCardController(IBaseBusiness<IssuedCard, IssuedCardDtoRequest, IssuedCardDto> business, ILogger<IssuedCardController> logger) : base(business, logger)
         {
         }
     }

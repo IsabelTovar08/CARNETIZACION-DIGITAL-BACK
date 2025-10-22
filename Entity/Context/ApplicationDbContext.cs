@@ -1,4 +1,13 @@
-﻿using Dapper;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Dapper;
 using Entity.DataInit.Operational;
 using Entity.DataInit.Parameter;
 using Entity.Models;
@@ -16,13 +25,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entity.Context
 {
@@ -73,12 +75,11 @@ namespace Entity.Context
         public DbSet<Schedule> Schedules { get; set; }
 
         public DbSet<Profiles> Profiles { get; set; }
-        public DbSet<Card> Cards { get; set; }
-        public DbSet<PersonDivisionProfile> PersonDivisionProfiles { get; set; }
+        public DbSet<CardConfiguration> CardsConfigurations { get; set; }
+        public DbSet<IssuedCard> IssuedCards { get; set; }
 
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationReceived> NotificationReceiveds { get; set; }
-        public DbSet<MenuStructure> MenuStructure { get; set; }
 
         //Events
         public DbSet<Event> Events { get; set; }
@@ -107,91 +108,8 @@ namespace Entity.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Conversión para TimeOnly → TimeSpan
-            modelBuilder.Entity<Schedule>()
-                .Property(s => s.StartTime)
-                .HasConversion(
-                    v => v.ToTimeSpan(),
-                    v => TimeOnly.FromTimeSpan(v));
-
-            modelBuilder.Entity<Schedule>()
-                .Property(s => s.EndTime)
-                .HasConversion(
-                    v => v.ToTimeSpan(),
-                    v => TimeOnly.FromTimeSpan(v));
-
-            modelBuilder.Entity<EventAccessPoint>(eb =>
-            {
-                eb.ToTable("EventAccessPoints", "Operational");
-
-                eb.HasKey(eap => new { eap.EventId, eap.AccessPointId }); // Clave compuesta
-
-                eb.HasOne(eap => eap.Event)
-                  .WithMany(e => e.EventAccessPoints)
-                  .HasForeignKey(eap => eap.EventId)
-                  .OnDelete(DeleteBehavior.Cascade);
-
-                eb.HasOne(eap => eap.AccessPoint)
-                  .WithMany(ap => ap.EventAccessPoints)
-                  .HasForeignKey(eap => eap.AccessPointId)
-                  .OnDelete(DeleteBehavior.Restrict);
-            });
-
-
-            // ================= ÍNDICES OPTIMIZACIÓN =================
-            modelBuilder.Entity<Attendance>(b =>
-            {
-                b.HasIndex(x => x.PersonId);
-                b.HasIndex(x => x.TimeOfEntry);
-                b.HasIndex(x => x.TimeOfExit);
-                b.HasIndex(x => x.IsDeleted);
-                // Compuesto: acelerar consultas de "abierto" (TimeOfExit == null) por persona.
-                b.HasIndex(x => new { x.PersonId, x.TimeOfExit });
-
-                // Si usas SQL Server y quieres índice filtrado, puedes agregarlo por migración SQL manual:
-                // b.HasIndex(x => x.PersonId).HasFilter("[TimeOfExit] IS NULL AND [IsDeleted] = 0");
-            });
-
-            // Otras configuraciones del ensamblado
+            // Carga todas las configuraciones (relaciones, seeds, restricciones, etc.)
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-
-            // EventTargetAudience
-            modelBuilder.Entity<EventTargetAudience>(eb =>
-            {
-                eb.ToTable("EventTargetAudiences", "Operational");
-
-                eb.HasOne(e => e.Profile)
-                  .WithMany()
-                  .HasForeignKey(e => e.ProfileId)
-                  .OnDelete(DeleteBehavior.Restrict);
-
-                eb.HasOne(e => e.OrganizationalUnit)
-                  .WithMany()
-                  .HasForeignKey(e => e.OrganizationalUnitId)
-                  .OnDelete(DeleteBehavior.Restrict);
-
-                eb.HasOne(e => e.InternalDivision)
-                  .WithMany()
-                  .HasForeignKey(e => e.InternalDivisionId)
-                  .OnDelete(DeleteBehavior.Restrict);
-            });
-
-           
-
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-            {
-                foreach (var property in entityType.GetProperties()
-                             .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?)))
-                {
-                    property.SetValueConverter(
-                        new ValueConverter<DateTime, DateTime>(
-                            v => v.ToUniversalTime(),
-                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc)));
-                }
-            }
-
-            //// Si tienes varias configuraciones en tu proyecto
-            //modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
 
         /// <summary>
@@ -210,9 +128,44 @@ namespace Entity.Context
         /// <param name="configurationBuilder">Constructor de configuración de modelos.</param>
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
-            configurationBuilder.Properties<decimal>().HavePrecision(18, 2);
-        }
+            // Precisión estándar para decimales
+            configurationBuilder
+                .Properties<decimal>()
+                .HavePrecision(18, 2);
 
+            configurationBuilder
+        .Properties<DateTime>()
+        .HaveConversion<DateTimeToUtcConverter>()   // 👈 usamos un conversor genérico
+        .HaveColumnType("timestamp with time zone");
+
+
+            // Manejo de DateOnly (si se usa)
+            configurationBuilder
+                .Properties<DateOnly>()
+                .HaveColumnType("date");
+
+            // Manejo de TimeOnly (si se usa)
+            configurationBuilder
+                .Properties<TimeOnly>()
+                .HaveColumnType("time");
+
+            // Enums se almacenan como int (compatible en todos los motores)
+            configurationBuilder
+                .Properties<Enum>()
+                .HaveConversion<int>()
+                .HaveColumnType("int");
+        }
+        /// <summary>
+        /// Conversor global para normalizar todos los DateTime como UTC.
+        /// </summary>
+        public class DateTimeToUtcConverter : ValueConverter<DateTime, DateTime>
+        {
+            public DateTimeToUtcConverter()
+                : base(
+                    v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc), // Guardar
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc))                                 // Leer
+            { }
+        }
         /// <summary>
         /// Guarda los cambios en la base de datos, asegurando la auditoría antes de persistir los datos.
         /// </summary>

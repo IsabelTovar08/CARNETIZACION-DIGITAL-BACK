@@ -7,7 +7,12 @@ namespace Web.FactoryDB.Classes
     {
         public void Configure(DbContextOptionsBuilder optionsBuilder, IConfiguration configuration)
         {
-           optionsBuilder.UseNpgsql(configuration.GetConnectionString("PostgresConnection"));
+            var connectionString = configuration.GetConnectionString("Postgres");
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException("⚠️ Connection string 'Postgres' no encontrada en appsettings.json.");
+
+            optionsBuilder.UseNpgsql(connectionString);
         }
+
     }
 }
