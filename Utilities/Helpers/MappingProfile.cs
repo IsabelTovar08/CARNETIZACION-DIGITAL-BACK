@@ -248,11 +248,7 @@ namespace Utilities.Helper
                     .ForMember(s => s.Organization, o => o.Ignore());
 
             CreateMap<Branch, BranchDtoRequest>()
-                .ReverseMap()
-                    .ForMember(s => s.Id, o => o.Ignore())
-                    .ForMember(s => s.IsDeleted, o => o.Ignore())
-                    .ForMember(s => s.City, o => o.Ignore())
-                    .ForMember(s => s.Organization, o => o.Ignore());
+                .ReverseMap();
 
             //Structure
 
