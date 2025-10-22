@@ -96,9 +96,9 @@ pipeline {
                 echo '🚀 Desplegando contenedor Docker...'
                 sh '''
                     APP_NAME=carnetizacion-digital-back
-                    docker stop $APP_NAME || true
-                    docker rm $APP_NAME || true
-                    docker run -d -p 5000:8080 --name $APP_NAME $APP_NAME:latest
+                    sudo docker stop $APP_NAME || true
+                    sudo docker rm $APP_NAME || true
+                    sudo docker run -d -p 5000:8080 --name $APP_NAME $APP_NAME:latest
                 '''
             }
         }
