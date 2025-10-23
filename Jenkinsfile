@@ -54,6 +54,7 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+            agent any
             steps {
                 echo '🐳 Construyendo imagen Docker...'
                 sh '''
@@ -64,6 +65,7 @@ pipeline {
         }
 
         stage('Deploy Docker Container') {
+            agent any
             steps {
                 echo '🚀 Desplegando contenedor Docker...'
                 sh '''
@@ -74,6 +76,7 @@ pipeline {
                 '''
             }
         }
+
     }
 
     post {
