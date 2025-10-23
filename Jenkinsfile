@@ -22,7 +22,7 @@ pipeline {
                 sh '''
                     mkdir -p $DOTNET_CLI_HOME
                     chmod -R 777 $DOTNET_CLI_HOME
-                    dotnet restore CARNETIZACION-DIGITAL-api-dev.sln
+                    dotnet restore CARNETIZACION-DIGITAL-BACK.sln
                 '''
             }
         }
