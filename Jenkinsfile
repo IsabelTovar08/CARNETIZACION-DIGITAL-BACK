@@ -10,13 +10,21 @@ pipeline {
     }
 
     stages {
+
         stage('Restore') {
             agent {
-                docker { image 'mcr.microsoft.com/dotnet/sdk:8.0' }
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
             }
             steps {
-                echo '🔧 Restaurando dependencias STAGING...'
-                sh 'dotnet restore CARNETIZACION-DIGITAL-BACK.sln'
+                echo '🔧 Restaurando dependencias...'
+                sh '''
+                    mkdir -p $DOTNET_CLI_HOME
+                    chmod -R 777 $DOTNET_CLI_HOME
+                    dotnet restore CARNETIZACION-DIGITAL-BACK.sln
+                '''
             }
         }
 
@@ -25,8 +33,8 @@ pipeline {
                 docker { image 'mcr.microsoft.com/dotnet/sdk:8.0' }
             }
             steps {
-                echo '🏗️ Compilando la solución STAGING...'
-                 sh '''
+                echo '🏗️ Compilando la solución...'
+                sh '''
                     for proj in $(find . -name "*.csproj" ! -path "./Diagram/*"); do
                         dotnet build "$proj" --no-restore -c Release
                     done
@@ -35,8 +43,11 @@ pipeline {
         }
 
         stage('Publish Web Layer') {
+            agent {
+                docker { image 'mcr.microsoft.com/dotnet/sdk:8.0' }
+            }
             steps {
-                echo '📦 Publicando capa Web STAGING...'
+                echo '📦 Publicando capa Web...'
                 sh 'dotnet publish Web/Web.csproj -c Release -o ./publish'
             }
         }
