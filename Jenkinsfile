@@ -19,8 +19,9 @@ pipeline {
     /// Variables de entorno globales para todo el pipeline.
     /// </summary>
     environment {
-        // ✅ Cambia el directorio temporal de .NET para evitar problemas de permisos
         DOTNET_CLI_HOME = '/tmp'
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
+        DOTNET_NOLOGO = '1'
     }
 
     stages {
