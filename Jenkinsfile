@@ -1,12 +1,16 @@
 pipeline {
-    agent any
+
+    agent {
+        docker {
+            image 'mcr.microsoft.com/dotnet/sdk:8.0'
+            args '-v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/workspace:/var/jenkins_home/workspace -w /var/jenkins_home/workspace/carnetizacion-digital-api-prod'
+        }
+    }
 
     environment {
-        // Carpeta temporal segura para .NET
         DOTNET_CLI_HOME = '/tmp'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
-
         APP_NAME = 'carnetizacion-digital-api-prod'
         PORT = '5300'
     }
@@ -14,33 +18,21 @@ pipeline {
     stages {
 
         stage('Restore') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock -v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
-                }
-            }
             steps {
                 echo '🔧 Restaurando dependencias...'
                 sh '''
-                    export DOTNET_CLI_HOME=/tmp
                     mkdir -p /tmp
+                    echo "📁 Contenido actual del workspace:"
+                    ls -la
                     dotnet restore CARNETIZACION-DIGITAL-BACK.sln
                 '''
             }
         }
 
         stage('Build') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    args '-v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
-                }
-            }
             steps {
                 echo '🏗️ Compilando la solución...'
                 sh '''
-                    export DOTNET_CLI_HOME=/tmp
                     for proj in $(find . -name "*.csproj" ! -path "./Diagram/*"); do
                         dotnet build "$proj" --no-restore -c Release
                     done
@@ -49,27 +41,16 @@ pipeline {
         }
 
         stage('Publish Web Layer') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    args '-v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
-                }
-            }
             steps {
                 echo '📦 Publicando capa Web...'
-                sh '''
-                    export DOTNET_CLI_HOME=/tmp
-                    dotnet publish Web/Web.csproj -c Release -o ./publish
-                '''
+                sh 'dotnet publish Web/Web.csproj -c Release -o ./publish'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Construyendo imagen Docker PRODUCCIÓN...'
-                sh '''
-                    docker build -t $APP_NAME:latest .
-                '''
+                sh 'docker build -t $APP_NAME:latest .'
             }
         }
 
