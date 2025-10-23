@@ -4,12 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Web.Extensions;
-using QuestPDF.Infrastructure;   //  Para QuestPDF
-using OfficeOpenXml;            //  Para EPPlus <= 7.x
 using Web.Realtime.Hubs;
 
-//   using de QuestPDF
-using QuestPDF.Infrastructure;
 
 namespace Web
 {
@@ -17,8 +13,6 @@ namespace Web
     {
         public static void Main(string[] args)
         {
-            // Configuración de licencia para QuestPDF
-            QuestPDF.Settings.License = LicenseType.Community;
 
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
