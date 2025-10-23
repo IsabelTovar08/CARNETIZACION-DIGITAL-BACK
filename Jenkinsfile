@@ -26,7 +26,11 @@ pipeline {
             }
             steps {
                 echo '🏗️ Compilando la solución STAGING...'
-                sh 'dotnet build CARNETIZACION-DIGITAL-BACK.sln -c Release --no-restore'
+                 sh '''
+                    for proj in $(find . -name "*.csproj" ! -path "./Diagram/*"); do
+                        dotnet build "$proj" --no-restore -c Release
+                    done
+                '''
             }
         }
 
