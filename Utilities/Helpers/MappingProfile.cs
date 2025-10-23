@@ -477,7 +477,9 @@ namespace Utilities.Helper
 
             CreateMap<ImportBatchStartDto, ImportBatch>().ReverseMap();
 
-            CreateMap<ImportBatchRowDto, ImportBatchRow>().ReverseMap();
+            CreateMap<ImportBatchRow, ImportBatchRowDto>()
+                .ForMember(d => d.PersonName, opt => opt.MapFrom(s => s.Person.FirstName + s.Person.MiddleName + s.Person.LastName + s.Person.SecondLastName))
+                .ReverseMap();
 
             // Mapear ImportBatch -> ImportBatchDto
             CreateMap<ImportBatch, ImportBatchDto>()

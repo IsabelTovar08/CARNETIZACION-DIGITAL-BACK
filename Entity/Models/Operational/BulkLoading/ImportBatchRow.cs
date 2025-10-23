@@ -25,6 +25,8 @@ namespace Entity.Models.Operational.BulkLoading
         public bool UpdatedPhoto { get; set; }
 
         public IssuedCard IssuedCard { get; set; }
+        public Person Person { get; set; }
+
 
     }
 }

@@ -14,7 +14,7 @@ namespace Business.Services.Cards
 {
     /// <summary>
     /// Servicio que genera el PDF de carnets (frontal y posterior)
-    /// usando exclusivamente SkiaSharp y Svg.Skia (versiones actuales).
+    /// usando exclusivamente SkiaSharp y Svg.Skia.
     /// </summary>
     public class CardPdfService : ICardPdfService
     {
@@ -26,74 +26,70 @@ namespace Business.Services.Cards
         }
 
         /// <summary>
-        /// Genera un carnet en formato PDF dentro del Stream indicado.
+        /// Genera un carnet PDF más estilizado (basado en tu plantilla SENA).
         /// </summary>
         public async Task GenerateCardAsync(CardTemplateResponse template, CardUserData userData, Stream output)
         {
-            // === 1️⃣ Descargar fondos SVG ===
+            // === 1️⃣ Cargar fondos ===
             var frontSvgBytes = await _http.GetByteArrayAsync(template.FrontBackgroundUrl);
             var backSvgBytes = await _http.GetByteArrayAsync(template.BackBackgroundUrl);
 
-            // === 2️⃣ Cargar SVGs ===
             using var frontSvg = new SKSvg();
             using var backSvg = new SKSvg();
             using (var fs = new MemoryStream(frontSvgBytes)) frontSvg.Load(fs);
             using (var bs = new MemoryStream(backSvgBytes)) backSvg.Load(bs);
 
-            // === 3️⃣ Cargar posiciones desde JSON ===
             var frontPos = JsonSerializer.Deserialize<Dictionary<string, Position>>(template.FrontElementsJson)
                            ?? throw new InvalidOperationException("FrontElementsJson inválido.");
             var backPos = JsonSerializer.Deserialize<Dictionary<string, Position>>(template.BackElementsJson)
                           ?? throw new InvalidOperationException("BackElementsJson inválido.");
 
-            // === 4️⃣ Cargar imágenes dinámicas (logo, foto, QR) ===
             using var userPhoto = await LoadImageAsync(userData.UserPhotoUrl);
             using var logoImg = await LoadImageAsync(userData.LogoUrl);
             using var qrImg = await LoadImageAsync(userData.QrUrl);
 
-            // === 5️⃣ Crear documento PDF ===
             var (pageW, pageH) = GetPageSizePoints(frontSvg);
 
             using var pdf = SKDocument.CreatePdf(output);
-            if (pdf == null)
-                throw new InvalidOperationException("No se pudo crear el documento PDF.");
-
-            // === Página frontal ===
             using (var canvas = pdf.BeginPage(pageW, pageH))
             {
                 DrawSvg(canvas, frontSvg, pageW, pageH);
 
-                // Imágenes
+                // === Fondo y estructura ===
                 DrawImage(canvas, logoImg, frontPos, "logo");
                 DrawImage(canvas, userPhoto, frontPos, "userPhoto");
                 DrawImage(canvas, qrImg, frontPos, "qr");
 
-                // Textos
-                DrawText(canvas, userData.CompanyName, frontPos, "companyName", 12);
-                DrawText(canvas, userData.Name, frontPos, "name", 14, bold: true);
-                DrawText(canvas, userData.Profile, frontPos, "profile", 12);
-                DrawText(canvas, userData.CategoryArea, frontPos, "categoryArea", 12);
-                DrawText(canvas, userData.PhoneNumber, frontPos, "phoneNumber", 10);
-                DrawText(canvas, userData.Email, frontPos, "email", 10);
-                DrawText(canvas, userData.CardId, frontPos, "cardId", 10);
+                // === Encabezado ===
+                DrawText(canvas, userData.CompanyName.ToUpper(), frontPos, "companyName", 18, bold: true, color: SKColors.White);
+                DrawText(canvas, userData.Profile.ToUpper(), frontPos, "profile", 16, bold: true, color: SKColors.Black);
+
+                // === Datos personales ===
+                DrawText(canvas, userData.Name, frontPos, "name", 20, bold: true);
+                DrawText(canvas, userData.CategoryArea, frontPos, "categoryArea", 14, color: new SKColor(70, 70, 70));
+                DrawText(canvas, userData.PhoneNumber, frontPos, "phoneNumber", 12, color: SKColors.Black);
+                DrawText(canvas, userData.Email, frontPos, "email", 12, color: SKColors.Black);
+
+                // === ID destacado ===
+                DrawRoundedBox(canvas, frontPos["cardId"].x - 10, frontPos["cardId"].y - 20, 130, 30, SKColors.LightBlue);
+                DrawText(canvas, $"#ID: {userData.CardId}", frontPos, "cardId", 16, bold: true, color: SKColors.DarkBlue);
 
                 pdf.EndPage();
             }
 
-            // === Página reverso ===
+            // === Reverso (simple informativo) ===
             using (var canvas = pdf.BeginPage(pageW, pageH))
             {
                 DrawSvg(canvas, backSvg, pageW, pageH);
 
-                DrawText(canvas, userData.Title, backPos, "title", 12, bold: true);
-                DrawText(canvas, userData.Address, backPos, "address", 10);
-                DrawText(canvas, userData.PhoneNumber, backPos, "phoneNumber", 10);
-                DrawText(canvas, userData.Email, backPos, "email", 10);
+                DrawText(canvas, "Información del titular", backPos, "title", 14, bold: true);
+                DrawText(canvas, $"Tel: {userData.PhoneNumber}", backPos, "phoneNumber", 12);
+                DrawText(canvas, $"Email: {userData.Email}", backPos, "email", 12);
+                DrawText(canvas, DateTime.Now.ToString("dd/MM/yyyy"), backPos, "address", 10, color: SKColors.Gray);
 
                 pdf.EndPage();
             }
 
-            // === 6️⃣ Cerrar PDF ===
             pdf.Close();
         }
 
@@ -101,9 +97,6 @@ namespace Business.Services.Cards
         // 🔹 Métodos auxiliares
         // ===========================================================
 
-        /// <summary>
-        /// Clase auxiliar que representa coordenadas (coincide con tu JSON).
-        /// </summary>
         private sealed class Position
         {
             public float x { get; set; }
@@ -112,9 +105,6 @@ namespace Business.Services.Cards
             public float? height { get; set; }
         }
 
-        /// <summary>
-        /// Descarga una imagen (JPG/PNG) o devuelve null si falla.
-        /// </summary>
         private async Task<SKImage?> LoadImageAsync(string? url)
         {
             if (string.IsNullOrWhiteSpace(url)) return null;
@@ -124,40 +114,27 @@ namespace Business.Services.Cards
                 using var data = SKData.CreateCopy(bytes);
                 return SKImage.FromEncodedData(data);
             }
-            catch
-            {
-                return null;
-            }
+            catch { return null; }
         }
 
-        /// <summary>
-        /// Dibuja una imagen en el canvas según coordenadas definidas.
-        /// </summary>
         private void DrawImage(SKCanvas canvas, SKImage? img, IDictionary<string, Position> posMap, string key)
         {
             if (img == null || !posMap.TryGetValue(key, out var pos)) return;
 
-            if (pos.width.HasValue && pos.height.HasValue)
-            {
-                var rect = new SKRect(pos.x, pos.y, pos.x + pos.width.Value, pos.y + pos.height.Value);
-                canvas.DrawImage(img, rect);
-            }
-            else
-            {
-                canvas.DrawImage(img, pos.x, pos.y);
-            }
+            var rect = new SKRect(pos.x, pos.y, pos.x + (pos.width ?? img.Width), pos.y + (pos.height ?? img.Height));
+            canvas.DrawImage(img, rect);
         }
 
         /// <summary>
-        /// Dibuja un texto simple (Arial) en el canvas.
+        /// Dibuja un texto con soporte de color y negrita.
         /// </summary>
-        private void DrawText(SKCanvas canvas, string? text, IDictionary<string, Position> posMap, string key, float fontSize, bool bold = false)
+        private void DrawText(SKCanvas canvas, string? text, IDictionary<string, Position> posMap, string key, float fontSize, bool bold = false, SKColor? color = null)
         {
             if (string.IsNullOrEmpty(text) || !posMap.TryGetValue(key, out var pos)) return;
 
             using var paint = new SKPaint
             {
-                Color = SKColors.Black,
+                Color = color ?? SKColors.Black,
                 TextSize = fontSize,
                 IsAntialias = true,
                 Typeface = SKTypeface.FromFamilyName("Arial", bold ? SKFontStyle.Bold : SKFontStyle.Normal)
@@ -167,18 +144,21 @@ namespace Business.Services.Cards
         }
 
         /// <summary>
-        /// Dibuja el fondo SVG adaptado al tamaño de la página.
+        /// Dibuja un rectángulo redondeado (para destacar el ID).
         /// </summary>
+        private void DrawRoundedBox(SKCanvas canvas, float x, float y, float width, float height, SKColor color)
+        {
+            using var paint = new SKPaint { Color = color, IsAntialias = true };
+            var rect = new SKRoundRect(new SKRect(x, y, x + width, y + height), 8, 8);
+            canvas.DrawRoundRect(rect, paint);
+        }
+
         private void DrawSvg(SKCanvas canvas, SKSvg svg, float width, float height)
         {
             var picture = svg.Picture;
             if (picture == null) return;
-
             var src = picture.CullRect;
-            var scaleX = width / src.Width;
-            var scaleY = height / src.Height;
-            var scale = Math.Min(scaleX, scaleY);
-
+            var scale = Math.Min(width / src.Width, height / src.Height);
             var tx = (width - src.Width * scale) / 2f;
             var ty = (height - src.Height * scale) / 2f;
 
@@ -189,22 +169,16 @@ namespace Business.Services.Cards
             canvas.Restore();
         }
 
-        /// <summary>
-        /// Obtiene el tamaño de página desde el SVG o usa A7 horizontal por defecto.
-        /// </summary>
         private (float width, float height) GetPageSizePoints(SKSvg svg)
         {
             var pic = svg.Picture;
             if (pic != null && pic.CullRect.Width > 0 && pic.CullRect.Height > 0)
                 return (pic.CullRect.Width, pic.CullRect.Height);
 
-            // A7 Landscape (105mm x 74mm)
-            return (MmToPt(105), MmToPt(74));
+            // A7 portrait
+            return (MmToPt(74), MmToPt(105));
         }
 
-        /// <summary>
-        /// Convierte milímetros a puntos (1 in = 25.4 mm, 1 in = 72 pt).
-        /// </summary>
         private static float MmToPt(float mm) => mm * 72f / 25.4f;
     }
 }

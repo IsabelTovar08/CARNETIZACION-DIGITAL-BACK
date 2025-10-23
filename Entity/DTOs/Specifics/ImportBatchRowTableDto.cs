@@ -21,5 +21,7 @@ namespace Entity.DTOs.Specifics
         public string Division { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
         public bool IsDeleted { get; set; }
+        public string? Message { get; set; }
+
     }
 }

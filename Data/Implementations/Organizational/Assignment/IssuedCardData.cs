@@ -50,8 +50,8 @@ namespace Data.Implementations.Organizational.Assignment
 
         public override Task<IssuedCard> SaveAsync(IssuedCard entity)
         {
-            entity.QRCode = "123";
-            entity.UniqueId = new Guid();
+            //entity.QRCode = "123";
+            //entity.UniqueId = new Guid();
             return base.SaveAsync(entity);
         }
     }

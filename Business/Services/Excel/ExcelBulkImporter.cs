@@ -169,47 +169,50 @@ namespace Business.Services.Excel
                     pdpId = pdpSaved.Id;
 
                     //// === STEP 3: Subir foto ===
-                    //if (row.PhotoBytes is { Length: > 0 })
-                    //{
-                    //    var (ext, contentType) = ImageFormatValidator.EnsureSupported(row.PhotoBytes, row.PhotoExtension);
-                    //    using var ms = new MemoryStream(row.PhotoBytes);
-                    //    await _personBusiness.UpsertPersonPhotoAsync(personId.Value, ms, contentType, $"excel-upload{ext}");
-                    //    rowRes.UpdatedPhoto = true;
-                    //}
+                    if (row.PhotoBytes is { Length: > 0 })
+                    {
+                        var (ext, contentType) = ImageFormatValidator.EnsureSupported(row.PhotoBytes, row.PhotoExtension);
+                        using var ms = new MemoryStream(row.PhotoBytes);
+                        var photo = await _personBusiness.UpsertPersonPhotoAsync(personId.Value, ms, contentType, $"excel-upload{ext}");
+                        rowRes.UpdatedPhoto = true;
+                        personCreated.Person.PhotoUrl = contentType;
+                    }
 
-                    // === STEP 4: Generar PDF del carnet individual ===
+                    /// <summary>
+                    /// Genera el PDF en memoria, lo convierte a Base64 y lo guarda en la base de datos.
+                    /// </summary>
                     try
                     {
                         var userData = new CardUserData
                         {
-                            Name = $"{row.Person.FirstName} {row.Person.LastName}",
+                            Name = $"{row.Person.FirstName} {row.Person.MiddleName} {row.Person.LastName} {row.Person.SecondLastName}",
                             Email = row.Person.Email,
                             PhoneNumber = row.Person.Phone ?? "",
-                            CardId = cardConfigId.ToString(),
+                            CardId = pdpSaved.UniqueId.ToString(),
                             Profile = ctx.ProfileId.ToString(),
                             CategoryArea = ctx.InternalDivisionCode ?? "",
                             CompanyName = ctx.OrganizationCode ?? "",
                             UserPhotoUrl = personCreated.Person.PhotoUrl ?? "",
                             LogoUrl = "https://carnetgo.com/logo.png",
-                            QrUrl = ""
+                            QrUrl = pdpSaved.QRCode
                         };
 
+                        // Crear stream del PDF en memoria
                         using var pdfStream = new MemoryStream();
                         await _cardPdfService.GenerateCardAsync(template, userData, pdfStream);
                         pdfStream.Position = 0;
 
-                        var (publicUrl, _) = await _storageService.UploadAsync(
-                            pdfStream,
-                            "application/pdf",
-                            $"Cards/Carnet_{pdpId}.pdf"
-                        );
+                        // Convertir el PDF en Base64
+                        string base64Pdf = Convert.ToBase64String(pdfStream.ToArray());
 
-                        await _pdpBusiness.UpdatePdfUrlAsync(pdpId.Value, publicUrl);
+                        // Guardar en la entidad (por ejemplo en un campo PdfBase64)
+                        await _pdpBusiness.UpdatePdfUrlAsync(pdpId.Value, base64Pdf);
                     }
                     catch (Exception pdfEx)
                     {
                         _logger.LogWarning(pdfEx, "Error generando PDF para PDP {PdpId}", pdpId);
                     }
+
 
                     await _uow.CommitAsync();
 
@@ -258,8 +261,8 @@ namespace Business.Services.Excel
                         RowNumber = row.RowNumber,
                         Success = rowRes.Success,
                         Message = rowRes.Message,
-                        PersonId = personId,
-                        IssuedCardId = pdpId,
+                        PersonId = personId ,
+                        IssuedCardId = pdpId ,
                         CardId = cardConfigId,
                         UpdatedPhoto = rowRes.UpdatedPhoto
                     });
