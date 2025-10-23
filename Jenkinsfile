@@ -22,7 +22,7 @@ pipeline {
                 sh '''
                     mkdir -p $DOTNET_CLI_HOME
                     chmod -R 777 $DOTNET_CLI_HOME
-                    dotnet restore CARNETIZACION-DIGITAL-BACK.sln
+                    dotnet restore CARNETIZACION-DIGITAL-api-dev.sln
                 '''
             }
         }
@@ -60,7 +60,7 @@ pipeline {
             steps {
                 echo '🐳 Construyendo imagen Docker...'
                 sh '''
-                    APP_NAME=carnetizacion-digital-back
+                    APP_NAME=carnetizacion-digital-api-dev
                     docker build -t $APP_NAME:latest .
                 '''
             }
@@ -71,7 +71,7 @@ pipeline {
             steps {
                 echo '🚀 Desplegando contenedor Docker...'
                 sh '''
-                    APP_NAME=carnetizacion-digital-back
+                    APP_NAME=carnetizacion-digital-api-dev
                     docker stop $APP_NAME || true
                     docker rm $APP_NAME || true
                     docker run -d -p 5000:8080 --name $APP_NAME $APP_NAME:latest
