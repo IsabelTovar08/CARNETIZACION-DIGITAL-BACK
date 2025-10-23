@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        // 🧩 Configuración global de .NET
+        // Carpeta temporal segura para .NET
         DOTNET_CLI_HOME = '/tmp'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
 
-        // 🐳 Configuración de la app
         APP_NAME = 'carnetizacion-digital-api-prod'
         PORT = '5300'
     }
@@ -18,13 +17,14 @@ pipeline {
             agent {
                 docker {
                     image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    // Montamos Docker para futuras etapas y el workspace para restaurar
                     args '-v /var/run/docker.sock:/var/run/docker.sock -v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
                 }
             }
             steps {
                 echo '🔧 Restaurando dependencias...'
                 sh '''
+                    export DOTNET_CLI_HOME=/tmp
+                    mkdir -p /tmp
                     dotnet restore CARNETIZACION-DIGITAL-BACK.sln
                 '''
             }
@@ -40,6 +40,7 @@ pipeline {
             steps {
                 echo '🏗️ Compilando la solución...'
                 sh '''
+                    export DOTNET_CLI_HOME=/tmp
                     for proj in $(find . -name "*.csproj" ! -path "./Diagram/*"); do
                         dotnet build "$proj" --no-restore -c Release
                     done
@@ -57,6 +58,7 @@ pipeline {
             steps {
                 echo '📦 Publicando capa Web...'
                 sh '''
+                    export DOTNET_CLI_HOME=/tmp
                     dotnet publish Web/Web.csproj -c Release -o ./publish
                 '''
             }
