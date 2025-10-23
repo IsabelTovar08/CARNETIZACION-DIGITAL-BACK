@@ -1,11 +1,6 @@
 pipeline {
 
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:8.0'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         DOTNET_CLI_HOME = '/var/jenkins_home/.dotnet'
@@ -15,27 +10,29 @@ pipeline {
 
     stages {
 
-        stage('Prepare Permissions') {
+        stage('Restore') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                /// <summary>
-                /// Crea el directorio de caché .NET con permisos válidos.
-                /// </summary>
-                echo '🔧 Ajustando permisos para .NET CLI...'
+                echo '🔧 Restaurando dependencias...'
                 sh '''
                     mkdir -p $DOTNET_CLI_HOME
                     chmod -R 777 $DOTNET_CLI_HOME
+                    dotnet restore CARNETIZACION-DIGITAL-BACK.sln
                 '''
             }
         }
 
-        stage('Restore') {
-            steps {
-                echo '🔧 Restaurando dependencias...'
-                sh 'dotnet restore CARNETIZACION-DIGITAL-BACK.sln'
-            }
-        }
-
         stage('Build') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                }
+            }
             steps {
                 echo '🏗️ Compilando la solución...'
                 sh '''
@@ -47,6 +44,11 @@ pipeline {
         }
 
         stage('Publish Web Layer') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                }
+            }
             steps {
                 echo '📦 Publicando capa Web...'
                 sh 'dotnet publish Web/Web.csproj -c Release -o ./publish'
@@ -76,7 +78,6 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
