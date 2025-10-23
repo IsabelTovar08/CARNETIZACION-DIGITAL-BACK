@@ -1,60 +1,52 @@
-/// <summary>
-/// Jenkinsfile para automatizar el flujo CI/CD de la aplicación .NET 8 CARNETIZACION-DIGITAL-BACK.
-/// Publica la capa Web, construye la imagen Docker y despliega automáticamente el contenedor.
-/// </summary>
-
 pipeline {
+    agent any
 
-    /// <summary>
-    /// Define el agente que usará la imagen oficial de .NET 8 SDK dentro de Docker.
-    /// </summary>
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:8.0'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
-
-    /// <summary>
-    /// Variables de entorno globales para todo el pipeline.
-    /// </summary>
     environment {
-        // ✅ Cambia el directorio temporal de .NET para evitar problemas de permisos
-        DOTNET_CLI_HOME = '/tmp'
+        DOTNET_CLI_HOME = '/var/jenkins_home/.dotnet'
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
+        DOTNET_NOLOGO = '1'
+        APP_NAME = 'carnetizacion-digital-api-qa'
+        PORT = '5100'
     }
 
     stages {
 
         stage('Restore') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                /// <summary>
-                /// Restaura las dependencias NuGet.
-                /// </summary>
                 echo '🔧 Restaurando dependencias...'
-                sh 'dotnet restore CARNETIZACION-DIGITAL-BACK.sln'
+                sh '''
+                    mkdir -p $DOTNET_CLI_HOME
+                    chmod -R 777 $DOTNET_CLI_HOME
+                    dotnet restore CARNETIZACION-DIGITAL-BACK.sln
+                '''
             }
         }
 
         stage('Build') {
+            agent {
+                docker { image 'mcr.microsoft.com/dotnet/sdk:8.0' }
+            }
             steps {
-                /// <summary>
-                /// Compila la solución.
-                /// </summary>
                 echo '🏗️ Compilando la solución...'
-                sh  '''
-                        for proj in $(find . -name "*.csproj" ! -path "./Diagram/*"); do
+                sh '''
+                    for proj in $(find . -name "*.csproj" ! -path "./Diagram/*"); do
                         dotnet build "$proj" --no-restore -c Release
-                        done
-                    '''
-
+                    done
+                '''
             }
         }
 
         stage('Publish Web Layer') {
+            agent {
+                docker { image 'mcr.microsoft.com/dotnet/sdk:8.0' }
+            }
             steps {
-                /// <summary>
-                /// Publica la capa Web en modo Release.
-                /// </summary>
                 echo '📦 Publicando capa Web...'
                 sh 'dotnet publish Web/Web.csproj -c Release -o ./publish'
             }
@@ -62,33 +54,25 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo '🐳 Construyendo imagen Docker...'
-                sh '''
-                    APP_NAME=carnetizacion-digital-back
-                    docker build -t $APP_NAME:latest .
-                '''
+                echo '🐳 Construyendo imagen Docker QA...'
+                sh 'docker build -t $APP_NAME:latest .'
             }
         }
 
         stage('Deploy Docker Container') {
             steps {
-                echo '🚀 Desplegando contenedor Docker...'
+                echo '🚀 Desplegando contenedor QA...'
                 sh '''
-                    APP_NAME=carnetizacion-digital-back
                     docker stop $APP_NAME || true
                     docker rm $APP_NAME || true
-                    docker run -d -p 5000:8080 --name $APP_NAME $APP_NAME:latest
+                    docker run -d -p $PORT:8080 --name $APP_NAME $APP_NAME:latest
                 '''
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline completado correctamente.'
-        }
-        failure {
-            echo 'Error durante el proceso del pipeline.'
-        }
+        success { echo '✅ Pipeline QA completado correctamente.' }
+        failure { echo '❌ Error en pipeline QA.' }
     }
 }
