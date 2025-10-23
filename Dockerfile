@@ -16,7 +16,6 @@ COPY Business/*.csproj Business/
 COPY Data/*.csproj Data/
 COPY Entity/*.csproj Entity/
 COPY Utilities/*.csproj Utilities/
-COPY TemplateEngineHost/*.csproj TemplateEngineHost/
 COPY Diagram/*.csproj Diagram/
 
 RUN dotnet restore Web/Web.csproj
