@@ -2,9 +2,12 @@ pipeline {
     agent any
 
     environment {
-        DOTNET_CLI_HOME = '/var/jenkins_home/.dotnet'
+        // 🧩 Configuración global de .NET
+        DOTNET_CLI_HOME = '/tmp'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
+
+        // 🐳 Configuración de la app
         APP_NAME = 'carnetizacion-digital-api-prod'
         PORT = '5300'
     }
@@ -15,14 +18,13 @@ pipeline {
             agent {
                 docker {
                     image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    // Montamos Docker para futuras etapas y el workspace para restaurar
+                    args '-v /var/run/docker.sock:/var/run/docker.sock -v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
                 }
             }
             steps {
                 echo '🔧 Restaurando dependencias...'
                 sh '''
-                    mkdir -p $DOTNET_CLI_HOME
-                    chmod -R 777 $DOTNET_CLI_HOME
                     dotnet restore CARNETIZACION-DIGITAL-BACK.sln
                 '''
             }
@@ -30,7 +32,10 @@ pipeline {
 
         stage('Build') {
             agent {
-                docker { image 'mcr.microsoft.com/dotnet/sdk:8.0' }
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                    args '-v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
+                }
             }
             steps {
                 echo '🏗️ Compilando la solución...'
@@ -44,18 +49,25 @@ pipeline {
 
         stage('Publish Web Layer') {
             agent {
-                docker { image 'mcr.microsoft.com/dotnet/sdk:8.0' }
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                    args '-v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
+                }
             }
             steps {
                 echo '📦 Publicando capa Web...'
-                sh 'dotnet publish Web/Web.csproj -c Release -o ./publish'
+                sh '''
+                    dotnet publish Web/Web.csproj -c Release -o ./publish
+                '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Construyendo imagen Docker PRODUCCIÓN...'
-                sh 'docker build -t $APP_NAME:latest .'
+                sh '''
+                    docker build -t $APP_NAME:latest .
+                '''
             }
         }
 
@@ -72,7 +84,11 @@ pipeline {
     }
 
     post {
-        success { echo '✅ Pipeline PRODUCCIÓN completado correctamente.' }
-        failure { echo '❌ Error en pipeline PRODUCCIÓN.' }
+        success {
+            echo '✅ Pipeline PRODUCCIÓN completado correctamente.'
+        }
+        failure {
+            echo '❌ Error en pipeline PRODUCCIÓN.'
+        }
     }
 }
