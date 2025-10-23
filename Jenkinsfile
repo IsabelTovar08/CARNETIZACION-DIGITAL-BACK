@@ -2,6 +2,7 @@
 /// Jenkinsfile principal para despliegue automatizado del proyecto carnetizacion-digital-api.
 /// Este pipeline detecta el entorno desde el archivo .env raíz,
 /// compila el proyecto .NET 8 y ejecuta el docker-compose correspondiente dentro de la carpeta devops/{entorno}.
+/// Antes del despliegue, elimina cualquier contenedor previo con el mismo nombre para evitar conflictos.
 /// </summary>
 
 pipeline {
@@ -22,6 +23,7 @@ pipeline {
     }
 
     stages {
+
         /// <summary>
         /// Etapa 1: Detección del entorno.
         /// Lee el archivo .env en la raíz del proyecto para obtener la variable ENVIRONMENT (por ejemplo, qa, prod, etc.)
@@ -93,13 +95,17 @@ pipeline {
         /// <summary>
         /// Etapa 4: Despliegue del backend.
         /// Ejecuta el docker-compose del entorno correspondiente para construir e iniciar el contenedor del backend.
-        /// Se utiliza el archivo docker-compose.yml y .env dentro de devops/{entorno}.
+        /// Antes de levantarlo, limpia cualquier contenedor previo con el mismo nombre para evitar conflictos.
         /// </summary>
         stage('Desplegar API') {
             steps {
                 echo "Desplegando carnetizacion-digital-api para entorno: ${env.ENVIRONMENT}"
                 
                 sh """
+                    # Eliminar contenedores previos del entorno si existen
+                    echo "Limpiando contenedores antiguos para ${env.ENVIRONMENT}..."
+                    docker ps -a --filter "name=carnetizacion-digital-api-${env.ENVIRONMENT}" -q | xargs -r docker rm -f || true
+
                     # Ejecutar docker-compose correspondiente al entorno detectado
                     docker compose -f ${env.COMPOSE_FILE} --env-file ${env.ENV_FILE} up -d --build
                 """
@@ -116,7 +122,7 @@ pipeline {
             echo "Despliegue completado correctamente para ${env.ENVIRONMENT}"
         }
         failure {
-            echo "rror durante el despliegue en ${env.ENVIRONMENT}"
+            echo "Error durante el despliegue en ${env.ENVIRONMENT}"
         }
     }
 }
