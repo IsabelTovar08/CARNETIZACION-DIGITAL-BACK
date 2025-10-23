@@ -13,8 +13,6 @@ services:
       - "5100:8080"
     networks:
       - network_develop         # red externa de la BD develop
-    depends_on:
-      - carnetizacion-postgres-develop
     labels:
       - com.carnetizacion.environment=develop
 

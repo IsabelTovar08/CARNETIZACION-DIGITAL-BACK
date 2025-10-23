@@ -13,8 +13,6 @@ services:
       - "5102:8080"
     networks:
       - network_staging
-    depends_on:
-      - carnetizacion-postgres-staging
     labels:
       - com.carnetizacion.environment=staging
 

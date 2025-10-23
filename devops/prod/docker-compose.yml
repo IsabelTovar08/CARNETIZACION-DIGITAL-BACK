@@ -13,8 +13,6 @@ services:
       - "5103:8080"
     networks:
       - network_prod
-    depends_on:
-      - carnetizacion-postgres-prod
     labels:
       - com.carnetizacion.environment=prod
 

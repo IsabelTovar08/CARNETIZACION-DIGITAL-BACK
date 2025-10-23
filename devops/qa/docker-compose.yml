@@ -13,8 +13,6 @@ services:
       - "5101:8080"
     networks:
       - network_qa
-    depends_on:
-      - carnetizacion-postgres-qa
     labels:
       - com.carnetizacion.environment=qa
 
