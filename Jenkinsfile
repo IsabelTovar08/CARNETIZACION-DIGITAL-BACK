@@ -41,7 +41,12 @@ pipeline {
                 /// Compila la solución.
                 /// </summary>
                 echo '🏗️ Compilando la solución...'
-                sh 'dotnet build CARNETIZACION-DIGITAL-BACK.sln --no-restore -c Release /p:ExcludeProjects=Diagram/Diagram.csproj'
+                sh  '''
+                        for proj in $(find . -name "*.csproj" ! -path "./Diagram/*"); do
+                        dotnet build "$proj" --no-restore -c Release
+                        done
+                    '''
+
             }
         }
 
