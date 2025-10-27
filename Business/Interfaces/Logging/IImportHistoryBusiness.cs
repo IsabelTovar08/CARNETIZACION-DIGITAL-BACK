@@ -23,7 +23,7 @@ namespace Business.Interfaces.Logging
         Task<ImportBatchDto?> GetByIdAsync(int id);
 
         /// <summary>Obtiene todas las filas de un lote.</summary>
-        Task<IEnumerable<ImportBatchRowTableDto>> GetRowsAsync(int batchId);
+        Task<IEnumerable<ImportBatchRowDto>> GetRowsAsync(int batchId);
 
         /// <summary>Obtiene solo las filas con error de un lote.</summary>
         Task<IEnumerable<ImportBatchRowDetailDto>> GetErrorRowsAsync(int batchId);

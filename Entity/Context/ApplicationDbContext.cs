@@ -1,4 +1,13 @@
-﻿using Dapper;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Dapper;
 using Entity.DataInit.Operational;
 using Entity.DataInit.Parameter;
 using Entity.Models;
@@ -16,13 +25,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entity.Context
 {
@@ -74,8 +76,9 @@ namespace Entity.Context
         public DbSet<ContactOrganization> ContactOrganizations { get; set; }
 
         public DbSet<Profiles> Profiles { get; set; }
+        public DbSet<CardConfiguration> CardsConfigurations { get; set; }
         public DbSet<Card> Cards { get; set; }
-        public DbSet<PersonDivisionProfile> PersonDivisionProfiles { get; set; }
+        public DbSet<IssuedCard> IssuedCards { get; set; }
 
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationReceived> NotificationReceiveds { get; set; }
@@ -138,10 +141,6 @@ namespace Entity.Context
                   .OnDelete(DeleteBehavior.Restrict);
             });
 
-            //Configuración específica para ContactOrganization
-            modelBuilder.Entity<ContactOrganization>().
-                ToTable("ContactOrganizations");
-
 
             // ================= ÍNDICES OPTIMIZACIÓN =================
             modelBuilder.Entity<Attendance>(b =>
@@ -156,33 +155,27 @@ namespace Entity.Context
                 // Si usas SQL Server y quieres índice filtrado, puedes agregarlo por migración SQL manual:
                 // b.HasIndex(x => x.PersonId).HasFilter("[TimeOfExit] IS NULL AND [IsDeleted] = 0");
             });
-
-            // Otras configuraciones del ensamblado
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-
-            // EventTargetAudience
+            // Configuración de EventTargetAudience
             modelBuilder.Entity<EventTargetAudience>(eb =>
             {
                 eb.ToTable("EventTargetAudiences", "Operational");
 
                 eb.HasOne(e => e.Profile)
-                  .WithMany()
-                  .HasForeignKey(e => e.ProfileId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany()
+                    .HasForeignKey(e => e.ProfileId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 eb.HasOne(e => e.OrganizationalUnit)
-                  .WithMany()
-                  .HasForeignKey(e => e.OrganizationalUnitId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany()
+                    .HasForeignKey(e => e.OrganizationalUnitId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 eb.HasOne(e => e.InternalDivision)
-                  .WithMany()
-                  .HasForeignKey(e => e.InternalDivisionId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany()
+                    .HasForeignKey(e => e.InternalDivisionId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
-
-           
-
+            // Conversión global UTC para DateTime
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties()
@@ -195,8 +188,8 @@ namespace Entity.Context
                 }
             }
 
-            //// Si tienes varias configuraciones en tu proyecto
-            //modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+            // Otras configuraciones del ensamblado
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
 
         /// <summary>
@@ -215,9 +208,44 @@ namespace Entity.Context
         /// <param name="configurationBuilder">Constructor de configuración de modelos.</param>
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
-            configurationBuilder.Properties<decimal>().HavePrecision(18, 2);
-        }
+            // Precisión estándar para decimales
+            configurationBuilder
+                .Properties<decimal>()
+                .HavePrecision(18, 2);
 
+            configurationBuilder
+        .Properties<DateTime>()
+        .HaveConversion<DateTimeToUtcConverter>()   // 👈 usamos un conversor genérico
+        .HaveColumnType("timestamp with time zone");
+
+
+            // Manejo de DateOnly (si se usa)
+            configurationBuilder
+                .Properties<DateOnly>()
+                .HaveColumnType("date");
+
+            // Manejo de TimeOnly (si se usa)
+            configurationBuilder
+                .Properties<TimeOnly>()
+                .HaveColumnType("time");
+
+            // Enums se almacenan como int (compatible en todos los motores)
+            configurationBuilder
+                .Properties<Enum>()
+                .HaveConversion<int>()
+                .HaveColumnType("int");
+        }
+        /// <summary>
+        /// Conversor global para normalizar todos los DateTime como UTC.
+        /// </summary>
+        public class DateTimeToUtcConverter : ValueConverter<DateTime, DateTime>
+        {
+            public DateTimeToUtcConverter()
+                : base(
+                    v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc), // Guardar
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc))                                 // Leer
+            { }
+        }
         /// <summary>
         /// Guarda los cambios en la base de datos, asegurando la auditoría antes de persistir los datos.
         /// </summary>

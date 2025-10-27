@@ -63,10 +63,10 @@ namespace Business.Services.Logging
 
         /// <inheritdoc/>
         /// <inheritdoc/>
-        public async Task<IEnumerable<ImportBatchRowTableDto>> GetRowsAsync(int batchId)
+        public async Task<IEnumerable<ImportBatchRowDto>> GetRowsAsync(int batchId)
         {
-            var rows = await _batchData.GetRowsAsync(batchId);
-            return _mapper.Map<IEnumerable<ImportBatchRowTableDto>>(rows);
+            IEnumerable<ImportBatchRow> rows = await _batchData.GetRowsAsync(batchId);
+            return _mapper.Map<IEnumerable<ImportBatchRowDto>>(rows);
         }
 
 

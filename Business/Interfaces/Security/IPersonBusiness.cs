@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Business.Interfases;
 using Entity.DTOs.ModelSecurity.Request;
@@ -32,12 +32,27 @@ namespace Business.Interfaces.Security
         //Task<PersonDto?> GetPersonByUserIdAsync(int userId);
 
         /// <summary>
-        /// Devuelve los datos (DTO) de la persona asociada al token del usuario actual.
-        /// Retorna null si no hay usuario autenticado o la persona no existe.
+        /// Filtro + paginación de personas:
+        /// - Solo personas no eliminadas
+        /// - Con al menos un PersonDivisionProfile que tenga asociado un Card (carnet)
+        /// - Filtros opcionales por división interna, unidad organizativa y perfil
         /// </summary>
+        /// 
+
+        
         Task<PersonDto?> GetCurrentPersonAsync();
 
         //  Evita que el documento se repita
         Task<PersonDto?> FindByDocumentAsync(string documentNumber);
+
+
+        Task<(IList<PersonDto> Items, int Total)> QueryWithFiltersAsync(
+            int? internalDivisionId,
+            int? organizationalUnitId,
+            int? profileId,
+            int page,
+            int pageSize,
+            CancellationToken ct = default
+        );
     }
 }

@@ -21,7 +21,9 @@ namespace Entity.DTOs.Specifics
         public string Source { get; set; } = "Excel";
 
         /// <summary>Usuario que inició la importación.</summary>
-        public string? StartedBy { get; set; }
+        public int? StartedBy { get; set; }
+        /// <summary>Usuario que inició la importación.</summary>
+        public string? StartedByUserName { get; set; }
 
         /// <summary>Total de filas detectadas en el archivo.</summary>
         public int TotalRows { get; set; }

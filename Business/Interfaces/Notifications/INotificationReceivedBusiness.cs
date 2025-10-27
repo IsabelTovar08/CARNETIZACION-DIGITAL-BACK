@@ -11,5 +11,19 @@ namespace Business.Interfaces.Notifications
 {
     public interface INotificationReceivedBusiness : IBaseBusiness<NotificationReceived, NotificationReceivedDto, NotificationReceivedDto>
     {
+        /// <summary>
+        /// Obtiene todas las notificaciones activas de un usuario.
+        /// </summary>
+        Task<List<NotificationReceivedDto>> GetActiveNotificationsByUserAsync(int userId);
+
+        /// <summary>
+        /// Marca una notificación como leída.
+        /// </summary>
+        Task MarkAsReadAsync(int notificationReceivedId);
+
+        /// <summary>
+        /// Marca todas las notificaciones de un usuario como leídas.
+        /// </summary>
+        Task MarkAllAsReadAsync(int userId);
     }
 }

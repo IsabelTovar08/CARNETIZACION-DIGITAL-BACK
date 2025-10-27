@@ -1,5 +1,4 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Auth;
 using Business.Interfaces.Security;
@@ -38,11 +37,13 @@ namespace Business.Classes
         private readonly IUserRoleBusiness _userRolBusiness;
         private readonly IAssetUploader _assetUploader;
         private readonly ICurrentUser _currentUser;
-        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserRoleBusiness userRolBusiness, IAssetUploader assetUploader, ICurrentUser currentUser) : base(personData, logger, mapper)
+
+        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserRoleBusiness userRolBusiness, IAssetUploader assetUploader, ICurrentUser currentUser)
+            : base(personData, logger, mapper)
         {
             _notificationSender = messageSender;
             _personData = personData;
-            _userRolBusiness = userRolBusiness; 
+            _userRolBusiness = userRolBusiness;
             _assetUploader = assetUploader;
             _currentUser = currentUser;
         }
@@ -53,7 +54,7 @@ namespace Business.Classes
 
             if (!string.IsNullOrWhiteSpace(entity.Phone))
             {
-                if (await _data.ExistsByAsync(x => x.Phone , entity.Phone ))
+                if (await _data.ExistsByAsync(x => x.Phone, entity.Phone))
                     errors.Add(("Phone ", "El teléfono ya está registrado."));
             }
             if (!string.IsNullOrWhiteSpace(entity.Email))
@@ -78,7 +79,8 @@ namespace Business.Classes
                 throw new ValidationException(errors[0].Field, combined);
             }
         }
-        protected  void Validate(PersonDtoRequest person)
+
+        protected void Validate(PersonDtoRequest person)
         {
             if (person == null)
                 throw new ValidationException("la persona no puede ser nula.");
@@ -99,7 +101,7 @@ namespace Business.Classes
             try
             {
                 Validate(personDTO);
-         
+
                 await EnsureIdentificationIsUnique(personDTO.DocumentNumber);
 
                 var person = _mapper.Map<Person>(personDTO);
@@ -124,7 +126,6 @@ namespace Business.Classes
             }
         }
 
-
         private async Task EnsureIdentificationIsUnique(string identification)
         {
             if (await _personData.FindByIdentification(identification) != null)
@@ -132,7 +133,6 @@ namespace Business.Classes
                 throw new ValidationException("Ya existe una persona con este número de identificación.");
             }
         }
-
 
         public async Task<PersonRegistrerDto> SavePersonAndUser(PersonRegistrer personUser)
         {
@@ -144,7 +144,7 @@ namespace Business.Classes
             (Person Person, User User) result = await _personData.SavePersonAndUser(personEntity, userEntity);
 
             // devuelve si se envió o no
-            bool emailSent = _=await SendWelcomeNotifications(result.Person, userEntity);
+            bool emailSent = _ = await SendWelcomeNotifications(result.Person, userEntity);
             _ = await AsignarRol(userEntity.Id);
 
             return (
@@ -156,7 +156,6 @@ namespace Business.Classes
                 }
             );
         }
-
 
         private async Task<bool> AsignarRol(int userId)
         {
@@ -198,14 +197,13 @@ namespace Business.Classes
                     ["LoginUrl"] = "https://carnet.tuempresa.com",
                     ["ActionUrl"] = "https://carnet.tuempresa.com/login"
                 };
-                if(user != null)
+                if (user != null)
                 {
                     if (!string.IsNullOrEmpty(user.Password))
                     {
                         model["temp_password"] = user.Password;
                     }
                 }
-                
 
                 var html = await EmailTemplates.RenderAsync("Welcome.html", model);
 
@@ -225,7 +223,6 @@ namespace Business.Classes
             }
         }
 
-
         public async Task<PersonInfoDto?> GetPersonInfoAsync(int id)
         {
             Person? person = await _personData.GetPersonInfo(id);
@@ -235,7 +232,6 @@ namespace Business.Classes
 
             return dto;
         }
-
 
         public async Task<PersonOrganizationalInfoDto?> GetOrganizationalInfoAsync(int personId)
         {
@@ -261,8 +257,6 @@ namespace Business.Classes
                 throw;
             }
         }
-
-        
 
         // Método público: upsert foto de persona 
         public async Task<(string PublicUrl, string StoragePath)> UpsertPersonPhotoAsync(
@@ -295,7 +289,6 @@ namespace Business.Classes
             return (publicUrl, storagePath);
         }
 
-
         // Helper para armar los segmentos de ruta
         private async Task<IReadOnlyList<string?>> BuildPersonPhotoPathPartsAsync(int personId)
         {
@@ -304,13 +297,13 @@ namespace Business.Classes
             var info = await GetOrganizationalInfoAsync(personId);
 
             var parts = new List<string?>
-        {
-            "people",
-            info?.OrganizationCode,
-            info?.OrganizationUnitCode,
-            info?.InternalDivissionCode,
-            personId.ToString()
-        };
+            {
+                "people",
+                info?.OrganizationCode,
+                info?.OrganizationUnitCode,
+                info?.InternalDivissionCode,
+                personId.ToString()
+            };
 
             return parts;
         }
@@ -323,7 +316,7 @@ namespace Business.Classes
 
             int userId = int.Parse(userIdStr);
 
-            // obtiene la persona asociada al User actual
+            //  obtiene la persona asociada al User actual
             var person = await _personData.GetPersonByUserIdAsync(userId);
             if (person == null)
                 throw new KeyNotFoundException("No se encontró la persona asociada al usuario actual.");
@@ -331,6 +324,22 @@ namespace Business.Classes
             return _mapper.Map<PersonDto>(person);
         }
 
+        // 🔹 NUEVO MÉTODO: Filtro + paginación
+        public async Task<(IList<PersonDto> Items, int Total)> QueryWithFiltersAsync(
+            int? internalDivisionId,
+            int? organizationalUnitId,
+            int? profileId,
+            int page,
+            int pageSize,
+            CancellationToken ct = default)
+        {
+            var (entities, total) = await _personData.QueryWithFiltersAsync(
+                internalDivisionId, organizationalUnitId, profileId, page, pageSize, ct);
+
+            var items = entities.Select(e => _mapper.Map<PersonDto>(e)).ToList();
+            return (items, total);
+        }
+    
         public async Task<PersonDto?> GetCurrentPersonAsync()
         {
             try

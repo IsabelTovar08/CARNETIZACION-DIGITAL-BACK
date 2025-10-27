@@ -7,18 +7,15 @@ using Entity.Enums.Attributes;
 
 namespace Utilities.Enums.Specifics
 {
+    /// <summary>
+    /// Estados posibles de una notificación recibida por un usuario.
+    /// </summary>
     public enum NotificationStatus
     {
-        [EnumDisplayEx("Pendiente")]
-        Pending = 1,
-
         [EnumDisplayEx("Enviado")]
-        Sent = 2,
+        Sent = 1,
 
         [EnumDisplayEx("Leído")]
-        Read = 3,
-
-        [EnumDisplayEx("Caducado")]
-        Expired = 4
+        Read = 2
     }
 }

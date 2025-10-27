@@ -4,6 +4,8 @@ using Business.Interfaces.Operational;
 using Entity.DTOs.Notifications;
 using Entity.DTOs.Notifications.Request;
 using Entity.DTOs.Operational;
+using Entity.DTOs.Specifics;
+using Entity.Enums.Specifics;
 using Entity.Models.Notifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -49,6 +51,17 @@ namespace Web.Controllers.Operational
                 message = "Listado de notificaciones",
                 data = result
             });
+        }
+
+
+        /// <summary>
+        /// Envía una notificación utilizando una plantilla predefinida.
+        /// </summary>
+        [HttpPost("template")]
+        public async Task<ActionResult<NotificationDto>> SendTemplate([FromQuery] NotificationTemplateType type, [FromBody] object[] args)
+        {
+            var result = await _business.SendTemplateAsync(type, args);
+            return Ok(result);
         }
     }
 }

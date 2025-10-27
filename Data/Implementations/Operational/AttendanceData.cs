@@ -34,7 +34,6 @@ namespace Data.Implementations.Operational
 
         public async Task<Attendance?> GetOpenAttendanceAsync(int personId, CancellationToken ct = default)
         {
-            // AsNoTracking para evitar conflictos de tracking cuando luego actualizamos
             return await _context.Set<Attendance>()
                 .AsNoTracking()
                 .Where(a => !a.IsDeleted
@@ -46,7 +45,6 @@ namespace Data.Implementations.Operational
 
         public async Task<Attendance> UpdateExitAsync(int id, DateTime timeOfExit, int? accessPointOut, CancellationToken ct = default)
         {
-            // Obtenemos la entidad "trackeada" y actualizamos sólo los campos de salida
             var entity = await _context.Set<Attendance>()
                 .FirstOrDefaultAsync(a => a.Id == id, ct);
 
@@ -60,14 +58,13 @@ namespace Data.Implementations.Operational
             return entity;
         }
 
-        //NUEVO: consulta con filtros y paginación
         public async Task<(IList<Attendance> Items, int Total)> QueryAsync(
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
             CancellationToken ct = default)
         {
             var q = _context.Set<Attendance>()
-                .AsNoTracking() // ⚡ performance para lectura
+                .AsNoTracking()
                 .Include(a => a.Person)
                 .Include(a => a.AccessPointEntry)
                 .ThenInclude(ap => ap.EventAccessPoints)
@@ -80,7 +77,6 @@ namespace Data.Implementations.Operational
             if (personId.HasValue)
                 q = q.Where(a => a.PersonId == personId.Value);
 
-            // Filtra por evento (entrada o salida)
             if (eventId.HasValue)
             {
                 q = q.Where(a =>
@@ -93,7 +89,6 @@ namespace Data.Implementations.Operational
             if (fromUtc.HasValue) q = q.Where(a => a.TimeOfEntry >= fromUtc.Value);
             if (toUtc.HasValue) q = q.Where(a => a.TimeOfEntry <= toUtc.Value);
 
-            // Orden
             bool desc = string.Equals(sortDir, "DESC", StringComparison.OrdinalIgnoreCase);
             q = (sortBy ?? "TimeOfEntry") switch
             {
@@ -103,8 +98,6 @@ namespace Data.Implementations.Operational
             };
 
             int total = await q.CountAsync(ct);
-
-            // Paginación (1-based)
             page = page <= 0 ? 1 : page;
             pageSize = pageSize <= 0 ? 20 : pageSize;
             int skip = (page - 1) * pageSize;

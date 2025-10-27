@@ -9,34 +9,64 @@ using Data.Interfases.Notifications;
 using Entity.DTOs.Notifications;
 using Entity.Models.Notifications;
 using Microsoft.Extensions.Logging;
+using Utilities.Enums.Specifics;
 
 namespace Business.Implementations.Notifications
 {
-    public class NotificationReceivedBusiness : BaseBusiness<NotificationReceived, NotificationReceivedDto, NotificationReceivedDto>, INotificationReceivedBusiness
+    /// <summary>
+    /// Lógica de negocio para notificaciones recibidas (lectura y estados).
+    /// </summary>
+    public class NotificationReceivedBusiness: BaseBusiness<NotificationReceived, NotificationReceivedDto, NotificationReceivedDto>, INotificationReceivedBusiness
     {
-        protected readonly INotificationsReceivedData _notificationReceivedData;
+        private readonly INotificationsReceivedData _notificationReceivedData;
 
-        public NotificationReceivedBusiness(INotificationsReceivedData notificationReceivedData, ILogger<NotificationReceived> logger, IMapper mapper)
-            : base(notificationReceivedData, logger, mapper)
+        public NotificationReceivedBusiness(
+            INotificationsReceivedData notificationReceivedData,
+            ILogger<NotificationReceived> logger,
+            IMapper mapper
+        ) : base(notificationReceivedData, logger, mapper)
         {
             _notificationReceivedData = notificationReceivedData;
         }
 
+        /// <summary>
+        /// Obtiene todas las notificaciones activas de un usuario.
+        /// </summary>
         public async Task<List<NotificationReceivedDto>> GetActiveNotificationsByUserAsync(int userId)
         {
-            var list = await _notificationReceivedData.GetAllAsync();
-            var filtered = list.Where(n => n.UserId == userId && !n.IsDeleted && (n.ExpirationDate == null || n.ExpirationDate > DateTime.Now)).ToList();
-            return _mapper.Map<List<NotificationReceivedDto>>(filtered);
+            IEnumerable<NotificationReceived> list = await _notificationReceivedData.GetActiveByUserAsync(userId);
+            return _mapper.Map<List<NotificationReceivedDto>>(list);
         }
 
+        /// <summary>
+        /// Marca una notificación como leída.
+        /// </summary>
         public async Task MarkAsReadAsync(int notificationReceivedId)
         {
-            var entity = await _notificationReceivedData.GetByIdAsync(notificationReceivedId);
-            if (entity != null && !entity.IsDeleted)
+            NotificationReceived? entity = await _notificationReceivedData.GetByIdAsync(notificationReceivedId);
+            if (entity != null && !entity.IsDeleted && entity.Status != NotificationStatus.Read)
             {
-                entity.ReadDate = DateTime.Now;
-                entity.StatusId = 2;
+                entity.ReadDate = System.DateTime.UtcNow;
+                entity.Status = NotificationStatus.Read;  
                 await _notificationReceivedData.UpdateAsync(entity);
+            }
+        }
+
+        /// <summary>
+        /// Marca todas las notificaciones de un usuario como leídas.
+        /// </summary>
+        public async Task MarkAllAsReadAsync(int userId)
+        {
+            IEnumerable<NotificationReceived> list = await _notificationReceivedData.GetByUserAsync(userId);
+
+            foreach (var entity in list)
+            {
+                if (entity.Status != NotificationStatus.Read)
+                {
+                    entity.ReadDate = System.DateTime.UtcNow;
+                    entity.Status = NotificationStatus.Read;
+                    await _notificationReceivedData.UpdateAsync(entity);
+                }
             }
         }
     }

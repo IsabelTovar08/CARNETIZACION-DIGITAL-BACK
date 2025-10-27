@@ -15,5 +15,10 @@ namespace Business.Interfaces.Operational
     {
         Task<int> CreateEventAsync(CreateEventRequest dto);
         Task<EventDetailsDtoResponse?> GetEventFullDetailsAsync(int eventId);
+
+        /// <summary>
+        /// Retorna el número de eventos disponibles
+        /// </summary>
+        Task<int> GetAvailableEventsCountAsync();
     }
 }

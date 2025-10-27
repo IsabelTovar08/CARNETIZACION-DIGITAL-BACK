@@ -1,13 +1,16 @@
 ﻿using Business.Classes;
 using Business.Interfaces.Security;
 using Business.Interfases;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs;
+using Entity.DTOs.ModelSecurity;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Exeptions;
+using Utilities.Responses;
 using Web.Controllers.Base;
 
 
@@ -33,13 +36,15 @@ namespace Web.Controllers.ModelSecurity
         {
             try
             {
-                var result = await _rolFormPermissionBusiness.GetAllRolFormPermissionsAsync();
-                return Ok(result);
+                List<RolFormPermissionsCompletedDto> result = await _rolFormPermissionBusiness.GetAllRolFormPermissionsAsync();
+                return Ok(ApiResponse<IEnumerable<RolFormPermissionsCompletedDto>>.Ok(result, "Listado obtenido"));
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener todos los permisos por formulario de roles.");
-                return StatusCode(500, "Error interno en el servidor.");
+                return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
+
             }
         }
         /// <summary>

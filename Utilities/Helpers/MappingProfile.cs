@@ -1,4 +1,4 @@
-﻿using System.Globalization; // ➕ para formateo es-CO
+﻿using System.Globalization;
 using AutoMapper;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
@@ -38,13 +38,31 @@ namespace Utilities.Helper
     {
         public MappingProfile()
         {
-            //Mapeo de la entidad Person 
             CreateMap<Person, PersonDto>()
-                .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
-                .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType.Name))
-                .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
-                .ReverseMap();
-            CreateMap<Person, PersonDtoRequest>().ReverseMap();
+     .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
+     .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType.Name))
+     .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
+
+
+     // 🔹 División actual
+     .ForMember(dest => dest.InternalDivisionName,
+         opt => opt.MapFrom(src =>
+             src.IssuedCard
+                 .Where(pdp => pdp.IsCurrentlySelected)
+                 .Select(pdp => pdp.InternalDivision.Name)
+                 .FirstOrDefault()))
+
+    
+
+
+     // 🔹 Si tiene carnet
+     .ForMember(dest => dest.HasCard,
+         opt => opt.MapFrom(src =>
+             src.IssuedCard.Any(pdp => pdp.Card != null)))
+
+     .ReverseMap();
+
+            CreateMap<PersonDtoRequest, Person>().ReverseMap();
 
 
             CreateMap<Person, PersonInfoDto>()
@@ -53,24 +71,24 @@ namespace Utilities.Helper
 
             // División actual (IsCurrentlySelected)
             .ForMember(d => d.DivissionId, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Id))
+                s.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Id))
             .ForMember(d => d.DivissionName, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Name))
+                s.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.Name))
 
             // Unidad
             .ForMember(d => d.UnitId, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Id))
+                s.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Id))
             .ForMember(d => d.UnitName, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Name))
+                s.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected).InternalDivision.OrganizationalUnit.Name))
 
             // Organización (desde Branch → Organization)
             .ForMember(d => d.OrganizationId, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
+                s.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected)
                     .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
                     .Select(oub => oub.Branch.Organization.Id)
                     .FirstOrDefault()))
             .ForMember(d => d.OrganizationName, o => o.MapFrom(s =>
-                s.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)
+                s.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected)
                     .InternalDivision.OrganizationalUnit.OrganizationalUnitBranches
                     .Select(oub => oub.Branch.Organization.Name)
                     .FirstOrDefault()));
@@ -116,7 +134,7 @@ namespace Utilities.Helper
          .SelectMany(ur => ur.Rol.RolFormPermissions.Select(rp => rp.Permission))
          .DistinctBy(p => p.Id)))
             .ForMember(d => d.CurrentProfile, opt => opt.MapFrom(s =>
-                s.Person.PersonDivisionProfile.FirstOrDefault(p => p.IsCurrentlySelected)));
+                s.Person.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected)));
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()
@@ -182,38 +200,34 @@ namespace Utilities.Helper
             //OPERATIONAL
 
             //Cards
-            CreateMap<Card, CardDto>()
-            .ForMember(d => d.StatusName, o => o.MapFrom(s => s.Status.Name))
-            .ForMember(d => d.PersonId, o => o.MapFrom(s => s.PersonDivisionProfile.Person.Id))
-            .ForMember(d => d.PersonFullName, o => o.MapFrom(s => s.PersonDivisionProfile.Person.FirstName + " " + s.PersonDivisionProfile.Person.LastName))
-            .ForMember(d => d.DivisionId, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.Id))
-            .ForMember(d => d.DivisionName, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.Name))
-            .ForMember(d => d.ProfileId, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Id))
-            .ForMember(d => d.ProfileName, o => o.MapFrom(s => s.PersonDivisionProfile.Profile.Name))
-            .ForMember(d => d.AreaCategoryName, o => o.MapFrom(s => s.PersonDivisionProfile.InternalDivision.AreaCategory.Name))
+            CreateMap<CardConfiguration, CardConfigurationDto>()
+            //.ForMember(d => d.PersonId, o => o.MapFrom(s => s.IssuedCard.Person.Id))
+            //.ForMember(d => d.PersonFullName, o => o.MapFrom(s => s.IssuedCard.Person.FirstName + " " + s.IssuedCard.Person.LastName))
+            //.ForMember(d => d.DivisionId, o => o.MapFrom(s => s.IssuedCard.InternalDivision.Id))
+            //.ForMember(d => d.DivisionName, o => o.MapFrom(s => s.IssuedCard.InternalDivision.Name))
+            //.ForMember(d => d.ProfileId, o => o.MapFrom(s => s.IssuedCard.Profile.Id))
+            //.ForMember(d => d.ProfileName, o => o.MapFrom(s => s.IssuedCard.Profile.Name))
+            //.ForMember(d => d.AreaCategoryName, o => o.MapFrom(s => s.IssuedCard.InternalDivision.AreaCategory.Name))
 
-            .ReverseMap()
-                .ForMember(s => s.Status, o => o.Ignore())
-                .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
+            .ReverseMap();
+            //.ForMember(s => s.IssuedCard, o => o.Ignore());
 
-            CreateMap<Card, CardDtoRequest>()
+            CreateMap<CardConfiguration, CardConfigurationDtoRequest>()
                 .ReverseMap()
                     .ForMember(s => s.Id, o => o.Ignore())
-                    .ForMember(s => s.IsDeleted, o => o.Ignore())
-                    .ForMember(s => s.Status, o => o.Ignore())
-                    .ForMember(s => s.PersonDivisionProfile, o => o.Ignore());
+                    .ForMember(s => s.IsDeleted, o => o.Ignore());
 
             CreateMap<CardTemplate, CardTemplateRequest>().ReverseMap();
             CreateMap<CardTemplate, CardTemplateResponse>().ReverseMap();
 
-            //PersonDivisionProfile
-            CreateMap<PersonDivisionProfile, PersonDivisionProfileDto>()
+            //IssuedCard
+            CreateMap<IssuedCard, IssuedCardDto>()
                 .ForMember(dest => dest.PersonName, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
                 .ForMember(dest => dest.DivisionName, opt => opt.MapFrom(src => src.InternalDivision.Name))
                 .ForMember(dest => dest.ProfileName, opt => opt.MapFrom(src => src.Profile.Name))
                 .ReverseMap();
 
-            CreateMap<PersonDivisionProfile, PersonDivisionProfileDtoRequest>()
+            CreateMap<IssuedCard, IssuedCardDtoRequest>()
                 .ReverseMap();
 
             //Profiles
@@ -232,11 +246,7 @@ namespace Utilities.Helper
                     .ForMember(s => s.Organization, o => o.Ignore());
 
             CreateMap<Branch, BranchDtoRequest>()
-                .ReverseMap()
-                    .ForMember(s => s.Id, o => o.Ignore())
-                    .ForMember(s => s.IsDeleted, o => o.Ignore())
-                    .ForMember(s => s.City, o => o.Ignore())
-                    .ForMember(s => s.Organization, o => o.Ignore());
+                .ReverseMap();
 
             //Structure
 
@@ -391,7 +401,7 @@ namespace Utilities.Helper
             //Notifications
             CreateMap<Notification, NotificationDto>()
                 .ForMember(d => d.NotificationTypeName,
-                    opt => opt.MapFrom(s => ((NotificationType)s.NotificationTypeId).ToString())) 
+                    opt => opt.MapFrom(s => ((NotificationType)s.NotificationType).ToString())) 
                 .ReverseMap();
 
             CreateMap<Notification, NotificationDtoRequest>()
@@ -481,24 +491,26 @@ namespace Utilities.Helper
 
             CreateMap<ImportBatchStartDto, ImportBatch>().ReverseMap();
 
-            CreateMap<ImportBatchRowDto, ImportBatchRow>().ReverseMap();
+            CreateMap<ImportBatchRow, ImportBatchRowDto>()
+                .ForMember(d => d.PersonName, opt => opt.MapFrom(s => s.Person.FirstName + s.Person.MiddleName + s.Person.LastName + s.Person.SecondLastName))
+                .ReverseMap();
 
             // Mapear ImportBatch -> ImportBatchDto
-            CreateMap<ImportBatch, ImportBatchDto>();
+            CreateMap<ImportBatch, ImportBatchDto>()
+                 .ForMember(d => d.StartedByUserName, opt => opt.MapFrom(s => s.StartedByUser.Person.FirstName + s.StartedByUser.Person.LastName))
+                .ReverseMap();
 
             // Mapear ImportBatchRow -> ImportBatchRowDetailDto
             CreateMap<ImportBatchRow, ImportBatchRowDetailDto>();
 
             CreateMap<ImportBatchRow, ImportBatchRowTableDto>()
-                .ForMember(d => d.Photo, opt => opt.MapFrom(src => src.PersonDivisionProfile.Person!.PhotoUrl))
+                .ForMember(d => d.Photo, opt => opt.MapFrom(src => src.IssuedCard.Person!.PhotoUrl))
                 .ForMember(d => d.Name, opt => opt.MapFrom(src =>
-                    src.PersonDivisionProfile.Person != null ? $"{src.PersonDivisionProfile.Person.FirstName} {src.PersonDivisionProfile.Person.LastName}" : "N/A"))
+                    src.IssuedCard.Person != null ? $"{src.IssuedCard.Person.FirstName} {src.IssuedCard.Person.LastName}" : "N/A"))
                 .ForMember(d => d.Org, opt => opt.MapFrom(src =>
-                    src.PersonDivisionProfile!.InternalDivision!.OrganizationalUnit!.Name))
+                    src.IssuedCard!.InternalDivision!.OrganizationalUnit!.Name))
                 .ForMember(d => d.Division, opt => opt.MapFrom(src =>
-                    src.PersonDivisionProfile!.InternalDivision!.Name))
-                .ForMember(d => d.State, opt => opt.MapFrom(src =>
-                    src.Card != null ? src.Card.Status!.Name : (src.Success ? "Activo" : "Error")))
+                    src.IssuedCard!.InternalDivision!.Name))
                 .ForMember(d => d.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted));
         }
     }

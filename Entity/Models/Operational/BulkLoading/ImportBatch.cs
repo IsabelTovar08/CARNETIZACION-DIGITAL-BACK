@@ -11,7 +11,7 @@ namespace Entity.Models.Operational.BulkLoading
     {
         public string Source { get; set; } = "Excel";
         public string? FileName { get; set; }
-        public string? StartedBy { get; set; }
+        public int? StartedBy { get; set; }
         public DateTime StartedAt { get; set; }
         public DateTime? EndedAt { get; set; }
 
@@ -21,6 +21,10 @@ namespace Entity.Models.Operational.BulkLoading
 
         public string? ContextJson { get; set; }
 
+        /// <summary>
+        /// Relación con el usuario que inició la importación
+        /// </summary>
+        public User? StartedByUser { get; set; }
         public ICollection<ImportBatchRow> Rows { get; set; } = new List<ImportBatchRow>();
     }
 }

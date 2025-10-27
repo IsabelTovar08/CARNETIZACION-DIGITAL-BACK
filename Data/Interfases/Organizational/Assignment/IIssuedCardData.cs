@@ -8,7 +8,11 @@ using System.Threading.Tasks;
 
 namespace Data.Interfases.Organizational.Assignment
 {
-    public interface IPersonDivisionProfileData : ICrudBase<PersonDivisionProfile>
+    public interface IIssuedCardData : ICrudBase<IssuedCard>
     {
+        /// <summary>
+        /// Actualiza la URL pública del PDF del carnet en la base de datos.
+        /// </summary>
+        Task<IssuedCard> UpdatePdfUrlAsync(int cardId, string pdfUrl);
     }
 }
