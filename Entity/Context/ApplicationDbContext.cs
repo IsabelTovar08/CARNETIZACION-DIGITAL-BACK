@@ -77,7 +77,7 @@ namespace Entity.Context
 
         public DbSet<Profiles> Profiles { get; set; }
         public DbSet<CardConfiguration> CardsConfigurations { get; set; }
-        public DbSet<Card> Cards { get; set; }
+        //public DbSet<Card> Cards { get; set; }
         public DbSet<IssuedCard> IssuedCards { get; set; }
 
         public DbSet<Notification> Notifications { get; set; }
@@ -115,14 +115,14 @@ namespace Entity.Context
             modelBuilder.Entity<Schedule>()
                 .Property(s => s.StartTime)
                 .HasConversion(
-                    v => v.ToTimeSpan(),
-                    v => TimeOnly.FromTimeSpan(v));
+                    v => v,
+                    v => v);
 
             modelBuilder.Entity<Schedule>()
                 .Property(s => s.EndTime)
                 .HasConversion(
-                    v => v.ToTimeSpan(),
-                    v => TimeOnly.FromTimeSpan(v));
+                    v => v,
+                    v => v);
 
             modelBuilder.Entity<EventAccessPoint>(eb =>
             {
@@ -271,7 +271,7 @@ namespace Entity.Context
         /// <summary>
         /// Ejecuta una consulta SQL utilizando Dapper y devuelve una colección de resultados de tipo genérico.
         /// </summary>
-        public async Task<IEnumerable<T>> QueryAsync<T>(string text, object parameters = null, int? timeout = null, CommandType? type = null)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string text, object? parameters = null, int? timeout = null, CommandType? type = null)
         {
             using var command = new DapperEFCoreCommand(this, text, parameters, timeout, type, CancellationToken.None);
             var connection = this.Database.GetDbConnection();
@@ -281,7 +281,7 @@ namespace Entity.Context
         /// <summary>
         /// Ejecuta una consulta SQL utilizando Dapper y devuelve un solo resultado o el valor predeterminado si no hay resultados.
         /// </summary>
-        public async Task<T> QueryFirstOrDefaultAsync<T>(string text, object parameters = null, int? timeout = null, CommandType? type = null)
+        public async Task<T?> QueryFirstOrDefaultAsync<T>(string text, object? parameters = null, int? timeout = null, CommandType? type = null)
         {
             using var command = new DapperEFCoreCommand(this, text, parameters, timeout, type, CancellationToken.None);
             var connection = this.Database.GetDbConnection();
