@@ -110,5 +110,17 @@ namespace Data.Classes.Specifics
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Person?> FindByDocumentAsync(string documentNumber)
+        {
+            return await _context.People
+                .FirstOrDefaultAsync(p => !p.IsDeleted && p.DocumentNumber == documentNumber);
+        }
+
+        public async Task<Person?> GetByDocumentAsync(string documentNumber)
+        {
+            return await _context.People
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.DocumentNumber == documentNumber && !p.IsDeleted);
+        }
     }
 }

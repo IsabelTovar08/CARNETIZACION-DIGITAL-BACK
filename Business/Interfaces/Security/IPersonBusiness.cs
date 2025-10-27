@@ -36,5 +36,8 @@ namespace Business.Interfaces.Security
         /// Retorna null si no hay usuario autenticado o la persona no existe.
         /// </summary>
         Task<PersonDto?> GetCurrentPersonAsync();
+
+        //  Evita que el documento se repita
+        Task<PersonDto?> FindByDocumentAsync(string documentNumber);
     }
 }

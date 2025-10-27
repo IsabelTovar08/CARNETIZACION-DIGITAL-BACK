@@ -360,6 +360,14 @@ namespace Business.Classes
                 throw; // deja que el middleware lo maneje (o encapsula en una excepción controlada)
             }
         }
+        public async Task<PersonDto?> FindByDocumentAsync(string documentNumber)
+        {
+            if (string.IsNullOrWhiteSpace(documentNumber))
+                return null;
+
+            var person = await _personData.FindByIdentification(documentNumber);
+            return _mapper.Map<PersonDto?>(person);
+        }
     }
 
 }

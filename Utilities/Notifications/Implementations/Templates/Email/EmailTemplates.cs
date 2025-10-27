@@ -33,6 +33,7 @@ namespace Utilities.Notifications.Implementations.Templates.Email
             ["reset"] = "ResetPassword.html",
             ["verify"] = "Verification.html",
             ["notify"] = "GenericNotification.html"
+
         };
 
         // Cache por “origen” (ruta de archivo o nombre de recurso)

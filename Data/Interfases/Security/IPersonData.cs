@@ -13,6 +13,7 @@ namespace Data.Interfases.Security
     public interface IPersonData : ICrudBase<Person>
     {
         Task<Person?> FindByIdentification(string identification);
+        Task<Person?> GetByDocumentAsync(string documentNumber);
         Task<(Person Person, User User)> SavePersonAndUser(Person person, User user);
         Task<Person?> GetPersonInfo(int id);
 

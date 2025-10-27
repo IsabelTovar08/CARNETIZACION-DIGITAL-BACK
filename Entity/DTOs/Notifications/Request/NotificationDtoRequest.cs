@@ -20,5 +20,8 @@ namespace Entity.DTOs.Notifications.Request
         [Required]
         public int NotificationTypeId { get; set; }
 
+        public int? TargetUserId { get; set; }
+
+
     }
 }

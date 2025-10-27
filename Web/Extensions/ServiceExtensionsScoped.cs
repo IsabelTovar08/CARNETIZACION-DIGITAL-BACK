@@ -251,7 +251,7 @@ namespace Web.Extensions
 
 
             //InternaDivision
-            services.AddScoped<IInternalDivisionData ,InternalDivisionData>();
+            services.AddScoped<Data.Interfases.Organizational.Structure.IInternalDivisionData , InternalDivisionData>();
             services.AddScoped<IInternalDivisionBusiness, InternalDivisionBusiness>();
 
             services.AddScoped<OrganizationalUnitBusiness>();
@@ -303,6 +303,10 @@ namespace Web.Extensions
             services.AddScoped<IExcelPersonParser, ExcelPersonParser>();
             services.AddScoped<IExcelBulkImporter, ExcelBulkImporter>();
 
+            // Contac-Organization
+            services.AddScoped<IContactOrganizationData, ContactOrganizationData>();
+            services.AddScoped<IContactOrganizationBusiness, ContactOrganizationBusiness>();
+
 
             services.AddScoped<IUserVerificationService, UserVerificationService>();
 
@@ -324,6 +328,7 @@ namespace Web.Extensions
             services.AddScoped<IImportBatchData, ImportBatchData>();
             services.AddScoped<IImportBatchRowData, ImportBatchRowData>();
 
+            
             // Business
             services.AddScoped<IImportHistoryBusiness, ImportHistoryBusiness>();
 

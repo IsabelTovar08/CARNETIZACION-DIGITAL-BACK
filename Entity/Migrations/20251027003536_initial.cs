@@ -757,6 +757,38 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ContactOrganizations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AdvisorName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompanyEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdvisorRole = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContactOrganizations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ContactOrganizations_People_PersonId",
+                        column: x => x.PersonId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "People",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 schema: "ModelSecurity",
                 columns: table => new
@@ -1750,6 +1782,11 @@ namespace Entity.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ContactOrganizations_PersonId",
+                table: "ContactOrganizations",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CustomTypes_Name",
                 schema: "Parameter",
                 table: "CustomTypes",
@@ -2111,6 +2148,9 @@ namespace Entity.Migrations
             migrationBuilder.DropTable(
                 name: "Attendances",
                 schema: "Operational");
+
+            migrationBuilder.DropTable(
+                name: "ContactOrganizations");
 
             migrationBuilder.DropTable(
                 name: "EventAccessPoints",

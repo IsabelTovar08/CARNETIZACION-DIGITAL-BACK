@@ -287,6 +287,20 @@ namespace Utilities.Helper
             .ForMember(d => d.Days, o => o.MapFrom(s => s.Days != null ? string.Join(",", s.Days) : null))
             .ForMember(d => d.Id, o => o.Ignore());
 
+            // Person mappings
+            CreateMap<PersonDto, PersonDtoRequest>().ReverseMap();
+
+            //Contac Organizational
+            CreateMap<ContactOrganization, ContactOrganizationDtoRequest>().ReverseMap();
+
+
+            CreateMap<ContactOrganization, ContactOrganizationDtoResponse>()
+                 .ForMember(dest => dest.DocumentNumber, opt => opt.MapFrom(src => src.Person.DocumentNumber))
+                 .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.Person.DocumentType != null ? src.Person.DocumentType.Name : null))
+                 .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.Person.BloodType != null ? src.Person.BloodType.PersonBlodType : null))
+                 .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.Person.City != null ? src.Person.City.Name : null))
+                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Person.Address))
+            .ReverseMap();
 
             //EventType
             CreateMap<EventType, EventTypeDtoRequest>().ReverseMap();
@@ -437,7 +451,7 @@ namespace Utilities.Helper
                                     : (int?)null
                             )
                     ))
-                // ➕ Formateo de fechas a string (cultura es-CO). Sin helpers externos.
+                // Formateo de fechas a string (cultura es-CO). Sin helpers externos.
                 .ForMember(dest => dest.TimeOfEntryStr,
                     opt => opt.MapFrom(src => src.TimeOfEntry.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))))
                 .ForMember(dest => dest.TimeOfExitStr,

@@ -71,6 +71,7 @@ namespace Entity.Context
         public DbSet<AreaCategory> AreaCategories { get; set; }
         public DbSet<InternalDivision> InternalDivisions { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<ContactOrganization> ContactOrganizations { get; set; }
 
         public DbSet<Profiles> Profiles { get; set; }
         public DbSet<Card> Cards { get; set; }
@@ -136,6 +137,10 @@ namespace Entity.Context
                   .HasForeignKey(eap => eap.AccessPointId)
                   .OnDelete(DeleteBehavior.Restrict);
             });
+
+            //Configuración específica para ContactOrganization
+            modelBuilder.Entity<ContactOrganization>().
+                ToTable("ContactOrganizations");
 
 
             // ================= ÍNDICES OPTIMIZACIÓN =================

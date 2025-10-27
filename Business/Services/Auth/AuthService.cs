@@ -81,8 +81,7 @@ namespace Business.Services.Auth
 
             _logger.LogInformation("Password changed for user {UserId}", userId);
         }
-
-
+        
         public async Task<string?> RequestPasswordResetAsync(string email)
         {
             try
