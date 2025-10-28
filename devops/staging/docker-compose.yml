@@ -21,14 +21,26 @@ services:
           echo 'Aún no disponible...';
           sleep 5;
         done;
-        echo 'Aplicando migraciones de Entity Framework...';
+        echo 'Instalando EF Core CLI...';
         dotnet tool install --global dotnet-ef --version 8.0.0;
         export PATH=\$PATH:/root/.dotnet/tools;
-        dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
-        echo 'Migraciones aplicadas correctamente.';
-        echo 'Iniciando aplicación...';
+
+        echo '📦 Creando nueva migración de Entity Framework...';
+        TIMESTAMP=\$(date +%Y%m%d%H%M%S);
+        dotnet ef migrations add AutoMigration_\$TIMESTAMP \
+          --project Entity/Entity.csproj \
+          --startup-project Web/Web.csproj;
+
+        echo '🏗️ Aplicando migraciones a la base de datos...';
+        dotnet ef database update \
+          --project Entity/Entity.csproj \
+          --startup-project Web/Web.csproj;
+
+        echo '✅ Migraciones aplicadas correctamente.';
+        echo '🚀 Iniciando aplicación...';
         dotnet Web.dll
       "
+
 
 networks:
   network_staging:
