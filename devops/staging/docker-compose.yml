@@ -1,30 +1,39 @@
 version: '3.8'
 
 services:
-  carnetizacion-digital-api-staging:
-    container_name: carnetizacion-digital-api-staging
-    build:
-      context: ../..
-      dockerfile: Dockerfile
-    restart: always
+  # 🏗️ Contenedor temporal para aplicar migraciones
+  carnetizacion-db-migrator-staging:
+    image: carnetizacion-digital-api-staging
+    depends_on:
+      - carnetizacion-postgres-staging
     env_file:
       - .env
+    networks:
+      - network_staging
+    entrypoint: >
+      bash -c "
+        echo '🏗️ Aplicando migraciones de Entity Framework...';
+        dotnet tool install --global dotnet-ef --version 8.0.0;
+        export PATH=\"\$PATH:/root/.dotnet/tools\";
+        dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
+        echo '✅ Migraciones aplicadas correctamente.';
+      "
+
+  # 🚀 Servicio principal de la API
+  carnetizacion-digital-api-staging:
+    container_name: carnetizacion-digital-api-staging
+    image: carnetizacion-digital-api-staging
+    depends_on:
+      - carnetizacion-db-migrator-staging
+      - carnetizacion-postgres-staging
+    env_file:
+      - .env
+    restart: always
     ports:
       - "5102:8080"
     networks:
       - network_staging
-    labels:
-      - com.carnetizacion.environment=staging
-    command: >
-      bash -c "
-        echo 'Instalando EF Core CLI...';
-        dotnet tool install --global dotnet-ef --version 8.0.0;
-        export PATH=\"\$PATH:/root/.dotnet/tools\";
-        echo 'Ejecutando migraciones de Entity Framework...';
-        dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
-        echo 'Migraciones completadas. Iniciando API...';
-        dotnet Web.dll
-      "
+    command: ["dotnet", "Web.dll"]
 
 networks:
   network_staging:
