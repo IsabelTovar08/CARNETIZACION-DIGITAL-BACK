@@ -15,6 +15,13 @@ services:
       - network_qa
     labels:
       - com.carnetizacion.environment=qa
+    command: >
+      sh -c "
+        echo 'Ejecutando migraciones de Entity Framework...';
+        dotnet ef database update --project ./Entity/Entity.csproj --startup-project ./Web/Web.csproj;
+        echo 'Migraciones completadas. Iniciando la API...';
+        dotnet ./Web/bin/Release/net8.0/Web.dll
+      "
 
 networks:
   network_qa:
