@@ -1,11 +1,6 @@
-version: '3.8'
-
 services:
-  # 🏗️ Contenedor temporal para aplicar migraciones
   carnetizacion-db-migrator-staging:
     image: carnetizacion-digital-api-staging
-    depends_on:
-      - carnetizacion-postgres-staging
     env_file:
       - .env
     networks:
@@ -19,13 +14,11 @@ services:
         echo '✅ Migraciones aplicadas correctamente.';
       "
 
-  # 🚀 Servicio principal de la API
   carnetizacion-digital-api-staging:
     container_name: carnetizacion-digital-api-staging
     image: carnetizacion-digital-api-staging
     depends_on:
       - carnetizacion-db-migrator-staging
-      - carnetizacion-postgres-staging
     env_file:
       - .env
     restart: always
