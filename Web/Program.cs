@@ -52,6 +52,15 @@ namespace Web
                 });
             });
 
+            // <summary>
+            /// Configuración de fuentes de configuración en orden de prioridad.
+            /// </summary>
+            builder.Configuration
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+
             builder.Services.AddSwaggerGen();
 
             // servicios y data
