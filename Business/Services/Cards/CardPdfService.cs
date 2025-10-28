@@ -7,14 +7,17 @@ using System.Threading.Tasks;
 using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Specifics.Cards;
 using Entity.Models.Operational;
+using QRCoder;
 using SkiaSharp;
 using Svg.Skia;
+using Utilities.Helpers;
 
 namespace Business.Services.Cards
 {
     /// <summary>
     /// Servicio que genera el PDF de carnets (frontal y posterior)
-    /// usando exclusivamente SkiaSharp y Svg.Skia.
+    /// usando SkiaSharp y Svg.Skia.
+    /// Ajustado a tamaño real (8.6 x 5.4 cm) con mejor calidad de imagen.
     /// </summary>
     public class CardPdfService : ICardPdfService
     {
@@ -26,11 +29,11 @@ namespace Business.Services.Cards
         }
 
         /// <summary>
-        /// Genera un carnet PDF más estilizado (basado en tu plantilla SENA).
+        /// Genera el carnet en formato PDF con frente y reverso.
         /// </summary>
         public async Task GenerateCardAsync(CardTemplateResponse template, CardUserData userData, Stream output)
         {
-            // === 1️⃣ Cargar fondos ===
+            // === 1️⃣ Cargar fondos SVG ===
             var frontSvgBytes = await _http.GetByteArrayAsync(template.FrontBackgroundUrl);
             var backSvgBytes = await _http.GetByteArrayAsync(template.BackBackgroundUrl);
 
@@ -41,51 +44,76 @@ namespace Business.Services.Cards
 
             var frontPos = JsonSerializer.Deserialize<Dictionary<string, Position>>(template.FrontElementsJson)
                            ?? throw new InvalidOperationException("FrontElementsJson inválido.");
+
             var backPos = JsonSerializer.Deserialize<Dictionary<string, Position>>(template.BackElementsJson)
                           ?? throw new InvalidOperationException("BackElementsJson inválido.");
 
+            // === 2️⃣ Cargar imágenes ===
             using var userPhoto = await LoadImageAsync(userData.UserPhotoUrl);
             using var logoImg = await LoadImageAsync(userData.LogoUrl);
-            using var qrImg = await LoadImageAsync(userData.QrUrl);
+            using var qrImg = BarcodeHelper.GenerateQr(userData.UniqueId.ToString(), 160); // QR dinámico
+            using var barcodeImg = BarcodeHelper.GenerateBarcode(userData.UniqueId.ToString(), 160, 40); // Código de barras por UUID
 
-            var (pageW, pageH) = GetPageSizePoints(frontSvg);
+            // === 3️⃣ Tamaño real del carnet ===
+            const float CARD_WIDTH_CM = 8.6f;
+            const float CARD_HEIGHT_CM = 5.4f;
+            const float widthPoints = CARD_WIDTH_CM / 2.54f * 72f;   // ≈ 244.8 pt
+            const float heightPoints = CARD_HEIGHT_CM / 2.54f * 72f; // ≈ 153.6 pt
 
             using var pdf = SKDocument.CreatePdf(output);
-            using (var canvas = pdf.BeginPage(pageW, pageH))
-            {
-                DrawSvg(canvas, frontSvg, pageW, pageH);
 
-                // === Fondo y estructura ===
+            // === 4️⃣ Página frontal ===
+            using (var canvas = pdf.BeginPage(widthPoints, heightPoints))
+            {
+                DrawSvg(canvas, frontSvg, widthPoints, heightPoints);
+
+                // Fondo base
+                canvas.Clear(SKColors.White);
+                canvas.Flush();
+
+                // Imágenes principales
                 DrawImage(canvas, logoImg, frontPos, "logo");
                 DrawImage(canvas, userPhoto, frontPos, "userPhoto");
                 DrawImage(canvas, qrImg, frontPos, "qr");
 
-                // === Encabezado ===
-                DrawText(canvas, userData.CompanyName.ToUpper(), frontPos, "companyName", 18, bold: true, color: SKColors.White);
-                DrawText(canvas, userData.Profile.ToUpper(), frontPos, "profile", 16, bold: true, color: SKColors.Black);
+                // Textos principales
+                DrawText(canvas, userData.CompanyName?.ToUpper(), frontPos, "companyName", 18, bold: true, color: SKColors.White);
+                DrawText(canvas, userData.Profile?.ToUpper(), frontPos, "profile", 16, bold: true, color: SKColors.Black);
 
-                // === Datos personales ===
                 DrawText(canvas, userData.Name, frontPos, "name", 20, bold: true);
                 DrawText(canvas, userData.CategoryArea, frontPos, "categoryArea", 14, color: new SKColor(70, 70, 70));
-                DrawText(canvas, userData.PhoneNumber, frontPos, "phoneNumber", 12, color: SKColors.Black);
-                DrawText(canvas, userData.Email, frontPos, "email", 12, color: SKColors.Black);
+                DrawText(canvas, userData.PhoneNumber, frontPos, "phoneNumber", 12);
+                DrawText(canvas, userData.Email, frontPos, "email", 12);
 
-                // === ID destacado ===
-                DrawRoundedBox(canvas, frontPos["cardId"].x - 10, frontPos["cardId"].y - 20, 130, 30, SKColors.LightBlue);
-                DrawText(canvas, $"#ID: {userData.CardId}", frontPos, "cardId", 16, bold: true, color: SKColors.DarkBlue);
+                // ID destacado
+                if (frontPos.TryGetValue("cardId", out var idPos))
+                {
+                    DrawRoundedBox(canvas, idPos.x - 10, idPos.y - 20, 130, 30, SKColors.LightBlue);
+                    DrawText(canvas, $"#ID: {userData.CardId}", frontPos, "cardId", 16, bold: true, color: SKColors.DarkBlue);
+                }
 
                 pdf.EndPage();
             }
 
-            // === Reverso (simple informativo) ===
-            using (var canvas = pdf.BeginPage(pageW, pageH))
+            // === 5️⃣ Página reversa ===
+            using (var canvas = pdf.BeginPage(widthPoints, heightPoints))
             {
-                DrawSvg(canvas, backSvg, pageW, pageH);
+                DrawSvg(canvas, backSvg, widthPoints, heightPoints);
 
-                DrawText(canvas, "Información del titular", backPos, "title", 14, bold: true);
-                DrawText(canvas, $"Tel: {userData.PhoneNumber}", backPos, "phoneNumber", 12);
-                DrawText(canvas, $"Email: {userData.Email}", backPos, "email", 12);
-                DrawText(canvas, DateTime.Now.ToString("dd/MM/yyyy"), backPos, "address", 10, color: SKColors.Gray);
+                // Términos básicos
+                DrawText(canvas, "Términos y Condiciones", backPos, "title", 14, bold: true);
+                DrawText(canvas, "Este carnet debe presentarse al ingresar o solicitar servicios internos.", backPos, "info1", 10);
+                DrawText(canvas, "Fraude o alteración puede conllevar sanciones.", backPos, "info2", 10);
+                DrawText(canvas, $"Contacto: {userData.Email}", backPos, "email", 10);
+                DrawText(canvas, DateTime.Now.ToString("dd/MM/yyyy"), backPos, "date", 9, color: SKColors.Gray);
+
+                // Código de barras centrado
+                if (barcodeImg != null)
+                {
+                    float x = (widthPoints - 160) / 2f;
+                    float y = heightPoints - 50;
+                    canvas.DrawImage(barcodeImg, new SKRect(x, y, x + 160, y + 40));
+                }
 
                 pdf.EndPage();
             }
@@ -105,28 +133,44 @@ namespace Business.Services.Cards
             public float? height { get; set; }
         }
 
+        /// <summary>
+        /// Carga una imagen remota y la decodifica en alta calidad.
+        /// </summary>
         private async Task<SKImage?> LoadImageAsync(string? url)
         {
             if (string.IsNullOrWhiteSpace(url)) return null;
             try
             {
                 var bytes = await _http.GetByteArrayAsync(url);
-                using var data = SKData.CreateCopy(bytes);
-                return SKImage.FromEncodedData(data);
+                using var ms = new MemoryStream(bytes);
+                using var bitmap = await Task.Run(() => SKBitmap.Decode(ms));
+                return SKImage.FromBitmap(bitmap);
             }
-            catch { return null; }
+            catch
+            {
+                return null;
+            }
         }
 
+        /// <summary>
+        /// Dibuja una imagen en la posición indicada.
+        /// </summary>
         private void DrawImage(SKCanvas canvas, SKImage? img, IDictionary<string, Position> posMap, string key)
         {
             if (img == null || !posMap.TryGetValue(key, out var pos)) return;
 
+            using var paint = new SKPaint
+            {
+                IsAntialias = true,
+                FilterQuality = SKFilterQuality.High
+            };
+
             var rect = new SKRect(pos.x, pos.y, pos.x + (pos.width ?? img.Width), pos.y + (pos.height ?? img.Height));
-            canvas.DrawImage(img, rect);
+            canvas.DrawImage(img, rect, paint);
         }
 
         /// <summary>
-        /// Dibuja un texto con soporte de color y negrita.
+        /// Dibuja texto con color y estilo opcional.
         /// </summary>
         private void DrawText(SKCanvas canvas, string? text, IDictionary<string, Position> posMap, string key, float fontSize, bool bold = false, SKColor? color = null)
         {
@@ -137,7 +181,8 @@ namespace Business.Services.Cards
                 Color = color ?? SKColors.Black,
                 TextSize = fontSize,
                 IsAntialias = true,
-                Typeface = SKTypeface.FromFamilyName("Arial", bold ? SKFontStyle.Bold : SKFontStyle.Normal)
+                FilterQuality = SKFilterQuality.High,
+                Typeface = SKFontManager.Default.MatchFamily("Arial", bold ? SKFontStyle.Bold : SKFontStyle.Normal)
             };
 
             canvas.DrawText(text, pos.x, pos.y, paint);
@@ -153,10 +198,14 @@ namespace Business.Services.Cards
             canvas.DrawRoundRect(rect, paint);
         }
 
+        /// <summary>
+        /// Dibuja el SVG escalado proporcionalmente al lienzo.
+        /// </summary>
         private void DrawSvg(SKCanvas canvas, SKSvg svg, float width, float height)
         {
             var picture = svg.Picture;
             if (picture == null) return;
+
             var src = picture.CullRect;
             var scale = Math.Min(width / src.Width, height / src.Height);
             var tx = (width - src.Width * scale) / 2f;
@@ -168,17 +217,5 @@ namespace Business.Services.Cards
             canvas.DrawPicture(picture);
             canvas.Restore();
         }
-
-        private (float width, float height) GetPageSizePoints(SKSvg svg)
-        {
-            var pic = svg.Picture;
-            if (pic != null && pic.CullRect.Width > 0 && pic.CullRect.Height > 0)
-                return (pic.CullRect.Width, pic.CullRect.Height);
-
-            // A7 portrait
-            return (MmToPt(74), MmToPt(105));
-        }
-
-        private static float MmToPt(float mm) => mm * 72f / 25.4f;
     }
 }

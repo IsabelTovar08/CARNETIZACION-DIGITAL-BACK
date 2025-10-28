@@ -1,9 +1,10 @@
-﻿using Entity.DTOs.Base;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entity.DTOs.Base;
+using Entity.Models.Operational;
 
 namespace Entity.DTOs.Organizational.Assigment.Response
 {
@@ -29,6 +30,9 @@ namespace Entity.DTOs.Organizational.Assigment.Response
 
         public int AreaCategoryId { get; set; }
         public string? AreaCategoryName { get; set; }
+
+        public int CardTemplateId { get; set; }
+        public string CardTemplateName { get; set; }
 
     }
 }

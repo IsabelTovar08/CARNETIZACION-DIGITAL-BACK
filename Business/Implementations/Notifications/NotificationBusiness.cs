@@ -9,6 +9,7 @@ using Business.Interfaces.Notifications;
 using Business.Services.Notifications;
 using Data.Interfases;
 using Data.Interfases.Notifications;
+using Data.Interfases.Transaction;
 using Entity.DTOs.Notifications;
 using Entity.DTOs.Notifications.Request;
 using Entity.DTOs.Specifics;
@@ -29,6 +30,7 @@ namespace Business.Implementations.Operational
         private readonly INotificationReceivedBusiness _notificationReceivedBusiness;
         private readonly INotificationDispatcher _dispatcher;
         private readonly ICurrentUser _currentUser;
+        private readonly IUnitOfWork _unitOfWork;
 
         public NotificationsBusiness(
             INotificationData data,
@@ -37,13 +39,15 @@ namespace Business.Implementations.Operational
             INotificationData notificationData,
             INotificationReceivedBusiness notificationReceivedBusiness,
             INotificationDispatcher dispatcher,
-            ICurrentUser currentUser
+            ICurrentUser currentUser,
+            IUnitOfWork unitOfWork
         ) : base(data, logger, mapper)
         {
             _notificationData = notificationData;
             _notificationReceivedBusiness = notificationReceivedBusiness;
             _dispatcher = dispatcher;
             _currentUser = currentUser;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -52,32 +56,44 @@ namespace Business.Implementations.Operational
         /// </summary>
         public async Task<NotificationDto> CreateAndSendAsync(NotificationDtoRequest dto)
         {
-            int userId = _currentUser.UserId;
+            await _unitOfWork.BeginTransactionAsync();
 
-            // Guardar notificación
-            NotificationDto notification = await Save(dto);
-
-            // Registrar recepción en estado "Enviado"
-            var received = new NotificationReceivedDto
+            try
             {
-                NotificationId = notification.Id,
-                UserId = userId,
-                StatusId = (int)NotificationStatus.Sent,
-                SendDate = DateTime.UtcNow
-            };
-            await _notificationReceivedBusiness.Save(received);
+                int userId = _currentUser.UserId;
 
-            // Enviar al usuario vía SignalR (u otro dispatcher)
-            await _dispatcher.SendToUserAsync(userId.ToString(), new
+                // Guardar notificación
+                NotificationDto notification = await Save(dto);
+
+                // Registrar recepción en estado "Enviado"
+                var received = new NotificationReceivedDto
+                {
+                    NotificationId = notification.Id,
+                    UserId = userId,
+                    StatusId = (int)NotificationStatus.Sent,
+                    SendDate = DateTime.UtcNow
+                };
+                await _notificationReceivedBusiness.Save(received);
+
+                await _unitOfWork.CommitAsync();
+
+                // Enviar al usuario vía SignalR (u otro dispatcher)
+                await _dispatcher.SendToUserAsync(userId.ToString(), new
+                {
+                    notification.Id,
+                    notification.Title,
+                    notification.Message,
+                    notification.NotificationTypeName,
+                    received.SendDate
+                });
+
+                return notification;
+            }
+            catch (Exception ex)
             {
-                notification.Id,
-                notification.Title,
-                notification.Message,
-                notification.NotificationTypeName,
-                received.SendDate
-            });
-
-            return notification;
+                await _unitOfWork.RollbackAsync();
+                throw new Exception($"Error al crear y enviar notificación: {ex.Message}", ex);
+            }
         }
 
         /// <summary>
@@ -85,8 +101,20 @@ namespace Business.Implementations.Operational
         /// </summary>
         public async Task<NotificationDto> SendTemplateAsync(NotificationTemplateType type, params object[] args)
         {
-            var dto = NotificationFactory.Create(type, args);
-            return await CreateAndSendAsync(dto);
+            await _unitOfWork.BeginTransactionAsync();
+
+            try
+            {
+                var dto = NotificationFactory.Create(type, args);
+                var notification = await CreateAndSendAsync(dto);
+                await _unitOfWork.CommitAsync();
+                return notification;
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackAsync();
+                throw new Exception($"Error al enviar notificación mediante plantilla: {ex.Message}", ex);
+            }
         }
 
         /// <summary>

@@ -119,7 +119,7 @@ namespace Web.Controllers.ModelSecurity
                 return BadRequest(new ApiResponse<AuthTokens> { Success = false, Message = result.Error });
 
             // Cargar usuario solo si fue exitoso (1 sola lectura si quieres: puedes mover el GenerateToken al servicio)
-            var user = await _userBusiness.GetById(dto.UserId);
+            UserDTO? user = await _userBusiness.GetById(dto.UserId);
             var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName ?? user.EmailPerson);
 
             AuthTokens pair = await _refreshTokenService.IssueAsync(
@@ -128,6 +128,8 @@ namespace Web.Controllers.ModelSecurity
                 jti: jti,
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
+
+            await _authService.NotifyLogin(user.NamePerson);
 
             return Ok( pair );
         }

@@ -28,5 +28,14 @@ namespace Utilities.Helpers.Excel
         (byte[]? bytes, string? extension) ReadPictureAtCell(IXLWorksheet ws, int row, int col);
 
         string GetFileName(Stream stream);
+
+        /// <summary>
+        /// Verifica si una celda contiene una imagen.
+        /// </summary>
+        /// <param name="ws">Hoja de Excel.</param>
+        /// <param name="row">Fila a verificar.</param>
+        /// <param name="col">Columna a verificar.</param>
+        /// <returns>True si hay imagen en la celda; false en caso contrario.</returns>
+        bool HasPictureAtCell(IXLWorksheet ws, int row, int col);
     }
 }

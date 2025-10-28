@@ -33,7 +33,7 @@ namespace Business.Services.Excel
         private readonly IExcelPersonParser _parser;
         private readonly IPersonBusiness _personBusiness;
         private readonly IIssuedCardBusiness _pdpBusiness;
-        private readonly ICardBusiness _cardBusiness;
+        private readonly ICardConfigurationBusiness _cardBusiness;
         private readonly ICardTemplateBusiness _templateBusiness;
         private readonly IUnitOfWork _uow;
         private readonly IImportHistoryBusiness _history;
@@ -48,7 +48,7 @@ namespace Business.Services.Excel
             IExcelPersonParser parser,
             IPersonBusiness personBusiness,
             IIssuedCardBusiness pdpBusiness,
-            ICardBusiness cardBusiness,
+            ICardConfigurationBusiness cardBusiness,
             ICardTemplateBusiness templateBusiness,
             IUnitOfWork uow,
             IImportHistoryBusiness history,
@@ -183,19 +183,7 @@ namespace Business.Services.Excel
                     /// </summary>
                     try
                     {
-                        var userData = new CardUserData
-                        {
-                            Name = $"{row.Person.FirstName} {row.Person.MiddleName} {row.Person.LastName} {row.Person.SecondLastName}",
-                            Email = row.Person.Email,
-                            PhoneNumber = row.Person.Phone ?? "",
-                            CardId = pdpSaved.UniqueId.ToString(),
-                            Profile = ctx.ProfileId.ToString(),
-                            CategoryArea = ctx.InternalDivisionCode ?? "",
-                            CompanyName = ctx.OrganizationCode ?? "",
-                            UserPhotoUrl = personCreated.Person.PhotoUrl ?? "",
-                            LogoUrl = "https://carnetgo.com/logo.png",
-                            QrUrl = pdpSaved.QRCode
-                        };
+                        var userData = await _pdpBusiness.GetCardDataByIssuedIdAsync(pdpSaved.Id);
 
                         // Crear stream del PDF en memoria
                         using var pdfStream = new MemoryStream();

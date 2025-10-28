@@ -217,7 +217,7 @@ namespace Web.Extensions
 
             //Card
             services.AddScoped<ICardConfigurationData, CardConfigurationData>();
-            services.AddScoped<ICardBusiness, CardBusiness>();
+            services.AddScoped<ICardConfigurationBusiness, CardConfigurationBusiness>();
 
             //Card Templates
             services.AddScoped<ICardTemplateData, CardTemplateData>();

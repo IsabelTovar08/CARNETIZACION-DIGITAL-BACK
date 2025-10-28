@@ -17,10 +17,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Business.Implementations.Organizational.Assignment
 {
-    public class CardBusiness : BaseBusiness<CardConfiguration, CardConfigurationDtoRequest, CardConfigurationDto>, ICardBusiness
+    public class CardConfigurationBusiness : BaseBusiness<CardConfiguration, CardConfigurationDtoRequest, CardConfigurationDto>, ICardConfigurationBusiness
     {
         public readonly ICardConfigurationData _cardData;
-        public CardBusiness(ICardConfigurationData data, ILogger<CardConfiguration> logger, IMapper mapper, ICardConfigurationData cardData) : base(data, logger, mapper)
+        public CardConfigurationBusiness(ICardConfigurationData data, ILogger<CardConfiguration> logger, IMapper mapper, ICardConfigurationData cardData) : base(data, logger, mapper)
         {
             _cardData = cardData;
         }

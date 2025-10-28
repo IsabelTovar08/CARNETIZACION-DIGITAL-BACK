@@ -11,8 +11,8 @@ namespace Web.Controllers.Organizational.Assignment
 {
     public class CardController : GenericController<CardConfiguration, CardConfigurationDtoRequest, CardConfigurationDto>
     {
-        protected readonly ICardBusiness _cardBusiness;
-        public CardController(ICardBusiness business, ILogger<CardController> logger, ICardBusiness cardBusiness)
+        protected readonly ICardConfigurationBusiness _cardBusiness;
+        public CardController(ICardConfigurationBusiness business, ILogger<CardController> logger, ICardConfigurationBusiness cardBusiness)
             : base(business, logger)
         {
             _cardBusiness = cardBusiness;

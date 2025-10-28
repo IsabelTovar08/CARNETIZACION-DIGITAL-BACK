@@ -112,6 +112,17 @@ namespace Business.Services.Notifications
                         NotificationTypeId = (int)NotificationType.System
                     };
 
+                /// <summary>
+                /// Notificación al iniciar sesión correctamente.
+                /// </summary>
+                case NotificationTemplateType.Login:
+                    return new NotificationDtoRequest
+                    {
+                        Title = "Inicio de sesión exitoso",
+                        Message = $"Bienvenido {args[0]}, tu acceso ha sido validado correctamente el {DateTime.Now:dd/MM/yyyy HH:mm}.",
+                        NotificationTypeId = (int)NotificationType.System
+                    };
+
                 default:
                     throw new ArgumentException("Tipo de notificación no soportado.");
             }

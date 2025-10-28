@@ -12,7 +12,7 @@ using Entity.Models.Organizational.Assignment;
 
 namespace Business.Interfaces.Organizational.Assignment
 {
-    public interface ICardBusiness : IBaseBusiness<CardConfiguration,CardConfigurationDtoRequest,CardConfigurationDto>
+    public interface ICardConfigurationBusiness : IBaseBusiness<CardConfiguration,CardConfigurationDtoRequest,CardConfigurationDto>
     {
 
         /// <summary>

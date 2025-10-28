@@ -5,18 +5,19 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Business.Classes;
 using Business.Interfaces.Security;
 using ClosedXML.Excel;
-using ClosedXML.Excel.Drawings;
 using Entity.DTOs.ModelSecurity.Request;
-using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Specifics;
 using Microsoft.Extensions.Logging;
 using Utilities.Helpers.Excel;
 
 namespace Business.Services.Excel
 {
+    /// <summary>
+    /// Servicio que lee un archivo Excel de personas y crea una lista de filas parseadas.
+    /// Optimizado para omitir filas y columnas vacías innecesarias.
+    /// </summary>
     public class ExcelPersonParser : IExcelPersonParser
     {
         private readonly ILogger _logger;
@@ -28,6 +29,9 @@ namespace Business.Services.Excel
             _excel = excelReaderHelper;
         }
 
+        /// <summary>
+        /// Parsea un archivo Excel de personas, validando y evitando leer columnas vacías.
+        /// </summary>
         public async Task<IReadOnlyList<ParsedPersonRow>> ParseAsync(Stream excelStream)
         {
             var ws = _excel.OpenFirstWorksheet(excelStream);
@@ -35,18 +39,19 @@ namespace Business.Services.Excel
             const int HEADER_ROW = 1;
             const int FIRST_DATA_ROW = 2;
 
-            const int COL_FIRSTNAME = 1;     // A
-            const int COL_MIDDLENAME = 2;    // B
-            const int COL_LASTNAME = 3;      // C
-            const int COL_SECONDLASTNAME = 4;// D
-            const int COL_DOCUMENTTYPEID = 5;// E
-            const int COL_DOCUMENTNUMBER = 6;// F
-            const int COL_BLOODTYPEID = 7;   // G
-            const int COL_PHONE = 8;         // H
-            const int COL_EMAIL = 9;         // I
-            const int COL_ADDRESS = 10;      // J
-            const int COL_CITYID = 11;       // K
-            const int COL_PHOTO = 12;        // L
+            // Columnas utilizadas (A-L)
+            const int COL_FIRSTNAME = 1;
+            const int COL_MIDDLENAME = 2;
+            const int COL_LASTNAME = 3;
+            const int COL_SECONDLASTNAME = 4;
+            const int COL_DOCUMENTTYPEID = 5;
+            const int COL_DOCUMENTNUMBER = 6;
+            const int COL_BLOODTYPEID = 7;
+            const int COL_PHONE = 8;
+            const int COL_EMAIL = 9;
+            const int COL_ADDRESS = 10;
+            const int COL_CITYID = 11;
+            const int COL_PHOTO = 12;
 
             var lastRow = _excel.GetLastUsedRow(ws);
             if (lastRow < FIRST_DATA_ROW) return Array.Empty<ParsedPersonRow>();
@@ -59,6 +64,10 @@ namespace Business.Services.Excel
             {
                 try
                 {
+                    // 🔹 Verifica si la fila tiene contenido relevante antes de leer todas las columnas.
+                    if (RowIsEmpty(ws, row, COL_FIRSTNAME, COL_LASTNAME, COL_EMAIL))
+                        continue;
+
                     var dto = new PersonDtoRequest
                     {
                         FirstName = _excel.ReadString(ws, row, COL_FIRSTNAME),
@@ -70,19 +79,20 @@ namespace Business.Services.Excel
                         BloodTypeId = _excel.ReadNullableInt(ws, row, COL_BLOODTYPEID),
                         Phone = _excel.ReadNullableString(ws, row, COL_PHONE),
                         Email = _excel.ReadString(ws, row, COL_EMAIL),
-                        Address = _excel.ReadString(ws, row, COL_ADDRESS),
+                        Address = _excel.ReadNullableString(ws, row, COL_ADDRESS),
                         CityId = _excel.ReadIntOrDefault(ws, row, COL_CITYID, 0)
                     };
 
-                    // Validaciones rápidas y duplicados en el archivo
                     var validationError = ValidateRow(dto, emailsInFile, docsInFile);
                     if (validationError != null)
                         throw new InvalidOperationException(validationError);
 
                     var tempPassword = GenerateTempPassword();
 
-                    // Foto embebida en la celda L(row); si existe, trae bytes y extensión
-                    var (photoBytes, photoExt) = _excel.ReadPictureAtCell(ws, row, COL_PHOTO);
+                    // 🔹 Solo intenta leer la foto si hay imagen realmente en esa celda
+                    var (photoBytes, photoExt) = _excel.HasPictureAtCell(ws, row, COL_PHOTO)
+                        ? _excel.ReadPictureAtCell(ws, row, COL_PHOTO)
+                        : (null, null);
 
                     list.Add(new ParsedPersonRow
                     {
@@ -96,15 +106,29 @@ namespace Business.Services.Excel
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Error parseando fila {Row}", row);
-                    // Seguimos con las demás filas
                 }
             }
 
             return list;
         }
 
-        // ============ Validaciones & utilidades  ============
+        /// <summary>
+        /// Verifica si una fila está vacía o no tiene los datos esenciales.
+        /// </summary>
+        private static bool RowIsEmpty(IXLWorksheet ws, int row, params int[] requiredCols)
+        {
+            foreach (var col in requiredCols)
+            {
+                var cellValue = ws.Cell(row, col).GetValue<string>()?.Trim();
+                if (!string.IsNullOrWhiteSpace(cellValue))
+                    return false;
+            }
+            return true;
+        }
 
+        /// <summary>
+        /// Validaciones de campos requeridos y duplicados en el archivo.
+        /// </summary>
         private static string? ValidateRow(
             PersonDtoRequest r,
             HashSet<string> emailsInFile,
@@ -123,6 +147,9 @@ namespace Business.Services.Excel
             return null;
         }
 
+        /// <summary>
+        /// Genera una contraseña temporal aleatoria.
+        /// </summary>
         private static string GenerateTempPassword(int length = 10)
         {
             const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@$!#%*?";

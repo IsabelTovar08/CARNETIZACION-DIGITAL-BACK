@@ -20,6 +20,7 @@ namespace Entity.Enums.Specifics
         ModificationRequest,
         ModificationApproved,
         ModificationRejected,
-        CardGenerated
+        CardGenerated,
+        Login
     }
 }

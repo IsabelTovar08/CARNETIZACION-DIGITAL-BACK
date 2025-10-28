@@ -1,12 +1,13 @@
-﻿using Data.Classes.Base;
+﻿using System.Security.Cryptography;
+using Data.Classes.Base;
 using Data.Interfases;
 using Data.Interfases.Security;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.Context;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
 using Utilities.Helper;
 using Utilities.Helpers;
 using static Utilities.Helper.EncryptedPassword;
@@ -28,6 +29,14 @@ namespace Data.Classes.Specifics
                 .ToListAsync();
         }
 
+        public async override Task<User?> GetByIdAsync(int id)
+        {
+            return await _context.Set<User>()
+                .Include(u => u.Person)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Rol)
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
 
         public async Task<List<string>> GetUserRolesByIdAsync(int userId)
         {

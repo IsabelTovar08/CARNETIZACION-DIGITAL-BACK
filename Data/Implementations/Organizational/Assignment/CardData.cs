@@ -29,6 +29,7 @@ namespace Data.Implementations.Organizational.Assignment
                 .Where(c => !c.IsDeleted)
                 .Include(c => c.CardTemplate)
                 .Include(c => c.Shedule)
+                .Include(c => c.CardTemplate)
                 .ToListAsync();
 
             return cards;
