@@ -16,11 +16,14 @@ services:
     labels:
       - com.carnetizacion.environment=staging
     command: >
-      sh -c "
+      bash -c "
+        echo 'Instalando EF Core CLI...';
+        dotnet tool install --global dotnet-ef --version 8.0.0;
+        export PATH=\"\$PATH:/root/.dotnet/tools\";
         echo 'Ejecutando migraciones de Entity Framework...';
-        dotnet ef database update --project ./Entity/Entity.csproj --startup-project ./Web/Web.csproj;
-        echo 'Migraciones completadas. Iniciando la API...';
-        dotnet ./Web/bin/Release/net8.0/Web.dll
+        dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
+        echo 'Migraciones completadas. Iniciando API...';
+        dotnet Web.dll
       "
 
 networks:
