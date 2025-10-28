@@ -16,16 +16,17 @@ services:
       - network_staging
     command: >
       bash -c "
-        echo 'Esperando base de datos...';
+        echo '⏳ Esperando base de datos...';
         until nc -z carnetizacion-postgres-staging 5432; do
-          echo 'Aún no disponible...';
+          echo '🔁 Aún no disponible...';
           sleep 5;
         done;
-        echo 'Instalando EF Core CLI...';
+
+        echo '📦 Instalando EF Core CLI...';
         dotnet tool install --global dotnet-ef --version 8.0.0;
         export PATH=\$PATH:/root/.dotnet/tools;
 
-        echo '📦 Creando nueva migración de Entity Framework...';
+        echo '🧩 Creando nueva migración incremental de Entity Framework...';
         TIMESTAMP=\$(date +%Y%m%d%H%M%S);
         dotnet ef migrations add AutoMigration_\$TIMESTAMP \
           --project Entity/Entity.csproj \
@@ -36,7 +37,7 @@ services:
           --project Entity/Entity.csproj \
           --startup-project Web/Web.csproj;
 
-        echo '✅ Migraciones aplicadas correctamente.';
+        echo '✅ Nueva migración aplicada correctamente.';
         echo '🚀 Iniciando aplicación...';
         dotnet Web.dll
       "
