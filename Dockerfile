@@ -1,15 +1,16 @@
 # ===================================================================
 # <summary>
 #  Etapa de compilación (Build Stage)
-#  - Basada en Ubuntu 22.04
-#  - Instala el SDK de .NET 8.0 para compilar la solución
-#  - Restaura dependencias y publica el proyecto en modo Release
+#  - Instala .NET SDK 8.0
+#  - Restaura dependencias
+#  - Aplica migraciones de Entity Framework
+#  - Publica la API en modo Release
 # </summary>
 # ===================================================================
 FROM ubuntu:22.04 AS build
 
 # <summary>
-# Instalar dependencias del sistema y el SDK de .NET 8.0
+# Instalar dependencias del sistema y SDK de .NET 8.0
 # </summary>
 RUN apt-get update && apt-get install -y wget apt-transport-https software-properties-common \
     && wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
@@ -32,53 +33,42 @@ COPY Diagram/*.csproj Diagram/
 RUN dotnet restore Web/Web.csproj
 
 # <summary>
-# Copiar el código fuente y publicar en modo Release
+# Copiar todo el código fuente
 # </summary>
 COPY . .
+
+# <summary>
+# Instalar la herramienta EF Core para ejecutar migraciones
+# </summary>
+RUN dotnet tool install --global dotnet-ef --version 8.0.0
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# <summary>
+# Ejecutar las migraciones de Entity Framework durante el build
+# </summary>
+RUN dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj
+
+# <summary>
+# Publicar la aplicación compilada en modo Release
+# </summary>
 RUN dotnet publish Web/Web.csproj -c Release -o /app/publish
 
 # ===================================================================
 # <summary>
 #  Etapa final (Runtime Stage)
-#  - Basada en Ubuntu 22.04 con SDK completo
-#  - Permite ejecutar migraciones EF Core dentro del contenedor
-#  - Inicia automáticamente la API
+#  - Usa el runtime de .NET 8.0
+#  - Copia la publicación ya migrada
+#  - Expone el puerto y arranca la API
 # </summary>
 # ===================================================================
-FROM ubuntu:22.04 AS final
-
-# <summary>
-# Instalar dependencias del sistema y el SDK de .NET 8.0
-# (Se usa el SDK completo, no solo el runtime, para soportar 'dotnet ef')
-# </summary>
-RUN apt-get update && apt-get install -y wget apt-transport-https software-properties-common \
-    && wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
-    && apt-get update && apt-get install -y dotnet-sdk-8.0
-
-# <summary>
-# Instalar la herramienta global de Entity Framework Core
-# Permite ejecutar 'dotnet ef database update' dentro del contenedor.
-# </summary>
-RUN dotnet tool install --global dotnet-ef --version 8.0.0
-ENV PATH="$PATH:/root/.dotnet/tools"
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://+:8080
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 
-# <summary>
-# Copiar la publicación generada desde la etapa de build
-# </summary>
 COPY --from=build /app/publish .
 
-# <summary>
-# Exponer el puerto de la API
-# </summary>
 EXPOSE 8080
 
-# <summary>
-# Comando de inicio por defecto
-# Si el docker-compose lo sobrescribe con migraciones, este será ignorado.
-# </summary>
 ENTRYPOINT ["dotnet", "Web.dll"]
