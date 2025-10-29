@@ -23,6 +23,7 @@ services:
         done;
 
         echo '🧩 Creando nueva migración de Entity Framework...';
+        dotnet tool install --global dotnet-ef --version 8.0.0;
         TIMESTAMP=\$(date +%Y%m%d%H%M%S);
         cd /app;
         dotnet ef migrations add AutoMigration_\$TIMESTAMP \
