@@ -8,7 +8,6 @@ pipeline {
     agent any
 
     options {
-        skipDefaultCheckout(true) // 👈 lo dejamos, pero hacemos checkout manual más abajo
         timestamps()
     }
 
@@ -16,7 +15,7 @@ pipeline {
         DOTNET_CLI_HOME = '/var/jenkins_home/.dotnet'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
-        BUILD_IMAGE = 'ubuntu-dotnet-sdk-8.0' // 👈 nombre personalizado de la imagen base
+        BUILD_IMAGE = 'ubuntu-dotnet-sdk-8.0'
         WORKSPACE_PATH = '/var/jenkins_home/workspace/carnetizacion-digital-api-staging'
     }
 
@@ -63,7 +62,7 @@ pipeline {
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
                         -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
                         $BUILD_IMAGE \
-                        bash -c "ls -la Web && dotnet restore Web/Web.csproj"
+                        bash -c "ls -la && ls -la Web && dotnet restore Web/Web.csproj"
                 '''
             }
         }
