@@ -99,43 +99,67 @@ namespace Web
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
                 try
                 {
                     Console.WriteLine("🏗️ Verificando base de datos...");
 
-                    // Revisa si existe la tabla de migraciones correctamente
-                    var migrationsTable = db.Database
-                        .ExecuteSqlRaw("SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = '__EFMigrationsHistory';");
+                    // 🔍 Detectar si existe la tabla de migraciones
+                    var hasHistoryTable = db.Database.ExecuteSqlRaw(
+                        "SELECT COUNT(*) FROM pg_tables WHERE tablename='__EFMigrationsHistory';"
+                    );
 
-                    // Si la tabla de migraciones no existe, crea una migración base y aplica
-                    if (migrationsTable == 0)
+                    // ⚙️ Si no hay migraciones creadas, genera y aplica una inicial automáticamente
+                    if (hasHistoryTable == 0)
                     {
-                        Console.WriteLine("⚙️ No existen migraciones, generando y aplicando una inicial...");
-                        var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                        {
-                            FileName = "dotnet",
-                            Arguments = "ef migrations add AutoInitial --project Entity --startup-project Web",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        });
-                        process?.WaitForExit();
-
-                        db.Database.Migrate();
+                        Console.WriteLine("⚙️ No hay migraciones, creando AutoInitial...");
+                        RunMigrationCommand("dotnet ef migrations add AutoInitial --project Entity --startup-project Web");
                     }
-                    else
+
+                    try
                     {
                         Console.WriteLine("📦 Aplicando migraciones pendientes...");
                         db.Database.Migrate();
+                        Console.WriteLine("✅ Migraciones aplicadas correctamente.");
                     }
-
-                    Console.WriteLine("✅ Base de datos lista.");
+                    catch (Exception ex) when (ex.Message.Contains("PendingModelChangesWarning"))
+                    {
+                        Console.WriteLine("⚠️ Se detectaron cambios pendientes en el modelo. Creando migración AutoFix...");
+                        RunMigrationCommand("dotnet ef migrations add AutoFix --project Entity --startup-project Web");
+                        db.Database.Migrate();
+                        Console.WriteLine("✅ Migraciones sincronizadas automáticamente.");
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"❌ Error inicializando base de datos: {ex.Message}");
                 }
+            }
+
+            // 👇 Función auxiliar para ejecutar comandos dotnet dentro del contenedor
+            static void RunMigrationCommand(string command)
+            {
+                var process = new System.Diagnostics.Process
+                {
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "bash",
+                        Arguments = $"-c \"{command}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                Console.WriteLine(output);
+                if (!string.IsNullOrWhiteSpace(error))
+                    Console.WriteLine($"⚠️ EF CLI output: {error}");
             }
 
 
