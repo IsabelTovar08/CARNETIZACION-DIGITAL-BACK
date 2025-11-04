@@ -3,16 +3,13 @@ version: '3.8'
 services:
   carnetizacion-db-migrator-staging:
     image: mcr.microsoft.com/dotnet/sdk:8.0
-    build:
-      context: ../..
-      dockerfile: Dockerfile
     env_file:
       - .env
+    working_dir: /src
+    volumes:
+      - ../..:/src
     networks:
       - network_staging
-    working_dir: /app
-    volumes:
-      - ../..:/app
     entrypoint: >
       bash -c "
         apt-get update && apt-get install -y netcat-openbsd;
@@ -41,10 +38,10 @@ services:
 
   carnetizacion-digital-api-staging:
     container_name: carnetizacion-digital-api-staging
-    image: carnetizacion-digital-api-staging
     build:
       context: ../..
       dockerfile: Dockerfile
+    image: carnetizacion-digital-api-staging
     depends_on:
       - carnetizacion-db-migrator-staging
     env_file:
