@@ -19,6 +19,9 @@ namespace Entity.DTOs.Specifics.Cards
         public string CardId { get; set; }
         public string BloodTypeValue { get; set; }
         public string CompanyName { get; set; }
+        public string BranchName { get; set; }
+        public string BranchAddress { get; set; }
+        public Guid UniqueId { get; set; }
         public string Address { get; set; }
         public string Title { get; set; }
 
