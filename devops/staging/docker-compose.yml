@@ -1,33 +1,18 @@
-services:
-  carnetizacion-db-migrator-staging:
-    image: carnetizacion-digital-api-staging
-    env_file:
-      - .env
-    networks:
-      - network_staging
-    entrypoint: >
-      bash -c "
-        echo '🏗️ Aplicando migraciones de Entity Framework...';
-        dotnet tool install --global dotnet-ef --version 8.0.0;
-        export PATH=\"\$PATH:/root/.dotnet/tools\";
-        dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
-        echo '✅ Migraciones aplicadas correctamente.';
-      "
 
-  carnetizacion-digital-api-staging:
-    container_name: carnetizacion-digital-api-staging
-    image: carnetizacion-digital-api-staging
-    depends_on:
-      - carnetizacion-db-migrator-staging
+services:
+  carnetizacion-digital-api-prod:
+    container_name: carnetizacion-digital-api-prod
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: always
     env_file:
       - .env
-    restart: always
     ports:
-      - "5102:8080"
-    networks:
-      - network_staging
-    command: ["dotnet", "Web.dll"]
+      - "5103:8080"
 
 networks:
-  network_staging:
+  network_prod:
     external: true
+labels:
+    om.carnetizacion.environment=prod
