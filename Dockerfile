@@ -15,7 +15,6 @@ RUN dotnet restore Web/Web.csproj
 COPY . .
 RUN dotnet publish Web/Web.csproj -c Release -o /app/publish
 
-
 # ---------- runtime stage ----------
 FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS final
 WORKDIR /app
@@ -27,3 +26,6 @@ ENV PATH="$PATH:/root/.dotnet/tools"
 ENV ASPNETCORE_URLS=http://+:8080
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 EXPOSE 8080
+
+# 👇 Mantiene el contenedor corriendo ejecutando la API
+ENTRYPOINT ["dotnet", "Web.dll"]
