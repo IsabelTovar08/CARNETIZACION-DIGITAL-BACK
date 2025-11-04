@@ -1,6 +1,9 @@
 services:
   carnetizacion-db-migrator-staging:
     image: carnetizacion-digital-api-staging
+    build:
+      context: ../..               # ruta al raíz del repo
+      dockerfile: Dockerfile       # usa tu Dockerfile
     env_file:
       - .env
     networks:
@@ -17,6 +20,9 @@ services:
   carnetizacion-digital-api-staging:
     container_name: carnetizacion-digital-api-staging
     image: carnetizacion-digital-api-staging
+    build:
+      context: ../..              
+      dockerfile: Dockerfile
     depends_on:
       - carnetizacion-db-migrator-staging
     env_file:
