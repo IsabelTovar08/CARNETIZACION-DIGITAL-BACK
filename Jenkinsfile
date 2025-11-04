@@ -1,7 +1,7 @@
 /// <summary>
-/// Jenkinsfile estable para carnetizacion-digital-api.
-/// Usa tu propia imagen base (la del Dockerfile) que ya instala el SDK 8.0,
-/// evitando el error "No .NET SDKs were found" dentro de Jenkins-in-Docker.
+/// Jenkinsfile estable para el despliegue automatizado del proyecto carnetizacion-digital-api.
+/// Usa la misma imagen base de build que tu Dockerfile (con SDK 8.0 preinstalado).
+/// Evita el error "No .NET SDKs were found" ejecutando restauración y compilación en la misma base.
 /// </summary>
 
 pipeline {
@@ -16,7 +16,7 @@ pipeline {
         DOTNET_CLI_HOME = '/var/jenkins_home/.dotnet'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
-        BUILD_IMAGE = 'carnetizacion-dotnet-build' // nombre temporal para tu imagen build
+        BUILD_IMAGE = 'ubuntu-dotnet-sdk-8.0' // 👈 nombre personalizado de la imagen base
     }
 
     stages {
@@ -41,19 +41,11 @@ pipeline {
             }
         }
 
-        stage('Construir imagen de build (con SDK 8.0)') {
-            steps {
-                sh '''
-                    echo "🧱 Construyendo imagen de build personalizada..."
-                    docker build -t $BUILD_IMAGE -f Dockerfile .
-                '''
-            }
-        }
-
         stage('Restaurar dependencias') {
             steps {
                 sh '''
-                    echo "📦 Restaurando dependencias usando imagen personalizada..."
+                    echo "📦 Restaurando dependencias dentro de la imagen de build personalizada..."
+                    docker build --target build -t $BUILD_IMAGE -f Dockerfile .
                     docker run --rm \
                         -v "$PWD:/src" \
                         -w /src \
@@ -69,7 +61,7 @@ pipeline {
         stage('Compilar proyecto') {
             steps {
                 sh '''
-                    echo "🛠️ Compilando proyecto usando imagen personalizada..."
+                    echo "🛠️ Compilando proyecto dentro de la misma imagen de build..."
                     docker run --rm \
                         -v "$PWD:/src" \
                         -w /src \
