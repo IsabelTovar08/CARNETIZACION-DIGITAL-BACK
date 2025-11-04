@@ -99,25 +99,35 @@ namespace Web
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
                 try
                 {
                     Console.WriteLine("🏗️ Verificando base de datos...");
 
-                    // 1️⃣ Si no hay migraciones creadas, crea la base directamente desde el modelo
-                    var hasMigrationsTable = db.Database.ExecuteSqlRaw(
-                        "SELECT to_regclass('__EFMigrationsHistory');"
-                    );
+                    // Revisa si existe la tabla de migraciones correctamente
+                    var migrationsTable = db.Database
+                        .ExecuteSqlRaw("SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = '__EFMigrationsHistory';");
 
-                    if (hasMigrationsTable == 0)
+                    // Si la tabla de migraciones no existe, crea una migración base y aplica
+                    if (migrationsTable == 0)
                     {
-                        Console.WriteLine("⚙️ No existen migraciones, creando base de datos desde el modelo...");
-                        db.Database.EnsureCreated(); // Crea las tablas directamente SIN migraciones
+                        Console.WriteLine("⚙️ No existen migraciones, generando y aplicando una inicial...");
+                        var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "dotnet",
+                            Arguments = "ef migrations add AutoInitial --project Entity --startup-project Web",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        });
+                        process?.WaitForExit();
+
+                        db.Database.Migrate();
                     }
                     else
                     {
                         Console.WriteLine("📦 Aplicando migraciones pendientes...");
-                        db.Database.Migrate(); // Aplica migraciones si existen
+                        db.Database.Migrate();
                     }
 
                     Console.WriteLine("✅ Base de datos lista.");
@@ -127,6 +137,7 @@ namespace Web
                     Console.WriteLine($"❌ Error inicializando base de datos: {ex.Message}");
                 }
             }
+
 
             app.MapHub<NotificationHub>("/hubs/notifications");
 
