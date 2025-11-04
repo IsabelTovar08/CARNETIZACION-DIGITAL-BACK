@@ -1,5 +1,7 @@
-﻿using Entity.DTOs.Notifications;
+﻿using Entity.Context;
+using Entity.DTOs.Notifications;
 using Entity.DTOs.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -52,6 +54,15 @@ namespace Web
                 });
             });
 
+            // <summary>
+            /// Configuración de fuentes de configuración en orden de prioridad.
+            /// </summary>
+            builder.Configuration
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+
             builder.Services.AddSwaggerGen();
 
             // servicios y data
@@ -85,14 +96,81 @@ namespace Web
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                try
+                {
+                    Console.WriteLine("🏗️ Verificando base de datos...");
+
+                    // 🔍 Detectar si existe la tabla de migraciones
+                    var hasHistoryTable = db.Database.ExecuteSqlRaw(
+                        "SELECT COUNT(*) FROM pg_tables WHERE tablename='__EFMigrationsHistory';"
+                    );
+
+                    // ⚙️ Si no hay migraciones creadas, genera y aplica una inicial automáticamente
+                    if (hasHistoryTable == 0)
+                    {
+                        Console.WriteLine("⚙️ No hay migraciones, creando AutoInitial...");
+                        RunMigrationCommand("dotnet ef migrations add AutoInitial --project Entity --startup-project Web");
+                    }
+
+                    try
+                    {
+                        Console.WriteLine("📦 Aplicando migraciones pendientes...");
+                        db.Database.Migrate();
+                        Console.WriteLine("✅ Migraciones aplicadas correctamente.");
+                    }
+                    catch (Exception ex) when (ex.Message.Contains("PendingModelChangesWarning"))
+                    {
+                        Console.WriteLine("⚠️ Se detectaron cambios pendientes en el modelo. Creando migración AutoFix...");
+                        RunMigrationCommand("dotnet ef migrations add AutoFix --project Entity --startup-project Web");
+                        db.Database.Migrate();
+                        Console.WriteLine("✅ Migraciones sincronizadas automáticamente.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ Error inicializando base de datos: {ex.Message}");
+                }
+            }
+
+            // 👇 Función auxiliar para ejecutar comandos dotnet dentro del contenedor
+            static void RunMigrationCommand(string command)
+            {
+                var process = new System.Diagnostics.Process
+                {
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "bash",
+                        Arguments = $"-c \"{command}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                Console.WriteLine(output);
+                if (!string.IsNullOrWhiteSpace(error))
+                    Console.WriteLine($"⚠️ EF CLI output: {error}");
+            }
+
+
             app.MapHub<NotificationHub>("/hubs/notifications");
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseHttpsRedirection();
-            app.UseCors();
+            app.UseRouting(); 
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

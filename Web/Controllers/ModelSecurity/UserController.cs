@@ -19,7 +19,6 @@ namespace Web.Controllers.ModelSecurity
     public class UserController : GenericController<User, UserDtoRequest, UserDTO>
     {
         protected readonly IUserBusiness _userBusiness;
-        private object _personBusiness;
 
         public UserController(IUserBusiness business, ILogger<UserController> logger) : base(business, logger)
         {
