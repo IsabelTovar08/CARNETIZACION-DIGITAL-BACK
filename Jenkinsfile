@@ -47,13 +47,14 @@ pipeline {
                     echo "📦 Restaurando dependencias dentro de la imagen de build personalizada..."
                     docker build --target build -t $BUILD_IMAGE -f Dockerfile .
                     docker run --rm \
-                        -v "$PWD:/src" \
-                        -w /src \
-                        -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
-                        -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
-                        -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
-                        $BUILD_IMAGE \
-                        bash -c "dotnet restore Web/Web.csproj"
+                    -v "/var/jenkins_home/workspace/carnetizacion-digital-api-staging:/src" \
+                    -w /src \
+                    -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
+                    -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
+                    -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
+                    $BUILD_IMAGE \
+                    bash -c "ls -la Web && dotnet restore Web/Web.csproj"
+
                 '''
             }
         }
