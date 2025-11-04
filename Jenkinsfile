@@ -92,25 +92,33 @@ pipeline {
             }
         }
 
-        /// <summary>
+       /// <summary>
         /// Etapa 4: Despliegue del backend.
         /// Ejecuta el docker-compose del entorno correspondiente para construir e iniciar el contenedor del backend.
-        /// Antes de levantarlo, limpia cualquier contenedor previo con el mismo nombre para evitar conflictos.
+        /// Antes de levantarlo, limpia cualquier contenedor e imagen previos para evitar conflictos o caché antiguo.
         /// </summary>
         stage('Desplegar API') {
             steps {
                 echo "Desplegando carnetizacion-digital-api para entorno: ${env.ENVIRONMENT}"
-                
+
                 sh """
-                    # Eliminar contenedores previos del entorno si existen
-                    echo "Limpiando contenedores antiguos para ${env.ENVIRONMENT}..."
+                    echo "🧹 Limpiando contenedores e imágenes antiguas para ${env.ENVIRONMENT}..."
+                    
+                    # Eliminar contenedores antiguos (si existen)
                     docker ps -a --filter "name=carnetizacion-digital-api-${env.ENVIRONMENT}" -q | xargs -r docker rm -f || true
 
-                    # Ejecutar docker-compose correspondiente al entorno detectado
-                    docker compose -f ${env.COMPOSE_FILE} --env-file ${env.ENV_FILE} up -d --build
+                    # Eliminar imagen vieja del entorno (si existe)
+                    docker images "carnetizacion-digital-api-${env.ENVIRONMENT}" -q | xargs -r docker rmi -f || true
+
+                    # Limpiar caché y recursos no utilizados
+                    docker system prune -f --volumes || true
+
+                    echo "🚀 Ejecutando nuevo despliegue limpio..."
+                    docker compose -f ${env.COMPOSE_FILE} --env-file ${env.ENV_FILE} up -d --build --force-recreate --no-deps --remove-orphans
                 """
             }
         }
+
     }
 
     /// <summary>
