@@ -1,5 +1,4 @@
 services:
-  services:
   carnetizacion-db-migrator-staging:
     image: carnetizacion-digital-api-staging
     build:
