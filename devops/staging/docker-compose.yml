@@ -1,51 +1,24 @@
-version: '3.8'
-
 services:
-  # Servicio para ejecutar migraciones
-  carnetizacion-migrations-staging:
-    container_name: carnetizacion-migrations-staging
-    build:
-      context: ../..
-      dockerfile: Dockerfile
-      target: migration
-    image: carnetizacion-digital-migrations-staging
+  carnetizacion-db-migrator-staging:
+    image: carnetizacion-digital-api-staging
     env_file:
       - .env
     networks:
       - network_staging
-    command: >
+    entrypoint: >
       bash -c "
-        echo 'Esperando base de datos...';
-        until nc -z carnetizacion-postgres-staging 5432; do
-          echo 'Base de datos aún no disponible...';
-          sleep 5;
-        done;
-        
-        echo 'Base de datos disponible';
         echo 'Aplicando migraciones de Entity Framework...';
-        
-        cd /src;
-        dotnet ef database update \
-          --project Entity/Entity.csproj \
-          --startup-project Web/Web.csproj \
-          --verbose;
-        
-        if [ $? -eq 0 ]; then
-          echo 'Migraciones aplicadas correctamente';
-        else
-          echo 'Error al aplicar migraciones';
-          exit 1;
-        fi
+        dotnet tool install --global dotnet-ef --version 8.0.0;
+        export PATH=\"\$PATH:/root/.dotnet/tools\";
+        dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
+        echo 'Migraciones aplicadas correctamente.';
       "
 
-  # Servicio de la aplicación
   carnetizacion-digital-api-staging:
     container_name: carnetizacion-digital-api-staging
-    build:
-      context: ../..
-      dockerfile: Dockerfile
-      target: final  # Usa el stage final (runtime)
     image: carnetizacion-digital-api-staging
+    depends_on:
+      - carnetizacion-db-migrator-staging
     env_file:
       - .env
     restart: always
@@ -53,14 +26,8 @@ services:
       - "5102:8080"
     networks:
       - network_staging
-    depends_on:
-      carnetizacion-migrations-staging:
-        condition: service_completed_successfully
-    command: >
-      bash -c "
-        echo 'Iniciando aplicación...';
-        dotnet Web.dll
-      "
+    command: ["dotnet", "Web.dll"]
+
 networks:
   network_staging:
     external: true
