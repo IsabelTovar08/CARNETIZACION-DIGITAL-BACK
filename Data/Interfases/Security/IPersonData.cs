@@ -19,6 +19,12 @@ namespace Data.Interfases.Security
         Task<Person?> GetPersonByUserIdAsync(int userId);
 
         /// <summary>
+        /// Devuelve la entidad Person con las relaciones necesarias (DocumentType, BloodType, City, IssuedCard...).
+        /// Útil para mapear a DTOs inmediatamente después de crear/actualizar.
+        /// </summary>
+        Task<Person?> GetByIdWithRelationsAsync(int id);
+
+        /// <summary>
         /// Filtro + paginación:
         /// - Solo personas no eliminadas
         /// - Con al menos un PersonDivisionProfile que tenga al menos un Card (carnet)

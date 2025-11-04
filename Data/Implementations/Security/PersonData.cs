@@ -55,6 +55,22 @@ namespace Data.Classes.Specifics
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        /// <summary>
+        /// Devuelve Person incluyendo las relaciones que normalmente se muestran en los DTO.
+        /// </summary>
+        public async Task<Person?> GetByIdWithRelationsAsync(int id)
+        {
+            return await _context.Set<Person>()
+                .AsNoTracking()
+                .Where(p => p.Id == id && !p.IsDeleted)
+                .Include(p => p.City)
+                .Include(p => p.DocumentType)
+                .Include(p => p.BloodType)
+                .Include(p => p.IssuedCard)
+                    .ThenInclude(ic => ic.InternalDivision)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<(Person Person, User User)> SavePersonAndUser(Person person, User user)
         {
             var hasAmbientTx = _context.Database.CurrentTransaction != null;
@@ -76,7 +92,8 @@ namespace Data.Classes.Specifics
                 if (!hasAmbientTx)
                     await _context.Database.CommitTransactionAsync();
 
-                return (person, user);
+                // Devuelve las entidades creadas (no las originales) para que el caller tenga los Ids generados
+                return (personCreated, userCreated);
             }
             catch
             {
