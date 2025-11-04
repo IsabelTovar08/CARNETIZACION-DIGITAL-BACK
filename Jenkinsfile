@@ -54,7 +54,7 @@ pipeline {
                     docker build --target build -t $BUILD_IMAGE -f Dockerfile .
                     
                     docker run --rm \
-                        -v "$PWD:/src" \
+                        -v "$WORKSPACE:/src" \
                         -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
@@ -70,7 +70,7 @@ pipeline {
                 sh '''
                     echo "🛠️ Compilando proyecto dentro de la misma imagen de build..."
                     docker run --rm \
-                        -v "$PWD:/src" \
+                        -v "$WORKSPACE:/src" \
                         -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
