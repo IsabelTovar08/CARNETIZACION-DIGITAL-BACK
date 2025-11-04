@@ -1,5 +1,7 @@
-﻿using Entity.DTOs.Notifications;
+﻿using Entity.Context;
+using Entity.DTOs.Notifications;
 using Entity.DTOs.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -93,6 +95,22 @@ namespace Web
             builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Upload"));
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                try
+                {
+                    Console.WriteLine("🏗️ Aplicando migraciones pendientes...");
+                    db.Database.Migrate();
+                    Console.WriteLine("✅ Migraciones aplicadas correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("❌ Error aplicando migraciones: " + ex.Message);
+                }
+            }
 
             app.MapHub<NotificationHub>("/hubs/notifications");
 
