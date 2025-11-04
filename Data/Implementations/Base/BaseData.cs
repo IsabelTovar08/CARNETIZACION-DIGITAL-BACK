@@ -79,17 +79,29 @@ namespace Data.Classes.Base
                 throw;
             }
         }
-        public override async Task<T> UpdateAsync(T entity)
+        public override async Task<T?> UpdateAsync(T entity)
         {
+
             try
             {
-                // Cargar la entidad actual desde BD y mapear campos explícitos evita sobrescrituras indeseadas
-                var existing = await _context.Set<T>().FindAsync(((dynamic)entity).Id);
-                if (existing == null) throw new KeyNotFoundException("Entidad no encontrada");
+                // Busca la entidad existente en el contexto
+                var existingEntity = await _context.Set<T>().FindAsync(entity.Id);
 
-                _context.Entry(existing).CurrentValues.SetValues(entity); // solo valores escalares
+                if (existingEntity != null)
+                {
+                    // Actualiza los valores de la entidad existente con los de la nueva instancia
+                    _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+                }
+                else
+                {
+                    // Si la entidad no está en el contexto, adjúntala como nueva
+                    _context.Attach(entity);
+                    _context.Entry(entity).State = EntityState.Modified;
+                }
+
+                // Guarda los cambios
                 await _context.SaveChangesAsync();
-                return existing;
+                return entity;
             }
             catch (Exception ex)
             {

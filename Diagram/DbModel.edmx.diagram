@@ -4,70 +4,83 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="82" >
+      <Diagram DiagramId="332a317072944d1c882224ec79489401" Name="Diagram1" ZoomLevel="67" >
 
 
         <EntityTypeShape EntityType="DbModel.Rol" Width="1.5" PointX="4.375" PointY="10.125" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="DbModel.User" Width="1.5" PointX="5" PointY="1.75" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="DbModel.Person" Width="1.5" PointX="7.125" PointY="4.625" FillColor="192, 192, 255" />
-        <EntityTypeShape EntityType="DbModel.Form" Width="1.5" PointX="6.125" PointY="11.625" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="DbModel.Module" Width="1.5" PointX="0.625" PointY="12.5" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="DbModel.UserRole" Width="1.5" PointX="1.625" PointY="2.25" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="DbModel.RoleFormPermission" Width="1.5" PointX="1.875" PointY="11.25" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="DbModel.Permission" Width="1.5" PointX="4.125" PointY="14.375" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="DbModel.FormModule" Width="1.5" PointX="1.125" PointY="9" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="DbModel.Department" Width="1.5" PointX="18.625" PointY="6.5" FillColor="192, 192, 255" />
-        <EntityTypeShape EntityType="DbModel.City" Width="1.5" PointX="16.375" PointY="6.375" FillColor="192, 192, 255" />
-        <EntityTypeShape EntityType="DbModel.Card" Width="1.5" PointX="9.75" PointY="10.25" FillColor="192, 192, 255" />
-        <EntityTypeShape EntityType="DbModel.Organization" Width="1.5" PointX="14.125" PointY="10.5" FillColor="255, 224, 192" />
-        <EntityTypeShape EntityType="DbModel.OrganizationalUnit" Width="1.5" PointX="23.125" PointY="3.5" FillColor="255, 224, 192" />
-        <EntityTypeShape EntityType="DbModel.InternalDivision" Width="1.5" PointX="20.875" PointY="3.5" FillColor="255, 224, 192" />
-        <EntityTypeShape EntityType="DbModel.Branch" Width="1.5" PointX="16.375" PointY="10.25" FillColor="255, 224, 192" />
-        <EntityTypeShape EntityType="DbModel.OrganizationalUnitBranch" Width="1.5" PointX="20.875" PointY="0.75" FillColor="255, 224, 192" />
-        <EntityTypeShape EntityType="DbModel.Event" Width="1.5" PointX="16.375" PointY="1.375" FillColor="255, 192, 192" />
-        <EntityTypeShape EntityType="DbModel.EventType" Width="1.5" PointX="18.625" PointY="2.125" FillColor="255, 192, 192" />
-        <EntityTypeShape EntityType="DbModel.AccessPoint" Width="1.5" PointX="14.125" PointY="2" FillColor="255, 192, 192" />
-        <EntityTypeShape EntityType="DbModel.Attendance" Width="1.5" PointX="11" PointY="15.875" FillColor="255, 192, 192" />
-        <EntityTypeShape EntityType="DbModel.Profile" Width="1.5" PointX="7.625" PointY="14.75" FillColor="255, 224, 192" />
-        <EntityTypeShape EntityType="DbModel.PersonDivisionProfile" Width="1.5" PointX="8.625" PointY="2.625" FillColor="192, 192, 255" />
-        <EntityTypeShape EntityType="DbModel.NotificationType" Width="1.5" PointX="7.125" PointY="18.75" FillColor="192, 255, 255" />
-        <EntityTypeShape EntityType="DbModel.Notification" Width="1.5" PointX="4.875" PointY="18.625" FillColor="192, 255, 255" />
-        <EntityTypeShape EntityType="DbModel.NotificationReceived" Width="1.5" PointX="2.625" PointY="18.625" FillColor="192, 255, 255" />
-        <EntityTypeShape EntityType="DbModel.Estatus" Width="1.5" PointX="25.875" PointY="1.875" />
-        <EntityTypeShape EntityType="DbModel.Shedule" Width="1.5" PointX="11.875" PointY="10.5" />
-        <EntityTypeShape EntityType="DbModel.EventTargetAudience" Width="1.5" PointX="4.125" PointY="22.375" FillColor="255, 192, 192" />
-        <EntityTypeShape EntityType="DbModel.AreaCategory" Width="1.5" PointX="23.125" PointY="6.25" />
-        <EntityTypeShape EntityType="DbModel.TypeCategory" Width="1.5" PointX="17.125" PointY="14.125" />
-        <EntityTypeShape EntityType="DbModel.CustomType" Width="1.5" PointX="14.875" PointY="14.125" />
-        <EntityTypeShape EntityType="DbModel.MenuStructure" Width="1.5" PointX="13.75" PointY="17.125" />
+        <EntityTypeShape EntityType="DbModel.User" Width="1.5" PointX="9.5" PointY="10" IsExpanded="true" FillColor="128, 128, 255" />
+        <EntityTypeShape EntityType="DbModel.Person" Width="2.125" PointX="12.625" PointY="10.5" FillColor="192, 192, 255" />
+        <EntityTypeShape EntityType="DbModel.Form" Width="1.5" PointX="7.625" PointY="13" FillColor="128, 128, 255" />
+        <EntityTypeShape EntityType="DbModel.Module" Width="1.5" PointX="5" PointY="15.75" FillColor="128, 128, 255" />
         <AssociationConnector Association="DbModel.UserPerson" />
+        <EntityTypeShape EntityType="DbModel.UserRole" Width="1.5" PointX="6.75" PointY="10" FillColor="128, 128, 255" />
+        <EntityTypeShape EntityType="DbModel.RoleFormPermission" Width="2" PointX="4.875" PointY="13" FillColor="128, 128, 255" />
+        <AssociationConnector Association="DbModel.RoleModuleRole" />
+        <AssociationConnector Association="DbModel.UserRoleRole" />
         <AssociationConnector Association="DbModel.UserRoleUser" />
-        <AssociationConnector Association="DbModel.NotificationReceivedUser" />
-        <AssociationConnector Association="DbModel.FormModuleForm" />
-        <AssociationConnector Association="DbModel.RoleFormPermissioForm" />
-        <AssociationConnector Association="DbModel.MenuStructureForm" />
-        <AssociationConnector Association="DbModel.FormModuleModule" />
-        <AssociationConnector Association="DbModel.MenuStructureModule" />
+        <EntityTypeShape EntityType="DbModel.Permission" Width="1.5" PointX="2.875" PointY="13" FillColor="128, 128, 255" />
         <AssociationConnector Association="DbModel.RoleModulePermission" />
-        <AssociationConnector Association="DbModel.CityDepartment" />
-        <AssociationConnector Association="DbModel.PersonCity" />
-        <AssociationConnector Association="DbModel.PersonDivisionProfileCard" />
-        <AssociationConnector Association="DbModel.OrganizationBranch" />
-        <AssociationConnector Association="DbModel.SheduleOrganization" />
+        <EntityTypeShape EntityType="DbModel.FormModule" Width="1.5" PointX="7.125" PointY="15.875" FillColor="128, 128, 255" />
+        <AssociationConnector Association="DbModel.FormModuleForm" />
+        <AssociationConnector Association="DbModel.FormModuleModule" />
+        <EntityTypeShape EntityType="DbModel.Department" Width="1.5" PointX="16" PointY="10.125" FillColor="192, 192, 255" />
+        <EntityTypeShape EntityType="DbModel.City" Width="1.5" PointX="16.125" PointY="12.25" FillColor="192, 192, 255" />
+        <AssociationConnector Association="DbModel.PersonCity" ManuallyRouted="false" >
+        </AssociationConnector>
+        <EntityTypeShape EntityType="DbModel.Card" Width="2" PointX="12.875" PointY="16.5" FillColor="192, 192, 255" />
+        <EntityTypeShape EntityType="DbModel.Organization" Width="1.5" PointX="21" PointY="9.75" FillColor="255, 224, 192" />
+        <EntityTypeShape EntityType="DbModel.OrganizationalUnit" Width="2.125" PointX="24.375" PointY="12" FillColor="255, 224, 192" />
+        <EntityTypeShape EntityType="DbModel.InternalDivision" Width="1.75" PointX="28.125" PointY="11.875" FillColor="255, 224, 192" />
         <AssociationConnector Association="DbModel.AssignmentOrganizationDivision" />
-        <AssociationConnector Association="DbModel.DivisionBranchDivision" />
-        <AssociationConnector Association="DbModel.AccessPointEvent" />
-        <AssociationConnector Association="DbModel.EventEventType" />
-        <AssociationConnector Association="DbModel.EventTargetAudienceEvent" />
+        <EntityTypeShape EntityType="DbModel.Branch" Width="1.5" PointX="18.5" PointY="9.75" FillColor="255, 224, 192" />
+        <AssociationConnector Association="DbModel.OrganizationBranch" />
+        <EntityTypeShape EntityType="DbModel.OrganizationalUnitBranch" Width="2.25" PointX="21.5" PointY="12.125" FillColor="255, 224, 192" />
+        <AssociationConnector Association="DbModel.DivisionBranchDivision" ManuallyRouted="false" >
+        </AssociationConnector>
+        <AssociationConnector Association="DbModel.DivisionBranchBranch" ManuallyRouted="false" >
+        </AssociationConnector>
+        <EntityTypeShape EntityType="DbModel.Event" Width="1.875" PointX="26.5" PointY="15" FillColor="255, 192, 192" />
+        <EntityTypeShape EntityType="DbModel.EventType" Width="1.5" PointX="29.125" PointY="17.125" FillColor="255, 192, 192" />
+        <EntityTypeShape EntityType="DbModel.AccessPoint" Width="1.5" PointX="24.5" PointY="15" FillColor="255, 192, 192" />
+        <EntityTypeShape EntityType="DbModel.Attendance" Width="1.75" PointX="22.25" PointY="14.875" FillColor="255, 192, 192" />
         <AssociationConnector Association="DbModel.AttendanceAccessPoint" />
-        <AssociationConnector Association="DbModel.AttendancePerson" />
-        <AssociationConnector Association="DbModel.PersonDivisionProfileProfile" />
+        <AssociationConnector Association="DbModel.EventEventType" ManuallyRouted="false" >
+        </AssociationConnector>
+        <AssociationConnector Association="DbModel.RoleFormPermissioForm" />
+        <AssociationConnector Association="DbModel.AttendancePerson" ManuallyRouted="false" >
+        </AssociationConnector>
+        <EntityTypeShape EntityType="DbModel.Profile" Width="1.5" PointX="18.25" PointY="16.5" FillColor="255, 224, 192" />
+        <EntityTypeShape EntityType="DbModel.PersonDivisionProfile" Width="1.875" PointX="15.75" PointY="16.5" FillColor="192, 192, 255" />
+        <AssociationConnector Association="DbModel.CityDepartment" />
+        <AssociationConnector Association="DbModel.BranchCity" />
         <AssociationConnector Association="DbModel.PersonDivisionProfilePerson" />
+        <AssociationConnector Association="DbModel.PersonDivisionProfileCard" />
+        <AssociationConnector Association="DbModel.PersonDivisionProfileProfile" />
+        <EntityTypeShape EntityType="DbModel.NotificationType" Width="1.875" PointX="17.125" PointY="19.375" FillColor="192, 255, 255" />
+        <EntityTypeShape EntityType="DbModel.Notification" Width="1.5" PointX="15.25" PointY="19.375" FillColor="192, 255, 255" />
         <AssociationConnector Association="DbModel.NotificationNotificationType" />
+
+        <EntityTypeShape EntityType="DbModel.NotificationReceived" Width="2.125" PointX="12.5" PointY="19.375" FillColor="192, 255, 255" IsExpanded="true" />
         <AssociationConnector Association="DbModel.NotificationReceivedNotification" />
+        <EntityTypeShape EntityType="DbModel.Estatus" Width="1.5" PointX="20.375" PointY="18.25" />
+        <AssociationConnector Association="DbModel.NotificationReceivedUser" />
+        <EntityTypeShape EntityType="DbModel.Shedule" Width="1.5" PointX="23.75" PointY="9.875" />
+        <AssociationConnector Association="DbModel.SheduleOrganization" />
+        <EntityTypeShape EntityType="DbModel.EventTargetAudience" Width="1.875" PointX="28.625" PointY="15" FillColor="255, 192, 192" />
+        <AssociationConnector Association="DbModel.EventTargetAudienceEvent" />
+        <AssociationConnector Association="DbModel.PersonDivisionProfileInternalDivision" />
+        <EntityTypeShape EntityType="DbModel.AreaCategory" Width="1.5" PointX="28.375" PointY="9.375" />
         <AssociationConnector Association="DbModel.InternalDivisionAreaCategory" />
+        <EntityTypeShape EntityType="DbModel.TypeCategory" Width="1.5" PointX="32.5" PointY="14.75" />
+        <EntityTypeShape EntityType="DbModel.CustomType" Width="1.5" PointX="34.625" PointY="14.625" />
         <AssociationConnector Association="DbModel.CustomTypeTypeCategory" />
-        </Diagram>
+        <EntityTypeShape EntityType="DbModel.MenuStructure" Width="1.5" PointX="10.125" PointY="15.125" />
+        <AssociationConnector Association="DbModel.MenuStructureModule" />
+        <AssociationConnector Association="DbModel.MenuStructureForm" />
+        <EntityTypeShape EntityType="DbModel.EventAcessPoint" Width="1.5" PointX="25.625" PointY="19.25" />
+        <AssociationConnector Association="DbModel.EventEventAcessPoint" />
+        <AssociationConnector Association="DbModel.AccessPointEventAcessPoint" />
+      </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

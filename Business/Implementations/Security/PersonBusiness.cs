@@ -109,18 +109,11 @@ namespace Business.Classes
                 await ValidateAsync(person);
 
                 var created = await _data.SaveAsync(person);
-
-                // Recargar la entidad con las relaciones necesarias antes de mapear a DTO
-                var createdWithNav = await _personData.GetByIdWithRelationsAsync(created.Id);
-
-                // Si no se pudo recargar, se mapea la entidad devuelta por SaveAsync como fallback
-                var dto = _mapper.Map<PersonDto>(createdWithNav ?? created);
-
                 await SendWelcomeNotifications(person, null);
 
                 _logger.LogInformation("Persona registrada correctamente con ID {Id}", created.Id);
 
-                return dto;
+                return _mapper.Map<PersonDto>(created);
             }
             catch (ValidationException)
             {
@@ -346,7 +339,7 @@ namespace Business.Classes
             var items = entities.Select(e => _mapper.Map<PersonDto>(e)).ToList();
             return (items, total);
         }
-
+    
         public async Task<PersonDto?> GetCurrentPersonAsync()
         {
             try
@@ -375,14 +368,6 @@ namespace Business.Classes
                 _logger.LogError(ex, "Error obteniendo persona actual para UserIdRaw={UserIdRaw}", _currentUser?.UserIdRaw);
                 throw; // deja que el middleware lo maneje (o encapsula en una excepción controlada)
             }
-        }
-        public async Task<PersonDto?> FindByDocumentAsync(string documentNumber)
-        {
-            if (string.IsNullOrWhiteSpace(documentNumber))
-                return null;
-
-            var person = await _personData.FindByIdentification(documentNumber);
-            return _mapper.Map<PersonDto?>(person);
         }
     }
 
