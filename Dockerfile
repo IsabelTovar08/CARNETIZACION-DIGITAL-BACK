@@ -1,15 +1,9 @@
 # ---------- build stage ----------
-FROM ubuntu:22.04 AS build
-
-# Instalar dependencias básicas y .NET SDK
-RUN apt-get update && apt-get install -y wget apt-transport-https software-properties-common \
-    && wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
-    && apt-get update && apt-get install -y dotnet-sdk-8.0
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /src
 
-# Copiar proyectos
+# Copiar proyectos y restaurar dependencias
 COPY *.sln ./
 COPY Web/*.csproj Web/
 COPY Business/*.csproj Business/
@@ -22,34 +16,43 @@ RUN dotnet restore Web/Web.csproj
 COPY . .
 RUN dotnet publish Web/Web.csproj -c Release -o /app/publish
 
+
 # ---------- runtime stage ----------
-FROM ubuntu:22.04 AS final
-
-# ⚙️ Instalar runtime y herramientas EF
-RUN apt-get update && apt-get install -y wget apt-transport-https software-properties-common netcat-openbsd \
-    && wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
-    && apt-get update && apt-get install -y aspnetcore-runtime-8.0 dotnet-sdk-8.0 \
-    && dotnet tool install --global dotnet-ef --version 8.0.0 \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV PATH="$PATH:/root/.dotnet/tools"
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS final
+# 👆 usa SDK, no solo runtime, así sí puede correr `dotnet ef`
 
 WORKDIR /app
-ENV ASPNETCORE_URLS=http://+:8080 DOTNET_RUNNING_IN_CONTAINER=true
+
+# Instalar netcat para esperar a la BD
+RUN apt-get update && apt-get install -y netcat-openbsd
+
+# Copiar archivos publicados
 COPY --from=build /app/publish .
+
+# Variables de entorno
+ENV ASPNETCORE_URLS=http://+:8080
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Instalar EF CLI
+RUN dotnet tool install --global dotnet-ef --version 8.0.0
+
 EXPOSE 8080
 
-# 🧠 Crea migración si no existe y luego aplica
+# 🧠 Migraciones automáticas + espera de base de datos + arranque
 CMD bash -c "\
-    echo '🏗️ Verificando migraciones de Entity Framework...'; \
-    if [ ! -d '/app/Migrations' ] || [ -z \"$(ls -A /app/Migrations 2>/dev/null)\" ]; then \
-        echo '⚙️ No hay migraciones existentes, creando una nueva...'; \
-        dotnet ef migrations add AutoInitial --project Entity/Entity.csproj --startup-project Web/Web.csproj || echo '⚠️ No se pudo crear la migración (puede que ya exista)'; \
+    echo '⏳ Esperando base de datos...'; \
+    until nc -z ${POSTGRES_HOST:-carnetizacion-postgres-staging} ${POSTGRES_PORT:-5432}; do \
+        echo '🕓 Aguardando conexión con la BD...'; sleep 3; \
+    done; \
+    echo '🏗️ Verificando migraciones existentes...'; \
+    if [ ! -d '/app/Entity/Migrations' ] || [ -z \"$(ls -A /app/Entity/Migrations 2>/dev/null)\" ]; then \
+        echo '⚙️ No hay migraciones, creando una nueva...'; \
+        dotnet ef migrations add AutoInitial --project Entity/Entity.csproj --startup-project Web/Web.csproj || true; \
     else \
         echo '✅ Migraciones detectadas.'; \
     fi; \
-    echo '📦 Aplicando migraciones a la base de datos...'; \
+    echo '📦 Aplicando migraciones...'; \
     dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj; \
-    echo '🚀 Iniciando aplicación...'; \
+    echo '🚀 Iniciando API...'; \
     dotnet Web.dll"
