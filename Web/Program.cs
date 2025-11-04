@@ -3,7 +3,6 @@ using Entity.DTOs.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Web.Config;
 using Web.Extensions;
 using Web.Realtime.Hubs;
 
