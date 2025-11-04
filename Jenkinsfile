@@ -1,7 +1,6 @@
 /// <summary>
-/// Jenkinsfile estable para el despliegue automatizado del proyecto carnetizacion-digital-api.
-/// Usa la misma imagen base de build que tu Dockerfile (con SDK 8.0 preinstalado).
-/// Evita el error "No .NET SDKs were found" ejecutando restauración y compilación en la misma base.
+/// Jenkinsfile estable y funcional para carnetizacion-digital-api.
+/// Ejecuta restore, build y despliegue con rutas relativas dentro del contenedor Jenkins.
 /// </summary>
 
 pipeline {
@@ -16,7 +15,6 @@ pipeline {
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
         BUILD_IMAGE = 'ubuntu-dotnet-sdk-8.0'
-        WORKSPACE_PATH = '/var/jenkins_home/workspace/carnetizacion-digital-api-staging'
     }
 
     stages {
@@ -56,7 +54,7 @@ pipeline {
                     docker build --target build -t $BUILD_IMAGE -f Dockerfile .
                     
                     docker run --rm \
-                        -v "$WORKSPACE_PATH:/src" \
+                        -v "$PWD:/src" \
                         -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
@@ -72,7 +70,7 @@ pipeline {
                 sh '''
                     echo "🛠️ Compilando proyecto dentro de la misma imagen de build..."
                     docker run --rm \
-                        -v "$WORKSPACE_PATH:/src" \
+                        -v "$PWD:/src" \
                         -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
