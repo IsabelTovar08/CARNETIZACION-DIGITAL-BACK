@@ -1,6 +1,8 @@
+version: '3.8'
+
 services:
   carnetizacion-db-migrator-staging:
-    image: carnetizacion-digital-api-staging
+    image: mcr.microsoft.com/dotnet/sdk:8.0
     build:
       context: ../..
       dockerfile: Dockerfile
@@ -8,40 +10,40 @@ services:
       - .env
     networks:
       - network_staging
+    working_dir: /app
+    volumes:
+      - ../..:/app
     entrypoint: >
       bash -c "
-        echo 'Esperando base de datos...';
+        apt-get update && apt-get install -y netcat-openbsd;
+        echo '⏳ Esperando base de datos...';
         until nc -z carnetizacion-postgres-staging 5432; do
-          echo 'Aún no disponible...';
+          echo '🔁 Aún no disponible...';
           sleep 5;
         done;
 
-        echo 'Verificando migraciones existentes...';
-        dotnet tool install --global dotnet-ef --version 8.0.0;
+        echo '🏗️ Verificando migraciones existentes...';
         export PATH=\"\$PATH:/root/.dotnet/tools\";
 
-        cd /app;
-
-        MIG_COUNT=$(dotnet ef migrations list --project Entity/Entity.csproj --startup-project Web/Web.csproj | wc -l);
+        MIG_COUNT=\$(dotnet ef migrations list --project Entity/Entity.csproj --startup-project Web/Web.csproj | wc -l);
 
         if [ \"\$MIG_COUNT\" -eq 0 ]; then
-          echo 'No se encontraron migraciones. Creando una nueva...';
+          echo '⚙️ No se encontraron migraciones. Creando una nueva...';
           TIMESTAMP=\$(date +%Y%m%d%H%M%S);
           dotnet ef migrations add AutoMigration_\$TIMESTAMP --project Entity/Entity.csproj --startup-project Web/Web.csproj;
         fi;
 
-        echo 'Aplicando migraciones...';
+        echo '🚀 Aplicando migraciones...';
         dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
 
-        echo 'Migraciones aplicadas correctamente.';
+        echo '✅ Migraciones aplicadas correctamente.';
       "
-
 
   carnetizacion-digital-api-staging:
     container_name: carnetizacion-digital-api-staging
     image: carnetizacion-digital-api-staging
     build:
-      context: ../..              
+      context: ../..
       dockerfile: Dockerfile
     depends_on:
       - carnetizacion-db-migrator-staging
