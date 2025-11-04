@@ -13,6 +13,14 @@ pipeline {
     agent any
 
     /// <summary>
+    /// Configuraciones adicionales del pipeline para evitar fallos por checkout duplicado y agregar timestamps.
+    /// </summary>
+    options {
+        skipDefaultCheckout(true)
+        timestamps()
+    }
+
+    /// <summary>
     /// Variables de entorno globales usadas durante todo el pipeline.
     /// Configura el comportamiento de .NET CLI y evita logs innecesarios o errores de permisos.
     /// </summary>
@@ -26,30 +34,26 @@ pipeline {
 
         /// <summary>
         /// Etapa 1: Detección del entorno.
-        /// Lee el archivo .env en la raíz del proyecto para obtener la variable ENVIRONMENT (por ejemplo, qa, prod, etc.)
-        /// Luego construye las rutas de los archivos docker-compose y .env correspondientes dentro de devops/.
+        /// Lee el archivo .env en la raíz del proyecto para obtener la variable ENVIRONMENT (por ejemplo, qa, prod, etc.),
+        /// luego construye las rutas de los archivos docker-compose y .env correspondientes dentro de devops/{entorno}.
         /// </summary>
         stage('Leer entorno desde .env raíz') {
             steps {
                 script {
-                    // Extraer valor de ENVIRONMENT del archivo .env (por ejemplo ENVIRONMENT=qa)
                     def envValue = sh(script: "grep '^ENVIRONMENT=' .env | cut -d '=' -f2", returnStdout: true).trim()
 
-                    // Validar que exista la variable
                     if (envValue == '') {
-                        error "No se encontró ENVIRONMENT en el archivo .env raíz"
+                        error "❌ No se encontró ENVIRONMENT en el archivo .env raíz"
                     }
 
-                    // Asignar variables dinámicas para las rutas de configuración
                     env.ENVIRONMENT = envValue
                     env.ENV_DIR = "devops/${env.ENVIRONMENT}"
                     env.COMPOSE_FILE = "${env.ENV_DIR}/docker-compose.yml"
                     env.ENV_FILE = "${env.ENV_DIR}/.env"
 
-                    // Mostrar información en consola Jenkins
-                    echo "Entorno detectado: ${env.ENVIRONMENT}"
-                    echo "Archivo compose: ${env.COMPOSE_FILE}"
-                    echo "Archivo de entorno: ${env.ENV_FILE}"
+                    echo "🌍 Entorno detectado: ${env.ENVIRONMENT}"
+                    echo "📄 Archivo compose: ${env.COMPOSE_FILE}"
+                    echo "⚙️ Archivo de entorno: ${env.ENV_FILE}"
                 }
             }
         }
@@ -63,16 +67,15 @@ pipeline {
             agent {
                 docker {
                     image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    // Forzamos un entrypoint que mantenga vivo el contenedor para evitar error "container is not running"
+                    args '-v /var/run/docker.sock:/var/run/docker.sock --entrypoint=/bin/sh'
                 }
             }
             steps {
                 sh '''
-                    # Crear el directorio para .NET CLI y asignar permisos
+                    echo "📦 Restaurando dependencias..."
                     mkdir -p $DOTNET_CLI_HOME
                     chmod -R 777 $DOTNET_CLI_HOME
-                    
-                    # Restaurar dependencias del proyecto principal
                     dotnet restore Web/Web.csproj
                 '''
             }
@@ -84,10 +87,13 @@ pipeline {
         /// </summary>
         stage('Compilar proyecto') {
             agent {
-                docker { image 'mcr.microsoft.com/dotnet/sdk:8.0' }
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                    args '--entrypoint=/bin/sh'
+                }
             }
             steps {
-                echo 'Compilando la solución carnetizacion-digital-api...'
+                echo '🛠️ Compilando la solución carnetizacion-digital-api...'
                 sh 'dotnet build Web/Web.csproj --configuration Release'
             }
         }
@@ -99,15 +105,16 @@ pipeline {
         /// </summary>
         stage('Desplegar API') {
             steps {
-                echo "Desplegando carnetizacion-digital-api para entorno: ${env.ENVIRONMENT}"
-                
-                sh """
-                    # Eliminar contenedores previos del entorno si existen
-                    echo "Limpiando contenedores antiguos para ${env.ENVIRONMENT}..."
-                    docker ps -a --filter "name=carnetizacion-digital-api-${env.ENVIRONMENT}" -q | xargs -r docker rm -f || true
+                echo "🚀 Desplegando carnetizacion-digital-api para entorno: ${env.ENVIRONMENT}"
 
-                    # Ejecutar docker-compose correspondiente al entorno detectado
-                    docker compose -f ${env.COMPOSE_FILE} --env-file ${env.ENV_FILE} up -d --build
+                sh """
+                    echo "🧹 Limpiando contenedores antiguos e imágenes residuales..."
+                    docker ps -a --filter "name=carnetizacion-digital-api-${env.ENVIRONMENT}" -q | xargs -r docker rm -f || true
+                    docker images "carnetizacion-digital-api-${env.ENVIRONMENT}" -q | xargs -r docker rmi -f || true
+                    docker system prune -f --volumes || true
+
+                    echo "🚀 Levantando servicios..."
+                    docker compose -f ${env.COMPOSE_FILE} --env-file ${env.ENV_FILE} up -d --build --force-recreate --no-deps --remove-orphans
                 """
             }
         }
@@ -119,10 +126,10 @@ pipeline {
     /// </summary>
     post {
         success {
-            echo "Despliegue completado correctamente para ${env.ENVIRONMENT}"
+            echo "✅ Despliegue completado correctamente para ${env.ENVIRONMENT}"
         }
         failure {
-            echo "Error durante el despliegue en ${env.ENVIRONMENT}"
+            echo "❌ Error durante el despliegue en ${env.ENVIRONMENT}"
         }
     }
 }
