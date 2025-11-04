@@ -8,7 +8,7 @@ pipeline {
     agent any
 
     options {
-        skipDefaultCheckout(true)
+        skipDefaultCheckout(true) // 👈 lo dejamos, pero hacemos checkout manual más abajo
         timestamps()
     }
 
@@ -17,9 +17,18 @@ pipeline {
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
         BUILD_IMAGE = 'ubuntu-dotnet-sdk-8.0' // 👈 nombre personalizado de la imagen base
+        WORKSPACE_PATH = '/var/jenkins_home/workspace/carnetizacion-digital-api-staging'
     }
 
     stages {
+
+        stage('Checkout código fuente') {
+            steps {
+                echo "📥 Descargando el código fuente desde Git..."
+                checkout scm
+                sh 'ls -la'
+            }
+        }
 
         stage('Leer entorno desde .env raíz') {
             steps {
@@ -46,15 +55,15 @@ pipeline {
                 sh '''
                     echo "📦 Restaurando dependencias dentro de la imagen de build personalizada..."
                     docker build --target build -t $BUILD_IMAGE -f Dockerfile .
+                    
                     docker run --rm \
-                    -v "/var/jenkins_home/workspace/carnetizacion-digital-api-staging:/src" \
-                    -w /src \
-                    -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
-                    -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
-                    -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
-                    $BUILD_IMAGE \
-                    bash -c "ls -la Web && dotnet restore Web/Web.csproj"
-
+                        -v "$WORKSPACE_PATH:/src" \
+                        -w /src \
+                        -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
+                        -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
+                        -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
+                        $BUILD_IMAGE \
+                        bash -c "ls -la Web && dotnet restore Web/Web.csproj"
                 '''
             }
         }
@@ -64,7 +73,7 @@ pipeline {
                 sh '''
                     echo "🛠️ Compilando proyecto dentro de la misma imagen de build..."
                     docker run --rm \
-                        -v "$PWD:/src" \
+                        -v "$WORKSPACE_PATH:/src" \
                         -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
