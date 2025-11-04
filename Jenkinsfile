@@ -1,6 +1,7 @@
 /// <summary>
-/// Jenkinsfile estable y funcional para despliegue automatizado del proyecto carnetizacion-digital-api.
-/// Evita errores del plugin docker-workflow ejecutando comandos dotnet con docker run manual.
+/// Jenkinsfile estable para el despliegue automatizado del proyecto carnetizacion-digital-api.
+/// Usa la misma imagen base de build que tu Dockerfile (con SDK 8.0 preinstalado).
+/// Evita el error "No .NET SDKs were found" ejecutando restauración y compilación en la misma base.
 /// </summary>
 
 pipeline {
@@ -15,7 +16,7 @@ pipeline {
         DOTNET_CLI_HOME = '/var/jenkins_home/.dotnet'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
-        WORKSPACE_DIR = "/var/jenkins_home/workspace/${env.JOB_NAME}"
+        BUILD_IMAGE = 'ubuntu-dotnet-sdk-8.0' // 👈 nombre personalizado de la imagen base
     }
 
     stages {
@@ -43,15 +44,16 @@ pipeline {
         stage('Restaurar dependencias') {
             steps {
                 sh '''
-                    echo "📦 Restaurando dependencias dentro de contenedor .NET SDK..."
+                    echo "📦 Restaurando dependencias dentro de la imagen de build personalizada..."
+                    docker build -t $BUILD_IMAGE -f Dockerfile .
                     docker run --rm \
                         -v "$PWD:/src" \
                         -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
                         -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
-                        mcr.microsoft.com/dotnet/sdk:8.0 \
-                        bash -c "ls -la && mkdir -p $DOTNET_CLI_HOME && chmod -R 777 $DOTNET_CLI_HOME && dotnet restore Web/Web.csproj"
+                        $BUILD_IMAGE \
+                        bash -c "dotnet restore Web/Web.csproj"
                 '''
             }
         }
@@ -59,14 +61,14 @@ pipeline {
         stage('Compilar proyecto') {
             steps {
                 sh '''
-                    echo "🛠️ Compilando proyecto dentro del contenedor .NET SDK..."
+                    echo "🛠️ Compilando proyecto dentro de la misma imagen de build..."
                     docker run --rm \
                         -v "$PWD:/src" \
                         -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
                         -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
-                        mcr.microsoft.com/dotnet/sdk:8.0 \
+                        $BUILD_IMAGE \
                         bash -c "dotnet build Web/Web.csproj --configuration Release"
                 '''
             }
