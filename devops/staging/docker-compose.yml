@@ -1,21 +1,42 @@
 services:
+  services:
   carnetizacion-db-migrator-staging:
     image: carnetizacion-digital-api-staging
     build:
-      context: ../..               # ruta al raíz del repo
-      dockerfile: Dockerfile       # usa tu Dockerfile
+      context: ../..
+      dockerfile: Dockerfile
     env_file:
       - .env
     networks:
       - network_staging
     entrypoint: >
       bash -c "
-        echo 'Aplicando migraciones de Entity Framework...';
+        echo 'Esperando base de datos...';
+        until nc -z carnetizacion-postgres-staging 5432; do
+          echo 'Aún no disponible...';
+          sleep 5;
+        done;
+
+        echo 'Verificando migraciones existentes...';
         dotnet tool install --global dotnet-ef --version 8.0.0;
         export PATH=\"\$PATH:/root/.dotnet/tools\";
+
+        cd /app;
+
+        MIG_COUNT=$(dotnet ef migrations list --project Entity/Entity.csproj --startup-project Web/Web.csproj | wc -l);
+
+        if [ \"\$MIG_COUNT\" -eq 0 ]; then
+          echo 'No se encontraron migraciones. Creando una nueva...';
+          TIMESTAMP=\$(date +%Y%m%d%H%M%S);
+          dotnet ef migrations add AutoMigration_\$TIMESTAMP --project Entity/Entity.csproj --startup-project Web/Web.csproj;
+        fi;
+
+        echo 'Aplicando migraciones...';
         dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
+
         echo 'Migraciones aplicadas correctamente.';
       "
+
 
   carnetizacion-digital-api-staging:
     container_name: carnetizacion-digital-api-staging
