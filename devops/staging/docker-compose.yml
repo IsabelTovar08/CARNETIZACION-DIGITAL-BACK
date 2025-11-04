@@ -1,58 +1,18 @@
-version: '3.8'
 
 services:
-  carnetizacion-db-migrator-staging:
-    image: mcr.microsoft.com/dotnet/sdk:8.0
-    env_file:
-      - .env
-    working_dir: /src
-    volumes:
-      - ../..:/src
-    networks:
-      - network_staging
-    entrypoint: >
-      bash -c "
-        apt-get update && apt-get install -y netcat-openbsd;
-        echo '⏳ Esperando base de datos...';
-        until nc -z carnetizacion-postgres-staging 5432; do
-          echo '🔁 Aún no disponible...';
-          sleep 5;
-        done;
-
-        echo '🏗️ Verificando migraciones existentes...';
-        export PATH=\"\$PATH:/root/.dotnet/tools\";
-
-        MIG_COUNT=\$(dotnet ef migrations list --project Entity/Entity.csproj --startup-project Web/Web.csproj | wc -l);
-
-        if [ \"\$MIG_COUNT\" -eq 0 ]; then
-          echo '⚙️ No se encontraron migraciones. Creando una nueva...';
-          TIMESTAMP=\$(date +%Y%m%d%H%M%S);
-          dotnet ef migrations add AutoMigration_\$TIMESTAMP --project Entity/Entity.csproj --startup-project Web/Web.csproj;
-        fi;
-
-        echo '🚀 Aplicando migraciones...';
-        dotnet ef database update --project Entity/Entity.csproj --startup-project Web/Web.csproj;
-
-        echo '✅ Migraciones aplicadas correctamente.';
-      "
-
   carnetizacion-digital-api-staging:
     container_name: carnetizacion-digital-api-staging
     build:
       context: ../..
       dockerfile: Dockerfile
-    image: carnetizacion-digital-api-staging
-    depends_on:
-      - carnetizacion-db-migrator-staging
+    restart: always
     env_file:
       - .env
-    restart: always
     ports:
-      - "5102:8080"
-    networks:
-      - network_staging
-    command: ["dotnet", "Web.dll"]
+      - "5103:8080"
 
 networks:
   network_staging:
     external: true
+labels:
+    om.carnetizacion.environment=staging

@@ -102,13 +102,29 @@ namespace Web
 
                 try
                 {
-                    Console.WriteLine("🏗️ Aplicando migraciones pendientes...");
-                    db.Database.Migrate();
-                    Console.WriteLine("✅ Migraciones aplicadas correctamente.");
+                    Console.WriteLine("🏗️ Verificando base de datos...");
+
+                    // 1️⃣ Si no hay migraciones creadas, crea la base directamente desde el modelo
+                    var hasMigrationsTable = db.Database.ExecuteSqlRaw(
+                        "SELECT to_regclass('__EFMigrationsHistory');"
+                    );
+
+                    if (hasMigrationsTable == 0)
+                    {
+                        Console.WriteLine("⚙️ No existen migraciones, creando base de datos desde el modelo...");
+                        db.Database.EnsureCreated(); // Crea las tablas directamente SIN migraciones
+                    }
+                    else
+                    {
+                        Console.WriteLine("📦 Aplicando migraciones pendientes...");
+                        db.Database.Migrate(); // Aplica migraciones si existen
+                    }
+
+                    Console.WriteLine("✅ Base de datos lista.");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("❌ Error aplicando migraciones: " + ex.Message);
+                    Console.WriteLine($"❌ Error inicializando base de datos: {ex.Message}");
                 }
             }
 
