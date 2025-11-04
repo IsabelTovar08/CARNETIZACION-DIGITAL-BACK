@@ -9,7 +9,7 @@
 
             services.AddCors(opciones =>
             {
-                opciones.AddDefaultPolicy(politica =>
+                opciones.AddPolicy("AllowFrontend",politica =>
                 {
                     politica.WithOrigins(origenesPermitidos).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                 });

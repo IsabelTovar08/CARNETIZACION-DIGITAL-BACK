@@ -170,7 +170,7 @@ namespace Web
             app.UseSwaggerUI();
 
             app.UseRouting(); 
-            app.UseCors();
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
