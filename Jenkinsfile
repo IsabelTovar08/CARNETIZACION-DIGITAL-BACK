@@ -1,8 +1,3 @@
-/// <summary>
-/// Jenkinsfile estable y funcional para carnetizacion-digital-api.
-/// Ejecuta restore, build y despliegue con rutas relativas dentro del contenedor Jenkins.
-/// </summary>
-
 pipeline {
     agent any
 
@@ -18,10 +13,9 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout código fuente') {
             steps {
-                echo "📥 Descargando el código fuente desde Git..."
+                echo "📥 Descargando código desde Git..."
                 checkout scm
                 sh 'ls -la'
             }
@@ -50,17 +44,16 @@ pipeline {
         stage('Restaurar dependencias') {
             steps {
                 sh '''
-                    echo "📦 Restaurando dependencias dentro de la imagen de build personalizada..."
+                    echo "📦 Construyendo imagen de build personalizada..."
                     docker build --target build -t $BUILD_IMAGE -f Dockerfile .
                     
+                    echo "📦 Restaurando dependencias dentro de la imagen..."
                     docker run --rm \
-                        -v "$WORKSPACE:/src" \
-                        -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
                         -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
                         $BUILD_IMAGE \
-                        bash -c "ls -la && ls -la Web && dotnet restore Web/Web.csproj"
+                        bash -c "dotnet restore Web/Web.csproj"
                 '''
             }
         }
@@ -68,10 +61,8 @@ pipeline {
         stage('Compilar proyecto') {
             steps {
                 sh '''
-                    echo "🛠️ Compilando proyecto dentro de la misma imagen de build..."
+                    echo "🛠️ Compilando dentro de la imagen (sin montar nada)..."
                     docker run --rm \
-                        -v "$WORKSPACE:/src" \
-                        -w /src \
                         -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
                         -e DOTNET_SKIP_FIRST_TIME_EXPERIENCE=$DOTNET_SKIP_FIRST_TIME_EXPERIENCE \
                         -e DOTNET_NOLOGO=$DOTNET_NOLOGO \
