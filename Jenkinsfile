@@ -1,10 +1,3 @@
-/// <summary>
-/// Jenkinsfile principal para despliegue automatizado del proyecto carnetizacion-digital-api.
-/// Este pipeline detecta el entorno desde el archivo .env raíz,
-/// compila el proyecto .NET 8 y ejecuta el docker-compose correspondiente dentro de la carpeta devops/{entorno}.
-/// Antes del despliegue, elimina cualquier contenedor previo con el mismo nombre para evitar conflictos.
-/// </summary>
-
 pipeline {
     agent any
 
@@ -15,16 +8,12 @@ pipeline {
     }
 
     stages {
-
-        /// <summary>
-        /// Etapa 1: Detección del entorno.
-        /// </summary>
         stage('Leer entorno desde .env raíz') {
             steps {
                 script {
                     def envValue = sh(script: "grep '^ENVIRONMENT=' .env | cut -d '=' -f2", returnStdout: true).trim()
                     if (envValue == '') {
-                        error "No se encontró ENVIRONMENT en el archivo .env raíz"
+                        error "❌ No se encontró ENVIRONMENT en el archivo .env raíz"
                     }
 
                     env.ENVIRONMENT = envValue
@@ -32,63 +21,50 @@ pipeline {
                     env.COMPOSE_FILE = "${env.ENV_DIR}/docker-compose.yml"
                     env.ENV_FILE = "${env.ENV_DIR}/.env"
 
-                    echo "Entorno detectado: ${env.ENVIRONMENT}"
-                    echo "Archivo compose: ${env.COMPOSE_FILE}"
-                    echo "Archivo de entorno: ${env.ENV_FILE}"
+                    echo "🌍 Entorno detectado: ${env.ENVIRONMENT}"
+                    echo "📄 Archivo compose: ${env.COMPOSE_FILE}"
+                    echo "⚙️ Archivo de entorno: ${env.ENV_FILE}"
                 }
             }
         }
 
-        /// <summary>
-        /// Etapa 2: Restauración de dependencias (.NET SDK 8.0)
-        /// </summary>
         stage('Restaurar dependencias') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock --entrypoint=tail mcr.microsoft.com/dotnet/sdk:8.0 -f /dev/null'
-                }
-            }
             steps {
                 sh '''
-                    echo "📦 Restaurando dependencias..."
-                    mkdir -p $DOTNET_CLI_HOME
-                    chmod -R 777 $DOTNET_CLI_HOME
-                    dotnet restore Web/Web.csproj
+                    echo "📦 Restaurando dependencias dentro del contenedor SDK..."
+                    docker run --rm \
+                        -v $PWD:/src \
+                        -w /src \
+                        -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
+                        mcr.microsoft.com/dotnet/sdk:8.0 \
+                        bash -c "mkdir -p $DOTNET_CLI_HOME && chmod -R 777 $DOTNET_CLI_HOME && dotnet restore Web/Web.csproj"
                 '''
             }
         }
 
-        /// <summary>
-        /// Etapa 3: Compilación del proyecto (.NET SDK 8.0)
-        /// </summary>
         stage('Compilar proyecto') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    args '--entrypoint=tail mcr.microsoft.com/dotnet/sdk:8.0 -f /dev/null'
-                }
-            }
             steps {
-                echo '🛠️ Compilando la solución carnetizacion-digital-api...'
-                sh 'dotnet build Web/Web.csproj --configuration Release'
+                sh '''
+                    echo "🛠️ Compilando proyecto dentro del contenedor SDK..."
+                    docker run --rm \
+                        -v $PWD:/src \
+                        -w /src \
+                        -e DOTNET_CLI_HOME=$DOTNET_CLI_HOME \
+                        mcr.microsoft.com/dotnet/sdk:8.0 \
+                        bash -c "dotnet build Web/Web.csproj --configuration Release"
+                '''
             }
         }
 
-        /// <summary>
-        /// Etapa 4: Despliegue del backend (Docker Compose)
-        /// </summary>
         stage('Desplegar API') {
             steps {
-                echo "🚀 Desplegando carnetizacion-digital-api para entorno: ${env.ENVIRONMENT}"
-
                 sh """
-                    echo "🧹 Limpiando contenedores e imágenes antiguas..."
+                    echo "🧹 Limpiando recursos antiguos para ${env.ENVIRONMENT}..."
                     docker ps -a --filter "name=carnetizacion-digital-api-${env.ENVIRONMENT}" -q | xargs -r docker rm -f || true
                     docker images "carnetizacion-digital-api-${env.ENVIRONMENT}" -q | xargs -r docker rmi -f || true
                     docker system prune -f --volumes || true
 
-                    echo "🚀 Ejecutando nuevo despliegue limpio..."
+                    echo "🚀 Desplegando API..."
                     docker compose -f ${env.COMPOSE_FILE} --env-file ${env.ENV_FILE} up -d --build --force-recreate --no-deps --remove-orphans
                 """
             }
