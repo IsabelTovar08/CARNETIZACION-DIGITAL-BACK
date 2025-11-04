@@ -1,7 +1,7 @@
 /// <summary>
-/// Jenkinsfile estable para el despliegue automatizado del proyecto carnetizacion-digital-api.
-/// Usa la misma imagen base de build que tu Dockerfile (con SDK 8.0 preinstalado).
-/// Evita el error "No .NET SDKs were found" ejecutando restauración y compilación en la misma base.
+/// Jenkinsfile estable para carnetizacion-digital-api.
+/// Usa tu propia imagen base (la del Dockerfile) que ya instala el SDK 8.0,
+/// evitando el error "No .NET SDKs were found" dentro de Jenkins-in-Docker.
 /// </summary>
 
 pipeline {
@@ -16,7 +16,7 @@ pipeline {
         DOTNET_CLI_HOME = '/var/jenkins_home/.dotnet'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_NOLOGO = '1'
-        BUILD_IMAGE = 'ubuntu-dotnet-sdk-8.0' // 👈 nombre personalizado de la imagen base
+        BUILD_IMAGE = 'carnetizacion-dotnet-build' // nombre temporal para tu imagen build
     }
 
     stages {
@@ -41,11 +41,19 @@ pipeline {
             }
         }
 
+        stage('Construir imagen de build (con SDK 8.0)') {
+            steps {
+                sh '''
+                    echo "🧱 Construyendo imagen de build personalizada..."
+                    docker build -t $BUILD_IMAGE -f Dockerfile .
+                '''
+            }
+        }
+
         stage('Restaurar dependencias') {
             steps {
                 sh '''
-                    echo "📦 Restaurando dependencias dentro de la imagen de build personalizada..."
-                    docker build -t $BUILD_IMAGE -f Dockerfile .
+                    echo "📦 Restaurando dependencias usando imagen personalizada..."
                     docker run --rm \
                         -v "$PWD:/src" \
                         -w /src \
@@ -61,7 +69,7 @@ pipeline {
         stage('Compilar proyecto') {
             steps {
                 sh '''
-                    echo "🛠️ Compilando proyecto dentro de la misma imagen de build..."
+                    echo "🛠️ Compilando proyecto usando imagen personalizada..."
                     docker run --rm \
                         -v "$PWD:/src" \
                         -w /src \
