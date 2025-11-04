@@ -10,9 +10,11 @@ services:
       - .env
     ports:
       - "5103:8080"
+    networks:
+      - network_staging
+    labels:
+      - com.carnetizacion.environment=staging
 
 networks:
   network_staging:
     external: true
-labels:
-    om.carnetizacion.environment=staging
