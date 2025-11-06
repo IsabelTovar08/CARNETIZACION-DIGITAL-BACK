@@ -17,16 +17,24 @@ namespace Business.Interfaces.Operational
         Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default);
 
         Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
-            int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
-            string? sortBy, string? sortDir, int page, int pageSize,
-            CancellationToken ct = default);
+            int? personId,
+            int? eventId,
+            DateTime? fromUtc,
+            DateTime? toUtc,
+            string? sortBy,
+            string? sortDir,
+            int page,
+            int pageSize,
+            CancellationToken ct = default
+        );
 
-        // <sumary>
-        /// pdf y excel export
-        /// </sumary>
+        /// <summary>
+        /// ✅ Registra asistencia a partir de un código QR escaneado del evento.
+        /// Devuelve un objeto tipado con éxito, mensaje y datos del registro.
+        /// </summary>
+        Task<AttendanceDtoResponse> RegisterAttendanceByQrAsync(string eventCode, int personId);
 
         Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
         Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
-
     }
 }
