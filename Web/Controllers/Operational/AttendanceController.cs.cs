@@ -1,13 +1,16 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Business.Interfaces.Operational;
+﻿using Business.Interfaces.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Reports;
 using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Web.Controllers.Base;
 using System.Linq; // necesario para ToList()
 
@@ -37,38 +40,22 @@ namespace Web.Controllers.Operational
         /// Registra asistencia por escaneo (móvil) y retorna la asistencia creada.
         /// </summary>
         [HttpPost("scan")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RegisterAttendance([FromBody] AttendanceDtoRequest dto)
         {
             if (dto == null)
-            {
-                _logger.LogWarning("Solicitud de registro de asistencia sin body.");
                 return BadRequest(new { success = false, message = "Solicitud inválida: body vacío." });
-            }
 
             var result = await _attendanceBusiness.RegisterAttendanceAsync(dto);
-
             if (result == null)
-            {
-                _logger.LogWarning("No se pudo registrar la asistencia con los datos proporcionados.");
                 return BadRequest(new { success = false, message = "No se pudo registrar la asistencia." });
-            }
 
-            return Ok(new
-            {
-                success = true,
-                message = "Asistencia registrada correctamente.",
-                data = result
-            });
+            return Ok(new { success = true, message = "Asistencia registrada correctamente.", data = result });
         }
 
         /// <summary>
         /// REGISTRA SOLO LA ENTRADA usando AttendanceDtoRequestSpecific.
         /// </summary>
         [HttpPost("register-entry")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RegisterEntry([FromBody] AttendanceDtoRequestSpecific dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -76,12 +63,7 @@ namespace Web.Controllers.Operational
             try
             {
                 var result = await _attendanceBusiness.RegisterEntryAsync(dto);
-                return Ok(new
-                {
-                    success = true,
-                    message = "Entrada registrada correctamente.",
-                    data = result
-                });
+                return Ok(new { success = true, message = "Entrada registrada correctamente.", data = result });
             }
             catch (Exception ex)
             {
@@ -94,8 +76,6 @@ namespace Web.Controllers.Operational
         /// REGISTRA SOLO LA SALIDA usando AttendanceDtoRequestSpecific.
         /// </summary>
         [HttpPost("register-exit")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RegisterExit([FromBody] AttendanceDtoRequestSpecific dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -103,12 +83,7 @@ namespace Web.Controllers.Operational
             try
             {
                 var result = await _attendanceBusiness.RegisterExitAsync(dto);
-                return Ok(new
-                {
-                    success = true,
-                    message = "Salida registrada correctamente.",
-                    data = result
-                });
+                return Ok(new { success = true, message = "Salida registrada correctamente.", data = result });
             }
             catch (Exception ex)
             {
@@ -119,7 +94,6 @@ namespace Web.Controllers.Operational
 
         // NUEVO ENDPOINT: CONSULTA Y FILTRO
         [HttpGet("search")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         public async Task<IActionResult> Search(
             [FromQuery] int? personId,
             [FromQuery] int? eventId,
@@ -135,7 +109,7 @@ namespace Web.Controllers.Operational
                 personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize, ct);
 
             if (total == 0)
-                return Ok(new { items = Array.Empty<object>(), total = 0, page, pageSize, message = "Sin resultados para los filtros aplicados." });
+                return Ok(new { items = Array.Empty<object>(), total = 0, page, pageSize, message = "Sin resultados." });
 
             return Ok(new { items, total, page, pageSize });
         }
@@ -144,28 +118,17 @@ namespace Web.Controllers.Operational
         /// Registra asistencia a un evento a través de un código QR.
         /// </summary>
         [HttpPost("register-by-qr")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RegisterByQr([FromBody] AttendanceDtoRequest dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.QrCode))
-            {
-                return BadRequest(new { success = false, message = "Solicitud inválida: debe incluir el QrCode y el PersonId." });
-            }
+                return BadRequest(new { success = false, message = "Debe incluir el QrCode y el PersonId." });
 
             var result = await _accessPointBusiness.RegisterAttendanceByQrAsync(dto.QrCode, dto.PersonId);
 
             if (result == null || !result.Success)
-            {
                 return BadRequest(new { success = false, message = result?.Message ?? "No se pudo registrar la asistencia." });
-            }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result
-            });
+            return Ok(new { success = true, message = result.Message, data = result });
         }
 
         // =========================================================

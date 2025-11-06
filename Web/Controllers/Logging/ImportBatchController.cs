@@ -46,7 +46,7 @@ namespace Web.Controllers.Logging
         public async Task<ActionResult<ApiResponse<IEnumerable<ImportBatchRowTableDto>>>> GetRows(int id)
         {
             var result = await _business.GetRowsAsync(id);
-            return Ok(ApiResponse<IEnumerable<ImportBatchRowTableDto>>.Ok(
+            return Ok(ApiResponse<IEnumerable<ImportBatchRowDto>>.Ok(
                 result,
                 "Filas obtenidas correctamente."
             ));

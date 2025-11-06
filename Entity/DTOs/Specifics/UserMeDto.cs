@@ -19,6 +19,6 @@ namespace Entity.DTOs.Specifics
         public List<RolDto> Roles { get; set; } = new();
         public List<PermissionDto> Permissions { get; set; } = new();
 
-        public PersonDivisionProfileDto? CurrentProfile { get; set; }
+        public IssuedCardDto? CurrentProfile { get; set; }
     }
 }

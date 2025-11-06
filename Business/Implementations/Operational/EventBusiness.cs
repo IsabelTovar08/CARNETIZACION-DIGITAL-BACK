@@ -13,10 +13,16 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing.Imaging;
+using QRCoder;
 using Utilities.Helpers;
+using System.Drawing;
+using System.Drawing.Imaging;
+using QuestPDF.Infrastructure;
 
 namespace Business.Implementations.Operational
 {
@@ -38,8 +44,20 @@ namespace Business.Implementations.Operational
 
         public async Task<int> CreateEventAsync(CreateEventRequest dto)
         {
-            // 1) Crear evento
+            // 1) Mapear evento desde DTO
             var ev = _mapper.Map<Event>(dto.Event);
+
+            // ✅ Generar QR único en Base64 y asignarlo al evento antes de persistir
+            string qrData = $"EVENT-{Guid.NewGuid()}-{ev.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
+            using var qrGen = new QRCodeGenerator();
+            using var qrCodeData = qrGen.CreateQrCode(qrData, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new QRCode(qrCodeData);
+            using var bitmap = qrCode.GetGraphic(20);
+            using var ms = new MemoryStream();
+            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            ev.QrCodeBase64 = Convert.ToBase64String(ms.ToArray());
+
+            // Guardar evento (ya con QrCodeBase64)
             var savedEvent = await _data.SaveAsync(ev);
 
             // 2) Crear AccessPoints nuevos si vienen en el DTO
@@ -109,6 +127,33 @@ namespace Business.Implementations.Operational
             var entity = await _data.GetEventWithDetailsAsync(eventId);
 
             return _mapper.Map<EventDetailsDtoResponse>(entity);
+        }
+
+
+        /// <summary>
+        /// Retorna el número de eventos disponibles
+        /// </summary>
+        public async Task<int> GetAvailableEventsCountAsync()
+        {
+            try
+            {
+                var total = await _data.GetAvailableEventsCountAsync();
+
+                if (total < 0)
+                    throw new InvalidOperationException("El número de eventos no puede ser negativo");
+
+                return total;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Validación fallida al obtener eventos disponibles");
+                throw; 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado en Business al obtener eventos disponibles");
+                throw; 
+            }
         }
     }
 }

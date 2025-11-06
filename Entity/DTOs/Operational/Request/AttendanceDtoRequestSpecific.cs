@@ -15,5 +15,15 @@ namespace Entity.DTOs.Operational.Request
 
         [Range(1, int.MaxValue, ErrorMessage = "El identificador del punto de acceso debe ser un número entero mayor que 0.")]
         public int? AccessPoint { get; set; }
+
+        /// <summary>
+        ///  Nueva propiedad para compatibilidad con la lógica existente.
+        /// Alias de AccessPoint, usada en Business y Controller.
+        /// </summary>
+        public int? AccessPointId
+        {
+            get => AccessPoint;
+            set => AccessPoint = value;
+        }
     }
 }

@@ -32,13 +32,8 @@ namespace Entity.Models.ModelSecurity
         public City? City { get; set; }
 
         public List<Attendance>? Attendances { get; set; }
-        public List<PersonDivisionProfile>? PersonDivisionProfile { get; set; }
+        public List<IssuedCard>? IssuedCard { get; set; }
         public CustomType DocumentType { get; set; }
         public CustomType? BloodType { get; set; }
-
-        public static implicit operator Person?(PersonInfoDto? v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

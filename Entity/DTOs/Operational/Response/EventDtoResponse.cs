@@ -27,6 +27,8 @@ namespace Entity.DTOs.Operational
         public int StatusId { get; set; }
         public string StatusName { get; set; }
 
+        public string? QrCodeBase64 { get; set; }
+
         public List<AccessPointDtoResponsee> AccessPoints { get; set; } = new();
     }
 }

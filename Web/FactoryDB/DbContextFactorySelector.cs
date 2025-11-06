@@ -1,4 +1,4 @@
-﻿using Web.FactoryDB.Classes;
+﻿using Web.FactoryDB.Factories;
 using Web.FactoryDB.Interfases;
 
 namespace Web.FactoryDB
@@ -9,9 +9,9 @@ namespace Web.FactoryDB
         {
             return provider switch
             {
-                "SqlServer" => new SqlServerDbContextFactory(),
-                "MySql" => new MySqlDbContextFactory(),
-                "Postgres" => new PostgresDbContextFactory(),
+                "SqlServer" => new SqlServerFactory(),
+                //"MySql" => new MySqlFactory(),
+                "Postgres" => new PostgresFactory(),
                 _ => throw new NotSupportedException($"proveedor{provider} no soportado"),
             };
         }

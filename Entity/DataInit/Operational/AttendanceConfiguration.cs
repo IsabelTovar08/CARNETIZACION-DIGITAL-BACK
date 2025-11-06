@@ -50,10 +50,6 @@ namespace Entity.DataInit.Operational
             // Tu modelo es DateTime? -> debe ser NO requerido en la BD
             builder.Property(a => a.TimeOfExit).IsRequired(false);
 
-            //  QrCode 
-            builder.Property(a => a.QrCode)
-                   .HasColumnType("nvarchar(max)")
-                   .IsRequired(false);
 
             builder.Property(x => x.IsDeleted).HasDefaultValue(false);
 

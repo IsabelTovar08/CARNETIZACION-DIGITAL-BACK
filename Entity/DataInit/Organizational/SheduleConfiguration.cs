@@ -14,37 +14,43 @@ namespace Entity.DataInit.Organizational
         public void Configure(EntityTypeBuilder<Schedule> builder)
         {
             builder.HasData(
-               new Schedule
-               {
-                   Id = 1,
-                   Name = "Horario Jornada A",
-                   StartTime = TimeOnly.Parse("07:00"),
-                   EndTime = TimeOnly.Parse("18:00"),
-                   OrganizationId = 1,
-                   IsDeleted = false
-               },
-               new Schedule
-               {
-                   Id = 2,
-                   Name = "Horario Jornada B",
-                   StartTime = TimeOnly.Parse("08:00"),
-                   EndTime = TimeOnly.Parse("17:00"),
-                   OrganizationId = 1,
-                   IsDeleted = false
-               },
-               new Schedule
-               {
-                   Id = 3,
-                   Name = "Horario Jornada C",
-                   StartTime = TimeOnly.Parse("06:30"),
-                   EndTime = TimeOnly.Parse("19:00"),
-                   OrganizationId = 1,
-                   IsDeleted = false
-               }
-           );
+                new Schedule
+                {
+                    Id = 1,
+                    Name = "Horario Jornada A",
+                    StartTime = new TimeSpan(7, 0, 0),
+                    EndTime = new TimeSpan(18, 0, 0),
+                    IsDeleted = false
+                },
+                new Schedule
+                {
+                    Id = 2,
+                    Name = "Horario Jornada B",
+                    StartTime = new TimeSpan(8, 0, 0),
+                    EndTime = new TimeSpan(17, 0, 0),
+                    IsDeleted = false
+                },
+                new Schedule
+                {
+                    Id = 3,
+                    Name = "Horario Jornada C",
+                    StartTime = new TimeSpan(6, 30, 0),
+                    EndTime = new TimeSpan(19, 0, 0),
+                    IsDeleted = false
+                }
+            );
 
             builder.Property(x => x.IsDeleted)
                    .HasDefaultValue(false);
+
+            /// <summary>
+            /// Configura los tipos de datos para compatibilidad entre proveedores.
+            /// SQL Server no soporta directamente TimeOnly, por lo tanto se almacena como TimeSpan.
+            /// PostgreSQL y MySQL soportan 'time' de forma nativa.
+            /// </summary>
+ 
+
+
 
             builder.ToTable("Schedules", schema: "Organizational");
         }

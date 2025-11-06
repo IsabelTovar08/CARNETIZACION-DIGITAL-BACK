@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entity.DTOs.Organizational.Assigment.Response
 {
-    public class CardDto : GenericDto
+    public class CardConfigurationDto : GenericDto
     {
         public string QRCode { get; set; }
 

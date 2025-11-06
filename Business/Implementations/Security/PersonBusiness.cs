@@ -339,5 +339,36 @@ namespace Business.Classes
             var items = entities.Select(e => _mapper.Map<PersonDto>(e)).ToList();
             return (items, total);
         }
+    
+        public async Task<PersonDto?> GetCurrentPersonAsync()
+        {
+            try
+            {
+                // 1) Validar user autenticado
+                if (_currentUser == null || _currentUser.UserId <= 0)
+                {
+                    _logger.LogDebug("Usuario no autenticado o claim inválido. UserIdRaw={UserIdRaw}", _currentUser?.UserIdRaw);
+                    return null; // o lanzar UnauthorizedAccessException según convención de tu app
+                }
+
+                // 2) Buscar la persona asociada al User (la consulta al back queda en la capa Data)
+                var person = await _personData.GetPersonByUserIdAsync(_currentUser.UserId);
+                if (person == null)
+                {
+                    _logger.LogInformation("No se encontró persona asociada al usuario {UserId}", _currentUser.UserId);
+                    return null;
+                }
+
+                // 3) Mapear a DTO usando AutoMapper (ya registrado)
+                var dto = _mapper.Map<PersonDto>(person);
+                return dto;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error obteniendo persona actual para UserIdRaw={UserIdRaw}", _currentUser?.UserIdRaw);
+                throw; // deja que el middleware lo maneje (o encapsula en una excepción controlada)
+            }
+        }
     }
+
 }

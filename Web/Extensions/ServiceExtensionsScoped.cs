@@ -2,34 +2,18 @@
 using Business.Classes.Base;
 using Business.Implementations.Notifications;
 using Business.Implementations.Operational;
-using Business.Implementations.Operational;
-using Business.Implementations.Operational;
-using Business.Implementations.Organizational.Assignment;
-using Business.Implementations.Organizational.Assignment;
 using Business.Implementations.Organizational.Assignment;
 using Business.Implementations.Organizational.Location;
-using Business.Implementations.Organizational.Structure;
-using Business.Implementations.Organizational.Structure;
 using Business.Implementations.Organizational.Structure;
 using Business.Implementations.Parameters;
 using Business.Implementations.Storage;
 using Business.Interfaces.ApiColombia;
 using Business.Interfaces.Auth;
-using Business.Interfaces.Auth;
-using Business.Interfaces.Auth;
 using Business.Interfaces.Enums;
 using Business.Interfaces.Logging;
 using Business.Interfaces.Notifications;
-using Business.Interfaces.Notifications;
-using Business.Interfaces.Notifications;
-using Business.Interfaces.Operational;
-using Business.Interfaces.Operational;
 using Business.Interfaces.Operational;
 using Business.Interfaces.Organizational.Assignment;
-using Business.Interfaces.Organizational.Assignment;
-using Business.Interfaces.Organizational.Assignment;
-using Business.Interfaces.Organizational.Structure;
-using Business.Interfaces.Organizational.Structure;
 using Business.Interfaces.Organizational.Structure;
 using Business.Interfaces.Parameters;
 using Business.Interfaces.Security;
@@ -40,6 +24,7 @@ using Business.Interfases.Organizational.Location;
 using Business.Interfases.Storage;
 using Business.Services.ApiColombia;
 using Business.Services.Auth;
+using Business.Services.Cards;
 using Business.Services.CodeGenerator;
 using Business.Services.Enums;
 using Business.Services.Excel;
@@ -50,72 +35,28 @@ using Business.Services.Storage;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Implementations.Auth;
-using Data.Implementations.Auth;
-using Data.Implementations.Auth;
 using Data.Implementations.Logging;
 using Data.Implementations.Notifications;
-using Data.Implementations.Notifications;
-using Data.Implementations.Notifications;
 using Data.Implementations.Operational;
-using Data.Implementations.Operational;
-using Data.Implementations.Operational;
-using Data.Implementations.Organizational.Assignment;
-using Data.Implementations.Organizational.Assignment;
 using Data.Implementations.Organizational.Assignment;
 using Data.Implementations.Organizational.Location;
 using Data.Implementations.Organizational.Structure;
-using Data.Implementations.Organizational.Structure;
-using Data.Implementations.Organizational.Structure;
 using Data.Implementations.Parameters;
 using Data.Implementations.Transaction;
-using Data.Interfaces.Security;
-using Data.Interfaces.Security;
-using Data.Interfaces.Security;
 using Data.Interfases;
-using Data.Interfases.Auth;
-using Data.Interfases.Auth;
 using Data.Interfases.Auth;
 using Data.Interfases.Logging;
 using Data.Interfases.Notifications;
-using Data.Interfases.Notifications;
-using Data.Interfases.Notifications;
 using Data.Interfases.Operational;
-using Data.Interfases.Operational;
-using Data.Interfases.Operational;
-using Data.Interfases.Organizational.Assignment;
-using Data.Interfases.Organizational.Assignment;
 using Data.Interfases.Organizational.Assignment;
 using Data.Interfases.Organizational.Location;
-using Data.Interfases.Organizational.Structure;
-using Data.Interfases.Organizational.Structure;
 using Data.Interfases.Organizational.Structure;
 using Data.Interfases.Parameters;
 using Data.Interfases.Security;
 using Data.Interfases.Transaction;
-using Entity.DTOs;
-using Entity.DTOs.ModelSecurity.Request;
-using Entity.DTOs.ModelSecurity.Response;
-using Entity.DTOs.Operational;
-using Entity.DTOs.Operational;
-using Entity.DTOs.Organizational.Structure.Request;
-using Entity.DTOs.Organizational.Structure.Request;
 using Entity.DTOs.Organizational.Structure.Request;
 using Entity.DTOs.Organizational.Structure.Response;
-using Entity.DTOs.Organizational.Structure.Response;
-using Entity.DTOs.Organizational.Structure.Response;
-using Entity.DTOs.Parameter;
-using Entity.DTOs.Parameter.Request;
-using Entity.DTOs.Parameter.Request;
-using Entity.DTOs.Parameter.Request;
-using Entity.DTOs.Parameter.Response;
-using Entity.DTOs.Parameter.Response;
-using Entity.DTOs.Parameter.Response;
 using Entity.Models;
-using Entity.Models.Auth;
-using Entity.Models.Auth;
-using Entity.Models.Auth;
-using Entity.Models.ModelSecurity;
-using Entity.Models.Notifications;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
@@ -275,7 +216,7 @@ namespace Web.Extensions
             services.AddScoped<OrganizationalUnitBranchData>();
 
             //Card
-            services.AddScoped<ICardData, CardData>();
+            services.AddScoped<ICardConfigurationData, CardConfigurationData>();
             services.AddScoped<ICardBusiness, CardBusiness>();
 
             //Card Templates
@@ -291,8 +232,8 @@ namespace Web.Extensions
             services.AddScoped<IScheduleBusiness, ScheduleBusiness>();
 
             //PersonDivisionProfile
-            services.AddScoped<IPersonDivisionProfileData, PersonDivisionProfileData>();
-            services.AddScoped<IPersonDivisionProfileBusiness, PersonDivisionProfileBusiness>();
+            services.AddScoped<IIssuedCardData, IssuedCardData>();
+            services.AddScoped<IIssuedCardBusiness, IssuedCardBusiness>();
 
             //Profiles
             services.AddScoped<IProfileData, ProfileData>();
@@ -339,6 +280,7 @@ namespace Web.Extensions
 
             services.AddScoped<IExportService, ExportService>();
 
+            services.AddHttpClient<ICardPdfService, CardPdfService>();
 
 
 

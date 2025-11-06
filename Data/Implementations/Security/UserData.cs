@@ -59,11 +59,10 @@ namespace Data.Classes.Specifics
                         .ThenInclude(p => p.City)
 
                     // Solo el perfil actual y sus dependencias HACIA ADELANTE
-                    .Include(u => u.Person.PersonDivisionProfile.Where(pdp => pdp.IsCurrentlySelected))
+                    .Include(u => u.Person.IssuedCard.Where(pdp => pdp.IsCurrentlySelected))
                         .ThenInclude(pdp => pdp.Profile)
-                    .Include(u => u.Person.PersonDivisionProfile.Where(pdp => pdp.IsCurrentlySelected))
-                        .ThenInclude(pdp => pdp.InternalDivision); // o Division, según tu modelo
-                                                                   // 👈 NO hagas: .ThenInclude(pdp => pdp.Person) ni .ThenInclude(...Person.City)
+                    .Include(u => u.Person.IssuedCard.Where(pdp => pdp.IsCurrentlySelected))
+                        .ThenInclude(pdp => pdp.InternalDivision); 
             }
 
             return await query.FirstOrDefaultAsync();

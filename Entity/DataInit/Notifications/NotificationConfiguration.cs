@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Entity.Models.Notifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Utilities.Enums.Specifics;
 
 namespace Entity.DataInit.Notifications
 {
@@ -13,26 +15,6 @@ namespace Entity.DataInit.Notifications
     {
         public void Configure(EntityTypeBuilder<Notification> builder)
         {
-            builder.HasData(
-               new Notification
-               {
-                   Id = 1,
-                   Title = "Verificación de cuenta",
-                   Message = "Por favor verifica tu cuenta haciendo clic en el enlace enviado.",
-                   CreateDate = new DateTime(2025, 7, 27, 10, 0, 0),
-                   NotificationTypeId = 1,
-                   IsDeleted = false
-               },
-               new Notification
-               {
-                   Id = 2,
-                   Title = "Invitación a evento",
-                   Message = "Estás invitado al evento de bienvenida. Confirma tu asistencia.",
-                   CreateDate = new DateTime(2025, 7, 28, 9, 30, 0),
-                   NotificationTypeId = 2,
-                   IsDeleted = false
-               }
-           );
 
             builder.Property(n => n.Title)
                .IsRequired()
@@ -42,8 +24,9 @@ namespace Entity.DataInit.Notifications
                 .IsRequired()
                 .HasMaxLength(1000);
 
-            builder.Property(n => n.CreateDate)
-                .HasColumnType("datetime");
+            builder
+                  .Property(e => e.NotificationType)
+                  .HasConversion<int>();
 
             //builder.HasOne(n => n.NotificationType)
             //    .WithMany()
@@ -54,6 +37,28 @@ namespace Entity.DataInit.Notifications
                 .WithOne(nr => nr.Notification)
                 .HasForeignKey(nr => nr.NotificationId)
                 .OnDelete(DeleteBehavior.Cascade);
+           // builder.HasData(
+           //    new Notification
+           //    {
+           //        Id = 1,
+           //        Title = "Verificación de cuenta",
+           //        Message = "Por favor verifica tu cuenta haciendo clic en el enlace enviado.",
+           //        CreateDate = new DateTime(2025, 7, 27, 10, 0, 0),
+           //        NotificationType = NotificationType.System,
+           //        IsDeleted = false
+           //    },
+           //    new Notification
+           //    {
+           //        Id = 2,
+           //        Title = "Invitación a evento",
+           //        Message = "Estás invitado al evento de bienvenida. Confirma tu asistencia.",
+           //        CreateDate = new DateTime(2025, 7, 28, 9, 30, 0),
+           //        NotificationType = NotificationType.System,
+           //        IsDeleted = false
+           //    }
+           //);
+
+            
 
             builder.ToTable("Notification", schema: "Notifications");
         }

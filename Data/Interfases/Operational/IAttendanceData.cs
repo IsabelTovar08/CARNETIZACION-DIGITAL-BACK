@@ -22,11 +22,15 @@ namespace Data.Interfases.Operational
 
         /// <summary>
         /// Consulta filtrada y paginada de asistencias.
-        /// Filtros opcionales: personId, eventId (vía AccessPoint Entry/Exit), rango de fechas, orden y paginación.
         /// </summary>
         Task<(IList<Attendance> Items, int Total)> QueryAsync(
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
             CancellationToken ct = default);
+
+        // NUEVO: Reporte filtrado sin paginación
+        //Task<IList<Attendance>> GetReportAsync(
+        //    int? eventId, int? personId, DateTime? startDate, DateTime? endDate,
+        //    CancellationToken ct = default);
     }
 }

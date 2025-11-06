@@ -39,6 +39,7 @@ namespace Data.Implementations.Logging
         {
             return await _context.Set<ImportBatch>()
                 .AsNoTracking()
+                 .Include(b => b.StartedByUser)
                 .OrderByDescending(b => b.StartedAt)
                 .ToListAsync();
         }
@@ -56,13 +57,11 @@ namespace Data.Implementations.Logging
         public async Task<IEnumerable<ImportBatchRow>> GetRowsAsync(int batchId)
         {
             return await _context.ImportBatchRows
-              .Include(r => r.PersonDivisionProfile)
+              .Include(r => r.IssuedCard)
                   .ThenInclude(pdp => pdp.Person)
-              .Include(r => r.PersonDivisionProfile)
+              .Include(r => r.IssuedCard)
                   .ThenInclude(pdp => pdp.InternalDivision)
                       .ThenInclude(div => div.OrganizationalUnit)
-              .Include(r => r.Card)
-                  .ThenInclude(c => c.Status)
               .Where(r => r.ImportBatchId == batchId)
               .ToListAsync();
 

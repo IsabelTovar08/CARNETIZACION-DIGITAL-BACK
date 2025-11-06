@@ -58,5 +58,45 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
+        /// <summary>
+        /// Retorna el número de eventos disponibles
+        /// </summary>
+        [HttpGet("available/count")]
+        public async Task<ActionResult<ApiResponse<int>>> GetAvailableEventsCount()
+        {
+            try
+            {
+                var total = await _eventBusiness.GetAvailableEventsCountAsync();
+                var response = ApiResponse<int>.Ok(total, "Eventos disponibles consultados correctamente");
+                response.TotalRows = total;
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Manejo de errores de negocio
+                var response = ApiResponse<int>.Fail("Validación de negocio fallida", new[] { ex.Message });
+                return BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores inesperados
+                var response = ApiResponse<int>.Fail("Error al consultar eventos disponibles", new[] { ex.Message });
+                return BadRequest(response);
+            }
+        }
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateEventRequest dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var id = await _eventBusiness.CreateEventAsync(dto);
+            return Ok(new
+            {
+                success = true,
+                message = "Evento creado correctamente con QR generado en Base64",
+                data = new { id }
+            });
+        }
     }
 }

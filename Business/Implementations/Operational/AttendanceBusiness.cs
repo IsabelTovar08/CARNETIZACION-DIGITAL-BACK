@@ -6,12 +6,12 @@ using Entity.Models.Organizational;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using QRCoder;
-using Entity.DTOs.Operational.Response;
-using Entity.DTOs.Operational.Request;
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Reports;
 using Utilities.Helpers; // ✅ cambio aquí
 
 namespace Business.Implementations.Operational
@@ -34,144 +34,127 @@ namespace Business.Implementations.Operational
         }
 
         /// <summary>
-        /// Escaneo QR: si NO hay asistencia abierta -> ENTRADA;
-        /// si SÍ hay una abierta -> SALIDA sobre esa misma.
+        /// Registra asistencia general (sin entrada/salida específica).
         /// </summary>
         public async Task<AttendanceDtoResponse?> RegisterAttendanceAsync(AttendanceDtoRequest dto)
         {
-            if (dto == null || dto.PersonId <= 0)
-            {
-                _logger.LogWarning("Intento de registrar asistencia con datos inválidos (DTO nulo o PersonId <= 0).");
-                return null;
-            }
-
             try
             {
-                // Normalización de AccessPoints (0 o negativos -> null)
-                if (dto.AccessPointOfEntry.HasValue && dto.AccessPointOfEntry.Value <= 0)
-                    dto.AccessPointOfEntry = null;
-                if (dto.AccessPointOfExit.HasValue && dto.AccessPointOfExit.Value <= 0)
-                    dto.AccessPointOfExit = null;
+                var entity = _mapper.Map<Attendance>(dto);
+                var saved = await _attendanceData.SaveAsync(entity);
+                var response = _mapper.Map<AttendanceDtoResponse>(saved);
 
-                // ¿Existe asistencia abierta?
-                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, CancellationToken.None);
+                response.Success = true;
+                response.Message = "Asistencia registrada correctamente.";
+                response.TimeOfEntryStr = response.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
 
-                if (open == null)
-                {
-                    // ➜ ENTRADA (crear)
-                    if (dto.TimeOfEntry == default)
-                        dto.TimeOfEntry = DateTime.Now;
+                if (response.TimeOfExit.HasValue)
+                    response.TimeOfExitStr = response.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
 
-                    dto.TimeOfExit = null; // no se registra aún
-                    var created = await Save(dto);
-                    _logger.LogInformation($"Entrada registrada. PersonId={dto.PersonId}, AttendanceId={created.Id}");
-                    return created;
-                }
-                else
-                {
-                    // ➜ SALIDA (actualizar por data layer)
-                    var now = DateTime.Now;
-                    if (now < open.TimeOfEntry) now = open.TimeOfEntry;
-
-                    int? apOut = dto.AccessPointOfExit.HasValue && dto.AccessPointOfExit.Value > 0
-                        ? dto.AccessPointOfExit
-                        : (open.AccessPointOfExit ?? open.AccessPointOfEntry);
-
-                    var updatedEntity = await _attendanceData.UpdateExitAsync(open.Id, now, apOut, CancellationToken.None);
-                    var updated = _mapper.Map<AttendanceDtoResponse>(updatedEntity);
-
-                    _logger.LogInformation($"Salida registrada. PersonId={dto.PersonId}, AttendanceId={updated.Id}");
-                    return updated;
-                }
+                return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al registrar asistencia (entrada/salida).");
-                return null;
+                _logger.LogError(ex, "Error registrando asistencia.");
+                return new AttendanceDtoResponse
+                {
+                    Success = false,
+                    Message = "Error al registrar asistencia."
+                };
             }
         }
 
         /// <summary>
-        /// REGISTRA SOLO LA ENTRADA (falla si ya existe una abierta).
+        /// Registra la entrada de una persona a un evento.
         /// </summary>
-        public async Task<AttendanceDtoResponse> RegisterEntryAsync(
-            AttendanceDtoRequestSpecific dto,
-            CancellationToken ct = default)
+        public async Task<AttendanceDtoResponse> RegisterEntryAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default)
         {
-            if (dto == null) throw new ArgumentNullException(nameof(dto));
-            if (dto.PersonId <= 0) throw new ArgumentException("El PersonId debe ser mayor que 0.", nameof(dto.PersonId));
-
-            var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, ct);
-            if (open != null)
-                throw new InvalidOperationException("Ya existe una ENTRADA abierta. Debe registrarse la SALIDA antes de crear otra ENTRADA.");
-
-            var time = dto.Time == default ? DateTime.Now : dto.Time;
-            int? apIn = (dto.AccessPoint.HasValue && dto.AccessPoint.Value > 0) ? dto.AccessPoint : null;
-
-            var req = new AttendanceDtoRequest
+            try
             {
-                PersonId = dto.PersonId,
-                TimeOfEntry = time,
-                TimeOfExit = null,
-                AccessPointOfEntry = apIn,
-                AccessPointOfExit = null
-            };
+                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, ct);
+                if (open != null)
+                {
+                    return new AttendanceDtoResponse
+                    {
+                        Success = false,
+                        Message = "La persona ya tiene una entrada activa."
+                    };
+                }
 
-            var created = await Save(req); // creación
-            _logger.LogInformation("Entrada registrada (endpoint específico). PersonId={PersonId}, AttendanceId={AttendanceId}", dto.PersonId, created.Id);
-            return created!;
+                var entity = new Attendance
+                {
+                    PersonId = dto.PersonId,
+                    TimeOfEntry = DateTime.UtcNow,
+                    AccessPointOfEntry = dto.AccessPointId
+                };
+
+                var saved = await _attendanceData.SaveAsync(entity);
+                var response = _mapper.Map<AttendanceDtoResponse>(saved);
+
+                response.Success = true;
+                response.Message = "Entrada registrada correctamente.";
+                response.TimeOfEntryStr = response.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error registrando entrada.");
+                return new AttendanceDtoResponse
+                {
+                    Success = false,
+                    Message = "Error al registrar entrada."
+                };
+            }
         }
 
         /// <summary>
-        /// REGISTRA SOLO LA SALIDA (falla si no hay entrada abierta).
+        /// Registra la salida de una persona de un evento.
         /// </summary>
-        public async Task<AttendanceDtoResponse> RegisterExitAsync(
-            AttendanceDtoRequestSpecific dto,
-            CancellationToken ct = default)
+        public async Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default)
         {
-            if (dto == null) throw new ArgumentNullException(nameof(dto));
-            if (dto.PersonId <= 0) throw new ArgumentException("El PersonId debe ser mayor que 0.", nameof(dto.PersonId));
+            try
+            {
+                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, ct);
+                if (open == null)
+                {
+                    return new AttendanceDtoResponse
+                    {
+                        Success = false,
+                        Message = "No se encontró una asistencia abierta para la persona."
+                    };
+                }
 
-            var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, ct);
-            if (open == null)
-                throw new InvalidOperationException("No existe una ENTRADA abierta para registrar la SALIDA.");
+                var updated = await _attendanceData.UpdateExitAsync(open.Id, DateTime.UtcNow, dto.AccessPointId, ct);
+                var response = _mapper.Map<AttendanceDtoResponse>(updated);
 
-            var time = dto.Time == default ? DateTime.Now : dto.Time;
-            if (time < open.TimeOfEntry) time = open.TimeOfEntry;
+                response.Success = true;
+                response.Message = "Salida registrada correctamente.";
+                response.TimeOfEntryStr = response.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
 
-            int? apOut = (dto.AccessPoint.HasValue && dto.AccessPoint.Value > 0)
-                ? dto.AccessPoint
-                : (open.AccessPointOfExit ?? open.AccessPointOfEntry);
+                if (response.TimeOfExit.HasValue)
+                    response.TimeOfExitStr = response.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
 
-            // Actualizar por data layer (evita conflicto de tracking y crea UPDATE real)
-            var updatedEntity = await _attendanceData.UpdateExitAsync(open.Id, time, apOut, ct);
-            var updated = _mapper.Map<AttendanceDtoResponse>(updatedEntity);
-
-            _logger.LogInformation("Salida registrada (endpoint específico). PersonId={PersonId}, AttendanceId={AttendanceId}", dto.PersonId, updated.Id);
-            return updated!;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error registrando salida.");
+                return new AttendanceDtoResponse
+                {
+                    Success = false,
+                    Message = "Error al registrar salida."
+                };
+            }
         }
 
-        private static string BuildQrPayload(AttendanceDtoRequest dto)
-        {
-            var apId = dto.AccessPointOfEntry ?? dto.AccessPointOfExit;
-            var apText = apId.HasValue ? apId.Value.ToString() : "NA";
-            return $"PERSON:{dto.PersonId}|ACCESS:{apText}|DATE:{DateTime.UtcNow:O}";
-        }
-
-        private static string GenerateQrCodeBase64(string content)
-        {
-            using var qrGenerator = new QRCodeGenerator();
-            using var qrData = qrGenerator.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
-            using var qrCode = new PngByteQRCode(qrData);
-            byte[] qrBytes = qrCode.GetGraphic(10);
-            return Convert.ToBase64String(qrBytes);
-        }
-
-        // NUEVO MÉTODO: búsqueda con filtros y paginación
+        /// <summary>
+        /// Búsqueda de asistencias con filtros y paginación.
+        /// </summary>
         public async Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
-            int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
-            string? sortBy, string? sortDir, int page, int pageSize,
-            CancellationToken ct = default)
+    int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
+    string? sortBy, string? sortDir, int page, int pageSize,
+    CancellationToken ct = default)
         {
             var (entities, total) = await _attendanceData.QueryAsync(
                 personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize, ct);

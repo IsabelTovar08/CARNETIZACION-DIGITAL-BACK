@@ -20,13 +20,26 @@ namespace Data.Implementations.Notifications
         }
 
         /// <summary>
-        /// Obtiene todos los registros de recepción de notificaciones de un usuario.
+        /// Obtiene todas las notificaciones de un usuario.
         /// </summary>
         public async Task<IEnumerable<NotificationReceived>> GetByUserAsync(int userId)
         {
             return await _context.NotificationReceiveds
                 .Include(nr => nr.Notification)
                 .Where(nr => nr.UserId == userId && !nr.IsDeleted)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Obtiene todas las notificaciones activas de un usuario (no eliminadas ni expiradas).
+        /// </summary>
+        public async Task<IEnumerable<NotificationReceived>> GetActiveByUserAsync(int userId)
+        {
+            return await _context.NotificationReceiveds
+                .Include(nr => nr.Notification)
+                .Where(nr => nr.UserId == userId
+                          && !nr.IsDeleted
+                          && (nr.ExpirationDate == null || nr.ExpirationDate > DateTime.UtcNow))
                 .ToListAsync();
         }
     }

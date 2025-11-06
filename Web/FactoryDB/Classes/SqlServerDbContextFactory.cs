@@ -1,13 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Web.FactoryDB.Interfases;
 
-namespace Web.FactoryDB.Classes
+namespace Web.FactoryDB.Factories
 {
-    public class SqlServerDbContextFactory : IDbContextFactory
+    /// <summary>
+    /// Fábrica para configurar Entity Framework con SQL Server.
+    /// </summary>
+    public class SqlServerFactory : IDbContextFactory
     {
-        public void Configure(DbContextOptionsBuilder optionsBuilder, IConfiguration configuration)
+        public void Configure(DbContextOptionsBuilder optionsBuilder, string connectionString)
         {
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            optionsBuilder.UseSqlServer(connectionString);
         }
     }
 }
