@@ -3,20 +3,17 @@ using System;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Entity.Migrations.Postgres
+namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251022021517_InitialCreatePostgres")]
-    partial class InitialCreatePostgres
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -856,7 +853,7 @@ namespace Entity.Migrations.Postgres
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("IssuedCardId")
+                    b.Property<int?>("IssuedCardId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Message")
@@ -885,6 +882,8 @@ namespace Entity.Migrations.Postgres
                     b.HasIndex("ImportBatchId");
 
                     b.HasIndex("IssuedCardId");
+
+                    b.HasIndex("PersonId");
 
                     b.ToTable("ImportBatchRows");
                 });
@@ -2349,6 +2348,9 @@ namespace Entity.Migrations.Postgres
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Days")
+                        .HasColumnType("text");
+
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("interval");
 
@@ -3539,13 +3541,17 @@ namespace Entity.Migrations.Postgres
 
                     b.HasOne("Entity.Models.Organizational.Assignment.IssuedCard", "IssuedCard")
                         .WithMany()
-                        .HasForeignKey("IssuedCardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IssuedCardId");
+
+                    b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId");
 
                     b.Navigation("Batch");
 
                     b.Navigation("IssuedCard");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>

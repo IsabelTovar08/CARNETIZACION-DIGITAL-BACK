@@ -45,12 +45,23 @@ namespace Data.Classes.Specifics
         public async Task<Person?> GetPersonInfo(int id)
         {
             return await _context.Set<Person>()
+                // Relaciones base necesarias para el DTO
+                .Include(p => p.City)
+                .Include(p => p.DocumentType)
+                .Include(p => p.BloodType)
+
+                // IssuedCard filtrado por el carnet actualmente seleccionado y sus caminos
                 .Include(u => u.IssuedCard.Where(up => up.IsCurrentlySelected))
                     .ThenInclude(pdp => pdp.InternalDivision)
-                        .ThenInclude(id => id.OrganizationalUnit)
+                        .ThenInclude(idiv => idiv.OrganizationalUnit)
                             .ThenInclude(ou => ou.OrganizationalUnitBranches)
                                 .ThenInclude(oub => oub.Branch)
                                     .ThenInclude(b => b.Organization)
+
+                // También incluir la entidad Card para que HasCard funcione correctamente
+                .Include(u => u.IssuedCard.Where(up => up.IsCurrentlySelected))
+                    .ThenInclude(pdp => pdp.Card)
+
                 .Where(u => !u.IsDeleted)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }

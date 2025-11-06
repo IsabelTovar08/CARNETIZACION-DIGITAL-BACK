@@ -363,10 +363,31 @@ namespace Utilities.Helper
 
 
             //Schedule
-            CreateMap<Schedule, ScheduleDto>().ReverseMap();
+            CreateMap<Schedule, ScheduleDto>()
+            .ForMember(d => d.Days, o => o.MapFrom(s =>
+                !string.IsNullOrWhiteSpace(s.Days)
+                    ? s.Days.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => x.Trim())
+                            .ToList()
+                    : new List<string>()))
+            .ReverseMap()
+            .ForMember(s => s.Days, o => o.MapFrom(d =>
+                (d.Days != null && d.Days.Any())
+                    ? string.Join(",", d.Days.Select(x => x.Trim()))
+                    : null));
 
             CreateMap<Schedule, ScheduleDtoRequest>()
-               .ReverseMap();
+              .ForMember(d => d.Days, o => o.MapFrom(s =>
+                 !string.IsNullOrWhiteSpace(s.Days)
+                     ? s.Days.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                       .Select(x => x.Trim())
+                        .ToList()
+                         : new List<string>()))
+                        .ReverseMap()
+              .ForMember(s => s.Days, o => o.MapFrom(d =>
+                       (d.Days != null && d.Days.Any())
+                         ? string.Join(",", d.Days.Select(x => x.Trim()))
+              : null));
 
             // EventTargetAudience
             CreateMap<EventTargetAudience, EventTargetAudienceDtoRequest>().ReverseMap();
