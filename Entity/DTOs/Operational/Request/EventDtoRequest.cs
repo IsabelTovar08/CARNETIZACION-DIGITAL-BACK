@@ -34,6 +34,6 @@ namespace Entity.DTOs.Operational.Request
         [Required(ErrorMessage = "El estado es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El estado debe ser un número entero mayor que 0.")]
         public int StatusId { get; set; }
-        public List<string>? Days { get; set; }
+        //public List<string>? Days { get; set; }
     }
 }

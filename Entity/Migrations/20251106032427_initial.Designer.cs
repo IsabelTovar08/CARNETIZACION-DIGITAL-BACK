@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251106020933_initial")]
+    [Migration("20251106032427_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -1434,9 +1434,6 @@ namespace Entity.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Days")
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -1463,6 +1460,9 @@ namespace Entity.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("QrCodeBase64")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ScheduleDate")
                         .HasColumnType("timestamp with time zone");

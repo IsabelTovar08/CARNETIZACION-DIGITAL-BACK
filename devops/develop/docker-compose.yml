@@ -1,60 +1,60 @@
-version: '3.8'
+  version: '3.8'
 
-services:
-  carnetizacion-digital-api-develop:
-    container_name: "${COMPOSE_PROJECT_NAME}-api"
-    build:
-      context: ../..         
-      dockerfile: Dockerfile
-    restart: always
-    env_file:
-      - .env
-    ports:
-      - "5100:8080"
-    networks: 
-      - network_develop         # red externa de la BD develop
-    labels:
-      - com.carnetizacion.environment=develop
-    depends_on:
-      - postgres 
-    environment:
-      DatabaseProvider: Postgres
-      ConnectionStrings__DefaultConnection: >
-        Host=postgres;
-        Port=5432;
-        Database=${POSTGRES_DB};
-        Username=${POSTGRES_USER};
-        Password=${POSTGRES_PASSWORD};
-        Ssl Mode=Disable;Trust Server Certificate=true
-    command: >
-      sh -c "
-        echo 'Ejecutando migraciones de Entity Framework...';
-        dotnet ef database update --project ./Entity/Entity.csproj --startup-project ./Web/Web.csproj;
-        echo 'Migraciones completadas. Iniciando la API...';
-        dotnet ./Web/bin/Release/net8.0/Web.dll
-      "
-postgres:
-    image: postgres:16
-    container_name: "${COMPOSE_PROJECT_NAME}-postgres"
-    restart: always
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /var/lib/postgresql/data
-    ports:
-      - "5433:5432"
-    volumes:
-      - pgdata_develop:/var/lib/postgresql/data
-    networks:  
-     - network_develop
+  services:
+    carnetizacion-digital-api-develop:
+      container_name: "${COMPOSE_PROJECT_NAME}-api"
+      build:
+        context: ../..         
+        dockerfile: Dockerfile
+      restart: always
+      env_file:
+        - .env
+      ports:
+        - "5100:8080"
+      networks: 
+        - network_develop         # red externa de la BD develop
+      labels:
+        - com.carnetizacion.environment=develop
+      depends_on:
+        - postgres 
+      environment:
+        DatabaseProvider: Postgres
+        ConnectionStrings__DefaultConnection: >
+          Host=postgres;
+          Port=5432;
+          Database=${POSTGRES_DB};
+          Username=${POSTGRES_USER};
+          Password=${POSTGRES_PASSWORD};
+          Ssl Mode=Disable;Trust Server Certificate=true
+      command: >
+        sh -c "
+          echo 'Ejecutando migraciones de Entity Framework...';
+          dotnet ef database update --project ./Entity/Entity.csproj --startup-project ./Web/Web.csproj;
+          echo 'Migraciones completadas. Iniciando la API...';
+          dotnet ./Web/bin/Release/net8.0/Web.dll
+        "
+  postgres:
+      image: postgres:16
+      container_name: "${COMPOSE_PROJECT_NAME}-postgres"
+      restart: always
+      env_file:
+        - .env
+      environment:
+        POSTGRES_DB: ${POSTGRES_DB}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        PGDATA: /var/lib/postgresql/data
+      ports:
+        - "5433:5432"
+      volumes:
+        - pgdata_develop:/var/lib/postgresql/data
+      networks:  
+      - network_develop
 
-networks:
-  network_develop:
-    name: "network_${ENVIRONMENT}"
+  networks:
+    network_develop:
+      name: "network_${ENVIRONMENT}"
 
-volumes:
-  pgdata_develop:
-    name: "pgdata_${ENVIRONMENT}"
+  volumes:
+    pgdata_develop:
+      name: "pgdata_${ENVIRONMENT}"

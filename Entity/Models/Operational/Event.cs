@@ -4,6 +4,7 @@ using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Entity.Models.Organizational
 {
     public class Event : GenericModel
@@ -25,7 +26,8 @@ namespace Entity.Models.Organizational
         public int EventTypeId { get; set; }
         public EventType? EventType { get; set; }
 
-        public string? Days { get; set; }
+        [Column(TypeName = "text")]
+        public string? QrCodeBase64 { get; set; }
 
         public ICollection<EventTargetAudience> EventTargetAudiences { get; set; } = new List<EventTargetAudience>();
         public Status? Status { get; set; }

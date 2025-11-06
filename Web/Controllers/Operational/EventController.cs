@@ -84,6 +84,19 @@ namespace Web.Controllers.Operational
                 return BadRequest(response);
             }
         }
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateEventRequest dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var id = await _eventBusiness.CreateEventAsync(dto);
+            return Ok(new
+            {
+                success = true,
+                message = "Evento creado correctamente con QR generado en Base64",
+                data = new { id }
+            });
+        }
     }
 }
