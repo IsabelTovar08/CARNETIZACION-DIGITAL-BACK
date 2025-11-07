@@ -17,7 +17,7 @@ namespace Data.Interfases.Organizational.Assignment
         Task<IssuedCard> UpdatePdfUrlAsync(int cardId, string pdfUrl);
 
         /// <summary>
-        /// Consulta toda la información necesaria para generar un carnet a partir de un IssuedCardId.
+        /// Consulta la información completa del carnet, incluyendo organización y sucursal (vía OrganizationalUnitBranch).
         /// </summary>
         Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId);
     }

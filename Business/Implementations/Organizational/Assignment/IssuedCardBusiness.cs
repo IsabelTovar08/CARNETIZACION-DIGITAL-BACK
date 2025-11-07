@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Business.Classes.Base;
+using Business.Interfaces.Operational;
 using Business.Interfaces.Organizational.Assignment;
 using Business.Services.Cards;
 using Data.Interfases;
 using Data.Interfases.Organizational.Assignment;
+using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Specifics.Cards;
@@ -21,13 +23,12 @@ namespace Business.Implementations.Organizational.Assignment
     public class IssuedCardBusiness : BaseBusiness<IssuedCard, IssuedCardDtoRequest, IssuedCardDto>, IIssuedCardBusiness
     {
         public readonly IIssuedCardData _issuedCardData;
-        private readonly ICardPdfService _cardPdfService;
-        private readonly ICardConfigurationBusiness _cardConfurationBusiness;
-
-        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper, ICardConfigurationBusiness cardConfigurationBusiness, ICardPdfService cardPdfService) : base(data, logger, mapper)
+        protected readonly ICardTemplateBusiness _cardTemplateBusiness;
+        protected readonly ICardPdfService _cardPdfService;
+        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper, ICardTemplateBusiness cardTemplateBusiness, ICardPdfService cardPdfService) : base(data, logger, mapper)
         {
             _issuedCardData = data;
-            _cardConfurationBusiness = cardConfigurationBusiness;
+            _cardTemplateBusiness = cardTemplateBusiness;
             _cardPdfService = cardPdfService;
         }
 
@@ -59,7 +60,7 @@ namespace Business.Implementations.Organizational.Assignment
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al guardar el carnet con UUID y QR.");
+                _logger.LogError(ex, "Error al guardar el carnet con UUID y QR.");  
                 throw new Exception("Error al guardar el carnet con UUID y QR.", ex);
             }
         }
@@ -105,34 +106,71 @@ namespace Business.Implementations.Organizational.Assignment
         }
 
 
-        public async Task GenerateAndAttachPdfAsync(int issuedCardId)
+        public async Task<CardUserData> GetCardDataByIssuedId(int issuedCardId)
         {
             try
             {
-                // Obtener el DTO del carnet emitido
-                IssuedCardDto? issuedCard = await GetById(issuedCardId);
-                if (issuedCard == null) throw new InvalidOperationException($"IssuedCard {issuedCardId} no encontrado.");
-
-                // Obtener la plantilla desde la configuración base
-                CardConfigurationDto? cardConfig = await _cardConfurationBusiness.GetById(issuedCard.CardId);
-                var template = cardConfig?.CardTemplate;
-
-                if (template == null)
-                    throw new InvalidOperationException($"La plantilla no está disponible para el CardId {issuedCard.CardId}");
-
-                // Obtener los datos para el PDF
-                var userData = await GetCardDataByIssuedIdAsync(issuedCardId);
-
-                using var pdfStream = new MemoryStream();
-                await _cardPdfService.GenerateCardAsync(template, userData, pdfStream);
-                pdfStream.Position = 0;
-
-                var base64Pdf = Convert.ToBase64String(pdfStream.ToArray());
-                await UpdatePdfUrlAsync(issuedCardId, base64Pdf);
+                // 1. Obtener los datos del carnet emitido (CardUserData)
+                CardUserData userData = await _issuedCardData.GetCardDataByIssuedIdAsync(issuedCardId);
+                return userData;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Error controlado al generar el PDF del carnet {IssuedCardId}", issuedCardId);
+                throw;
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error generando PDF para IssuedCard {IssuedCardId}", issuedCardId);
+                _logger.LogError(ex, "Error interno al generar el PDF del carnet {IssuedCardId}", issuedCardId);
+                throw new InvalidOperationException("Error interno al generar el PDF del carnet.", ex);
+            }
+        }
+
+
+
+
+        /// <inheritdoc/>
+        public async Task<byte[]> GenerateCardPdfBase64Async(int issuedCardId)
+        {
+            try
+            {
+                // 1. Obtener los datos del carnet emitido (CardUserData)
+                CardUserData userData = await GetCardDataByIssuedId(issuedCardId);
+
+                if (userData == null)
+                    throw new InvalidOperationException($"No se encontraron datos para el carnet emitido {issuedCardId}.");
+
+                // 2. Obtener el ID de configuración desde el IssuedCard real
+                IssuedCardDto? issuedCardEntity = await GetById(issuedCardId);
+
+                if (issuedCardEntity == null)
+                    throw new InvalidOperationException($"No se encontró el registro IssuedCard con ID {issuedCardId}.");
+
+                int cardConfigurationId = issuedCardEntity.CardId; // aquí CardId = CardConfigurationId
+
+                // 3. Consultar la plantilla asociada a ese CardConfiguration
+                CardTemplateResponse cardTemplate = await _cardTemplateBusiness.GetTemplateByCardConfigurationId(cardConfigurationId);
+
+                if (cardTemplate == null)
+                    throw new InvalidOperationException($"No se encontró plantilla asociada al CardConfiguration {cardConfigurationId}.");
+
+                // 4. Generar el PDF en memoria
+                using var ms = new MemoryStream();
+
+                await _cardPdfService.GenerateCardAsync(cardTemplate, userData, ms);
+                ms.Position = 0;
+
+                return ms.ToArray();
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Error controlado al generar el PDF del carnet {IssuedCardId}", issuedCardId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error interno al generar el PDF del carnet {IssuedCardId}", issuedCardId);
+                throw new InvalidOperationException("Error interno al generar el PDF del carnet.", ex);
             }
         }
     }

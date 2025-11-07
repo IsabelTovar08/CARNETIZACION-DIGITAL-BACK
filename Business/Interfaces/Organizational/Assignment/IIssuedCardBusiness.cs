@@ -19,8 +19,13 @@ namespace Business.Interfaces.Organizational.Assignment
         Task<IssuedCardDto> UpdatePdfUrlAsync(int cardId, string pdfUrl);
 
         /// <summary>
-        /// Consulta toda la información necesaria para generar un carnet a partir de un IssuedCardId.
+        /// Consulta la información completa del carnet, incluyendo organización y sucursal (vía OrganizationalUnitBranch).
         /// </summary>
-        Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId);
+        Task<CardUserData> GetCardDataByIssuedId(int issuedCardId);
+
+        /// <summary>
+        /// Genera el PDF del carnet emitido y devuelve su contenido en Base64.
+        /// </summary>
+        Task<byte[]> GenerateCardPdfBase64Async(int issuedCardId);
     }
 }

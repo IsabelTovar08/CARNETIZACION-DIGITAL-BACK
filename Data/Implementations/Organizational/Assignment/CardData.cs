@@ -9,6 +9,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using Entity.Context;
 using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Specifics;
+using Entity.Models.Operational;
 using Entity.Models.Organizational.Assignment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -123,6 +124,34 @@ namespace Data.Implementations.Organizational.Assignment
             {
                 _logger.LogError(ex, "Error al obtener el total de carnets");
                 throw;
+            }
+        }
+
+
+        /// /<inheritdoc/>
+        public async Task<CardTemplate> GetTemplateByCardConfigurationIdAsync(int cardConfigurationId)
+        {
+            try
+            {
+                var configuration = await _context.CardsConfigurations
+                    .Include(c => c.CardTemplate)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == cardConfigurationId && !c.IsDeleted);
+
+                if (configuration == null)
+                    throw new InvalidOperationException($"No se encontró el CardConfiguration con ID {cardConfigurationId}.");
+
+                return configuration.CardTemplate!;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Error controlado al obtener la plantilla por CardConfigurationId {CardConfigurationId}", cardConfigurationId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al consultar la plantilla asociada al CardConfigurationId {CardConfigurationId}", cardConfigurationId);
+                throw new InvalidOperationException("Ocurrió un error al consultar la plantilla del carnet.", ex);
             }
         }
 

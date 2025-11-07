@@ -18,31 +18,38 @@ namespace Business.Implementations.Operational
 {
     public class CardTemplateBusiness : BaseBusiness<CardTemplate, CardTemplateRequest, CardTemplateResponse>, ICardTemplateBusiness
     {
-        public readonly ICardTemplateData _cardTemplateData;
-        public CardTemplateBusiness(ICardTemplateData data, ILogger<CardTemplate> logger, IMapper mapper, ICodeGeneratorService<CardTemplate>? codeService = null) : base(data, logger, mapper, codeService)
+        protected readonly ICardTemplateData _cardTemplateData;
+        public CardTemplateBusiness(ICrudBase<CardTemplate> data, ILogger<CardTemplate> logger, IMapper mapper, ICardTemplateData cardTemplateData, ICodeGeneratorService<CardTemplate>? codeService = null) : base(data, logger, mapper, codeService)
         {
-            _cardTemplateData = data;
+            _cardTemplateData = cardTemplateData;
         }
 
-        public async Task<CardTemplateResponse?> GetCardTemplateByIssuedCard(int issuedCardId)
+        /// <summary>
+        /// Mapea la entidad CardTemplate a su DTO CardTemplateResponse.
+        /// </summary>
+        /// <param name="cardConfigurationId">Identificador del CardConfiguration.</param>
+        /// <returns>DTO de tipo CardTemplateResponse mapeado desde la entidad CardTemplate.</returns>
+        public async Task<CardTemplateResponse> GetTemplateByCardConfigurationId(int cardConfigurationId)
         {
             try
             {
-                if (issuedCardId > 0)
-                {
-                    CardTemplate? template = await _cardTemplateData.GetCardTemplateByIssuedCardAsync(issuedCardId);
-                    return _mapper.Map<CardTemplateResponse?>(template);
-                }
-                else
-                {
-                    throw new ArgumentException("El ID de la tarjeta emitida debe ser mayor que cero.", nameof(issuedCardId));
-                }
+                // Consultar la entidad desde la capa Data
+                CardTemplate cardTemplateEntity = await _cardTemplateData.GetTemplateByCardConfigurationIdAsync(cardConfigurationId);
+
+                if (cardTemplateEntity == null)
+                    throw new InvalidOperationException($"No se encontró la plantilla asociada al CardConfiguration {cardConfigurationId}.");
+
+                // Mapear la entidad a DTO usando AutoMapper
+                CardTemplateResponse cardTemplateDto = _mapper.Map<CardTemplateResponse>(cardTemplateEntity);
+
+                return cardTemplateDto;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al obtener CardTemplate para IssuedCard ID {issuedCardId}");
-                throw;
+                _logger.LogError(ex, "Error al mapear la plantilla a DTO para CardConfigurationId {CardConfigurationId}", cardConfigurationId);
+                throw new InvalidOperationException("Error al mapear la plantilla del carnet.", ex);
             }
         }
+
     }
 }

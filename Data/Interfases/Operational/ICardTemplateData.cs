@@ -9,12 +9,12 @@ namespace Data.Interfases.Operational
 {
     public interface ICardTemplateData : ICrudBase<CardTemplate>
     {
+
         /// <summary>
-        /// Obtiene la plantilla (CardTemplate) asociada a una tarjeta emitida (IssuedCard)
-        /// mediante su relación con CardConfiguration.
+        /// Obtiene el CardTemplate asociado a un CardConfiguration específico.
         /// </summary>
-        /// <param name="issuedCardId">Id de la tarjeta emitida</param>
-        /// <returns>Objeto CardTemplate asociado a la tarjeta emitida</returns>
-        Task<CardTemplate?> GetCardTemplateByIssuedCardAsync(int issuedCardId);
+        /// <param name="cardConfigurationId">Identificador del CardConfiguration.</param>
+        /// <returns>Entidad CardTemplate encontrada.</returns>
+        Task<CardTemplate> GetTemplateByCardConfigurationIdAsync(int cardConfigurationId);
     }
 }

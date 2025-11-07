@@ -20,6 +20,8 @@ namespace Entity.DTOs.Specifics.Cards
         public string BloodTypeValue { get; set; }
         public string CompanyName { get; set; }
         public string BranchName { get; set; }
+        public string BranchEmail { get; set; }
+        public string BranchPhone { get; set; }
         public string BranchAddress { get; set; }
 
 
@@ -29,6 +31,9 @@ namespace Entity.DTOs.Specifics.Cards
         public string UserPhotoUrl { get; set; }
         public string LogoUrl { get; set; }
         public string QrUrl { get; set; }
+        public string InternalDivisionName { get; set; }
+        public string OrganizationalUnit { get; set; }
+        public string DocumentNumber { get; set; }
         public Guid UniqueId { get; set; }
     }
 }

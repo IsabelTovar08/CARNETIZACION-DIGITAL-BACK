@@ -178,29 +178,6 @@ namespace Business.Services.Excel
                         personCreated.Person.PhotoUrl = contentType;
                     }
 
-                    /// <summary>
-                    /// Genera el PDF en memoria, lo convierte a Base64 y lo guarda en la base de datos.
-                    /// </summary>
-                    try
-                    {
-                        var userData = await _pdpBusiness.GetCardDataByIssuedIdAsync(pdpSaved.Id);
-
-                        // Crear stream del PDF en memoria
-                        using var pdfStream = new MemoryStream();
-                        await _cardPdfService.GenerateCardAsync(template, userData, pdfStream);
-                        pdfStream.Position = 0;
-
-                        // Convertir el PDF en Base64
-                        string base64Pdf = Convert.ToBase64String(pdfStream.ToArray());
-
-                        // Guardar en la entidad (por ejemplo en un campo PdfBase64)
-                        await _pdpBusiness.UpdatePdfUrlAsync(pdpId.Value, base64Pdf);
-                    }
-                    catch (Exception pdfEx)
-                    {
-                        _logger.LogWarning(pdfEx, "Error generando PDF para PDP {PdpId}", pdpId);
-                    }
-
 
                     await _uow.CommitAsync();
 
