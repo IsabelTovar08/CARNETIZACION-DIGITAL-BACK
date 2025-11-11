@@ -9,7 +9,8 @@ namespace Entity.Models.Organizational.Structure
         public TimeSpan EndTime { get; set; }
         //public int OrganizationId { get; set; }
         //public Organization? Organization { get; set; }
-        
+        public string? Days { get; set; }
+
     }
 }
     

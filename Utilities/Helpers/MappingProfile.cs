@@ -295,7 +295,7 @@ namespace Utilities.Helper
 
             CreateMap<EventDtoRequest, Event>()
             .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
-            .ForMember(d => d.Days, o => o.MapFrom(s => s.Days != null ? string.Join(",", s.Days) : null))
+            //.ForMember(d => d.Days, o => o.MapFrom(s => s.Days != null ? string.Join(",", s.Days) : null))
             .ForMember(d => d.Id, o => o.Ignore());
 
 
