@@ -1,18 +1,14 @@
 ﻿using Business.Interfaces.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
-using Entity.DTOs.Reports;
 using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Web.Controllers.Base;
-using System.Linq; // necesario para ToList()
 
 namespace Web.Controllers.Operational
 {
@@ -22,23 +18,60 @@ namespace Web.Controllers.Operational
     public class AttendanceController : GenericController<Attendance, AttendanceDtoRequest, AttendanceDtoResponse>
     {
         private readonly IAttendanceBusiness _attendanceBusiness;
-        private readonly IAccessPointBusiness _accessPointBusiness;
         private readonly ILogger<AttendanceController> _logger;
 
         public AttendanceController(
             IAttendanceBusiness attendanceBusiness,
-            IAccessPointBusiness accessPointBusiness,
             ILogger<AttendanceController> logger
         ) : base(attendanceBusiness, logger)
         {
             _attendanceBusiness = attendanceBusiness;
-            _accessPointBusiness = accessPointBusiness;
             _logger = logger;
         }
 
+        // =========================================================
+        // ✅ REGISTRO AUTOMÁTICO DE ASISTENCIA POR QR DEL EVENTO
+        // =========================================================
         /// <summary>
-        /// Registra asistencia por escaneo (móvil) y retorna la asistencia creada.
+        /// Registra asistencia al escanear un QR generado desde el evento.
+        /// Espera un cuerpo con el QR y el Id de la persona.
         /// </summary>
+        /// <param name="dto">Contiene QrCode (texto del QR leído) y PersonId.</param>
+        [HttpPost("register-by-qr")]
+        public async Task<IActionResult> RegisterByQr([FromBody] AttendanceDtoRequest dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.QrCode) || dto.PersonId <= 0)
+                return BadRequest(new { success = false, message = "Debe incluir el QrCode válido y el PersonId." });
+
+            try
+            {
+                var result = await _attendanceBusiness.RegisterAttendanceByQrAsync(dto.QrCode, dto.PersonId);
+
+                if (result == null || !result.Success)
+                    return BadRequest(new { success = false, message = result?.Message ?? "No se pudo registrar la asistencia." });
+
+                return Ok(new
+                {
+                    success = true,
+                    message = result.Message,
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar asistencia mediante QR.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "Error interno al registrar asistencia mediante QR.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        // =========================================================
+        // REGISTRO GENERAL DE ASISTENCIA (MÓVIL O MANUAL)
+        // =========================================================
         [HttpPost("scan")]
         public async Task<IActionResult> RegisterAttendance([FromBody] AttendanceDtoRequest dto)
         {
@@ -49,21 +82,22 @@ namespace Web.Controllers.Operational
             if (result == null)
                 return BadRequest(new { success = false, message = "No se pudo registrar la asistencia." });
 
-            return Ok(new { success = true, message = "Asistencia registrada correctamente.", data = result });
+            return Ok(new { success = true, message = result.Message, data = result });
         }
 
-        /// <summary>
-        /// REGISTRA SOLO LA ENTRADA usando AttendanceDtoRequestSpecific.
-        /// </summary>
+        // =========================================================
+        // REGISTRO MANUAL DE ENTRADA Y SALIDA (si se usa sin QR)
+        // =========================================================
         [HttpPost("register-entry")]
         public async Task<IActionResult> RegisterEntry([FromBody] AttendanceDtoRequestSpecific dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
                 var result = await _attendanceBusiness.RegisterEntryAsync(dto);
-                return Ok(new { success = true, message = "Entrada registrada correctamente.", data = result });
+                return Ok(new { success = result.Success, message = result.Message, data = result });
             }
             catch (Exception ex)
             {
@@ -72,18 +106,16 @@ namespace Web.Controllers.Operational
             }
         }
 
-        /// <summary>
-        /// REGISTRA SOLO LA SALIDA usando AttendanceDtoRequestSpecific.
-        /// </summary>
         [HttpPost("register-exit")]
         public async Task<IActionResult> RegisterExit([FromBody] AttendanceDtoRequestSpecific dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
                 var result = await _attendanceBusiness.RegisterExitAsync(dto);
-                return Ok(new { success = true, message = "Salida registrada correctamente.", data = result });
+                return Ok(new { success = result.Success, message = result.Message, data = result });
             }
             catch (Exception ex)
             {
@@ -92,7 +124,9 @@ namespace Web.Controllers.Operational
             }
         }
 
-        // NUEVO ENDPOINT: CONSULTA Y FILTRO
+        // =========================================================
+        // BÚSQUEDA Y EXPORTACIÓN DE ASISTENCIAS
+        // =========================================================
         [HttpGet("search")]
         public async Task<IActionResult> Search(
             [FromQuery] int? personId,
@@ -114,68 +148,33 @@ namespace Web.Controllers.Operational
             return Ok(new { items, total, page, pageSize });
         }
 
-        /// <summary>
-        /// Registra asistencia a un evento a través de un código QR.
-        /// </summary>
-        [HttpPost("register-by-qr")]
-        public async Task<IActionResult> RegisterByQr([FromBody] AttendanceDtoRequest dto)
-        {
-            if (dto == null || string.IsNullOrWhiteSpace(dto.QrCode))
-                return BadRequest(new { success = false, message = "Debe incluir el QrCode y el PersonId." });
-
-            var result = await _accessPointBusiness.RegisterAttendanceByQrAsync(dto.QrCode, dto.PersonId);
-
-            if (result == null || !result.Success)
-                return BadRequest(new { success = false, message = result?.Message ?? "No se pudo registrar la asistencia." });
-
-            return Ok(new { success = true, message = result.Message, data = result });
-        }
-
-        // =========================================================
-        // NUEVOS ENDPOINTS: EXPORTACIÓN PDF y EXCEL
-        // =========================================================
-
-        /// <summary>
-        /// Exporta asistencias a PDF (filtrando opcionalmente por persona, evento y rango de fechas).
-        /// </summary>
         [HttpGet("export/pdf")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ExportPdf(
             [FromQuery] int? personId,
             [FromQuery] int? eventId,
             [FromQuery] DateTime? fromUtc,
             [FromQuery] DateTime? toUtc,
-            [FromQuery] string? sortBy = "TimeOfEntry",
-            [FromQuery] string? sortDir = "DESC",
             CancellationToken ct = default)
         {
             var (items, _) = await _attendanceBusiness.SearchAsync(
-                personId, eventId, fromUtc, toUtc, sortBy, sortDir, 1, int.MaxValue, ct);
+                personId, eventId, fromUtc, toUtc, "TimeOfEntry", "DESC", 1, int.MaxValue, ct);
 
-            var file = await _attendanceBusiness.ExportToPdfAsync(items.ToList(), ct);
-
+            var file = await _attendanceBusiness.ExportToPdfAsync(items, ct);
             return File(file, "application/pdf", $"Reporte_Asistencias_{DateTime.Now:yyyyMMddHHmm}.pdf");
         }
 
-        /// <summary>
-        /// Exporta asistencias a Excel (filtrando opcionalmente por persona, evento y rango de fechas).
-        /// </summary>
         [HttpGet("export/excel")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ExportExcel(
             [FromQuery] int? personId,
             [FromQuery] int? eventId,
             [FromQuery] DateTime? fromUtc,
             [FromQuery] DateTime? toUtc,
-            [FromQuery] string? sortBy = "TimeOfEntry",
-            [FromQuery] string? sortDir = "DESC",
             CancellationToken ct = default)
         {
             var (items, _) = await _attendanceBusiness.SearchAsync(
-                personId, eventId, fromUtc, toUtc, sortBy, sortDir, 1, int.MaxValue, ct);
+                personId, eventId, fromUtc, toUtc, "TimeOfEntry", "DESC", 1, int.MaxValue, ct);
 
-            var file = await _attendanceBusiness.ExportToExcelAsync(items.ToList(), ct);
-
+            var file = await _attendanceBusiness.ExportToExcelAsync(items, ct);
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"Reporte_Asistencias_{DateTime.Now:yyyyMMddHHmm}.xlsx");
         }

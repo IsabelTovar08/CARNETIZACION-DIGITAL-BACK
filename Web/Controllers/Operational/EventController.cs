@@ -24,19 +24,33 @@ namespace Web.Controllers.Operational
         }
 
         /// <summary>
-        /// Crea un evento con accesos y audiencias (perfiles, unidades, divisiones).
+        /// Crea un evento con accesos, audiencias y genera automáticamente el QR en Base64.
         /// </summary>
         [HttpPost("create-with-access-points")]
         public async Task<IActionResult> CreateWithAccessPoints([FromBody] CreateEventRequest dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var id = await (_business as IEventBusiness)!.CreateEventAsync(dto);
+            var id = await _eventBusiness.CreateEventAsync(dto);
+
+            // Recuperar el evento recién creado (con su QR)
+            var result = await _eventBusiness.GetEventFullDetailsAsync(id);
+
+            if (result == null)
+                return NotFound(new { success = false, message = "Error al obtener el evento recién creado" });
+
             return CreatedAtAction(nameof(GetById), new { id }, new
             {
                 success = true,
-                message = "Evento creado",
-                data = new { id }
+                message = "Evento creado correctamente con su código QR generado en Base64",
+                data = new
+                {
+                    eventId = id,
+                    eventName = result.Name,
+                    eventCode = result.Code,
+                    qrCodeBase64 = result.QrCodeBase64
+                }
             });
         }
 
@@ -58,10 +72,8 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
-
-
         /// <summary>
-        /// Retorna el número de eventos disponibles
+        /// Retorna el número de eventos disponibles.
         /// </summary>
         [HttpGet("available/count")]
         public async Task<ActionResult<ApiResponse<int>>> GetAvailableEventsCount()
@@ -75,13 +87,11 @@ namespace Web.Controllers.Operational
             }
             catch (InvalidOperationException ex)
             {
-                // Manejo de errores de negocio
                 var response = ApiResponse<int>.Fail("Validación de negocio fallida", new[] { ex.Message });
                 return BadRequest(response);
             }
             catch (Exception ex)
             {
-                // Manejo de errores inesperados
                 var response = ApiResponse<int>.Fail("Error al consultar eventos disponibles", new[] { ex.Message });
                 return BadRequest(response);
             }

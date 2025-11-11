@@ -20,7 +20,6 @@ using System.Drawing.Imaging;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Utilities.Exeptions;
 using Utilities.Helpers;
@@ -29,23 +28,33 @@ namespace Business.Implementations.Operational
 {
     public class EventBusiness : BaseBusiness<Event, EventDtoResponse, EventDtoResponse>, IEventBusiness
     {
-
-        public readonly IEventData _data;
+        private readonly IEventData _data;
         private readonly IEventTargetAudienceData _audienceRepo;
-        private readonly IMapper _mapper;
         private readonly IAccessPointData _apData;
+        private readonly IMapper _mapper;
+        private readonly ILogger<Event> _logger;
 
-        public EventBusiness(IEventData data, IEventTargetAudienceData audienceRepo, IAccessPointData apData, ILogger<Event> logger, IMapper mapper) : base(data, logger, mapper)
+        public EventBusiness(
+            IEventData data,
+            IEventTargetAudienceData audienceRepo,
+            IAccessPointData apData,
+            ILogger<Event> logger,
+            IMapper mapper
+        ) : base(data, logger, mapper)
         {
             _data = data;
             _audienceRepo = audienceRepo;
             _apData = apData;
             _mapper = mapper;
+            _logger = logger;
         }
 
+        /// <summary>
+        /// Crea un evento con accesos, audiencias y genera un código QR corto con datos útiles.
+        /// </summary>
         public async Task<int> CreateEventAsync(CreateEventRequest dto)
         {
-            // 1) Mapear evento desde DTO
+            // 1️⃣ Mapear el evento desde DTO
             var ev = _mapper.Map<Event>(dto.Event);
 
             // Generar QR único en Base64 y asignarlo al evento antes de persistir
@@ -59,9 +68,11 @@ namespace Business.Implementations.Operational
             ev.QrCodeBase64 = Convert.ToBase64String(ms.ToArray());
 
             // Guardar evento (ya con QrCodeBase64)
+            // Primero guardamos el evento (para tener su ID disponible para el QR)
             var savedEvent = await _data.SaveAsync(ev);
 
             // Crear AccessPoints nuevos si vienen en el DTO
+            // 2️⃣ Crear puntos de acceso si vienen en el DTO
             var createdAccessPoints = new List<AccessPoint>();
             if (dto.AccessPoints?.Any() == true)
             {
@@ -69,10 +80,8 @@ namespace Business.Implementations.Operational
                     .Select(apDto => _mapper.Map<AccessPoint>(apDto))
                     .ToList();
 
-                // Guardar primero los access points (así obtienen su Id)
                 await _apData.BulkInsertAsync(createdAccessPoints);
 
-                // Crear vínculos Event ↔ AccessPoint
                 var links = createdAccessPoints.Select(ap => new EventAccessPoint
                 {
                     EventId = savedEvent.Id,
@@ -82,6 +91,23 @@ namespace Business.Implementations.Operational
                 await _data.BulkInsertEventAccessPointsAsync(links);
             }
 
+            // ✅ 3️⃣ Generar código QR corto con: ID, nombre y punto de acceso
+            string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
+            string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
+
+            // Generar imagen QR (pequeña) y codificarla en Base64
+            using var qrGen = new QRCodeGenerator();
+            using var qrData = qrGen.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new QRCode(qrData);
+            using var bitmap = qrCode.GetGraphic(6);
+            using var ms = new MemoryStream();
+            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            savedEvent.QrCodeBase64 = Convert.ToBase64String(ms.ToArray());
+
+            // Guardar el evento con su QR actualizado
+            await _data.UpdateAsync(savedEvent);
+
+            // 4️⃣ Crear audiencias (perfiles, unidades, divisiones)
             // Mapear audiencias
             var audiences = new List<EventTargetAudience>();
 
@@ -121,6 +147,9 @@ namespace Business.Implementations.Operational
             return savedEvent.Id;
         }
 
+        /// <summary>
+        /// Obtiene los detalles completos del evento, incluyendo accesos, audiencias y QR.
+        /// </summary>
         public async Task<int> UpdateEventAsync(EventDtoRequest dto)
         {
             try
@@ -209,34 +238,30 @@ namespace Business.Implementations.Operational
         public async Task<EventDetailsDtoResponse?> GetEventFullDetailsAsync(int eventId)
         {
             var entity = await _data.GetEventWithDetailsAsync(eventId);
-
             return _mapper.Map<EventDetailsDtoResponse>(entity);
         }
 
-
         /// <summary>
-        /// Retorna el número de eventos disponibles
+        /// Retorna el número de eventos disponibles.
         /// </summary>
         public async Task<int> GetAvailableEventsCountAsync()
         {
             try
             {
                 var total = await _data.GetAvailableEventsCountAsync();
-
                 if (total < 0)
                     throw new InvalidOperationException("El número de eventos no puede ser negativo");
-
                 return total;
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Validación fallida al obtener eventos disponibles");
-                throw; 
+                throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inesperado en Business al obtener eventos disponibles");
-                throw; 
+                throw;
             }
         }
     }
