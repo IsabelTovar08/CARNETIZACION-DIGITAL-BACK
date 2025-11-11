@@ -24,5 +24,7 @@ namespace Data.Interfases.Operational
         /// Consulta el número de eventos disponibles
         /// </summary>
         Task<int> GetAvailableEventsCountAsync();
+
+        Task DeleteEventAccessPointsByEventIdAsync(int eventId);
     }
 }

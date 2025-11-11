@@ -118,6 +118,16 @@ namespace Data.Implementations.Operational
                 throw;
             }
         }
+
+        public async Task DeleteEventAccessPointsByEventIdAsync(int eventId)
+        {
+            var links = _context.EventAccessPoints.Where(eap => eap.EventId == eventId);
+            if (links.Any())
+            {
+                _context.EventAccessPoints.RemoveRange(links);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 
 }

@@ -58,6 +58,8 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
+
+
         /// <summary>
         /// Retorna el número de eventos disponibles
         /// </summary>
@@ -95,6 +97,24 @@ namespace Web.Controllers.Operational
             {
                 success = true,
                 message = "Evento creado correctamente con QR generado en Base64",
+                data = new { id }
+            });
+        }
+
+        /// <summary>
+        /// Actualiza un evento con sus relaciones (AccessPoints, Audiencias, etc.)
+        /// </summary>
+        [HttpPut("update-full")]
+        public async Task<IActionResult> UpdateFull([FromBody] EventDtoRequest dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var id = await _eventBusiness.UpdateEventAsync(dto);
+            return Ok(new
+            {
+                success = true,
+                message = "Evento actualizado correctamente con accesos y audiencias",
                 data = new { id }
             });
         }

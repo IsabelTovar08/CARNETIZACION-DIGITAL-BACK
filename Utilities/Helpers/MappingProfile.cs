@@ -293,9 +293,23 @@ namespace Utilities.Helper
              .ForMember(d => d.Audiences, opt => opt.MapFrom(s => s.EventTargetAudiences));
 
             CreateMap<EventDtoRequest, Event>()
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+            .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+            .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+            .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))
             .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
-            //.ForMember(d => d.Days, o => o.MapFrom(s => s.Days != null ? string.Join(",", s.Days) : null))
-            .ForMember(d => d.Id, o => o.Ignore());
+            .ForMember(d => d.ScheduleDate, o => o.MapFrom(s => s.ScheduleDate))
+            .ForMember(d => d.ScheduleTime, o => o.MapFrom(s => s.ScheduleTime))
+            .ForMember(d => d.ScheduleId, o => o.MapFrom(s => s.SheduleId))
+            .ForMember(d => d.EventTypeId, o => o.MapFrom(s => s.EventTypeId))
+            .ForMember(d => d.StatusId, o => o.MapFrom(s => s.StatusId))
+            .ForMember(d => d.QrCodeBase64, o => o.Ignore()) // ✅ Mantiene el QR
+                                                             // 🔹 Convierte la lista de IDs en objetos EventAccessPoint
+            .ForMember(d => d.EventAccessPoints, o => o.MapFrom(s =>
+                s.AccessPoints != null
+                    ? s.AccessPoints.Select(id => new EventAccessPoint { AccessPointId = id }).ToList()
+                    : new List<EventAccessPoint>()))
+            .ForMember(d => d.EventTargetAudiences, o => o.Ignore());
 
 
             //EventType

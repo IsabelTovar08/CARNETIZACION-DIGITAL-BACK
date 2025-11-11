@@ -20,5 +20,7 @@ namespace Business.Interfaces.Operational
         /// Retorna el número de eventos disponibles
         /// </summary>
         Task<int> GetAvailableEventsCountAsync();
+
+        Task<int> UpdateEventAsync(EventDtoRequest dto);
     }
 }
