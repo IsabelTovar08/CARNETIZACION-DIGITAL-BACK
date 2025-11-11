@@ -129,6 +129,10 @@ namespace Web.Controllers.ModelSecurity
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
 
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName ?? user.EmailPerson));
+            HttpContext.User = new ClaimsPrincipal(identity);
             await _authService.NotifyLogin(user.NamePerson);
 
             return Ok( pair );

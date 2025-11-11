@@ -27,7 +27,7 @@ namespace Business.Services.Notifications
                 Title = "Carga masiva completada",
                 Message = $"La carga masiva desde el archivo \"{fileName}\" finalizó exitosamente. " +
                           $"Se procesaron {totalRecords} registros correctamente.",
-                NotificationTypeId = (int)NotificationType.System
+                NotificationTypeId = NotificationType.System
             };
         }
 
@@ -45,7 +45,7 @@ namespace Business.Services.Notifications
                 Title = "¡Bienvenido al sistema!",
                 Message = $"Hola {userName}, es tu primera vez en el sistema de carnetización digital. " +
                           $"Explora las funcionalidades disponibles y mantén tu información actualizada.",
-                NotificationTypeId = (int)NotificationType.Info
+                NotificationTypeId = NotificationType.Info
             };
         }
 
@@ -59,7 +59,7 @@ namespace Business.Services.Notifications
                 Title = "Cambio de contraseña requerido",
                 Message = "Por seguridad, debes cambiar la contraseña asignada automáticamente al registrarte. " +
                           "Accede a tu perfil y establece una nueva contraseña personal.",
-                NotificationTypeId = (int)NotificationType.Warning
+                NotificationTypeId = NotificationType.Warning
             };
         }
 
@@ -76,7 +76,7 @@ namespace Business.Services.Notifications
             {
                 Title = "Recordatorio de evento",
                 Message = $"Tienes programado el evento \"{eventName}\" el {eventDate:dd/MM/yyyy} a las {eventDate:HH:mm}.",
-                NotificationTypeId = (int)NotificationType.Reminder
+                NotificationTypeId = NotificationType.Reminder
             };
         }
 
@@ -90,7 +90,7 @@ namespace Business.Services.Notifications
                 Title = "Nuevo evento disponible",
                 Message = $"Se ha creado un nuevo evento: \"{eventName}\" el {eventDate:dd/MM/yyyy} a las {eventDate:HH:mm} " +
                           $"en {location}. ¡No olvides inscribirte!",
-                NotificationTypeId = (int)NotificationType.Info
+                NotificationTypeId = NotificationType.Info
             };
         }
 
@@ -103,7 +103,7 @@ namespace Business.Services.Notifications
             {
                 Title = "Asistencia confirmada",
                 Message = $"Tu asistencia al evento \"{eventName}\" del {eventDate:dd/MM/yyyy} ha sido registrada exitosamente.",
-                NotificationTypeId = (int)NotificationType.Info
+                NotificationTypeId = NotificationType.Info
             };
         }
 
@@ -117,7 +117,7 @@ namespace Business.Services.Notifications
             {
                 Title = "Solicitud de modificación de datos",
                 Message = $"{requesterName} ha solicitado una modificación de datos: {detail}.",
-                NotificationTypeId = (int)NotificationType.Warning
+                NotificationTypeId = NotificationType.Warning
             };
         }
 
@@ -127,7 +127,7 @@ namespace Business.Services.Notifications
             {
                 Title = "Modificación aprobada",
                 Message = $"Tu solicitud de modificación en el campo \"{fieldUpdated}\" ha sido aprobada y actualizada en el sistema.",
-                NotificationTypeId = (int)NotificationType.Info
+                NotificationTypeId = NotificationType.Info
             };
         }
 
@@ -137,7 +137,7 @@ namespace Business.Services.Notifications
             {
                 Title = "Modificación rechazada",
                 Message = $"Tu solicitud de modificación en el campo \"{fieldRejected}\" ha sido rechazada. Motivo: {reason}.",
-                NotificationTypeId = (int)NotificationType.Warning
+                NotificationTypeId = NotificationType.Warning
             };
         }
 
@@ -151,7 +151,7 @@ namespace Business.Services.Notifications
             {
                 Title = "Carnet generado",
                 Message = $"El carnet digital para {personName} ha sido generado exitosamente. Código: {cardCode}.",
-                NotificationTypeId = (int)NotificationType.System
+                NotificationTypeId = NotificationType.System
             };
         }
     }

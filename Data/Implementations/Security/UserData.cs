@@ -195,5 +195,23 @@ namespace Data.Classes.Specifics
                 .FirstOrDefaultAsync();
         }
 
+
+        /// <summary>
+        /// Obtiene todos los usuarios que tienen asignado un rol específico (por nombre del rol).
+        /// </summary>
+        public async Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName)
+        {
+            if (string.IsNullOrWhiteSpace(roleName))
+                return Enumerable.Empty<User>();
+
+            return await _context.Users
+                .Where(u => !u.IsDeleted &&
+                            u.UserRoles.Any(ur => ur.Rol.Name.ToLower() == roleName.ToLower()))
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Rol)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
     }
 }

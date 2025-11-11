@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<form *ngIf="form" [formGroup]="form" (ngSubmit)="onSubmit()" mat-dialog-content class="form-container">
+  <div *ngFor="let field of fields" class="form-field">
+
+    <!-- 🔹 Texto / Número -->
+    <mat-form-field *ngIf="field.type === 'text' || field.type === 'number'" appearance="outline">
+      <mat-label>{{ field.label }}</mat-label>
+      <input
+        matInput
+        [type]="field.type"
+        [placeholder]="field.placeholder || ''"
+        [formControlName]="asKey(field.key)" />
+    </mat-form-field>
+
+    <!-- 🔹 Select -->
+    <mat-form-field *ngIf="field.type === 'select'" appearance="outline">
+      <mat-label>{{ field.label }}</mat-label>
+      <mat-select [formControlName]="asKey(field.key)">
+        <mat-option *ngFor="let opt of field.options" [value]="opt.value">
+          {{ opt.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- 🔹 Archivo -->
+    <div *ngIf="field.type === 'file'" class="file-upload">
+      <label>{{ field.label }}</label>
+      <input
+        type="file"
+        (change)="onFileChange($event, field.key)" />
+    </div>
+
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit">{{ action }}</button>
+  </div>
+</form>

@@ -8,6 +8,7 @@ using Data.Interfases.Notifications;
 using Data.Interfases.Operational;
 using Entity.Context;
 using Entity.DTOs.Specifics;
+using Entity.Enums.Extensions;
 using Entity.Models.Notifications;
 using Entity.Models.Organizational;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +37,7 @@ namespace Data.Implementations.Notifications
                     NotificationId = nr.Notification.Id,
                     Title = nr.Notification.Title,
                     Message = nr.Notification.Message,
-                    NotificationTypeName = ((NotificationType)nr.Notification.NotificationType).ToString(),
+                    NotificationTypeName = ((NotificationType)nr.Notification.NotificationType).GetDisplayName(),
                     StatusId = nr.Status,
                     SendDate = nr.SendDate,
                     ReadDate = nr.ReadDate

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utilities.Enums.Specifics;
 
 namespace Entity.DTOs.Notifications.Request
 {
@@ -18,7 +19,7 @@ namespace Entity.DTOs.Notifications.Request
         public string Message { get; set; }
 
         [Required]
-        public int NotificationTypeId { get; set; }
+        public NotificationType NotificationTypeId { get; set; }
 
     }
 }

@@ -29,7 +29,7 @@ namespace Business.Services.Notifications
                         Title = "Carga masiva completada",
                         Message = $"La carga masiva desde el archivo \"{args[1]}\" finalizó exitosamente. " +
                                   $"Se procesaron {args[0]} registros correctamente.",
-                        NotificationTypeId = (int)NotificationType.System
+                        NotificationTypeId = NotificationType.System
                     };
 
                 case NotificationTemplateType.FirstLoginWelcome:
@@ -38,7 +38,7 @@ namespace Business.Services.Notifications
                         Title = "¡Bienvenido al sistema!",
                         Message = $"Hola {args[0]}, es tu primera vez en el sistema de carnetización digital. " +
                                   "Explora las funcionalidades disponibles y mantén tu información actualizada.",
-                        NotificationTypeId = (int)NotificationType.Info
+                        NotificationTypeId = NotificationType.Info
                     };
 
                 case NotificationTemplateType.PasswordChangeRequired:
@@ -47,7 +47,7 @@ namespace Business.Services.Notifications
                         Title = "Cambio de contraseña requerido",
                         Message = "Por seguridad, debes cambiar la contraseña asignada automáticamente al registrarte. " +
                                   "Accede a tu perfil y establece una nueva contraseña personal.",
-                        NotificationTypeId = (int)NotificationType.Warning
+                        NotificationTypeId = NotificationType.Warning
                     };
 
                 case NotificationTemplateType.NewEvent:
@@ -56,7 +56,7 @@ namespace Business.Services.Notifications
                         Title = "Nuevo evento disponible",
                         Message = $"Se ha creado un nuevo evento: \"{args[0]}\" el {((DateTime)args[1]):dd/MM/yyyy} " +
                                   $"a las {((DateTime)args[1]):HH:mm} en {args[2]}. ¡No olvides inscribirte!",
-                        NotificationTypeId = (int)NotificationType.Info
+                        NotificationTypeId = NotificationType.Info
                     };
 
                 case NotificationTemplateType.EventReminder:
@@ -65,7 +65,7 @@ namespace Business.Services.Notifications
                         Title = "Recordatorio de evento",
                         Message = $"Tienes programado el evento \"{args[0]}\" el {((DateTime)args[1]):dd/MM/yyyy} " +
                                   $"a las {((DateTime)args[1]):HH:mm}.",
-                        NotificationTypeId = (int)NotificationType.Reminder
+                        NotificationTypeId = NotificationType.Reminder
                     };
 
                 case NotificationTemplateType.EventAttendance:
@@ -74,7 +74,7 @@ namespace Business.Services.Notifications
                         Title = "Asistencia confirmada",
                         Message = $"Tu asistencia al evento \"{args[0]}\" del {((DateTime)args[1]):dd/MM/yyyy} " +
                                   "ha sido registrada exitosamente.",
-                        NotificationTypeId = (int)NotificationType.Info
+                        NotificationTypeId = NotificationType.Info
                     };
 
                 case NotificationTemplateType.ModificationRequest:
@@ -82,7 +82,7 @@ namespace Business.Services.Notifications
                     {
                         Title = "Solicitud de modificación de datos",
                         Message = $"{args[0]} ha solicitado una modificación de datos: {args[1]}.",
-                        NotificationTypeId = (int)NotificationType.Warning
+                        NotificationTypeId = NotificationType.Warning
                     };
 
                 case NotificationTemplateType.ModificationApproved:
@@ -91,7 +91,7 @@ namespace Business.Services.Notifications
                         Title = "Modificación aprobada",
                         Message = $"Tu solicitud de modificación en el campo \"{args[0]}\" ha sido aprobada " +
                                   "y actualizada en el sistema.",
-                        NotificationTypeId = (int)NotificationType.Info
+                        NotificationTypeId = NotificationType.Info
                     };
 
                 case NotificationTemplateType.ModificationRejected:
@@ -100,7 +100,7 @@ namespace Business.Services.Notifications
                         Title = "Modificación rechazada",
                         Message = $"Tu solicitud de modificación en el campo \"{args[0]}\" ha sido rechazada. " +
                                   $"Motivo: {args[1]}.",
-                        NotificationTypeId = (int)NotificationType.Warning
+                        NotificationTypeId = NotificationType.Warning
                     };
 
                 case NotificationTemplateType.CardGenerated:
@@ -109,7 +109,7 @@ namespace Business.Services.Notifications
                         Title = "Carnet generado",
                         Message = $"El carnet digital para {args[0]} ha sido generado exitosamente. " +
                                   $"Código: {args[1]}.",
-                        NotificationTypeId = (int)NotificationType.System
+                        NotificationTypeId = NotificationType.System
                     };
 
                 /// <summary>
@@ -120,7 +120,7 @@ namespace Business.Services.Notifications
                     {
                         Title = "Inicio de sesión exitoso",
                         Message = $"Bienvenido {args[0]}, tu acceso ha sido validado correctamente el {DateTime.Now:dd/MM/yyyy HH:mm}.",
-                        NotificationTypeId = (int)NotificationType.System
+                        NotificationTypeId = NotificationType.System
                     };
 
                 default:

@@ -5,6 +5,7 @@ using Business.Services.Auth;
 using Data.Classes.Specifics;
 using Data.Interfases;
 using Data.Interfases.Security;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs;
 using Entity.DTOs.Auth;
 using Entity.DTOs.ModelSecurity.Request;
@@ -216,5 +217,16 @@ namespace Business.Classes
             }
         }
 
+
+
+        /// <summary>
+        /// Obtiene todos los usuarios que pertenecen a un rol específico.
+        /// </summary>
+        public async Task<IEnumerable<UserDTO>> GetUsersByRoleAsync(string roleName)
+        {
+            IEnumerable<User> users = await _userData.GetUsersByRoleAsync(roleName);
+
+            return _mapper.Map<IEnumerable<UserDTO>>(users);
+        }
     }
 }

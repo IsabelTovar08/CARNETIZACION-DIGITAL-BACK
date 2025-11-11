@@ -26,5 +26,11 @@ namespace Data.Interfases.Security
 
         Task<User?> GetByIdForMeAsync(int userId, bool includeProfile);
         Task<User?> GetByIdWithPersonAsync(int userId);
+
+        /// <summary>
+        /// Devuelve todos los usuarios que tengan asignado el rol especificado.
+        /// </summary>
+        Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName);
+
     }
 }

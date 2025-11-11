@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using AutoMapper;
+using DocumentFormat.OpenXml.Drawing;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
@@ -404,18 +405,25 @@ namespace Utilities.Helper
                 .ReverseMap();
 
 
-            CreateMap<ModificationRequest, ModificationRequestDtoResponse>()
+            CreateMap<ModificationRequest, ModificationRequestResponseDto>()
             .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => (int)src.Field))
-            .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Field.GetDisplayName()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.GetDisplayName()))
+            .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => ((ModificationField)src.Field).GetDisplayName()))
+            .ForMember(dest => dest.ReasonId, opt => opt.MapFrom(src => (int)src.Reason))
+            .ForMember(dest => dest.ReasonName, opt => opt.MapFrom(src => ((ModificationReason)src.Reason).GetDisplayName()))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ((ModificationRequestStatus)src.Status).GetDisplayName()))
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => (src.User.Person.FirstName + " " + src.User.Person.MiddleName + " "+ src.User.Person.LastName + " " + src.User.Person.SecondLastName)))
+            .ForMember(dest => dest.UserIdentification, opt => opt.MapFrom(src => (src.User.Person.DocumentNumber)))
+
+
             .ReverseMap();
 
             // De Create DTO a Entity
-            CreateMap<ModificationRequestDtoRequest, ModificationRequest>()
-                .ForMember(dest => dest.RequestDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => ModificationRequestStatus.Pending))
-                .ReverseMap();
+            //CreateMap<ModificationRequestResponseDto, ModificationRequest>()
+            //    .ForMember(dest => dest.RequestDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
+            //    .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => ModificationRequestStatus.Pending))
+            //    .ReverseMap();
 
+            CreateMap<ModificationRequest, ModificationRequestDto>().ReverseMap();
             // Attendance
 
             CreateMap<Attendance, AttendanceDtoRequest>().ReverseMap();

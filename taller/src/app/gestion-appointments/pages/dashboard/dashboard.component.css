@@ -1,0 +1,45 @@
+.dashboard-container {
+  max-width: 1200px;
+  margin: auto;
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+/* 🔹 Tarjetas */
+.quick-card {
+  padding: 1.5rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+  background-color: #fff;
+}
+
+.quick-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(63, 81, 181, 0.2);
+}
+
+/* 🔹 Íconos dentro de círculo */
+.icon-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #e3f2fd;
+  color: #1976d2;
+  font-size: 32px;
+}
+
+/* 🔹 Carrusel */
+.carousel img {
+  height: 380px;
+  object-fit: cover;
+}
+
+.carousel-caption {
+  bottom: 1.5rem;
+}
