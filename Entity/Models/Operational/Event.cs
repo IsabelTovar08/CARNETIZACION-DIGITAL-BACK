@@ -34,7 +34,5 @@ namespace Entity.Models.Organizational
         public Schedule? Shedule { get; set; }
         public ICollection<EventAccessPoint> EventAccessPoints { get; set; } = new List<EventAccessPoint>();
 
-
-
-    }
+    }   
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Operational;
+using Data.Implementations.Operational;
 using Data.Interfases;
 using Data.Interfases.Operational;
 using Entity.DTOs.Operational;
@@ -12,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using QRCoder;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,27 +45,17 @@ namespace Business.Implementations.Operational
         }
 
         /// <summary>
-        /// Crea un evento con accesos, audiencias y genera un código QR corto con datos útiles.
+        /// Crea un evento con accesos, audiencias y genera un código QR.
         /// </summary>
         public async Task<int> CreateEventAsync(CreateEventRequest dto)
         {
-            // 1️⃣ Mapear el evento desde DTO
+            //Mapear el evento desde el DTO
             var ev = _mapper.Map<Event>(dto.Event);
 
-            // Generar QR único inicial
-            string qrData = $"EVENT-{Guid.NewGuid()}-{ev.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
-            using var qrGen = new QRCodeGenerator();
-            using var qrCodeData = qrGen.CreateQrCode(qrData, QRCodeGenerator.ECCLevel.Q);
-            using var qrCode = new QRCode(qrCodeData);
-            using var bitmap = qrCode.GetGraphic(20);
-            using var ms = new MemoryStream();
-            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-            ev.QrCodeBase64 = Convert.ToBase64String(ms.ToArray());
-
-            // Guardar evento (ya con QrCodeBase64)
+            // Guardar primero el evento para obtener su Id real
             var savedEvent = await _data.SaveAsync(ev);
 
-            // 2️⃣ Crear puntos de acceso si vienen en el DTO
+            //Crear puntos de acceso (AccessPoints) si vienen en el DTO
             var createdAccessPoints = new List<AccessPoint>();
             if (dto.AccessPoints?.Any() == true)
             {
@@ -72,6 +63,7 @@ namespace Business.Implementations.Operational
                     .Select(apDto => _mapper.Map<AccessPoint>(apDto))
                     .ToList();
 
+                // Guardar AccessPoints y vincularlos al evento
                 await _apData.BulkInsertAsync(createdAccessPoints);
 
                 var links = createdAccessPoints.Select(ap => new EventAccessPoint
@@ -83,23 +75,15 @@ namespace Business.Implementations.Operational
                 await _data.BulkInsertEventAccessPointsAsync(links);
             }
 
-            // 3️⃣ Generar código QR corto con: ID, nombre y punto de acceso
+            //Generar código QR real (usando el ID real del evento)
             string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
             string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
+            savedEvent.QrCodeBase64 = GenerateQrCodeBase64(qrContent);
 
-            // ✅ Nombres distintos para evitar colisión
-            using var shortQrGen = new QRCodeGenerator();
-            using var shortQrData = shortQrGen.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
-            using var shortQrCode = new QRCode(shortQrData);
-            using var shortBitmap = shortQrCode.GetGraphic(6);
-            using var shortMs = new MemoryStream();
-            shortBitmap.Save(shortMs, System.Drawing.Imaging.ImageFormat.Png);
-            savedEvent.QrCodeBase64 = Convert.ToBase64String(shortMs.ToArray());
-
-            // Guardar el evento con su QR actualizado
+            // 5️⃣ Actualizar el evento con el QR final
             await _data.UpdateAsync(savedEvent);
 
-            // 4️⃣ Crear audiencias (perfiles, unidades, divisiones)
+            // rear audiencias (Perfiles, Unidades, Divisiones)
             var audiences = new List<EventTargetAudience>();
 
             if (dto.ProfileIds?.Any() == true)
@@ -138,19 +122,20 @@ namespace Business.Implementations.Operational
             return savedEvent.Id;
         }
 
+
         /// <summary>
-        /// Actualiza un evento y sus relaciones (AccessPoints, Audiencias).
+        /// Actualiza un evento existente con sus relaciones.
         /// </summary>
         public async Task<int> UpdateEventAsync(EventDtoRequest dto)
         {
             try
             {
+                // Buscar el evento existente con sus relaciones
                 var existingEvent = await _data.GetEventWithDetailsAsync(dto.Id);
-
                 if (existingEvent == null)
                     throw new EntityNotFoundException($"No se encontró el evento con Id {dto.Id}");
 
-                // 1️⃣ Actualizar campos principales (sin tocar código ni QR)
+                // Actualizar solo los campos principales
                 existingEvent.Name = dto.Name;
                 existingEvent.Description = dto.Description;
                 existingEvent.ScheduleDate = dto.ScheduleDate;
@@ -161,59 +146,23 @@ namespace Business.Implementations.Operational
                 existingEvent.IsPublic = dto.Ispublic;
                 existingEvent.UpdateAt = DateTime.UtcNow;
 
-                // 2️⃣ AccessPoints (reemplazo total)
+                // Actualizar AccessPoints (vínculos)
                 if (dto.AccessPoints != null && dto.AccessPoints.Any())
                 {
                     await _data.DeleteEventAccessPointsByEventIdAsync(existingEvent.Id);
-
                     var newLinks = dto.AccessPoints.Select(apId => new EventAccessPoint
                     {
                         EventId = existingEvent.Id,
                         AccessPointId = apId
                     }).ToList();
-
                     await _data.BulkInsertEventAccessPointsAsync(newLinks);
                 }
 
-                // 3️⃣ Audiencias (Profiles / Units / Divisions)
+                // Actualizar audiencias
                 await _audienceRepo.DeleteByEventIdAsync(existingEvent.Id);
+                await CreateEventAudiencesAsync(existingEvent.Id, dto.ProfileIds, dto.OrganizationalUnitIds, dto.InternalDivisionIds);
 
-                var newAudiences = new List<EventTargetAudience>();
-
-                if (dto.ProfileIds?.Any() == true)
-                {
-                    newAudiences.AddRange(dto.ProfileIds.Select(pid => new EventTargetAudience
-                    {
-                        TypeId = 1,
-                        ProfileId = pid,
-                        EventId = existingEvent.Id
-                    }));
-                }
-
-                if (dto.OrganizationalUnitIds?.Any() == true)
-                {
-                    newAudiences.AddRange(dto.OrganizationalUnitIds.Select(ouid => new EventTargetAudience
-                    {
-                        TypeId = 2,
-                        OrganizationalUnitId = ouid,
-                        EventId = existingEvent.Id
-                    }));
-                }
-
-                if (dto.InternalDivisionIds?.Any() == true)
-                {
-                    newAudiences.AddRange(dto.InternalDivisionIds.Select(did => new EventTargetAudience
-                    {
-                        TypeId = 3,
-                        InternalDivisionId = did,
-                        EventId = existingEvent.Id
-                    }));
-                }
-
-                if (newAudiences.Any())
-                    await _audienceRepo.BulkInsertAsync(newAudiences);
-
-                // 4️⃣ Guardar cambios
+                // Guardar cambios
                 await _data.UpdateAsync(existingEvent);
 
                 return existingEvent.Id;
@@ -225,12 +174,18 @@ namespace Business.Implementations.Operational
             }
         }
 
+        /// <summary>
+        /// Obtiene los detalles completos del evento.
+        /// </summary>
         public async Task<EventDetailsDtoResponse?> GetEventFullDetailsAsync(int eventId)
         {
             var entity = await _data.GetEventWithDetailsAsync(eventId);
             return _mapper.Map<EventDetailsDtoResponse>(entity);
         }
 
+        /// <summary>
+        /// Retorna el número de eventos disponibles.
+        /// </summary>
         public async Task<int> GetAvailableEventsCountAsync()
         {
             try
@@ -238,7 +193,6 @@ namespace Business.Implementations.Operational
                 var total = await _data.GetAvailableEventsCountAsync();
                 if (total < 0)
                     throw new InvalidOperationException("El número de eventos no puede ser negativo");
-
                 return total;
             }
             catch (InvalidOperationException ex)
@@ -252,5 +206,68 @@ namespace Business.Implementations.Operational
                 throw;
             }
         }
+
+        #region Métodos Privados
+
+        /// <summary>
+        /// Genera un código QR en formato Base64.
+        /// </summary>
+        private string GenerateQrCodeBase64(string content)
+        {
+            using var qrGen = new QRCodeGenerator();
+            using var qrData = qrGen.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new QRCode(qrData);
+            using var bitmap = qrCode.GetGraphic(6);
+            using var ms = new MemoryStream();
+            bitmap.Save(ms, ImageFormat.Png);
+            return Convert.ToBase64String(ms.ToArray());
+        }
+
+        /// <summary>
+        /// Crea las audiencias del evento (perfiles, unidades, divisiones).
+        /// </summary>
+        private async Task CreateEventAudiencesAsync(
+            int eventId,
+            IEnumerable<int>? profileIds,
+            IEnumerable<int>? organizationalUnitIds,
+            IEnumerable<int>? internalDivisionIds)
+        {
+            var audiences = new List<EventTargetAudience>();
+
+            if (profileIds?.Any() == true)
+            {
+                audiences.AddRange(profileIds.Select(pid => new EventTargetAudience
+                {
+                    TypeId = 1,
+                    ProfileId = pid,
+                    EventId = eventId
+                }));
+            }
+
+            if (organizationalUnitIds?.Any() == true)
+            {
+                audiences.AddRange(organizationalUnitIds.Select(ouid => new EventTargetAudience
+                {
+                    TypeId = 2,
+                    OrganizationalUnitId = ouid,
+                    EventId = eventId
+                }));
+            }
+
+            if (internalDivisionIds?.Any() == true)
+            {
+                audiences.AddRange(internalDivisionIds.Select(did => new EventTargetAudience
+                {
+                    TypeId = 3,
+                    InternalDivisionId = did,
+                    EventId = eventId
+                }));
+            }
+
+            if (audiences.Any())
+                await _audienceRepo.BulkInsertAsync(audiences);
+        }
+
+        #endregion
     }
 }
