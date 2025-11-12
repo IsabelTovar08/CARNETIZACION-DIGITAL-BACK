@@ -18,7 +18,6 @@ namespace Entity.DTOs.Organizational.Structure.Request
         //[Required(ErrorMessage = "El identificador de la organización es obligatorio.")]
         //[Range(1, int.MaxValue, ErrorMessage = "El identificador de la organización debe ser un número entero mayor que 0.")]
         //public int OrganizationId { get; set; }
-       
-
+        public List<string>? Days { get; set; }
     }
 }

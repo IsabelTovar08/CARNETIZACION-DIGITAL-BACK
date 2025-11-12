@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entity.DTOs.Specifics;   // ✅ NECESARIO PARA EventFilterDto
 
 namespace Business.Interfaces.Operational
 {
@@ -20,5 +21,19 @@ namespace Business.Interfaces.Operational
         /// Retorna el número de eventos disponibles
         /// </summary>
         Task<int> GetAvailableEventsCountAsync();
+
+        Task<int> UpdateEventAsync(EventDtoRequest dto);
+
+        Task<bool> FinalizeEventAsync(int eventId);
+
+        /// <summary>
+        /// Para que el servicio que verifica y actualiza el estado de eventos "en curso"
+        /// </summary>
+        Task CheckAndUpdateEventStatusAsync(int eventId);
+
+        // ============================================================
+        // 🚀 NUEVO: FILTRO POR ESTADO, TIPO Y PÚBLICO/PRIVADO
+        // ============================================================
+        Task<IEnumerable<EventDtoResponse>> FilterAsync(EventFilterDto filters);
     }
 }

@@ -14,6 +14,6 @@ namespace Entity.DTOs.Organizational.Structure.Response
 
         //public int OrganizationId { get; set; }
         //public string? OrganizationName { get; set; }
-
+        public List<string>? Days { get; set; }
     }
 }

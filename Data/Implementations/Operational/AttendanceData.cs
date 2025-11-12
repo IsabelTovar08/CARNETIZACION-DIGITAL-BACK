@@ -25,10 +25,9 @@ namespace Data.Implementations.Operational
                 .Include(x => x.AccessPointEntry)
                     .ThenInclude(ap => ap.EventAccessPoints)
                     .ThenInclude(eap => eap.Event)
-                .Include(x => x.AccessPointExit).
-                    ThenInclude(ap => ap.EventAccessPoints)
-                        .ThenInclude(eap => eap.Event)
-
+                .Include(x => x.AccessPointExit)
+                    .ThenInclude(ap => ap.EventAccessPoints)
+                    .ThenInclude(eap => eap.Event)
                 .ToListAsync();
         }
 
@@ -43,6 +42,24 @@ namespace Data.Implementations.Operational
                 .FirstOrDefaultAsync(ct);
         }
 
+        // ✅ Nuevo método sobrescrito para recargar relaciones después de guardar (entrada)
+        public override async Task<Attendance> SaveAsync(Attendance entity)
+        {
+            await base.SaveAsync(entity);
+
+            // 🔹 Recargar la asistencia con sus relaciones completas
+            var saved = await _context.Set<Attendance>()
+                .Include(a => a.AccessPointEntry)
+                .ThenInclude(ap => ap.EventAccessPoints)
+                    .ThenInclude(eap => eap.Event)
+                .Include(a => a.AccessPointExit)
+                .ThenInclude(ap => ap.EventAccessPoints)
+                    .ThenInclude(eap => eap.Event)
+                .FirstOrDefaultAsync(a => a.Id == entity.Id);
+
+            return saved!;
+        }
+
         public async Task<Attendance> UpdateExitAsync(int id, DateTime timeOfExit, int? accessPointOut, CancellationToken ct = default)
         {
             var entity = await _context.Set<Attendance>()
@@ -55,7 +72,18 @@ namespace Data.Implementations.Operational
             entity.AccessPointOfExit = accessPointOut;
 
             await _context.SaveChangesAsync(ct);
-            return entity;
+
+            // ✅ Recargar el registro con relaciones completas
+            var updated = await _context.Set<Attendance>()
+                .Include(a => a.AccessPointEntry)
+                .ThenInclude(ap => ap.EventAccessPoints)
+                    .ThenInclude(eap => eap.Event)
+                .Include(a => a.AccessPointExit)
+                .ThenInclude(ap => ap.EventAccessPoints)
+                    .ThenInclude(eap => eap.Event)
+                .FirstOrDefaultAsync(a => a.Id == id, ct);
+
+            return updated!;
         }
 
         public async Task<(IList<Attendance> Items, int Total)> QueryAsync(
@@ -67,12 +95,12 @@ namespace Data.Implementations.Operational
                 .AsNoTracking()
                 .Include(a => a.Person)
                 .Include(a => a.AccessPointEntry)
-                .ThenInclude(ap => ap.EventAccessPoints)
-                    .ThenInclude(eap => eap.Event)
+                    .ThenInclude(ap => ap.EventAccessPoints)
+                        .ThenInclude(eap => eap.Event)
                 .Include(a => a.AccessPointExit)
                     .ThenInclude(ap => ap.EventAccessPoints)
                         .ThenInclude(eap => eap.Event)
-                 .Where(a => !a.IsDeleted);
+                .Where(a => !a.IsDeleted);
 
             if (personId.HasValue)
                 q = q.Where(a => a.PersonId == personId.Value);
@@ -80,14 +108,15 @@ namespace Data.Implementations.Operational
             if (eventId.HasValue)
             {
                 q = q.Where(a =>
-                 (a.AccessPointEntry != null && a.AccessPointEntry.EventAccessPoints.Any(eap => eap.EventId == eventId.Value)) ||
-                 (a.AccessPointExit != null && a.AccessPointExit.EventAccessPoints.Any(eap => eap.EventId == eventId.Value))
-             );
-
+                    (a.AccessPointEntry != null && a.AccessPointEntry.EventAccessPoints.Any(eap => eap.EventId == eventId.Value)) ||
+                    (a.AccessPointExit != null && a.AccessPointExit.EventAccessPoints.Any(eap => eap.EventId == eventId.Value))
+                );
             }
 
-            if (fromUtc.HasValue) q = q.Where(a => a.TimeOfEntry >= fromUtc.Value);
-            if (toUtc.HasValue) q = q.Where(a => a.TimeOfEntry <= toUtc.Value);
+            if (fromUtc.HasValue)
+                q = q.Where(a => a.TimeOfEntry >= fromUtc.Value);
+            if (toUtc.HasValue)
+                q = q.Where(a => a.TimeOfEntry <= toUtc.Value);
 
             bool desc = string.Equals(sortDir, "DESC", StringComparison.OrdinalIgnoreCase);
             q = (sortBy ?? "TimeOfEntry") switch
@@ -104,6 +133,13 @@ namespace Data.Implementations.Operational
 
             var items = await q.Skip(skip).Take(pageSize).ToListAsync(ct);
             return (items, total);
+        }
+
+        // ✅ NUEVO MÉTODO — necesario para el AttendanceBusiness
+        // Permite hacer Include() desde el negocio sin romper capas
+        public IQueryable<Attendance> GetQueryable()
+        {
+            return _context.Set<Attendance>().AsQueryable();
         }
     }
 }

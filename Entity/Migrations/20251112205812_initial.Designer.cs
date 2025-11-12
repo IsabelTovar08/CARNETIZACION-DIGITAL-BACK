@@ -3,17 +3,20 @@ using System;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Entity.Migrations.Postgres
+namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251112205812_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -954,8 +957,11 @@ namespace Entity.Migrations.Postgres
 
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
                 {
-                    b.Property<int>("EventId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccessPointId")
                         .HasColumnType("integer");
@@ -966,7 +972,7 @@ namespace Entity.Migrations.Postgres
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("EventId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
@@ -975,11 +981,33 @@ namespace Entity.Migrations.Postgres
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("EventId", "AccessPointId");
+                    b.HasKey("Id");
 
                     b.HasIndex("AccessPointId");
 
+                    b.HasIndex("EventId");
+
                     b.ToTable("EventAccessPoints", "Operational");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccessPointId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EventId = 1,
+                            IsDeleted = false,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccessPointId = 2,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EventId = 1,
+                            IsDeleted = false,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
@@ -1359,6 +1387,9 @@ namespace Entity.Migrations.Postgres
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -1384,6 +1415,8 @@ namespace Entity.Migrations.Postgres
                     b.HasIndex("AccessPointOfEntry");
 
                     b.HasIndex("AccessPointOfExit");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("PersonId");
 
@@ -1431,9 +1464,6 @@ namespace Entity.Migrations.Postgres
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Days")
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -1461,14 +1491,11 @@ namespace Entity.Migrations.Postgres
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<DateTime?>("ScheduleDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("QrCodeBase64")
+                        .HasColumnType("text");
 
                     b.Property<int?>("ScheduleId")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("ScheduleTime")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("integer");
@@ -1498,8 +1525,6 @@ namespace Entity.Migrations.Postgres
                             IsDeleted = false,
                             IsPublic = true,
                             Name = "Conferencia de Tecnología",
-                            ScheduleDate = new DateTime(2023, 7, 30, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ScheduleTime = new DateTime(1900, 1, 1, 10, 0, 0, 0, DateTimeKind.Utc),
                             StatusId = 1,
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -1514,8 +1539,6 @@ namespace Entity.Migrations.Postgres
                             IsDeleted = false,
                             IsPublic = false,
                             Name = "Charla de Salud",
-                            ScheduleDate = new DateTime(2023, 8, 5, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ScheduleTime = new DateTime(1900, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc),
                             StatusId = 1,
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -2347,6 +2370,9 @@ namespace Entity.Migrations.Postgres
 
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Days")
+                        .HasColumnType("text");
 
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("interval");
@@ -3655,6 +3681,10 @@ namespace Entity.Migrations.Postgres
                         .HasForeignKey("AccessPointOfExit")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Entity.Models.Organizational.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithMany("Attendances")
                         .HasForeignKey("PersonId")
@@ -3664,6 +3694,8 @@ namespace Entity.Migrations.Postgres
                     b.Navigation("AccessPointEntry");
 
                     b.Navigation("AccessPointExit");
+
+                    b.Navigation("Event");
 
                     b.Navigation("Person");
                 });
@@ -3676,7 +3708,7 @@ namespace Entity.Migrations.Postgres
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Shedule")
+                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId");
 
@@ -3688,7 +3720,7 @@ namespace Entity.Migrations.Postgres
 
                     b.Navigation("EventType");
 
-                    b.Navigation("Shedule");
+                    b.Navigation("Schedule");
 
                     b.Navigation("Status");
                 });
