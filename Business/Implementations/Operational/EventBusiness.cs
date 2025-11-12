@@ -49,78 +49,92 @@ namespace Business.Implementations.Operational
         /// </summary>
         public async Task<int> CreateEventAsync(CreateEventRequest dto)
         {
-            //Mapear el evento desde el DTO
-            var ev = _mapper.Map<Event>(dto.Event);
-
-            // Guardar primero el evento para obtener su Id real
-            var savedEvent = await _data.SaveAsync(ev);
-
-            //Crear puntos de acceso (AccessPoints) si vienen en el DTO
-            var createdAccessPoints = new List<AccessPoint>();
-            if (dto.AccessPoints?.Any() == true)
+            try
             {
-                createdAccessPoints = dto.AccessPoints
-                    .Select(apDto => _mapper.Map<AccessPoint>(apDto))
-                    .ToList();
+                // 1️⃣ Crear el evento
+                var ev = _mapper.Map<Event>(dto.Event);
+                var savedEvent = await _data.SaveAsync(ev);
 
-                // Guardar AccessPoints y vincularlos al evento
-                await _apData.BulkInsertAsync(createdAccessPoints);
-
-                var links = createdAccessPoints.Select(ap => new EventAccessPoint
+                // 2️⃣ Crear puntos de acceso (AccessPoints)
+                var createdAccessPoints = new List<AccessPoint>();
+                if (dto.AccessPoints?.Any() == true)
                 {
-                    EventId = savedEvent.Id,
-                    AccessPointId = ap.Id
-                }).ToList();
+                    // Mapea los AccessPoints, pero ignora EventId (no debe existir)
+                    createdAccessPoints = dto.AccessPoints
+                        .Select(apDto => new AccessPoint
+                        {
+                            Name = apDto.Name,
+                            Description = apDto.Description,
+                            TypeId = apDto.TypeId,
+                            IsDeleted = false
+                        })
+                        .ToList();
 
-                await _data.BulkInsertEventAccessPointsAsync(links);
+                    await _apData.BulkInsertAsync(createdAccessPoints);
+
+                    // 3️⃣ Crear vínculos (EventAccessPoints)
+                    var links = createdAccessPoints.Select(ap => new EventAccessPoint
+                    {
+                        EventId = savedEvent.Id,
+                        AccessPointId = ap.Id
+                    }).ToList();
+
+                    await _data.BulkInsertEventAccessPointsAsync(links);
+                }
+
+                // 4️⃣ Generar código QR real
+                string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
+                string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
+                savedEvent.QrCodeBase64 = GenerateQrCodeBase64(qrContent);
+                await _data.UpdateAsync(savedEvent);
+
+                // 5️⃣ Crear audiencias (Perfiles, Unidades, Divisiones)
+                var audiences = new List<EventTargetAudience>();
+
+                if (dto.ProfileIds?.Any() == true)
+                {
+                    audiences.AddRange(dto.ProfileIds.Select(pid => new EventTargetAudience
+                    {
+                        TypeId = 1,
+                        ProfileId = pid,
+                        EventId = savedEvent.Id
+                    }));
+                }
+
+                if (dto.OrganizationalUnitIds?.Any() == true)
+                {
+                    audiences.AddRange(dto.OrganizationalUnitIds.Select(ouid => new EventTargetAudience
+                    {
+                        TypeId = 2,
+                        OrganizationalUnitId = ouid,
+                        EventId = savedEvent.Id
+                    }));
+                }
+
+                if (dto.InternalDivisionIds?.Any() == true)
+                {
+                    audiences.AddRange(dto.InternalDivisionIds.Select(did => new EventTargetAudience
+                    {
+                        TypeId = 3,
+                        InternalDivisionId = did,
+                        EventId = savedEvent.Id
+                    }));
+                }
+
+                if (audiences.Any())
+                    await _audienceRepo.BulkInsertAsync(audiences);
+
+               
+                return savedEvent.Id;
             }
-
-            //Generar código QR real (usando el ID real del evento)
-            string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
-            string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
-            savedEvent.QrCodeBase64 = GenerateQrCodeBase64(qrContent);
-
-            // 5️⃣ Actualizar el evento con el QR final
-            await _data.UpdateAsync(savedEvent);
-
-            // rear audiencias (Perfiles, Unidades, Divisiones)
-            var audiences = new List<EventTargetAudience>();
-
-            if (dto.ProfileIds?.Any() == true)
+            catch (Exception ex)
             {
-                audiences.AddRange(dto.ProfileIds.Select(pid => new EventTargetAudience
-                {
-                    TypeId = 1,
-                    ProfileId = pid,
-                    EventId = savedEvent.Id
-                }));
+                
+                _logger.LogError(ex, "Error al crear evento con access points");
+                throw;
             }
-
-            if (dto.OrganizationalUnitIds?.Any() == true)
-            {
-                audiences.AddRange(dto.OrganizationalUnitIds.Select(ouid => new EventTargetAudience
-                {
-                    TypeId = 2,
-                    OrganizationalUnitId = ouid,
-                    EventId = savedEvent.Id
-                }));
-            }
-
-            if (dto.InternalDivisionIds?.Any() == true)
-            {
-                audiences.AddRange(dto.InternalDivisionIds.Select(did => new EventTargetAudience
-                {
-                    TypeId = 3,
-                    InternalDivisionId = did,
-                    EventId = savedEvent.Id
-                }));
-            }
-
-            if (audiences.Any())
-                await _audienceRepo.BulkInsertAsync(audiences);
-
-            return savedEvent.Id;
         }
+
 
 
         /// <summary>
@@ -140,7 +154,7 @@ namespace Business.Implementations.Operational
                 existingEvent.Description = dto.Description;
                 existingEvent.ScheduleDate = dto.ScheduleDate;
                 existingEvent.ScheduleTime = dto.ScheduleTime;
-                existingEvent.ScheduleId = dto.SheduleId;
+                existingEvent.ScheduleId = dto.ScheduleId;
                 existingEvent.EventTypeId = dto.EventTypeId;
                 existingEvent.StatusId = dto.StatusId;
                 existingEvent.IsPublic = dto.Ispublic;

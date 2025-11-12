@@ -3,17 +3,20 @@ using System;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Entity.Migrations
+namespace Entity.MigracionesEq
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251112000103_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3679,7 +3682,7 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Shedule")
+                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId");
 
@@ -3691,7 +3694,7 @@ namespace Entity.Migrations
 
                     b.Navigation("EventType");
 
-                    b.Navigation("Shedule");
+                    b.Navigation("Schedule");
 
                     b.Navigation("Status");
                 });

@@ -22,7 +22,7 @@ namespace Entity.DTOs.Operational.Request
         public DateTime? ScheduleTime { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "El identificador del horario debe ser un número entero mayor que 0.")]
-        public int? SheduleId { get; set; }
+        public int? ScheduleId { get; set; }
 
         [Required(ErrorMessage = "El tipo de evento es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El tipo de evento debe ser un número entero mayor que 0.")]

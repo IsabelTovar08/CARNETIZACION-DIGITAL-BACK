@@ -300,16 +300,14 @@ namespace Utilities.Helper
             .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
             .ForMember(d => d.ScheduleDate, o => o.MapFrom(s => s.ScheduleDate))
             .ForMember(d => d.ScheduleTime, o => o.MapFrom(s => s.ScheduleTime))
-            .ForMember(d => d.ScheduleId, o => o.MapFrom(s => s.SheduleId))
+            .ForMember(d => d.ScheduleId, o => o.MapFrom(s => s.ScheduleId))
             .ForMember(d => d.EventTypeId, o => o.MapFrom(s => s.EventTypeId))
             .ForMember(d => d.StatusId, o => o.MapFrom(s => s.StatusId))
-            .ForMember(d => d.QrCodeBase64, o => o.Ignore()) // ✅ Mantiene el QR
-                                                             // 🔹 Convierte la lista de IDs en objetos EventAccessPoint
-            .ForMember(d => d.EventAccessPoints, o => o.MapFrom(s =>
-                s.AccessPoints != null
-                    ? s.AccessPoints.Select(id => new EventAccessPoint { AccessPointId = id }).ToList()
-                    : new List<EventAccessPoint>()))
+            .ForMember(d => d.QrCodeBase64, o => o.Ignore())
+            // 🔹 Ignora relaciones — se manejan manualmente en el servicio
+            .ForMember(d => d.EventAccessPoints, o => o.Ignore())
             .ForMember(d => d.EventTargetAudiences, o => o.Ignore());
+
 
 
             //EventType
@@ -357,8 +355,12 @@ namespace Utilities.Helper
 
             //AccessPoints
             CreateMap<AccessPointDtoRequest, AccessPoint>()
-             .ForMember(d => d.Id, o => o.Ignore())
-             .ForMember(d => d.AccessPointType, o => o.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+                .ForMember(d => d.TypeId, o => o.MapFrom(s => s.TypeId))
+                .ForMember(d => d.QrCode, o => o.Ignore())
+                .ForMember(d => d.EventAccessPoints, o => o.Ignore());
 
             CreateMap<AccessPoint, AccessPointDtoRequest>().ReverseMap();
 

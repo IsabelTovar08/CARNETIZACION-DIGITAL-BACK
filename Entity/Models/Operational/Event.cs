@@ -26,12 +26,12 @@ namespace Entity.Models.Organizational
         public int EventTypeId { get; set; }
         public EventType? EventType { get; set; }
 
-        [Column(TypeName = "text")]
+        [Column(TypeName = "text")] 
         public string? QrCodeBase64 { get; set; }
 
         public ICollection<EventTargetAudience> EventTargetAudiences { get; set; } = new List<EventTargetAudience>();
         public Status? Status { get; set; }
-        public Schedule? Shedule { get; set; }
+        public Schedule? Schedule { get; set; }
         public ICollection<EventAccessPoint> EventAccessPoints { get; set; } = new List<EventAccessPoint>();
 
     }   
