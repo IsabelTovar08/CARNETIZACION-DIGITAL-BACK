@@ -7,7 +7,7 @@ namespace Entity.Models.Organizational
     public class Attendance : BaseModel
     {
         public DateTime TimeOfEntry { get; set; }
-        public DateTime? TimeOfExit { get; set; }   // nullable
+        public DateTime? TimeOfExit { get; set; }
 
         public int? AccessPointOfEntry { get; set; }
         public int? AccessPointOfExit { get; set; }
@@ -17,6 +17,10 @@ namespace Entity.Models.Organizational
 
         public int PersonId { get; set; }
         public Person Person { get; set; }
+
+        //  vínculo al evento
+        public int? EventId { get; set; }
+        public Event? Event { get; set; }
 
         // aquí vive el Base64 del PNG del QR
         public string? QrCode { get; set; }

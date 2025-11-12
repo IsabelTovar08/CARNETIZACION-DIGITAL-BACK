@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Business.Classes.Base;
+using Business.Interfaces.Auth;
 using Business.Interfaces.Operational;
+using Business.Interfaces.Security;
 using Data.Interfases.Operational;
 using Data.Interfases.Security;
 using Entity.DTOs.Operational.Request;
@@ -23,15 +25,19 @@ namespace Business.Implementations.Operational
         private readonly IAttendanceData _attendanceData;
         private readonly IEventData _eventData;
         private readonly IPersonData _personData;
+        private readonly ICurrentUser _currentUser;
         private readonly ILogger<Attendance> _logger;
         private readonly IMapper _mapper;
+        private readonly IUserBusiness _userBusiness;
 
         public AttendanceBusiness(
             IAttendanceData attendanceData,
             IEventData eventData,
             IPersonData personData,
             ILogger<Attendance> logger,
-            IMapper mapper
+            IMapper mapper,
+            ICurrentUser currentUser,
+            IUserBusiness userBusiness
         ) : base(attendanceData, logger, mapper)
         {
             _attendanceData = attendanceData;
@@ -39,6 +45,8 @@ namespace Business.Implementations.Operational
             _personData = personData;
             _logger = logger;
             _mapper = mapper;
+            _currentUser = currentUser;
+            _userBusiness = userBusiness;
         }
 
         /// <summary>
@@ -101,20 +109,20 @@ namespace Business.Implementations.Operational
                     PersonId = person.Id,
                     TimeOfEntry = DateTime.UtcNow,
                     AccessPointOfEntry = accessPoint.Id,
+                    EventId = ev.Id,
                     QrCode = qrContent
                 };
 
                 var saved = await _attendanceData.SaveAsync(attendance);
 
-                return new AttendanceDtoResponse
-                {
-                    Success = true,
-                    Message = $"Asistencia registrada en '{ev.Name}' - Punto: '{accessPoint.Name}'.",
-                    EventName = ev.Name,
-                    TimeOfEntry = saved.TimeOfEntry,
-                    TimeOfEntryStr = saved.TimeOfEntry.ToString("dd/MM/yyyy HH:mm"),
-                    PersonName = $"{person.FirstName} {person.LastName}"
-                };
+                // ✅ Recargar entidad con relaciones
+                var reloaded = await _attendanceData.GetAllAsync();
+                var full = reloaded.FirstOrDefault(a => a.Id == saved.Id);
+
+                var response = _mapper.Map<AttendanceDtoResponse>(full);
+                response.Success = true;
+                response.Message = $"Asistencia registrada en '{ev.Name}' - Punto: '{accessPoint.Name}'.";
+                return response;
             }
             catch (Exception ex)
             {
@@ -127,9 +135,6 @@ namespace Business.Implementations.Operational
             }
         }
 
-        /// <summary>
-        /// Registra asistencia general (sin entrada/salida específica).
-        /// </summary>
         public async Task<AttendanceDtoResponse?> RegisterAttendanceAsync(AttendanceDtoRequest dto)
         {
             try
@@ -162,7 +167,7 @@ namespace Business.Implementations.Operational
         {
             try
             {
-                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, ct);
+                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId ?? 0, ct);
                 if (open != null)
                 {
                     return new AttendanceDtoResponse
@@ -172,16 +177,37 @@ namespace Business.Implementations.Operational
                     };
                 }
 
+                var ev = await _eventData.GetQueryable()
+                    .Include(e => e.EventAccessPoints)
+                        .ThenInclude(eap => eap.AccessPoint)
+                    .FirstOrDefaultAsync(e => e.Id == (dto.EventId ?? 0) && !e.IsDeleted, ct);
+
+                if (ev == null)
+                {
+                    return new AttendanceDtoResponse
+                    {
+                        Success = false,
+                        Message = "El evento especificado no existe o fue eliminado."
+                    };
+                }
+
                 var entity = new Attendance
                 {
-                    PersonId = dto.PersonId,
+                    PersonId = dto.PersonId ?? 0,
                     TimeOfEntry = DateTime.UtcNow,
-                    AccessPointOfEntry = dto.AccessPointId
+                    AccessPointOfEntry = dto.AccessPointId ?? 0,
+                    EventId = dto.EventId ?? 0
                 };
 
                 var saved = await _attendanceData.SaveAsync(entity);
-                var response = _mapper.Map<AttendanceDtoResponse>(saved);
 
+                // ✅ Recargar con relaciones
+                var reloaded = await _attendanceData.GetAllAsync();
+                var full = reloaded.FirstOrDefault(a => a.Id == saved.Id);
+
+                var response = _mapper.Map<AttendanceDtoResponse>(full);
+                response.EventId = ev.Id;
+                response.EventName = ev.Name;
                 response.Success = true;
                 response.Message = "Entrada registrada correctamente.";
                 response.TimeOfEntryStr = response.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
@@ -199,11 +225,14 @@ namespace Business.Implementations.Operational
             }
         }
 
+        /// <summary>
+        /// ✅ Registra salida manual (desde token) con relaciones y nombres de evento/puntos
+        /// </summary>
         public async Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default)
         {
             try
             {
-                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, ct);
+                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId ?? 0, ct);
                 if (open == null)
                 {
                     return new AttendanceDtoResponse
@@ -213,8 +242,38 @@ namespace Business.Implementations.Operational
                     };
                 }
 
-                var updated = await _attendanceData.UpdateExitAsync(open.Id, DateTime.UtcNow, dto.AccessPointId, ct);
-                var response = _mapper.Map<AttendanceDtoResponse>(updated);
+                var updated = await _attendanceData.UpdateExitAsync(open.Id, DateTime.UtcNow, dto.AccessPointId ?? 0, ct);
+
+                
+                // Recargar el registro actualizado con todas las relaciones directamente desde el contexto
+                var full = await _attendanceData.GetQueryable()
+                    .Include(a => a.AccessPointEntry)
+                        .ThenInclude(ap => ap.EventAccessPoints)
+                            .ThenInclude(eap => eap.Event)
+                    .Include(a => a.AccessPointExit)
+                        .ThenInclude(ap => ap.EventAccessPoints)
+                            .ThenInclude(eap => eap.Event)
+                    .FirstOrDefaultAsync(a => a.Id == updated.Id, ct);
+
+                var response = _mapper.Map<AttendanceDtoResponse>(full);
+
+                // Cargar nombres de los puntos si existen
+                if (full?.AccessPointEntry != null)
+                    response.AccessPointOfEntryName = full.AccessPointEntry.Name;
+
+                if (full?.AccessPointExit != null)
+                    response.AccessPointOfExitName = full.AccessPointExit.Name;
+
+                // Cargar nombre del evento
+                if (full?.EventId != null)
+                {
+                    var ev = full.AccessPointEntry?.EventAccessPoints
+                        ?.Select(eap => eap.Event?.Name)
+                        ?.FirstOrDefault();
+
+                    if (!string.IsNullOrEmpty(ev))
+                        response.EventName = ev;
+                }
 
                 response.Success = true;
                 response.Message = "Salida registrada correctamente.";

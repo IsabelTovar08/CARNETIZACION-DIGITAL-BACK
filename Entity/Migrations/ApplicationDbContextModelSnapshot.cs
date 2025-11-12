@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Entity.MigracionesEq
+namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -1359,6 +1359,9 @@ namespace Entity.MigracionesEq
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -1384,6 +1387,8 @@ namespace Entity.MigracionesEq
                     b.HasIndex("AccessPointOfEntry");
 
                     b.HasIndex("AccessPointOfExit");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("PersonId");
 
@@ -3658,6 +3663,10 @@ namespace Entity.MigracionesEq
                         .HasForeignKey("AccessPointOfExit")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Entity.Models.Organizational.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithMany("Attendances")
                         .HasForeignKey("PersonId")
@@ -3667,6 +3676,8 @@ namespace Entity.MigracionesEq
                     b.Navigation("AccessPointEntry");
 
                     b.Navigation("AccessPointExit");
+
+                    b.Navigation("Event");
 
                     b.Navigation("Person");
                 });

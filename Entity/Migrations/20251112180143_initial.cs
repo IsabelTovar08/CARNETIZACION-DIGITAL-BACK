@@ -6,10 +6,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Entity.MigracionesEq
+namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -691,6 +691,7 @@ namespace Entity.MigracionesEq
                     AccessPointOfEntry = table.Column<int>(type: "integer", nullable: true),
                     AccessPointOfExit = table.Column<int>(type: "integer", nullable: true),
                     PersonId = table.Column<int>(type: "integer", nullable: false),
+                    EventId = table.Column<int>(type: "integer", nullable: true),
                     QrCode = table.Column<string>(type: "text", nullable: true),
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
@@ -714,6 +715,12 @@ namespace Entity.MigracionesEq
                         principalTable: "AccessPoints",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendances_Events_EventId",
+                        column: x => x.EventId,
+                        principalSchema: "Operational",
+                        principalTable: "Events",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Attendances_People_PersonId",
                         column: x => x.PersonId,
@@ -1506,11 +1513,11 @@ namespace Entity.MigracionesEq
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Attendances",
-                columns: new[] { "Id", "AccessPointOfEntry", "AccessPointOfExit", "Code", "CreateAt", "PersonId", "QrCode", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
+                columns: new[] { "Id", "AccessPointOfEntry", "AccessPointOfExit", "Code", "CreateAt", "EventId", "PersonId", "QrCode", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, null, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, 1, null, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, 2, null, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1552,6 +1559,12 @@ namespace Entity.MigracionesEq
                 schema: "Operational",
                 table: "Attendances",
                 column: "AccessPointOfExit");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendances_EventId",
+                schema: "Operational",
+                table: "Attendances",
+                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendances_PersonId",

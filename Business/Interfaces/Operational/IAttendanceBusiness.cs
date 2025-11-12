@@ -12,10 +12,30 @@ namespace Business.Interfaces.Operational
 {
     public interface IAttendanceBusiness : IBaseBusiness<Attendance, AttendanceDtoRequest, AttendanceDtoResponse>
     {
+        /// <summary>
+        /// ✅ Registra asistencia general (sin entrada/salida específica)
+        /// </summary>
         Task<AttendanceDtoResponse?> RegisterAttendanceAsync(AttendanceDtoRequest dto);
+
+        /// <summary>
+        /// ✅ Registra entrada manual (desde token)
+        /// </summary>
         Task<AttendanceDtoResponse> RegisterEntryAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default);
+
+        /// <summary>
+        /// ✅ Registra salida manual (desde token)
+        /// </summary>
         Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default);
 
+        /// <summary>
+        /// ✅ Registra asistencia automáticamente al leer un código QR del evento.
+        /// QR esperado: EVT|EventId|EventName|AccessPointName
+        /// </summary>
+        Task<AttendanceDtoResponse> RegisterAttendanceByQrAsync(string qrContent, int personId);
+
+        /// <summary>
+        /// ✅ Búsqueda filtrada de asistencias
+        /// </summary>
         Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
             int? personId,
             int? eventId,
@@ -29,12 +49,13 @@ namespace Business.Interfaces.Operational
         );
 
         /// <summary>
-        /// ✅ Registra asistencia a partir de un código QR escaneado del evento.
-        /// Devuelve un objeto tipado con éxito, mensaje y datos del registro.
+        /// ✅ Exporta las asistencias a PDF
         /// </summary>
-        Task<AttendanceDtoResponse> RegisterAttendanceByQrAsync(string eventCode, int personId);
-
         Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
+
+        /// <summary>
+        /// ✅ Exporta las asistencias a Excel
+        /// </summary>
         Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
     }
 }
