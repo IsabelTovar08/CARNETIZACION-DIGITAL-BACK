@@ -136,6 +136,7 @@ namespace Data.Implementations.Operational
                 await _context.SaveChangesAsync();
             }
         }
+
         // metodo para el servicio que finaliza eventos automáticamente
         public async Task<List<Event>> GetEventsToFinalizeAsync(DateTime now)
         {
@@ -157,5 +158,15 @@ namespace Data.Implementations.Operational
                 .ToListAsync();
         }
 
+        // =============================================================
+        //  implementación real para filtros personalizados
+        // =============================================================
+        public async Task<List<Event>> ToListAsync(IQueryable<Event> query)
+        {
+            return await query
+                .Include(e => e.Status)
+                .Include(e => e.EventType)
+                .ToListAsync();
+        }
     }
 }

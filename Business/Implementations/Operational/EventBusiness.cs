@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Utilities.Exeptions;
+using Entity.DTOs.Specifics;   // ✅ NECESARIO PARA EventFilterDto
 
 namespace Business.Implementations.Operational
 {
@@ -87,7 +88,7 @@ namespace Business.Implementations.Operational
             if (existingEvent == null)
                 throw new EntityNotFoundException($"Evento con Id {eventId} no encontrado.");
 
-            existingEvent.StatusId = 10; 
+            existingEvent.StatusId = 10;
             existingEvent.IsPublic = false;
             existingEvent.UpdateAt = DateTime.UtcNow;
 
@@ -102,11 +103,9 @@ namespace Business.Implementations.Operational
         {
             try
             {
-                // Crear el evento
                 var ev = _mapper.Map<Event>(dto.Event);
                 var savedEvent = await _data.SaveAsync(ev);
 
-                // Crear puntos de acceso (AccessPoints)
                 var createdAccessPoints = new List<AccessPoint>();
                 if (dto.AccessPoints?.Any() == true)
                 {
@@ -122,7 +121,6 @@ namespace Business.Implementations.Operational
 
                     await _apData.BulkInsertAsync(createdAccessPoints);
 
-                    // Crear vínculos (EventAccessPoints)
                     var links = createdAccessPoints.Select(ap => new EventAccessPoint
                     {
                         EventId = savedEvent.Id,
@@ -132,13 +130,11 @@ namespace Business.Implementations.Operational
                     await _data.BulkInsertEventAccessPointsAsync(links);
                 }
 
-                // Generar código QR real
                 string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
                 string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
                 savedEvent.QrCodeBase64 = GenerateQrCodeBase64(qrContent);
                 await _data.UpdateAsync(savedEvent);
 
-                // Crear audiencias (Perfiles, Unidades, Divisiones)
                 var audiences = new List<EventTargetAudience>();
 
                 if (dto.ProfileIds?.Any() == true)
@@ -191,30 +187,23 @@ namespace Business.Implementations.Operational
             var ev = await _data.GetEventWithDetailsAsync(eventId);
             if (ev == null) return;
 
-            // Fecha y hora actual
             var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Local);
 
-
-            // Validar rango de fechas del evento
             if (ev.EventStart.HasValue && ev.EventEnd.HasValue && ev.EventStart <= now && ev.EventEnd >= now)
             {
-                // Si tiene horario asociado (Schedule)
                 if (ev.Schedule != null)
                 {
                     var today = now.DayOfWeek.ToString();
                     var scheduleDays = ev.Schedule.Days?.Split(',').Select(d => d.Trim()) ?? Enumerable.Empty<string>();
 
-                    // Verificar si hoy aplica
                     if (scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
                     {
                         var startTime = ev.Schedule.StartTime;
                         var endTime = ev.Schedule.EndTime;
 
-                        // Hora actual dentro del rango
                         if (now.TimeOfDay >= startTime && now.TimeOfDay <= endTime)
                         {
-                            // Si no está ya en curso
-                            if (ev.StatusId != 8) // 8 = "En curso"
+                            if (ev.StatusId != 8)
                             {
                                 ev.StatusId = 8;
                                 ev.UpdateAt = DateTime.Now;
@@ -228,7 +217,6 @@ namespace Business.Implementations.Operational
             }
         }
 
-
         /// <summary>
         /// Actualiza un evento existente con sus relaciones.
         /// </summary>
@@ -236,12 +224,10 @@ namespace Business.Implementations.Operational
         {
             try
             {
-                // Buscar el evento existente con sus relaciones
                 var existingEvent = await _data.GetEventWithDetailsAsync(dto.Id);
                 if (existingEvent == null)
                     throw new EntityNotFoundException($"No se encontró el evento con Id {dto.Id}");
 
-                // Actualizar solo los campos principales
                 existingEvent.Name = dto.Name;
                 existingEvent.Description = dto.Description;
                 existingEvent.EventStart = dto.EventStart;
@@ -251,8 +237,7 @@ namespace Business.Implementations.Operational
                 existingEvent.StatusId = dto.StatusId;
                 existingEvent.IsPublic = dto.Ispublic;
                 existingEvent.UpdateAt = DateTime.Now;
-   
-                // Actualizar AccessPoints (vínculos)
+
                 if (dto.AccessPoints != null && dto.AccessPoints.Any())
                 {
                     await _data.DeleteEventAccessPointsByEventIdAsync(existingEvent.Id);
@@ -264,11 +249,13 @@ namespace Business.Implementations.Operational
                     await _data.BulkInsertEventAccessPointsAsync(newLinks);
                 }
 
-                // Actualizar audiencias
                 await _audienceRepo.DeleteByEventIdAsync(existingEvent.Id);
-                await CreateEventAudiencesAsync(existingEvent.Id, dto.ProfileIds, dto.OrganizationalUnitIds, dto.InternalDivisionIds);
+                await CreateEventAudiencesAsync(
+                    existingEvent.Id,
+                    dto.ProfileIds,
+                    dto.OrganizationalUnitIds,
+                    dto.InternalDivisionIds);
 
-                // Guardar cambios
                 await _data.UpdateAsync(existingEvent);
 
                 return existingEvent.Id;
@@ -282,9 +269,6 @@ namespace Business.Implementations.Operational
 
         #region Métodos Privados
 
-        /// <summary>
-        /// Genera un código QR en formato Base64.
-        /// </summary>
         private string GenerateQrCodeBase64(string content)
         {
             using var qrGen = new QRCodeGenerator();
@@ -296,9 +280,6 @@ namespace Business.Implementations.Operational
             return Convert.ToBase64String(ms.ToArray());
         }
 
-        /// <summary>
-        /// Crea las audiencias del evento (perfiles, unidades, divisiones).
-        /// </summary>
         private async Task CreateEventAudiencesAsync(
             int eventId,
             IEnumerable<int>? profileIds,
@@ -342,5 +323,27 @@ namespace Business.Implementations.Operational
         }
 
         #endregion
+
+
+        // ============================================================
+        //  NUEVO MÉTODO: FILTRAR EVENTOS POR ESTADO, TIPO Y PÚBLICO
+        // ============================================================
+        public async Task<IEnumerable<EventDtoResponse>> FilterAsync(EventFilterDto filters)
+        {
+            var query = _data.GetQueryable()
+                .Where(e => !e.IsDeleted);
+
+            if (filters.StatusId.HasValue)
+                query = query.Where(e => e.StatusId == filters.StatusId.Value);
+
+            if (filters.EventTypeId.HasValue)
+                query = query.Where(e => e.EventTypeId == filters.EventTypeId.Value);
+
+            if (filters.IsPublic.HasValue)
+                query = query.Where(e => e.IsPublic == filters.IsPublic.Value);
+
+            var list = await _data.ToListAsync(query);
+            return list.Select(e => _mapper.Map<EventDtoResponse>(e));
+        }
     }
 }
