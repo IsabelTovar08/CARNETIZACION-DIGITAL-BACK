@@ -128,5 +128,25 @@ namespace Web.Controllers.Operational
                 data = new { id }
             });
         }
+
+
+        /// <summary>
+        /// cancelar o finalizar un evento manualmente
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut("finalize/{id}")]
+        public async Task<IActionResult> FinalizeEvent(int id)
+        {
+            var success = await _eventBusiness.FinalizeEventAsync(id);
+
+            return Ok(new
+            {
+                success,
+                message = success
+                    ? "El evento ha sido finalizado correctamente."
+                    : "No se pudo finalizar el evento."
+            });
+        }
     }
 }

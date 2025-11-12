@@ -45,13 +45,64 @@ namespace Business.Implementations.Operational
         }
 
         /// <summary>
+        /// Obtiene los detalles completos del evento.
+        /// </summary>
+        public async Task<EventDetailsDtoResponse?> GetEventFullDetailsAsync(int eventId)
+        {
+            var entity = await _data.GetEventWithDetailsAsync(eventId);
+            return _mapper.Map<EventDetailsDtoResponse>(entity);
+        }
+
+        /// <summary>
+        /// Retorna el número de eventos disponibles.
+        /// </summary>
+        public async Task<int> GetAvailableEventsCountAsync()
+        {
+            try
+            {
+                var total = await _data.GetAvailableEventsCountAsync();
+                if (total < 0)
+                    throw new InvalidOperationException("El número de eventos no puede ser negativo");
+                return total;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Validación fallida al obtener eventos disponibles");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado en Business al obtener eventos disponibles");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Finaliza un evento manualmente.
+        /// </summary>
+        public async Task<bool> FinalizeEventAsync(int eventId)
+        {
+            var existingEvent = await _data.GetByIdAsync(eventId);
+
+            if (existingEvent == null)
+                throw new EntityNotFoundException($"Evento con Id {eventId} no encontrado.");
+
+            existingEvent.StatusId = 10; 
+            existingEvent.IsPublic = false;
+            existingEvent.UpdateAt = DateTime.UtcNow;
+
+            await _data.UpdateAsync(existingEvent);
+            return true;
+        }
+
+        /// <summary>
         /// Crea un evento con accesos, audiencias y genera un código QR.
         /// </summary>
         public async Task<int> CreateEventAsync(CreateEventRequest dto)
         {
             try
             {
-                //Crear el evento
+                // Crear el evento
                 var ev = _mapper.Map<Event>(dto.Event);
                 var savedEvent = await _data.SaveAsync(ev);
 
@@ -59,7 +110,6 @@ namespace Business.Implementations.Operational
                 var createdAccessPoints = new List<AccessPoint>();
                 if (dto.AccessPoints?.Any() == true)
                 {
-                    // Mapea los AccessPoints, pero ignora EventId (no debe existir)
                     createdAccessPoints = dto.AccessPoints
                         .Select(apDto => new AccessPoint
                         {
@@ -88,7 +138,7 @@ namespace Business.Implementations.Operational
                 savedEvent.QrCodeBase64 = GenerateQrCodeBase64(qrContent);
                 await _data.UpdateAsync(savedEvent);
 
-                //Crear audiencias (Perfiles, Unidades, Divisiones)
+                // Crear audiencias (Perfiles, Unidades, Divisiones)
                 var audiences = new List<EventTargetAudience>();
 
                 if (dto.ProfileIds?.Any() == true)
@@ -124,16 +174,59 @@ namespace Business.Implementations.Operational
                 if (audiences.Any())
                     await _audienceRepo.BulkInsertAsync(audiences);
 
-               
                 return savedEvent.Id;
             }
             catch (Exception ex)
             {
-                
                 _logger.LogError(ex, "Error al crear evento con access points");
                 throw;
             }
         }
+
+        /// <summary>
+        /// Actualiza el estado del evento automáticamente a "En curso" si coincide con su horario.
+        /// </summary>
+        public async Task CheckAndUpdateEventStatusAsync(int eventId)
+        {
+            var ev = await _data.GetEventWithDetailsAsync(eventId);
+            if (ev == null) return;
+
+            // Fecha y hora actual
+            var now = DateTime.Now;
+
+            // Validar rango de fechas del evento
+            if (ev.EventStart.HasValue && ev.EventEnd.HasValue && ev.EventStart <= now && ev.EventEnd >= now)
+            {
+                // Si tiene horario asociado (Schedule)
+                if (ev.Schedule != null)
+                {
+                    var today = now.DayOfWeek.ToString();
+                    var scheduleDays = ev.Schedule.Days?.Split(',').Select(d => d.Trim()) ?? Enumerable.Empty<string>();
+
+                    // Verificar si hoy aplica
+                    if (scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
+                    {
+                        var startTime = ev.Schedule.StartTime;
+                        var endTime = ev.Schedule.EndTime;
+
+                        // Hora actual dentro del rango
+                        if (now.TimeOfDay >= startTime && now.TimeOfDay <= endTime)
+                        {
+                            // Si no está ya en curso
+                            if (ev.StatusId != 8) // 8 = "En curso"
+                            {
+                                ev.StatusId = 8;
+                                ev.UpdateAt = DateTime.Now;
+                                await _data.UpdateAsync(ev);
+
+                                _logger.LogInformation($"Evento {ev.Id} marcado como 'En curso'.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// Actualiza un evento existente con sus relaciones.
@@ -150,7 +243,7 @@ namespace Business.Implementations.Operational
                 // Actualizar solo los campos principales
                 existingEvent.Name = dto.Name;
                 existingEvent.Description = dto.Description;
-                existingEvent.EventStart= dto.EventStart;
+                existingEvent.EventStart = dto.EventStart;
                 existingEvent.EventEnd = dto.EventEnd;
                 existingEvent.ScheduleId = dto.ScheduleId;
                 existingEvent.EventTypeId = dto.EventTypeId;
@@ -183,39 +276,6 @@ namespace Business.Implementations.Operational
             {
                 _logger.LogError(ex, $"Error al actualizar el evento con Id {dto.Id}");
                 throw new ExternalServiceException("Error al actualizar el evento", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Obtiene los detalles completos del evento.
-        /// </summary>
-        public async Task<EventDetailsDtoResponse?> GetEventFullDetailsAsync(int eventId)
-        {
-            var entity = await _data.GetEventWithDetailsAsync(eventId);
-            return _mapper.Map<EventDetailsDtoResponse>(entity);
-        }
-
-        /// <summary>
-        /// Retorna el número de eventos disponibles.
-        /// </summary>
-        public async Task<int> GetAvailableEventsCountAsync()
-        {
-            try
-            {
-                var total = await _data.GetAvailableEventsCountAsync();
-                if (total < 0)
-                    throw new InvalidOperationException("El número de eventos no puede ser negativo");
-                return total;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, "Validación fallida al obtener eventos disponibles");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error inesperado en Business al obtener eventos disponibles");
-                throw;
             }
         }
 

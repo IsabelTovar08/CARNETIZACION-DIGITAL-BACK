@@ -50,5 +50,18 @@ namespace Data.Interfases.Operational
         Task<int> GetAvailableEventsCountAsync();
 
         Task DeleteEventAccessPointsByEventIdAsync(int eventId);
+
+        /// <summary>
+        /// para el servicio que finaliza eventos automáticamente:
+        /// </summary>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        Task<List<Event>> GetEventsToFinalizeAsync(DateTime now);
+
+        /// <summary>
+        /// Para el servicio que verifica y actualiza el estado de eventos "en curso":
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<Event>> GetActiveEventsAsync();
     }
 }

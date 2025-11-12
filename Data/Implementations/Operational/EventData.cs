@@ -136,5 +136,22 @@ namespace Data.Implementations.Operational
                 await _context.SaveChangesAsync();
             }
         }
+        // metodo para el servicio que finaliza eventos automáticamente
+        public async Task<List<Event>> GetEventsToFinalizeAsync(DateTime now)
+        {
+            return await _context.Set<Event>()
+                .Where(e => e.EventEnd < now && (e.StatusId == 1 || e.StatusId == 8))
+                .ToListAsync();
+        }
+
+        // metodo para el servicio que verifica y actualiza el estado de eventos "en curso"
+        public async Task<IEnumerable<Event>> GetActiveEventsAsync()
+        {
+            return await _context.Set<Event>()
+                .Include(e => e.Schedule)
+                .Where(e => e.StatusId == 1 || e.StatusId == 8)
+                .ToListAsync();
+        }
+
     }
 }
