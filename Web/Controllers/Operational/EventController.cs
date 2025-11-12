@@ -53,6 +53,21 @@ namespace Web.Controllers.Operational
                 }
             });
         }
+        /// <summary>
+        /// Para traer todos los eventos con su informacion completa
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("list-full")]
+        public async Task<IActionResult> GetFullList()
+        {
+            var result = await _eventBusiness.GetFullListAsync();
+
+            return Ok(new
+            {
+                success = true,
+                data = result
+            });
+        }
 
         /// <summary>
         /// Obtiene un evento con accesos y audiencias.
@@ -96,20 +111,7 @@ namespace Web.Controllers.Operational
                 return BadRequest(response);
             }
         }
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] CreateEventRequest dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var id = await _eventBusiness.CreateEventAsync(dto);
-            return Ok(new
-            {
-                success = true,
-                message = "Evento creado correctamente con QR generado en Base64",
-                data = new { id }
-            });
-        }
+       
 
         /// <summary>
         /// Actualiza un evento con sus relaciones (AccessPoints, Audiencias, etc.)

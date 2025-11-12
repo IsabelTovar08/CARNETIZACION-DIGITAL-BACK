@@ -53,6 +53,32 @@ namespace Data.Implementations.Operational
             return ev;
         }
 
+
+        /// <summary>
+        /// Para listar todos los eventos con su informacion completa
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Event>> GetAllEventsWithDetailsAsync()
+        {
+            return await _context.Set<Event>()
+                .AsSplitQuery()
+                .Include(e => e.EventType)
+                .Include(e => e.Status)
+                .Include(e => e.Schedule)
+
+                .Include(e => e.EventTargetAudiences)
+                    .ThenInclude(a => a.Profile)
+
+                .Include(e => e.EventTargetAudiences)
+                    .ThenInclude(a => a.OrganizationalUnit)
+
+                .Include(e => e.EventTargetAudiences)
+                    .ThenInclude(a => a.InternalDivision)
+
+                .ToListAsync();
+        }
+
+
         public async Task<Event> SaveFullEventAsync(
             Event ev,
             IEnumerable<AccessPoint> accessPoints,

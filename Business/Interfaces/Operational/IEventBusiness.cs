@@ -28,5 +28,11 @@ namespace Business.Interfaces.Operational
         /// <summary>
         /// Para que el servicio que verifica y actualiza el estado de eventos "en curso"
         Task CheckAndUpdateEventStatusAsync(int eventId);
+
+        /// <summary>
+        /// Para llamar todos los eventos y mostrar toda la informacion
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<EventDetailsDtoResponse>> GetFullListAsync();
     }
 }

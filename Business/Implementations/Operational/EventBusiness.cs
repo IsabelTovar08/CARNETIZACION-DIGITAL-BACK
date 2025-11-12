@@ -96,6 +96,16 @@ namespace Business.Implementations.Operational
         }
 
         /// <summary>
+        /// Para listar todos los eventos con su informacion completa
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<EventDetailsDtoResponse>> GetFullListAsync()
+        {
+            var events = await _data.GetAllEventsWithDetailsAsync();
+            return _mapper.Map<IEnumerable<EventDetailsDtoResponse>>(events);
+        }
+
+        /// <summary>
         /// Crea un evento con accesos, audiencias y genera un código QR.
         /// </summary>
         public async Task<int> CreateEventAsync(CreateEventRequest dto)

@@ -63,5 +63,11 @@ namespace Data.Interfases.Operational
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Event>> GetActiveEventsAsync();
+
+        /// <summary>
+        /// Para listar los eventos con toda la informacion
+        /// </summary>
+        /// <returns></returns>
+        Task<List<Event>> GetAllEventsWithDetailsAsync();
     }
 }
