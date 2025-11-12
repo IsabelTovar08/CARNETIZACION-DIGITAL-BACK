@@ -35,10 +35,17 @@ namespace Business.Services.Events
                         var eventRepo = scope.ServiceProvider.GetRequiredService<IEventData>();
                         var eventBusiness = scope.ServiceProvider.GetRequiredService<IEventBusiness>();
 
-                        var now = DateTime.Now;
+                        var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Local);
 
                         // Trae eventos activos cuyo End ya pasó
                         var expiredEvents = await eventRepo.GetEventsToFinalizeAsync(now);
+
+                        _logger.LogInformation($"[AutoFinalizer] Iniciando revisión a las {DateTime.Now}...");
+                        _logger.LogInformation($"[AutoFinalizer] {expiredEvents.Count()} eventos expirados encontrados.");
+
+                        var allActiveEvents = await eventRepo.GetActiveEventsAsync();
+                        _logger.LogInformation($"[AutoFinalizer] {allActiveEvents.Count()} eventos activos revisados.");
+
 
                         foreach (var ev in expiredEvents)
                         {
@@ -50,7 +57,6 @@ namespace Business.Services.Events
                         }
 
                         // Verificar eventos "en curso"
-                        var allActiveEvents = await eventRepo.GetActiveEventsAsync(); 
                         foreach (var ev in allActiveEvents)
                         {
                             await eventBusiness.CheckAndUpdateEventStatusAsync(ev.Id);

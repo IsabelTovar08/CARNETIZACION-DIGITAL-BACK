@@ -192,7 +192,8 @@ namespace Business.Implementations.Operational
             if (ev == null) return;
 
             // Fecha y hora actual
-            var now = DateTime.Now;
+            var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Local);
+
 
             // Validar rango de fechas del evento
             if (ev.EventStart.HasValue && ev.EventEnd.HasValue && ev.EventStart <= now && ev.EventEnd >= now)
@@ -249,8 +250,8 @@ namespace Business.Implementations.Operational
                 existingEvent.EventTypeId = dto.EventTypeId;
                 existingEvent.StatusId = dto.StatusId;
                 existingEvent.IsPublic = dto.Ispublic;
-                existingEvent.UpdateAt = DateTime.UtcNow;
-
+                existingEvent.UpdateAt = DateTime.Now;
+   
                 // Actualizar AccessPoints (vínculos)
                 if (dto.AccessPoints != null && dto.AccessPoints.Any())
                 {

@@ -139,8 +139,12 @@ namespace Data.Implementations.Operational
         // metodo para el servicio que finaliza eventos automáticamente
         public async Task<List<Event>> GetEventsToFinalizeAsync(DateTime now)
         {
+            var localNow = DateTime.SpecifyKind(now, DateTimeKind.Local);
+
             return await _context.Set<Event>()
-                .Where(e => e.EventEnd < now && (e.StatusId == 1 || e.StatusId == 8))
+                .Where(e => (e.StatusId == 1 || e.StatusId == 8)
+                    && e.EventEnd <= localNow
+                    && !e.IsDeleted)
                 .ToListAsync();
         }
 
