@@ -150,8 +150,8 @@ namespace Business.Implementations.Operational
                 // Actualizar solo los campos principales
                 existingEvent.Name = dto.Name;
                 existingEvent.Description = dto.Description;
-                existingEvent.ScheduleDate = dto.ScheduleDate;
-                existingEvent.ScheduleTime = dto.ScheduleTime;
+                existingEvent.EventStart= dto.EventStart;
+                existingEvent.EventEnd = dto.EventEnd;
                 existingEvent.ScheduleId = dto.ScheduleId;
                 existingEvent.EventTypeId = dto.EventTypeId;
                 existingEvent.StatusId = dto.StatusId;

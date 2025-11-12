@@ -1461,14 +1461,8 @@ namespace Entity.MigracionesEq
                     b.Property<string>("QrCodeBase64")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("ScheduleDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int?>("ScheduleId")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("ScheduleTime")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("integer");
@@ -1498,8 +1492,6 @@ namespace Entity.MigracionesEq
                             IsDeleted = false,
                             IsPublic = true,
                             Name = "Conferencia de Tecnología",
-                            ScheduleDate = new DateTime(2023, 7, 30, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ScheduleTime = new DateTime(1900, 1, 1, 10, 0, 0, 0, DateTimeKind.Utc),
                             StatusId = 1,
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -1514,8 +1506,6 @@ namespace Entity.MigracionesEq
                             IsDeleted = false,
                             IsPublic = false,
                             Name = "Charla de Salud",
-                            ScheduleDate = new DateTime(2023, 8, 5, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ScheduleTime = new DateTime(1900, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc),
                             StatusId = 1,
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });

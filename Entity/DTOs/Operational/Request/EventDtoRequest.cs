@@ -15,11 +15,11 @@ namespace Entity.DTOs.Operational.Request
         [RegularExpression(@"(^$|.*\S.*)", ErrorMessage = "La descripción no puede estar compuesta únicamente por espacios en blanco.")]
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "La fecha de programación es obligatoria.")]
-        public DateTime? ScheduleDate { get; set; }
+        [Required(ErrorMessage = "La fecha de inicio del evento es obligatoria.")]
+        public DateTime? EventStart { get; set; }
 
-        [Required(ErrorMessage = "La hora de programación es obligatoria.")]
-        public DateTime? ScheduleTime { get; set; }
+        [Required(ErrorMessage = "La fecha de fin del evento es obligatoria.")]
+        public DateTime? EventEnd{ get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "El identificador del horario debe ser un número entero mayor que 0.")]
         public int? ScheduleId { get; set; }
@@ -28,7 +28,7 @@ namespace Entity.DTOs.Operational.Request
         [Range(1, int.MaxValue, ErrorMessage = "El tipo de evento debe ser un número entero mayor que 0.")]
         public int EventTypeId { get; set; }
 
-        public String EventName { get; set; }
+        public String? EventName { get; set; }
 
         [Required(ErrorMessage = "Debe especificar si el evento es público o no.")]
         public bool Ispublic { get; set; }

@@ -15,8 +15,8 @@ namespace Entity.DTOs.Operational
         public string Code { get; set; }
         public string? Description { get; set; }
 
-        public DateTime? ScheduleDate { get; set; }
-        public DateTime? ScheduleTime { get; set; }       
+        public DateTime? EventStart { get; set; }
+        public DateTime? EventEnd{ get; set; }       
         public int? ScheduleId { get; set; }
 
         public ScheduleDto? Schedule { get; set; }
