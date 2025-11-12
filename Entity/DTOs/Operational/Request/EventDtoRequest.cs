@@ -28,6 +28,8 @@ namespace Entity.DTOs.Operational.Request
         [Range(1, int.MaxValue, ErrorMessage = "El tipo de evento debe ser un número entero mayor que 0.")]
         public int EventTypeId { get; set; }
 
+        public String EventName { get; set; }
+
         [Required(ErrorMessage = "Debe especificar si el evento es público o no.")]
         public bool Ispublic { get; set; }
 

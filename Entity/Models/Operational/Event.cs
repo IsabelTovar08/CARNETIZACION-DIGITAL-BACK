@@ -17,6 +17,7 @@ namespace Entity.Models.Organizational
         public DateTime? EventStart { get; set; }
         public DateTime? EventEnd { get; set; }
 
+        public Schedule? Schedule { get; set; }
         public int? ScheduleId { get; set; }
 
 
@@ -31,7 +32,6 @@ namespace Entity.Models.Organizational
 
         public ICollection<EventTargetAudience> EventTargetAudiences { get; set; } = new List<EventTargetAudience>();
         public Status? Status { get; set; }
-        public Schedule? Schedule { get; set; }
         public ICollection<EventAccessPoint> EventAccessPoints { get; set; } = new List<EventAccessPoint>();
 
     }   

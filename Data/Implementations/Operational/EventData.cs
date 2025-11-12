@@ -29,13 +29,23 @@ namespace Data.Implementations.Operational
         {
             var ev = await _context.Set<Event>()
                 .AsSplitQuery()
+
+                .Include(e => e.Schedule)
+                .Include(e => e.EventType)
+
+                //Incluye el estado (Status)
+                .Include(e => e.Status)
+
                 .Include(e => e.EventAccessPoints)
                     .ThenInclude(eap => eap.AccessPoint)
                         .ThenInclude(ap => ap.AccessPointType)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.Profile)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.OrganizationalUnit)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.InternalDivision)
                 .FirstOrDefaultAsync(e => e.Id == eventId);

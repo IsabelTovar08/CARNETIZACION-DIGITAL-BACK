@@ -51,11 +51,11 @@ namespace Business.Implementations.Operational
         {
             try
             {
-                // 1️⃣ Crear el evento
+                //Crear el evento
                 var ev = _mapper.Map<Event>(dto.Event);
                 var savedEvent = await _data.SaveAsync(ev);
 
-                // 2️⃣ Crear puntos de acceso (AccessPoints)
+                // Crear puntos de acceso (AccessPoints)
                 var createdAccessPoints = new List<AccessPoint>();
                 if (dto.AccessPoints?.Any() == true)
                 {
@@ -72,7 +72,7 @@ namespace Business.Implementations.Operational
 
                     await _apData.BulkInsertAsync(createdAccessPoints);
 
-                    // 3️⃣ Crear vínculos (EventAccessPoints)
+                    // Crear vínculos (EventAccessPoints)
                     var links = createdAccessPoints.Select(ap => new EventAccessPoint
                     {
                         EventId = savedEvent.Id,
@@ -82,13 +82,13 @@ namespace Business.Implementations.Operational
                     await _data.BulkInsertEventAccessPointsAsync(links);
                 }
 
-                // 4️⃣ Generar código QR real
+                // Generar código QR real
                 string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
                 string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
                 savedEvent.QrCodeBase64 = GenerateQrCodeBase64(qrContent);
                 await _data.UpdateAsync(savedEvent);
 
-                // 5️⃣ Crear audiencias (Perfiles, Unidades, Divisiones)
+                //Crear audiencias (Perfiles, Unidades, Divisiones)
                 var audiences = new List<EventTargetAudience>();
 
                 if (dto.ProfileIds?.Any() == true)
@@ -134,8 +134,6 @@ namespace Business.Implementations.Operational
                 throw;
             }
         }
-
-
 
         /// <summary>
         /// Actualiza un evento existente con sus relaciones.
