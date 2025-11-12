@@ -17,18 +17,35 @@ namespace Data.Implementations.Operational
 {
     public class EventData : BaseData<Event>, IEventData
     {
-        public EventData(ApplicationDbContext context, ILogger<Event> logger) : base(context, logger){}
+        public EventData(ApplicationDbContext context, ILogger<Event> logger) : base(context, logger) { }
+
+        // ✅ NUEVO MÉTODO para cumplir con la interfaz IEventData
+        public IQueryable<Event> GetQueryable()
+        {
+            return _context.Set<Event>().AsQueryable();
+        }
+
         public async Task<Event?> GetEventWithDetailsAsync(int eventId)
         {
             var ev = await _context.Set<Event>()
                 .AsSplitQuery()
+
+                .Include(e => e.Schedule)
+                .Include(e => e.EventType)
+
+                //Incluye el estado (Status)
+                .Include(e => e.Status)
+
                 .Include(e => e.EventAccessPoints)
                     .ThenInclude(eap => eap.AccessPoint)
                         .ThenInclude(ap => ap.AccessPointType)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.Profile)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.OrganizationalUnit)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.InternalDivision)
                 .FirstOrDefaultAsync(e => e.Id == eventId);
@@ -37,22 +54,44 @@ namespace Data.Implementations.Operational
         }
 
 
-        public async Task<Event> SaveFullEventAsync(
-        Event ev,
-        IEnumerable<AccessPoint> accessPoints,
-        IEnumerable<EventTargetAudience> audiences)
+        /// <summary>
+        /// Para listar todos los eventos con su informacion completa
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Event>> GetAllEventsWithDetailsAsync()
         {
-            // 1. Guardar evento
+            return await _context.Set<Event>()
+                .AsSplitQuery()
+                .Include(e => e.EventType)
+                .Include(e => e.Status)
+                .Include(e => e.Schedule)
+
+                .Include(e => e.EventTargetAudiences)
+                    .ThenInclude(a => a.Profile)
+
+                .Include(e => e.EventTargetAudiences)
+                    .ThenInclude(a => a.OrganizationalUnit)
+
+                .Include(e => e.EventTargetAudiences)
+                    .ThenInclude(a => a.InternalDivision)
+
+                .ToListAsync();
+        }
+
+
+        public async Task<Event> SaveFullEventAsync(
+            Event ev,
+            IEnumerable<AccessPoint> accessPoints,
+            IEnumerable<EventTargetAudience> audiences)
+        {
             await _context.Events.AddAsync(ev);
             await _context.SaveChangesAsync();
 
-            // 2. Guardar access points
             if (accessPoints != null && accessPoints.Any())
             {
                 await _context.AccessPoints.AddRangeAsync(accessPoints);
                 await _context.SaveChangesAsync();
 
-                // Crear relaciones en EventAccessPoints
                 var links = accessPoints.Select(ap => new EventAccessPoint
                 {
                     EventId = ev.Id,
@@ -62,7 +101,6 @@ namespace Data.Implementations.Operational
                 await _context.EventAccessPoints.AddRangeAsync(links);
             }
 
-            // 3. Guardar audiencias
             if (audiences != null && audiences.Any())
             {
                 foreach (var au in audiences)
@@ -74,7 +112,6 @@ namespace Data.Implementations.Operational
             await _context.SaveChangesAsync();
             return ev;
         }
-
 
         public async Task BulkInsertEventAccessPointsAsync(IEnumerable<EventAccessPoint> links)
         {
@@ -94,9 +131,6 @@ namespace Data.Implementations.Operational
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Consulta el número de eventos disponibles
-        /// </summary>
         public async Task<int> GetAvailableEventsCountAsync()
         {
             try
@@ -106,7 +140,7 @@ namespace Data.Implementations.Operational
                 var total = await _context.Set<Event>()
                     .AsNoTracking()
                     .Where(e => !e.IsDeleted
-                                && e.StatusId == 1 // asumiendo que 1 = Activo
+                                && e.StatusId == 1
                                 && (e.EventEnd == null || e.EventEnd >= now))
                     .CountAsync();
 
@@ -118,6 +152,47 @@ namespace Data.Implementations.Operational
                 throw;
             }
         }
-    }
 
+        public async Task DeleteEventAccessPointsByEventIdAsync(int eventId)
+        {
+            var links = _context.EventAccessPoints.Where(eap => eap.EventId == eventId);
+            if (links.Any())
+            {
+                _context.EventAccessPoints.RemoveRange(links);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // metodo para el servicio que finaliza eventos automáticamente
+        public async Task<List<Event>> GetEventsToFinalizeAsync(DateTime now)
+        {
+            var localNow = DateTime.SpecifyKind(now, DateTimeKind.Local);
+
+            return await _context.Set<Event>()
+                .Where(e => (e.StatusId == 1 || e.StatusId == 8)
+                    && e.EventEnd <= localNow
+                    && !e.IsDeleted)
+                .ToListAsync();
+        }
+
+        // metodo para el servicio que verifica y actualiza el estado de eventos "en curso"
+        public async Task<IEnumerable<Event>> GetActiveEventsAsync()
+        {
+            return await _context.Set<Event>()
+                .Include(e => e.Schedule)
+                .Where(e => e.StatusId == 1 || e.StatusId == 8)
+                .ToListAsync();
+        }
+
+        // =============================================================
+        //  implementación real para filtros personalizados
+        // =============================================================
+        public async Task<List<Event>> ToListAsync(IQueryable<Event> query)
+        {
+            return await query
+                .Include(e => e.Status)
+                .Include(e => e.EventType)
+                .ToListAsync();
+        }
+    }
 }

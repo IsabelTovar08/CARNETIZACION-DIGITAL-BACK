@@ -266,6 +266,9 @@ namespace Utilities.Helper
             //Event
             CreateMap<Event, EventDtoResponse>()
             .ForMember(d => d.Ispublic, o => o.MapFrom(s => s.IsPublic))
+            .ForMember(d => d.Schedule, o => o.MapFrom(s => s.Schedule))
+            .ForMember(d => d.EventTypeName, o => o.MapFrom(s => s.EventType != null ? s.EventType.Name : null))
+            .ForMember(d => d.StatusName, o => o.MapFrom(s => s.Status != null ? s.Status.Name : null))
             .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
                 s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
                 {
@@ -293,9 +296,21 @@ namespace Utilities.Helper
              .ForMember(d => d.Audiences, opt => opt.MapFrom(s => s.EventTargetAudiences));
 
             CreateMap<EventDtoRequest, Event>()
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+            .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+            .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+            .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))
             .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
-            //.ForMember(d => d.Days, o => o.MapFrom(s => s.Days != null ? string.Join(",", s.Days) : null))
-            .ForMember(d => d.Id, o => o.Ignore());
+            .ForMember(d => d.EventStart, o => o.MapFrom(s => s.EventStart))
+            .ForMember(d => d.EventEnd, o => o.MapFrom(s => s.EventEnd))
+            .ForMember(d => d.ScheduleId, o => o.MapFrom(s => s.ScheduleId))
+            .ForMember(d => d.EventTypeId, o => o.MapFrom(s => s.EventTypeId))
+            .ForMember(d => d.StatusId, o => o.MapFrom(s => s.StatusId))
+            .ForMember(d => d.QrCodeBase64, o => o.Ignore())
+            // 🔹 Ignora relaciones — se manejan manualmente en el servicio
+            .ForMember(d => d.EventAccessPoints, o => o.Ignore())
+            .ForMember(d => d.EventTargetAudiences, o => o.Ignore());
+
 
 
             //EventType
@@ -343,8 +358,12 @@ namespace Utilities.Helper
 
             //AccessPoints
             CreateMap<AccessPointDtoRequest, AccessPoint>()
-             .ForMember(d => d.Id, o => o.Ignore())
-             .ForMember(d => d.AccessPointType, o => o.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+                .ForMember(d => d.TypeId, o => o.MapFrom(s => s.TypeId))
+                .ForMember(d => d.QrCode, o => o.Ignore())
+                .ForMember(d => d.EventAccessPoints, o => o.Ignore());
 
             CreateMap<AccessPoint, AccessPointDtoRequest>().ReverseMap();
 
@@ -363,24 +382,48 @@ namespace Utilities.Helper
 
 
             //Schedule
-            CreateMap<Schedule, ScheduleDto>().ReverseMap();
+            CreateMap<Schedule, ScheduleDto>()
+            .ForMember(d => d.Days, o => o.MapFrom(s =>
+                !string.IsNullOrWhiteSpace(s.Days)
+                    ? s.Days.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => x.Trim())
+                            .ToList()
+                    : new List<string>()))
+            .ReverseMap()
+            .ForMember(s => s.Days, o => o.MapFrom(d =>
+                (d.Days != null && d.Days.Any())
+                    ? string.Join(",", d.Days.Select(x => x.Trim()))
+                    : null));
 
             CreateMap<Schedule, ScheduleDtoRequest>()
-               .ReverseMap();
+              .ForMember(d => d.Days, o => o.MapFrom(s =>
+                 !string.IsNullOrWhiteSpace(s.Days)
+                     ? s.Days.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                       .Select(x => x.Trim())
+                        .ToList()
+                         : new List<string>()))
+                        .ReverseMap()
+              .ForMember(s => s.Days, o => o.MapFrom(d =>
+                       (d.Days != null && d.Days.Any())
+                         ? string.Join(",", d.Days.Select(x => x.Trim()))
+              : null));
 
             // EventTargetAudience
             CreateMap<EventTargetAudience, EventTargetAudienceDtoRequest>().ReverseMap();
 
-            CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
-             .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.Event.Name))
-             .ForMember(d => d.ReferenceName, opt => opt.MapFrom(s =>
-                 s.TypeId == 1 && s.Profile != null ? s.Profile.Name :
-                 s.TypeId == 2 && s.OrganizationalUnit != null ? s.OrganizationalUnit.Name :
-                 s.TypeId == 3 && s.InternalDivision != null ? s.InternalDivision.Name :
-                 null
-             ));
+            CreateMap<EventTargetAudience, EventTargetAudienceViewDtoResponse>()
+            .ForMember(d => d.ReferenceId, opt => opt.MapFrom(src =>
+                src.TypeId == 1 ? src.ProfileId :
+                src.TypeId == 2 ? src.OrganizationalUnitId :
+                src.TypeId == 3 ? src.InternalDivisionId : 0))
+            .ForMember(d => d.ReferenceName, opt => opt.MapFrom(src =>
+                src.TypeId == 1 && src.Profile != null ? src.Profile.Name :
+                src.TypeId == 2 && src.OrganizationalUnit != null ? src.OrganizationalUnit.Name :
+                src.TypeId == 3 && src.InternalDivision != null ? src.InternalDivision.Name :
+                null));
 
-           
+
+
 
             //EventAccessPoint
 

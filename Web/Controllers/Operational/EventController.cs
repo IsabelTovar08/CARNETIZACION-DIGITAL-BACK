@@ -6,6 +6,7 @@ using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Responses;
 using Web.Controllers.Base;
+using Entity.DTOs.Specifics;   // ✅ AGREGADO PARA QUE FUNCIONE EventFilterDto
 
 namespace Web.Controllers.Operational
 {
@@ -24,19 +25,48 @@ namespace Web.Controllers.Operational
         }
 
         /// <summary>
-        /// Crea un evento con accesos y audiencias (perfiles, unidades, divisiones).
+        /// Crea un evento con accesos, audiencias y genera automáticamente el QR en Base64.
         /// </summary>
         [HttpPost("create-with-access-points")]
         public async Task<IActionResult> CreateWithAccessPoints([FromBody] CreateEventRequest dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var id = await (_business as IEventBusiness)!.CreateEventAsync(dto);
+            var id = await _eventBusiness.CreateEventAsync(dto);
+
+            // Recuperar el evento recién creado (cargado con su QR)
+            var result = await _eventBusiness.GetEventFullDetailsAsync(id);
+
+            if (result == null)
+                return NotFound(new { success = false, message = "Error al obtener el evento recién creado" });
+
             return CreatedAtAction(nameof(GetById), new { id }, new
             {
                 success = true,
-                message = "Evento creado",
-                data = new { id }
+                message = "Evento creado correctamente con su código QR generado en Base64",
+                data = new
+                {
+                    eventId = id,
+                    eventName = result.Name,
+                    eventCode = result.Code,
+                    qrCodeBase64 = result.QrCodeBase64
+                }
+            });
+        }
+        /// <summary>
+        /// Para traer todos los eventos con su informacion completa
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("list-full")]
+        public async Task<IActionResult> GetFullList()
+        {
+            var result = await _eventBusiness.GetFullListAsync();
+
+            return Ok(new
+            {
+                success = true,
+                data = result
             });
         }
 
@@ -58,8 +88,9 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
+
         /// <summary>
-        /// Retorna el número de eventos disponibles
+        /// Retorna el número de eventos disponibles.
         /// </summary>
         [HttpGet("available/count")]
         public async Task<ActionResult<ApiResponse<int>>> GetAvailableEventsCount()
@@ -73,17 +104,97 @@ namespace Web.Controllers.Operational
             }
             catch (InvalidOperationException ex)
             {
-                // Manejo de errores de negocio
                 var response = ApiResponse<int>.Fail("Validación de negocio fallida", new[] { ex.Message });
                 return BadRequest(response);
             }
             catch (Exception ex)
             {
-                // Manejo de errores inesperados
                 var response = ApiResponse<int>.Fail("Error al consultar eventos disponibles", new[] { ex.Message });
                 return BadRequest(response);
             }
         }
+<<<<<<< HEAD
+       
+=======
 
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateEventRequest dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var id = await _eventBusiness.CreateEventAsync(dto);
+            return Ok(new
+            {
+                success = true,
+                message = "Evento creado correctamente con QR generado en Base64",
+                data = new { id }
+            });
+        }
+>>>>>>> e16487a4b1233384a63770627926e0f41f6c165f
+
+        /// <summary>
+        /// Actualiza un evento con sus relaciones (AccessPoints, Audiencias, etc.)
+        /// </summary>
+        [HttpPut("update-full")]
+        public async Task<IActionResult> UpdateFull([FromBody] EventDtoRequest dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var id = await _eventBusiness.UpdateEventAsync(dto);
+            return Ok(new
+            {
+                success = true,
+                message = "Evento actualizado correctamente con accesos y audiencias",
+                data = new { id }
+            });
+        }
+
+        /// <summary>
+        /// cancelar o finalizar un evento manualmente
+        /// </summary>
+        [HttpPut("finalize/{id}")]
+        public async Task<IActionResult> FinalizeEvent(int id)
+        {
+            var success = await _eventBusiness.FinalizeEventAsync(id);
+
+            return Ok(new
+            {
+                success,
+                message = success
+                    ? "El evento ha sido finalizado correctamente."
+                    : "No se pudo finalizar el evento."
+            });
+        }
+
+        // ============================================================
+        // 🚀 NUEVO ENDPOINT: FILTRO POR ESTADO, TIPO Y PÚBLICO/PRIVADO
+        // ============================================================
+        /// <summary>
+        /// Filtra eventos por estado, tipo y si es público o privado.
+        /// </summary>
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilterEvents(
+            [FromQuery] int? statusId,
+            [FromQuery] int? eventTypeId,
+            [FromQuery] bool? isPublic)
+        {
+            var filters = new EventFilterDto
+            {
+                StatusId = statusId,
+                EventTypeId = eventTypeId,
+                IsPublic = isPublic
+            };
+
+            var result = await _eventBusiness.FilterAsync(filters);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Eventos filtrados correctamente",
+                data = result
+            });
+        }
     }
 }
