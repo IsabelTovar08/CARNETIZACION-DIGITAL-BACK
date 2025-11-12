@@ -69,6 +69,9 @@ namespace Web
             builder.Services.AddProjectServices();
             builder.Services.AddCorsConfiguration(configuration);
 
+            //Servicio en segundo plano para auto-finalizar eventos
+            builder.Services.AddHostedService<Business.Services.Events.EventAutoFinalizerService>();
+
             // Automapper
             builder.Services.AddAutoMapper(typeof(Utilities.Helper.MappingProfile));
 
@@ -136,7 +139,7 @@ namespace Web
                 }
             }
 
-            // 👇 Función auxiliar para ejecutar comandos dotnet dentro del contenedor
+            //  Función auxiliar para ejecutar comandos dotnet dentro del contenedor
             static void RunMigrationCommand(string command)
             {
                 var process = new System.Diagnostics.Process

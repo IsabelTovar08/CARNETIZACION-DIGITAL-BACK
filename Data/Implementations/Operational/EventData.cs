@@ -29,13 +29,23 @@ namespace Data.Implementations.Operational
         {
             var ev = await _context.Set<Event>()
                 .AsSplitQuery()
+
+                .Include(e => e.Schedule)
+                .Include(e => e.EventType)
+
+                //Incluye el estado (Status)
+                .Include(e => e.Status)
+
                 .Include(e => e.EventAccessPoints)
                     .ThenInclude(eap => eap.AccessPoint)
                         .ThenInclude(ap => ap.AccessPointType)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.Profile)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.OrganizationalUnit)
+
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.InternalDivision)
                 .FirstOrDefaultAsync(e => e.Id == eventId);
@@ -126,5 +136,26 @@ namespace Data.Implementations.Operational
                 await _context.SaveChangesAsync();
             }
         }
+        // metodo para el servicio que finaliza eventos automáticamente
+        public async Task<List<Event>> GetEventsToFinalizeAsync(DateTime now)
+        {
+            var localNow = DateTime.SpecifyKind(now, DateTimeKind.Local);
+
+            return await _context.Set<Event>()
+                .Where(e => (e.StatusId == 1 || e.StatusId == 8)
+                    && e.EventEnd <= localNow
+                    && !e.IsDeleted)
+                .ToListAsync();
+        }
+
+        // metodo para el servicio que verifica y actualiza el estado de eventos "en curso"
+        public async Task<IEnumerable<Event>> GetActiveEventsAsync()
+        {
+            return await _context.Set<Event>()
+                .Include(e => e.Schedule)
+                .Where(e => e.StatusId == 1 || e.StatusId == 8)
+                .ToListAsync();
+        }
+
     }
 }

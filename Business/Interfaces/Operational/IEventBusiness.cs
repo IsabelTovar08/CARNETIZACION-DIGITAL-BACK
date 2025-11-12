@@ -22,5 +22,11 @@ namespace Business.Interfaces.Operational
         Task<int> GetAvailableEventsCountAsync();
 
         Task<int> UpdateEventAsync(EventDtoRequest dto);
+
+        Task<bool> FinalizeEventAsync(int eventId);
+
+        /// <summary>
+        /// Para que el servicio que verifica y actualiza el estado de eventos "en curso"
+        Task CheckAndUpdateEventStatusAsync(int eventId);
     }
 }

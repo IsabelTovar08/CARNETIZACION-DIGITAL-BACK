@@ -266,6 +266,9 @@ namespace Utilities.Helper
             //Event
             CreateMap<Event, EventDtoResponse>()
             .ForMember(d => d.Ispublic, o => o.MapFrom(s => s.IsPublic))
+            .ForMember(d => d.Schedule, o => o.MapFrom(s => s.Schedule))
+            .ForMember(d => d.EventTypeName, o => o.MapFrom(s => s.EventType != null ? s.EventType.Name : null))
+            .ForMember(d => d.StatusName, o => o.MapFrom(s => s.Status != null ? s.Status.Name : null))
             .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
                 s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
                 {
@@ -298,8 +301,8 @@ namespace Utilities.Helper
             .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
             .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))
             .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
-            .ForMember(d => d.ScheduleDate, o => o.MapFrom(s => s.ScheduleDate))
-            .ForMember(d => d.ScheduleTime, o => o.MapFrom(s => s.ScheduleTime))
+            .ForMember(d => d.EventStart, o => o.MapFrom(s => s.EventStart))
+            .ForMember(d => d.EventEnd, o => o.MapFrom(s => s.EventEnd))
             .ForMember(d => d.ScheduleId, o => o.MapFrom(s => s.ScheduleId))
             .ForMember(d => d.EventTypeId, o => o.MapFrom(s => s.EventTypeId))
             .ForMember(d => d.StatusId, o => o.MapFrom(s => s.StatusId))
@@ -408,16 +411,19 @@ namespace Utilities.Helper
             // EventTargetAudience
             CreateMap<EventTargetAudience, EventTargetAudienceDtoRequest>().ReverseMap();
 
-            CreateMap<EventTargetAudience, EventTargetAudienceDtoResponse>()
-             .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.Event.Name))
-             .ForMember(d => d.ReferenceName, opt => opt.MapFrom(s =>
-                 s.TypeId == 1 && s.Profile != null ? s.Profile.Name :
-                 s.TypeId == 2 && s.OrganizationalUnit != null ? s.OrganizationalUnit.Name :
-                 s.TypeId == 3 && s.InternalDivision != null ? s.InternalDivision.Name :
-                 null
-             ));
+            CreateMap<EventTargetAudience, EventTargetAudienceViewDtoResponse>()
+            .ForMember(d => d.ReferenceId, opt => opt.MapFrom(src =>
+                src.TypeId == 1 ? src.ProfileId :
+                src.TypeId == 2 ? src.OrganizationalUnitId :
+                src.TypeId == 3 ? src.InternalDivisionId : 0))
+            .ForMember(d => d.ReferenceName, opt => opt.MapFrom(src =>
+                src.TypeId == 1 && src.Profile != null ? src.Profile.Name :
+                src.TypeId == 2 && src.OrganizationalUnit != null ? src.OrganizationalUnit.Name :
+                src.TypeId == 3 && src.InternalDivision != null ? src.InternalDivision.Name :
+                null));
 
-           
+
+
 
             //EventAccessPoint
 
