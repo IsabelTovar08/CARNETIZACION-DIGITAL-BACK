@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Data.Interfases;
@@ -32,5 +33,8 @@ namespace Data.Interfases.Operational
         //Task<IList<Attendance>> GetReportAsync(
         //    int? eventId, int? personId, DateTime? startDate, DateTime? endDate,
         //    CancellationToken ct = default);
+
+        // ✅ NUEVO MÉTODO: necesario para que el Business pueda hacer Include()
+        IQueryable<Attendance> GetQueryable();
     }
 }

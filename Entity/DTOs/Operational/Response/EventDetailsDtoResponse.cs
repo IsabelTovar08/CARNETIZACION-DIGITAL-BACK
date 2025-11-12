@@ -9,6 +9,6 @@ namespace Entity.DTOs.Operational.Response
     public class EventDetailsDtoResponse : EventDtoResponse
     {
         public List<AccessPointDtoResponsee>? AccessPoints { get; set; }
-        public List<EventTargetAudienceDtoResponse>? Audiences { get; set; }
+        public List<EventTargetAudienceViewDtoResponse> Audiences { get; set; } = new();
     }
 }
