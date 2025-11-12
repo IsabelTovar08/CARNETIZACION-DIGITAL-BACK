@@ -3,20 +3,17 @@ using System;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Entity.MigracionesEq
+namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251112181126_Initial")]
-    partial class Initial
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -957,8 +954,11 @@ namespace Entity.MigracionesEq
 
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
                 {
-                    b.Property<int>("EventId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccessPointId")
                         .HasColumnType("integer");
@@ -969,7 +969,7 @@ namespace Entity.MigracionesEq
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("EventId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
@@ -978,11 +978,33 @@ namespace Entity.MigracionesEq
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("EventId", "AccessPointId");
+                    b.HasKey("Id");
 
                     b.HasIndex("AccessPointId");
 
+                    b.HasIndex("EventId");
+
                     b.ToTable("EventAccessPoints", "Operational");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccessPointId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EventId = 1,
+                            IsDeleted = false,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccessPointId = 2,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EventId = 1,
+                            IsDeleted = false,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
@@ -1362,6 +1384,9 @@ namespace Entity.MigracionesEq
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -1387,6 +1412,8 @@ namespace Entity.MigracionesEq
                     b.HasIndex("AccessPointOfEntry");
 
                     b.HasIndex("AccessPointOfExit");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("PersonId");
 
@@ -3651,6 +3678,10 @@ namespace Entity.MigracionesEq
                         .HasForeignKey("AccessPointOfExit")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Entity.Models.Organizational.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithMany("Attendances")
                         .HasForeignKey("PersonId")
@@ -3660,6 +3691,8 @@ namespace Entity.MigracionesEq
                     b.Navigation("AccessPointEntry");
 
                     b.Navigation("AccessPointExit");
+
+                    b.Navigation("Event");
 
                     b.Navigation("Person");
                 });

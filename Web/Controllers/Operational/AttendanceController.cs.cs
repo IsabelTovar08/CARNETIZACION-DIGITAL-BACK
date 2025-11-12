@@ -1,4 +1,6 @@
-﻿using Business.Interfaces.Operational;
+﻿using Business.Interfaces.Auth;
+using Business.Interfaces.Operational;
+using Data.Interfases.Security;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
 using Entity.Models.Organizational;
@@ -19,24 +21,25 @@ namespace Web.Controllers.Operational
     {
         private readonly IAttendanceBusiness _attendanceBusiness;
         private readonly ILogger<AttendanceController> _logger;
+        private readonly ICurrentUser _currentUser;
+        private readonly IPersonData _personData;
 
         public AttendanceController(
             IAttendanceBusiness attendanceBusiness,
+            IPersonData personData,
+            ICurrentUser currentUser,
             ILogger<AttendanceController> logger
         ) : base(attendanceBusiness, logger)
         {
             _attendanceBusiness = attendanceBusiness;
+            _personData = personData;
+            _currentUser = currentUser;
             _logger = logger;
         }
 
         // =========================================================
         // ✅ REGISTRO AUTOMÁTICO DE ASISTENCIA POR QR DEL EVENTO
         // =========================================================
-        /// <summary>
-        /// Registra asistencia al escanear un QR generado desde el evento.
-        /// Espera un cuerpo con el QR y el Id de la persona.
-        /// </summary>
-        /// <param name="dto">Contiene QrCode (texto del QR leído) y PersonId.</param>
         [HttpPost("register-by-qr")]
         public async Task<IActionResult> RegisterByQr([FromBody] AttendanceDtoRequest dto)
         {
@@ -86,7 +89,7 @@ namespace Web.Controllers.Operational
         }
 
         // =========================================================
-        // REGISTRO MANUAL DE ENTRADA Y SALIDA (si se usa sin QR)
+        // ✅ REGISTRO MANUAL DE ENTRADA (con token → persona asociada)
         // =========================================================
         [HttpPost("register-entry")]
         public async Task<IActionResult> RegisterEntry([FromBody] AttendanceDtoRequestSpecific dto)
@@ -96,16 +99,51 @@ namespace Web.Controllers.Operational
 
             try
             {
-                var result = await _attendanceBusiness.RegisterEntryAsync(dto);
-                return Ok(new { success = result.Success, message = result.Message, data = result });
+                var userId = _currentUser.UserId;
+                var person = await _personData.GetPersonByUserIdAsync(userId);
+                if (person == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "No se encontró la persona asociada al usuario autenticado."
+                    });
+                }
+
+                dto.PersonId = person.Id;
+
+                var safeDto = new AttendanceDtoRequestSpecific
+                {
+                    PersonId = dto.PersonId ?? 0,
+                    AccessPointId = dto.AccessPointId ?? 0,
+                    EventId = dto.EventId ?? 0,
+                    Time = dto.Time ?? DateTime.UtcNow
+                };
+
+                var result = await _attendanceBusiness.RegisterEntryAsync(safeDto);
+
+                return Ok(new
+                {
+                    success = result.Success,
+                    message = result.Message,
+                    data = result
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al registrar ENTRADA.");
-                return BadRequest(new { success = false, message = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "Error interno al registrar la entrada.",
+                    error = ex.Message
+                });
             }
         }
 
+        // =========================================================
+        // ✅ REGISTRO MANUAL DE SALIDA (con token → persona asociada)
+        // =========================================================
         [HttpPost("register-exit")]
         public async Task<IActionResult> RegisterExit([FromBody] AttendanceDtoRequestSpecific dto)
         {
@@ -114,13 +152,51 @@ namespace Web.Controllers.Operational
 
             try
             {
-                var result = await _attendanceBusiness.RegisterExitAsync(dto);
-                return Ok(new { success = result.Success, message = result.Message, data = result });
+                // 1️⃣ Obtener usuario actual desde el token
+                var userId = _currentUser.UserId;
+
+                // 2️⃣ Buscar persona asociada al usuario autenticado
+                var person = await _personData.GetPersonByUserIdAsync(userId);
+                if (person == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "No se encontró la persona asociada al usuario autenticado."
+                    });
+                }
+
+                // 3️⃣ Asignar automáticamente el PersonId
+                dto.PersonId = person.Id;
+
+                // 4️⃣ Asegurar nullables con valores válidos
+                var safeDto = new AttendanceDtoRequestSpecific
+                {
+                    PersonId = dto.PersonId ?? 0,
+                    AccessPointId = dto.AccessPointId ?? 0,
+                    EventId = dto.EventId ?? 0,
+                    Time = dto.Time ?? DateTime.UtcNow
+                };
+
+                // 5️⃣ Registrar la salida
+                var result = await _attendanceBusiness.RegisterExitAsync(safeDto);
+
+                return Ok(new
+                {
+                    success = result.Success,
+                    message = result.Message,
+                    data = result
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al registrar SALIDA.");
-                return BadRequest(new { success = false, message = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "Error interno al registrar la salida.",
+                    error = ex.Message
+                });
             }
         }
 

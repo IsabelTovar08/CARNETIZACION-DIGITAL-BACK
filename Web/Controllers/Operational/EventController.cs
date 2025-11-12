@@ -6,6 +6,7 @@ using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Responses;
 using Web.Controllers.Base;
+using Entity.DTOs.Specifics;   // ✅ AGREGADO PARA QUE FUNCIONE EventFilterDto
 
 namespace Web.Controllers.Operational
 {
@@ -34,7 +35,7 @@ namespace Web.Controllers.Operational
 
             var id = await _eventBusiness.CreateEventAsync(dto);
 
-            // Recuperar el evento recién creado (con su QR)
+            // Recuperar el evento recién creado (cargado con su QR)
             var result = await _eventBusiness.GetEventFullDetailsAsync(id);
 
             if (result == null)
@@ -87,6 +88,7 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
+
         /// <summary>
         /// Retorna el número de eventos disponibles.
         /// </summary>
@@ -111,7 +113,25 @@ namespace Web.Controllers.Operational
                 return BadRequest(response);
             }
         }
+<<<<<<< HEAD
        
+=======
+
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateEventRequest dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var id = await _eventBusiness.CreateEventAsync(dto);
+            return Ok(new
+            {
+                success = true,
+                message = "Evento creado correctamente con QR generado en Base64",
+                data = new { id }
+            });
+        }
+>>>>>>> e16487a4b1233384a63770627926e0f41f6c165f
 
         /// <summary>
         /// Actualiza un evento con sus relaciones (AccessPoints, Audiencias, etc.)
@@ -131,12 +151,9 @@ namespace Web.Controllers.Operational
             });
         }
 
-
         /// <summary>
         /// cancelar o finalizar un evento manualmente
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [HttpPut("finalize/{id}")]
         public async Task<IActionResult> FinalizeEvent(int id)
         {
@@ -148,6 +165,35 @@ namespace Web.Controllers.Operational
                 message = success
                     ? "El evento ha sido finalizado correctamente."
                     : "No se pudo finalizar el evento."
+            });
+        }
+
+        // ============================================================
+        // 🚀 NUEVO ENDPOINT: FILTRO POR ESTADO, TIPO Y PÚBLICO/PRIVADO
+        // ============================================================
+        /// <summary>
+        /// Filtra eventos por estado, tipo y si es público o privado.
+        /// </summary>
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilterEvents(
+            [FromQuery] int? statusId,
+            [FromQuery] int? eventTypeId,
+            [FromQuery] bool? isPublic)
+        {
+            var filters = new EventFilterDto
+            {
+                StatusId = statusId,
+                EventTypeId = eventTypeId,
+                IsPublic = isPublic
+            };
+
+            var result = await _eventBusiness.FilterAsync(filters);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Eventos filtrados correctamente",
+                data = result
             });
         }
     }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entity.DTOs.Specifics;   // ✅ NECESARIO PARA EventFilterDto
 
 namespace Business.Interfaces.Operational
 {
@@ -27,6 +28,7 @@ namespace Business.Interfaces.Operational
 
         /// <summary>
         /// Para que el servicio que verifica y actualiza el estado de eventos "en curso"
+        /// </summary>
         Task CheckAndUpdateEventStatusAsync(int eventId);
 
         /// <summary>
@@ -34,5 +36,8 @@ namespace Business.Interfaces.Operational
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<EventDetailsDtoResponse>> GetFullListAsync();
+
+        Task<IEnumerable<EventDtoResponse>> FilterAsync(EventFilterDto filters);
+
     }
 }

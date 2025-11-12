@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Entity.Models.Organizational;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,6 +9,7 @@ namespace Entity.DataInit.Operational
     {
         public void Configure(EntityTypeBuilder<Event> builder)
         {
+            
             builder.HasData(
                  new Event
                  {
@@ -40,8 +37,7 @@ namespace Entity.DataInit.Operational
                  }
              );
 
-
-            // Propiedades
+            //  Propiedades
             builder.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -55,7 +51,7 @@ namespace Entity.DataInit.Operational
             builder.Property(e => e.IsDeleted)
                 .HasDefaultValue(false);
 
-            // Relaciones
+            //  Relaciones
             builder.HasOne(e => e.EventType)
                    .WithMany()
                    .HasForeignKey(e => e.EventTypeId)
@@ -66,6 +62,7 @@ namespace Entity.DataInit.Operational
                    .HasForeignKey(e => e.StatusId)
                    .OnDelete(DeleteBehavior.Restrict);
 
+            //  Tabla destino
             builder.ToTable("Events", schema: "Operational");
         }
     }

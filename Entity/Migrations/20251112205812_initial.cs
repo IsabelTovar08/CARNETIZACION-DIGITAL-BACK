@@ -6,10 +6,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Entity.MigracionesEq
+namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -612,9 +612,10 @@ namespace Entity.MigracionesEq
                 schema: "Operational",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EventId = table.Column<int>(type: "integer", nullable: false),
                     AccessPointId = table.Column<int>(type: "integer", nullable: false),
-                    Id = table.Column<int>(type: "integer", nullable: false),
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -622,7 +623,7 @@ namespace Entity.MigracionesEq
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventAccessPoints", x => new { x.EventId, x.AccessPointId });
+                    table.PrimaryKey("PK_EventAccessPoints", x => x.Id);
                     table.ForeignKey(
                         name: "FK_EventAccessPoints_AccessPoints_AccessPointId",
                         column: x => x.AccessPointId,
@@ -689,6 +690,7 @@ namespace Entity.MigracionesEq
                     AccessPointOfEntry = table.Column<int>(type: "integer", nullable: true),
                     AccessPointOfExit = table.Column<int>(type: "integer", nullable: true),
                     PersonId = table.Column<int>(type: "integer", nullable: false),
+                    EventId = table.Column<int>(type: "integer", nullable: true),
                     QrCode = table.Column<string>(type: "text", nullable: true),
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
@@ -712,6 +714,12 @@ namespace Entity.MigracionesEq
                         principalTable: "AccessPoints",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendances_Events_EventId",
+                        column: x => x.EventId,
+                        principalSchema: "Operational",
+                        principalTable: "Events",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Attendances_People_PersonId",
                         column: x => x.PersonId,
@@ -1504,11 +1512,11 @@ namespace Entity.MigracionesEq
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Attendances",
-                columns: new[] { "Id", "AccessPointOfEntry", "AccessPointOfExit", "Code", "CreateAt", "PersonId", "QrCode", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
+                columns: new[] { "Id", "AccessPointOfEntry", "AccessPointOfExit", "Code", "CreateAt", "EventId", "PersonId", "QrCode", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, null, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, 1, null, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, 2, null, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1519,6 +1527,16 @@ namespace Entity.MigracionesEq
                 {
                     { 1, "Calle 1 # 2-34", 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "principal@org.com", "Centro", "Sucursal Principal", 1, "123456789", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { 2, "Carrera 45 # 67-89", 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "norte@org.com", "Zona Norte", "Sucursal Norte", 1, "987654321", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "Operational",
+                table: "EventAccessPoints",
+                columns: new[] { "Id", "AccessPointId", "Code", "CreateAt", "EventId", "IsDeleted", "UpdateAt" },
+                values: new object[,]
+                {
+                    { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1550,6 +1568,12 @@ namespace Entity.MigracionesEq
                 schema: "Operational",
                 table: "Attendances",
                 column: "AccessPointOfExit");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendances_EventId",
+                schema: "Operational",
+                table: "Attendances",
+                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendances_PersonId",
@@ -1633,6 +1657,12 @@ namespace Entity.MigracionesEq
                 schema: "Operational",
                 table: "EventAccessPoints",
                 column: "AccessPointId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventAccessPoints_EventId",
+                schema: "Operational",
+                table: "EventAccessPoints",
+                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_EventTypeId",
