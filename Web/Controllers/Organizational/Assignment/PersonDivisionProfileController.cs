@@ -18,15 +18,15 @@ namespace Web.Controllers.Organizational.Assignment
         }
 
         /// <summary>
-        /// Genera el PDF del carnet emitido y lo devuelve en un ApiResponse con contenido binario.
+        /// Genera el PDF del carnet emitido y lo devuelve ya sea como archivo PDF
+        /// o como JSON con base64, dependiendo del header Accept del cliente.
         /// </summary>
         /// <param name="issuedCardId">Identificador del carnet emitido.</param>
-        /// <returns>Archivo PDF dentro de un ApiResponse.</returns>
+        /// <returns>Archivo PDF o JSON con base64, según la solicitud.</returns>
         [HttpGet("generate/{issuedCardId:int}")]
-        [ProducesResponseType(typeof(ApiResponse<byte[]>), 200)]
-        [ProducesResponseType(typeof(ApiResponse<byte[]>), 400)]
-        [ProducesResponseType(typeof(ApiResponse<byte[]>), 500)]
-        [Produces("application/pdf")]
+        [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GeneratePdfAsync(int issuedCardId)
         {
             try
@@ -35,22 +35,33 @@ namespace Web.Controllers.Organizational.Assignment
                 var pdfBytes = await _business.GenerateCardPdfBase64Async(issuedCardId);
 
                 if (pdfBytes == null || pdfBytes.Length == 0)
-                    return NotFound(ApiResponse<byte[]>.Fail("No se pudo generar el PDF del carnet."));
+                    return NotFound("No se pudo generar el PDF del carnet.");
 
-                // 🔹 Swagger mostrará el binario, y se mantiene el formato ApiResponse
-                return File(pdfBytes, "application/pdf", $"carnet_{issuedCardId}.pdf");
+                var fileName = $"carnet_{issuedCardId}.pdf";
+
+                // 🔹 Detectar el encabezado Accept del cliente
+                var accept = Request.Headers["Accept"].ToString();
+
+                // Si el cliente pide PDF directamente (app móvil, navegador)
+                if (accept.Contains("application/pdf", StringComparison.OrdinalIgnoreCase))
+                    return File(pdfBytes, "application/pdf", fileName);
+
+                // Si Swagger o Postman piden JSON, devolvemos base64 dentro del ApiResponse
+                var base64 = Convert.ToBase64String(pdfBytes);
+                return Ok(ApiResponse<string>.Ok(base64));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Error controlado al generar el PDF del carnet {IssuedCardId}", issuedCardId);
-                return BadRequest(ApiResponse<byte[]>.Fail(ex.Message));
+                return BadRequest(ApiResponse<string>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error interno al generar el PDF del carnet {IssuedCardId}", issuedCardId);
-                return StatusCode(500, ApiResponse<byte[]>.Fail("Ocurrió un error interno al generar el PDF del carnet."));
+                return StatusCode(500, ApiResponse<string>.Fail("Ocurrió un error interno al generar el PDF del carnet."));
             }
         }
+
 
 
 

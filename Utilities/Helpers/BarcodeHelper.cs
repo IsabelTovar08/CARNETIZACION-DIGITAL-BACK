@@ -37,10 +37,13 @@ namespace Utilities.Helpers
 
                 // Crear SKImage seguro (sin unsafe)
                 using var bitmap = new SKBitmap(pixelData.Width, pixelData.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
-                var span = bitmap.GetPixelSpan();
-                pixelData.Pixels.CopyTo(span); // copia segura sin punteros
+
+                // Copia los píxeles de forma segura sin punteros (compatible con SkiaSharp 2.88.8)
+                var handle = bitmap.GetPixels();
+                System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, handle, pixelData.Width * pixelData.Height * 4);
 
                 return SKImage.FromBitmap(bitmap);
+
             }
             catch
             {
@@ -99,10 +102,13 @@ namespace Utilities.Helpers
 
                 // Crear SKImage seguro (sin unsafe)
                 using var bitmap = new SKBitmap(pixelData.Width, pixelData.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
-                var span = bitmap.GetPixelSpan();
-                pixelData.Pixels.CopyTo(span);
+
+                // Copia los píxeles de forma segura sin punteros (compatible con SkiaSharp 2.88.8)
+                var handle = bitmap.GetPixels();
+                System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, handle, pixelData.Width * pixelData.Height * 4);
 
                 return SKImage.FromBitmap(bitmap);
+
             }
             catch
             {
@@ -129,6 +135,24 @@ namespace Utilities.Helpers
         {
             var bytes = GenerateBarcodeBytes(content, width, height);
             return bytes != null ? Convert.ToBase64String(bytes) : null;
+        }
+
+
+
+        /// <summary>
+        /// Limpia un string Base64 eliminando prefijos como data:image/png;base64.
+        /// </summary>
+        public static string CleanBase64Logo(string? rawBase64)
+        {
+            if (string.IsNullOrWhiteSpace(rawBase64))
+                return string.Empty;
+
+            // Si viene con metadata tipo "data:image/png;base64,xxxx"
+            int commaIndex = rawBase64.IndexOf(',');
+
+            return commaIndex >= 0
+                ? rawBase64[(commaIndex + 1)..].Trim()
+                : rawBase64.Trim();
         }
     }
 }

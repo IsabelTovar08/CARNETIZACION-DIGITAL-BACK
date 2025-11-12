@@ -35,5 +35,12 @@ namespace Entity.DTOs.Specifics.Cards
         public string OrganizationalUnit { get; set; }
         public string DocumentNumber { get; set; }
         public Guid UniqueId { get; set; }
+        public string FrontTemplateUrl { get; set; }
+        public string BackTemplateUrl { get; set; }
+
+        public DateTime ValidFrom { get; set; }
+        public DateTime ValidUntil { get; set; }
+        public DateTime IssuedDate { get; set; }
+
     }
 }

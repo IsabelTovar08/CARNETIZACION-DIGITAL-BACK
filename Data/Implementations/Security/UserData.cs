@@ -48,33 +48,31 @@ namespace Data.Classes.Specifics
             return user?.UserRoles.Select(ur => ur.Rol.Name).ToList() ?? new List<string>();
         }
 
-        public async Task<User?> GetByIdForMeAsync(int userId, bool includeProfile)
+        /// <summary>
+        /// Obtiene un usuario por Id con sus carnets:
+        /// - El seleccionado (IsCurrentlySelected)
+        /// - Los demás
+        /// </summary>
+        public async Task<User?> GetByIdForMeAsync(int userId)
         {
-            var query = _context.Users
-                .AsNoTrackingWithIdentityResolution() // <- permite fix-up sin tracking
+            return await _context.Users
+                .AsNoTrackingWithIdentityResolution()
                 .Where(u => u.Id == userId && !u.IsDeleted)
-                // Roles / Permisos
+
+                // Roles
                 .Include(u => u.UserRoles)
                     .ThenInclude(ur => ur.Rol)
                         .ThenInclude(r => r.RolFormPermissions)
                             .ThenInclude(rp => rp.Permission)
-                .AsQueryable();
 
-            if (includeProfile)
-            {
-                query = query
-                    // Person + City desde el root (NO volver a Person desde PDP)
-                    .Include(u => u.Person)
-                        .ThenInclude(p => p.City)
+                // Person + City
+                .Include(u => u.Person)
+                    .ThenInclude(p => p.City)
 
-                    // Solo el perfil actual y sus dependencias HACIA ADELANTE
-                    .Include(u => u.Person.IssuedCard.Where(pdp => pdp.IsCurrentlySelected))
-                        .ThenInclude(pdp => pdp.Profile)
-                    .Include(u => u.Person.IssuedCard.Where(pdp => pdp.IsCurrentlySelected))
-                        .ThenInclude(pdp => pdp.InternalDivision); 
-            }
+                // Todos los IssuedCards, pero SIN profile completo
+                .Include(u => u.Person.IssuedCard)
 
-            return await query.FirstOrDefaultAsync();
+                .FirstOrDefaultAsync();
         }
 
 

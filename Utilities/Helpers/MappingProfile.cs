@@ -133,9 +133,8 @@ namespace Utilities.Helper
             .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
         s.UserRoles
          .SelectMany(ur => ur.Rol.RolFormPermissions.Select(rp => rp.Permission))
-         .DistinctBy(p => p.Id)))
-            .ForMember(d => d.CurrentProfile, opt => opt.MapFrom(s =>
-                s.Person.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected)));
+         .DistinctBy(p => p.Id)));
+           
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()
@@ -255,7 +254,7 @@ namespace Utilities.Helper
             CreateMap<Organization, OrganizationDto>()
                 .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.OrganizaionType.Name))
                 .ReverseMap();
-            CreateMap<Organization, OrganizationDtoRequest>();
+            CreateMap<Organization, OrganizationDtoRequest>().ReverseMap();
 
             //Area Categoria
             CreateMap<AreaCategory, AreaCategoryDto>()

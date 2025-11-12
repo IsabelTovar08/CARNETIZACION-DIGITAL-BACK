@@ -11,6 +11,7 @@ using Entity.DTOs.Specifics.Cards;
 using Entity.Models.Organizational.Assignment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static Utilities.Helpers.BarcodeHelper;
 
 namespace Data.Implementations.Organizational.Assignment
 {
@@ -52,12 +53,32 @@ namespace Data.Implementations.Organizational.Assignment
         }
 
 
-        public override Task<IssuedCard> SaveAsync(IssuedCard entity)
+        /// <summary>
+        /// Guarda un carnet garantizando:
+        /// - Si no hay ninguno seleccionado, este se vuelve seleccionado.
+        /// - Si ya hay uno seleccionado, este se crea con IsCurrentlySelected = false.
+        /// </summary>
+        public override async Task<IssuedCard> SaveAsync(IssuedCard entity)
         {
-            //entity.QRCode = "123";
-            //entity.UniqueId = new Guid();
-            return base.SaveAsync(entity);
+            // Obtener si existe algún carnet seleccionado de esta persona
+            bool alreadySelected = await _context.IssuedCards
+                .AnyAsync(c => c.PersonId == entity.PersonId && c.IsCurrentlySelected);
+
+            if (!alreadySelected)
+            {
+                // Si no hay seleccionado → este se vuelve el seleccionado
+                entity.IsCurrentlySelected = true;
+            }
+            else
+            {
+                // Si ya existe uno seleccionado → este NO puede quedar seleccionado
+                entity.IsCurrentlySelected = false;
+            }
+
+            // Guardar normalmente
+            return await base.SaveAsync(entity);
         }
+
 
         /// </<inheritdoc/>>
         public async Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId)
@@ -74,6 +95,7 @@ namespace Data.Implementations.Organizational.Assignment
                         .ThenInclude(u => u.OrganizationalUnitBranches)
                             .ThenInclude(oub => oub.Branch)
                                 .ThenInclude(b => b.Organization)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == issuedCardId);
 
             if (issuedCard == null)
@@ -82,36 +104,47 @@ namespace Data.Implementations.Organizational.Assignment
             var division = issuedCard.InternalDivision;
             var unit = division?.OrganizationalUnit;
 
-            // 🔹 Obtener la primera relación con Branch
             var orgUnitBranch = unit?.OrganizationalUnitBranches?.FirstOrDefault();
             var branch = orgUnitBranch?.Branch;
             var org = branch?.Organization;
 
+            // Logo Base64 limpio
+            string base64Logo = CleanBase64Logo(org?.Logo);
+
             return new CardUserData
             {
-                // 🔸 Datos personales
-                Name = $"{issuedCard.Person?.FirstName} {issuedCard.Person?.LastName}".Trim(),
+                // Datos personales
+                Name = $"{issuedCard.Person?.FirstName} {issuedCard.Person?.MiddleName} {issuedCard.Person?.LastName} {issuedCard.Person?.SecondLastName} ".Trim(),
                 Email = issuedCard.Person?.Email ?? string.Empty,
                 PhoneNumber = issuedCard.Person?.Phone ?? string.Empty,
-                DocumentNumber = issuedCard.Person.DocumentNumber ?? string.Empty,
+                DocumentNumber = issuedCard.Person?.DocumentNumber ?? string.Empty,
+                //BloodTypeValue = issuedCard.Person?.BloodType.ToString() ?? string.Empty,
 
-                // 🔸 Datos organizacionales
+                // Datos organizacionales
                 CompanyName = org?.Name ?? "Sin organización",
                 BranchName = branch?.Name ?? "Sin sucursal",
                 BranchAddress = branch?.Address ?? "Sin dirección",
                 BranchPhone = branch?.Phone ?? string.Empty,
                 BranchEmail = branch?.Email ?? string.Empty,
-                CategoryArea = division.AreaCategory.Name ?? string.Empty,
+                CategoryArea = division?.AreaCategory?.Name ?? string.Empty,
 
-                // 🔸 Datos del carnet
+                // Datos del carnet
                 CardId = issuedCard.UniqueId.ToString(),
                 Profile = issuedCard.Profile?.Name ?? "Sin perfil",
                 InternalDivisionName = division?.Name ?? "N/A",
-                OrganizationalUnit = unit.Name ?? "N/A",
+                OrganizationalUnit = unit?.Name ?? "N/A",
                 UserPhotoUrl = issuedCard.Person?.PhotoUrl ?? string.Empty,
-                LogoUrl = org?.Logo ?? "https://carnetgo.com/logo.png",
+
+                // Aquí queda el Base64 limpio del logo
+                LogoUrl = base64Logo,
+
                 QrUrl = issuedCard.QRCode,
-                UniqueId = issuedCard.UniqueId
+                UniqueId = issuedCard.UniqueId,
+                FrontTemplateUrl = issuedCard.Card.CardTemplate.FrontBackgroundUrl,
+                BackTemplateUrl = issuedCard.Card.CardTemplate.BackBackgroundUrl,
+                ValidFrom = issuedCard.Card.ValidFrom,
+                ValidUntil = issuedCard.Card.ValidTo,
+                IssuedDate = issuedCard.Card.CreateAt
             };
         }
     }
