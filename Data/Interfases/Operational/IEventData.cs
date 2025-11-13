@@ -32,13 +32,12 @@ namespace Data.Interfases.Operational
 
         Task<IEnumerable<Event>> GetActiveEventsAsync();
 
-<<<<<<< HEAD
         /// <summary>
         /// Para listar los eventos con toda la informacion
         /// </summary>
         /// <returns></returns>
         Task<List<Event>> GetAllEventsWithDetailsAsync();
-=======
+
         // =============================================================
         // 🚀 NUEVO — requerido para filtros personalizados en Business
         // =============================================================
@@ -46,6 +45,6 @@ namespace Data.Interfases.Operational
         /// Convierte un IQueryable<Event> en una lista asincrónicamente.
         /// </summary>
         Task<List<Event>> ToListAsync(IQueryable<Event> query);
->>>>>>> e16487a4b1233384a63770627926e0f41f6c165f
+
     }
 }

@@ -6,7 +6,7 @@ using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Responses;
 using Web.Controllers.Base;
-using Entity.DTOs.Specifics;   // ✅ AGREGADO PARA QUE FUNCIONE EventFilterDto
+using Entity.DTOs.Specifics;   
 
 namespace Web.Controllers.Operational
 {
@@ -113,25 +113,6 @@ namespace Web.Controllers.Operational
                 return BadRequest(response);
             }
         }
-<<<<<<< HEAD
-       
-=======
-
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] CreateEventRequest dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var id = await _eventBusiness.CreateEventAsync(dto);
-            return Ok(new
-            {
-                success = true,
-                message = "Evento creado correctamente con QR generado en Base64",
-                data = new { id }
-            });
-        }
->>>>>>> e16487a4b1233384a63770627926e0f41f6c165f
 
         /// <summary>
         /// Actualiza un evento con sus relaciones (AccessPoints, Audiencias, etc.)
