@@ -113,9 +113,6 @@ namespace Web.Controllers.Operational
                 return BadRequest(response);
             }
         }
-<<<<<<< HEAD
-       
-=======
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateEventRequest dto)
@@ -131,7 +128,6 @@ namespace Web.Controllers.Operational
                 data = new { id }
             });
         }
->>>>>>> e16487a4b1233384a63770627926e0f41f6c165f
 
         /// <summary>
         /// Actualiza un evento con sus relaciones (AccessPoints, Audiencias, etc.)

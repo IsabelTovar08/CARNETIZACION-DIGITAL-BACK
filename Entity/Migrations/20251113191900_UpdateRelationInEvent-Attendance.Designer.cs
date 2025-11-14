@@ -3,6 +3,7 @@ using System;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Entity.Migrations.Postgres
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251113191900_UpdateRelationInEvent-Attendance")]
+    partial class UpdateRelationInEventAttendance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -963,6 +966,12 @@ namespace Entity.Migrations.Postgres
                     b.Property<int>("AccessPointId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("AccessPointId1")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("AccessPointId2")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Code")
                         .HasColumnType("text");
 
@@ -972,11 +981,11 @@ namespace Entity.Migrations.Postgres
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("EventId1")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("QrCodeKey")
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("timestamp with time zone");
@@ -985,7 +994,13 @@ namespace Entity.Migrations.Postgres
 
                     b.HasIndex("AccessPointId");
 
+                    b.HasIndex("AccessPointId1");
+
+                    b.HasIndex("AccessPointId2");
+
                     b.HasIndex("EventId");
+
+                    b.HasIndex("EventId1");
 
                     b.ToTable("EventAccessPoints", "Operational");
 
@@ -3628,16 +3643,28 @@ namespace Entity.Migrations.Postgres
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
                 {
                     b.HasOne("Entity.Models.Organizational.AccessPoint", "AccessPoint")
-                        .WithMany("EventAccessPoints")
+                        .WithMany()
                         .HasForeignKey("AccessPointId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Entity.Models.Organizational.AccessPoint", null)
+                        .WithMany("EventAccessPointsEntry")
+                        .HasForeignKey("AccessPointId1");
+
+                    b.HasOne("Entity.Models.Organizational.AccessPoint", null)
+                        .WithMany("EventAccessPointsExit")
+                        .HasForeignKey("AccessPointId2");
+
                     b.HasOne("Entity.Models.Organizational.Event", "Event")
-                        .WithMany("EventAccessPoints")
+                        .WithMany()
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Entity.Models.Organizational.Event", null)
+                        .WithMany("EventAccessPoints")
+                        .HasForeignKey("EventId1");
 
                     b.Navigation("AccessPoint");
 
@@ -4010,7 +4037,9 @@ namespace Entity.Migrations.Postgres
 
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
                 {
-                    b.Navigation("EventAccessPoints");
+                    b.Navigation("EventAccessPointsEntry");
+
+                    b.Navigation("EventAccessPointsExit");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profiles", b =>

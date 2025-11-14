@@ -9,6 +9,10 @@ namespace Data.Interfases.Operational
 {
     public interface IEventAccessPointData : ICrudBase<EventAccessPoint>
     {
+        /// <summary>
+        /// Obtiene un EventAccessPoint por su QrCodeKey.
+        /// </summary>
+        Task<EventAccessPoint?> GetByQrKeyAsync(string qrKey);
 
     }
 }

@@ -7,7 +7,6 @@ using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 namespace Entity.Models.Organizational
 {
     public class Event : GenericModel
@@ -33,6 +32,5 @@ namespace Entity.Models.Organizational
         public ICollection<EventTargetAudience> EventTargetAudiences { get; set; } = new List<EventTargetAudience>();
         public Status? Status { get; set; }
         public ICollection<EventAccessPoint> EventAccessPoints { get; set; } = new List<EventAccessPoint>();
-
-    }   
+    }
 }

@@ -21,6 +21,8 @@ namespace Entity.Enums.Specifics
         ModificationApproved,
         ModificationRejected,
         CardGenerated,
-        Login
+        Login,
+        AttendanceEntry,
+        AttendanceExit
     }
 }

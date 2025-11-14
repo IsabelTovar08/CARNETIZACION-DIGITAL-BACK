@@ -175,6 +175,7 @@ namespace Web
 
 
             app.MapHub<NotificationHub>("/hubs/notifications");
+            app.MapHub<AttendanceHub>("/hubs/attendance");
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();

@@ -18,14 +18,14 @@ namespace Business.Interfaces.Operational
         Task<AttendanceDtoResponse?> RegisterAttendanceAsync(AttendanceDtoRequest dto);
 
         /// <summary>
-        /// ✅ Registra entrada manual (desde token)
+        /// Registra entrada manual (desde token)
         /// </summary>
-        Task<AttendanceDtoResponse> RegisterEntryAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default);
+        Task<AttendanceDtoResponse> RegisterEntryAsync(AttendanceDtoRequestSpecific dto);
 
         /// <summary>
-        /// ✅ Registra salida manual (desde token)
+        /// Registra salida manual (desde token)
         /// </summary>
-        Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default);
+        Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto);
 
         /// <summary>
         /// ✅ Registra asistencia automáticamente al leer un código QR del evento.

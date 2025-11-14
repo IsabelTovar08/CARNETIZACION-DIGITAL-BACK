@@ -3,6 +3,7 @@ using System;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Entity.Migrations.Postgres
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251113175208_UpdateRelationInAttendance")]
+    partial class UpdateRelationInAttendance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -975,9 +978,6 @@ namespace Entity.Migrations.Postgres
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("QrCodeKey")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1431,6 +1431,12 @@ namespace Entity.Migrations.Postgres
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AccessPointId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("AccessPointId1")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Code")
                         .HasColumnType("text");
 
@@ -1441,6 +1447,9 @@ namespace Entity.Migrations.Postgres
                         .HasColumnType("integer");
 
                     b.Property<int?>("EventAccessPointExitId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EventId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
@@ -1462,9 +1471,15 @@ namespace Entity.Migrations.Postgres
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccessPointId");
+
+                    b.HasIndex("AccessPointId1");
+
                     b.HasIndex("EventAccessPointEntryId");
 
                     b.HasIndex("EventAccessPointExitId");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("PersonId");
 
@@ -3636,7 +3651,7 @@ namespace Entity.Migrations.Postgres
                     b.HasOne("Entity.Models.Organizational.Event", "Event")
                         .WithMany("EventAccessPoints")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AccessPoint");
@@ -3730,6 +3745,14 @@ namespace Entity.Migrations.Postgres
 
             modelBuilder.Entity("Entity.Models.Organizational.Attendance", b =>
                 {
+                    b.HasOne("Entity.Models.Organizational.AccessPoint", null)
+                        .WithMany("AttendancesEntry")
+                        .HasForeignKey("AccessPointId");
+
+                    b.HasOne("Entity.Models.Organizational.AccessPoint", null)
+                        .WithMany("AttendancesExit")
+                        .HasForeignKey("AccessPointId1");
+
                     b.HasOne("Entity.Models.Operational.EventAccessPoint", "EventAccessPointEntry")
                         .WithMany("AttendancesEntry")
                         .HasForeignKey("EventAccessPointEntryId")
@@ -3740,6 +3763,10 @@ namespace Entity.Migrations.Postgres
                         .WithMany("AttendancesExit")
                         .HasForeignKey("EventAccessPointExitId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Entity.Models.Organizational.Event", null)
+                        .WithMany("Attendances")
+                        .HasForeignKey("EventId");
 
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithMany("Attendances")
@@ -4010,6 +4037,10 @@ namespace Entity.Migrations.Postgres
 
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
                 {
+                    b.Navigation("AttendancesEntry");
+
+                    b.Navigation("AttendancesExit");
+
                     b.Navigation("EventAccessPoints");
                 });
 
@@ -4020,6 +4051,8 @@ namespace Entity.Migrations.Postgres
 
             modelBuilder.Entity("Entity.Models.Organizational.Event", b =>
                 {
+                    b.Navigation("Attendances");
+
                     b.Navigation("EventAccessPoints");
 
                     b.Navigation("EventTargetAudiences");

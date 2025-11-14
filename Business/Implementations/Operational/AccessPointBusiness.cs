@@ -109,7 +109,7 @@ namespace Business.Implementations.Operational
                 {
                     PersonId = personId,
                     TimeOfEntry = DateTime.UtcNow,
-                    AccessPointOfEntry = null
+                    EventAccessPointEntryId = null
                 };
 
                 var entity = _mapper.Map<Attendance>(attendance);

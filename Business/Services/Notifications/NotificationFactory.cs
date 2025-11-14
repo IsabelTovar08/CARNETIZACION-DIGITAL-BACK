@@ -123,6 +123,23 @@ namespace Business.Services.Notifications
                         NotificationTypeId = NotificationType.System
                     };
 
+                case NotificationTemplateType.AttendanceEntry:
+                    return new NotificationDtoRequest
+                    {
+                        Title = "Entrada registrada",
+                        Message = $"Ingresaste a \"{args[1]}\" por el punto de acceso \"{args[2]}\" el {((DateTime)args[0]):dd/MM/yyyy HH:mm}.",
+                        NotificationTypeId = NotificationType.Info
+                    };
+
+                case NotificationTemplateType.AttendanceExit:
+                    return new NotificationDtoRequest
+                    {
+                        Title = "Salida registrada",
+                        Message = $"Saliste de \"{args[1]}\" por el punto de acceso \"{args[2]}\" el {((DateTime)args[0]):dd/MM/yyyy HH:mm}.",
+                        NotificationTypeId = NotificationType.Info
+                    };
+
+
                 default:
                     throw new ArgumentException("Tipo de notificación no soportado.");
             }

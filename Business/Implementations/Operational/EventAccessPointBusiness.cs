@@ -18,8 +18,23 @@ namespace Business.Implementations.Operational
 {
     public class EventAccessPointBusiness : BaseBusiness<EventAccessPoint, EventAccessPointDtoRequest, EventAccessPointDto>, IEventAccessPointBusiness
     {
+        protected readonly IEventAccessPointData _data;
         public EventAccessPointBusiness(IEventAccessPointData data, ILogger<EventAccessPoint> logger, IMapper mapper, ICodeGeneratorService<EventAccessPoint>? codeService = null) : base(data, logger, mapper, codeService)
         {
+            _data = data;
+        }
+
+        ///  <inheritdoc/>
+        public async Task<EventAccessPoint?> GetByQrKey(string qrKey)
+        {
+            try
+            {
+                return await _data.GetByQrKeyAsync(qrKey);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ocurrió un error al consultar el Punto de Acesso del evento a través del UNIQUEKEY: {ex.Message}", ex);
+            }
         }
     }
 }

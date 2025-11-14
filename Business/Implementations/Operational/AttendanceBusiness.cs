@@ -1,21 +1,26 @@
-﻿using AutoMapper;
-using Business.Classes.Base;
-using Business.Interfaces.Auth;
-using Business.Interfaces.Operational;
-using Business.Interfaces.Security;
-using Data.Interfases.Operational;
-using Data.Interfases.Security;
-using Entity.DTOs.Operational.Request;
-using Entity.DTOs.Operational.Response;
-using Entity.DTOs.Reports;
-using Entity.Models.Organizational;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
+using Business.Classes.Base;
+using Business.Interfaces.Auth;
+using Business.Interfaces.Notifications;
+using Business.Interfaces.Operational;
+using Business.Interfaces.Security;
+using Data.Implementations.Operational;
+using Data.Interfases.Operational;
+using Data.Interfases.Security;
+using DocumentFormat.OpenXml.EMMA;
+using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Operational.Request;
+using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Reports;
+using Entity.Enums.Specifics;
+using Entity.Models.Organizational;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Utilities.Helpers;
 
 namespace Business.Implementations.Operational
@@ -29,6 +34,8 @@ namespace Business.Implementations.Operational
         private readonly ILogger<Attendance> _logger;
         private readonly IMapper _mapper;
         private readonly IUserBusiness _userBusiness;
+        private readonly IEventAccessPointBusiness _eventAccessPointBusiness;
+        private readonly INotificationBusiness _notificationBusiness;
 
         public AttendanceBusiness(
             IAttendanceData attendanceData,
@@ -37,7 +44,9 @@ namespace Business.Implementations.Operational
             ILogger<Attendance> logger,
             IMapper mapper,
             ICurrentUser currentUser,
-            IUserBusiness userBusiness
+            IUserBusiness userBusiness,
+            IEventAccessPointBusiness eventAccessPointBusiness,
+            INotificationBusiness notificationBusiness
         ) : base(attendanceData, logger, mapper)
         {
             _attendanceData = attendanceData;
@@ -47,6 +56,8 @@ namespace Business.Implementations.Operational
             _mapper = mapper;
             _currentUser = currentUser;
             _userBusiness = userBusiness;
+            _eventAccessPointBusiness = eventAccessPointBusiness;
+            _notificationBusiness = notificationBusiness;
         }
 
         /// <summary>
@@ -93,24 +104,24 @@ namespace Business.Implementations.Operational
                     return new AttendanceDtoResponse { Success = false, Message = "Punto de acceso no encontrado." };
 
                 // Verificar si ya hay asistencia abierta
-                var open = await _attendanceData.GetOpenAttendanceAsync(personId);
-                if (open != null)
-                {
-                    return new AttendanceDtoResponse
-                    {
-                        Success = false,
-                        Message = "La persona ya tiene una asistencia abierta."
-                    };
-                }
+                //var open = await _attendanceData.GetOpenAttendanceAsync(personId, eventAccessPointEntryId);
+                //if (open != null)
+                //{
+                //    return new AttendanceDtoResponse
+                //    {
+                //        Success = false,
+                //        Message = "La persona ya tiene una asistencia abierta."
+                //    };
+                //}
 
                 // Crear registro de asistencia
                 var attendance = new Attendance
                 {
                     PersonId = person.Id,
                     TimeOfEntry = DateTime.UtcNow,
-                    AccessPointOfEntry = accessPoint.Id,
-                    EventId = ev.Id,
-                    QrCode = qrContent
+                    EventAccessPointEntryId = accessPoint.Id,
+                    //EventId = ev.Id,
+                    //QrCode = qrContent
                 };
 
                 var saved = await _attendanceData.SaveAsync(attendance);
@@ -139,6 +150,8 @@ namespace Business.Implementations.Operational
         {
             try
             {
+                UserDTO? user = await _userBusiness.GetById(_currentUser.UserId);
+                dto.PersonId = user?.PersonId ?? dto.PersonId;
                 var entity = _mapper.Map<Attendance>(dto);
                 var saved = await _attendanceData.SaveAsync(entity);
                 var response = _mapper.Map<AttendanceDtoResponse>(saved);
@@ -163,51 +176,53 @@ namespace Business.Implementations.Operational
             }
         }
 
-        public async Task<AttendanceDtoResponse> RegisterEntryAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default)
+        /// <summary>
+        /// Registra una entrada validando si ya existe una asistencia abierta para la persona.
+        /// </summary>
+        public async Task<AttendanceDtoResponse> RegisterEntryAsync(AttendanceDtoRequestSpecific dto)
         {
             try
             {
-                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId ?? 0, ct);
+                // Obtener persona
+                UserDTO? user = await _userBusiness.GetById(_currentUser.UserId);
+                dto.PersonId = user?.PersonId ?? dto.PersonId;
+
+                // Obtener EventAccessPointId 
+                int eventAccessPointId = await ResolveEventAccessPointIdAsync(dto.QrCodeKey);
+
+                // Validar si la persona ya tiene asistencia abierta en este mismo punto
+                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, eventAccessPointId);
                 if (open != null)
                 {
                     return new AttendanceDtoResponse
                     {
                         Success = false,
-                        Message = "La persona ya tiene una entrada activa."
+                        Message = "Ya existe una entrada registrada. ¿Desea realizar la salida?"
                     };
                 }
 
-                var ev = await _eventData.GetQueryable()
-                    .Include(e => e.EventAccessPoints)
-                        .ThenInclude(eap => eap.AccessPoint)
-                    .FirstOrDefaultAsync(e => e.Id == (dto.EventId ?? 0) && !e.IsDeleted, ct);
-
-                if (ev == null)
+                // Crear DTO para guardar
+                var dtoRequest = new AttendanceDtoRequest
                 {
-                    return new AttendanceDtoResponse
-                    {
-                        Success = false,
-                        Message = "El evento especificado no existe o fue eliminado."
-                    };
-                }
-
-                var entity = new Attendance
-                {
-                    PersonId = dto.PersonId ?? 0,
+                    PersonId = dto.PersonId,
                     TimeOfEntry = DateTime.UtcNow,
-                    AccessPointOfEntry = dto.AccessPointId ?? 0,
-                    EventId = dto.EventId ?? 0
+                    EventAccessPointEntryId = eventAccessPointId
                 };
 
-                var saved = await _attendanceData.SaveAsync(entity);
+                // Guardar entrada
+                var saved = await Save(dtoRequest);
 
-                // ✅ Recargar con relaciones
-                var reloaded = await _attendanceData.GetAllAsync();
-                var full = reloaded.FirstOrDefault(a => a.Id == saved.Id);
+                // Recargar para retorno
+                var reloaded = await GetById(saved.Id);
+                var response = _mapper.Map<AttendanceDtoResponse>(reloaded);
 
-                var response = _mapper.Map<AttendanceDtoResponse>(full);
-                response.EventId = ev.Id;
-                response.EventName = ev.Name;
+                await _notificationBusiness.SendTemplateAsync(
+                    NotificationTemplateType.AttendanceEntry,
+                    response.TimeOfEntry,      // args[0]
+                    reloaded.EventName,           // args[1]
+                    reloaded.AccessPointOfEntryName      // args[2]
+                );
+
                 response.Success = true;
                 response.Message = "Entrada registrada correctamente.";
                 response.TimeOfEntryStr = response.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
@@ -225,55 +240,51 @@ namespace Business.Implementations.Operational
             }
         }
 
+
+
         /// <summary>
-        /// ✅ Registra salida manual (desde token) con relaciones y nombres de evento/puntos
+        /// Registra salida utilizando el método Update normal.
         /// </summary>
-        public async Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto, CancellationToken ct = default)
+        public async Task<AttendanceDtoResponse> RegisterExitAsync(AttendanceDtoRequestSpecific dto)
         {
             try
             {
-                var open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId ?? 0, ct);
+                // Obtener persona desde JWT
+                UserDTO? user = await _userBusiness.GetById(_currentUser.UserId);
+                dto.PersonId = user?.PersonId ?? dto.PersonId;
+
+                // Obtener EventAccessPointId desde el QR
+                int eventAccessPointId = await ResolveEventAccessPointIdAsync(dto.QrCodeKey);
+
+                // Buscar asistencia abierta
+                Attendance? open = await _attendanceData.GetOpenAttendanceAsync(dto.PersonId, eventAccessPointId);
                 if (open == null)
                 {
                     return new AttendanceDtoResponse
                     {
                         Success = false,
-                        Message = "No se encontró una asistencia abierta para la persona."
+                        Message = "No se encontró una asistencia abierta para registrar salida."
                     };
                 }
 
-                var updated = await _attendanceData.UpdateExitAsync(open.Id, DateTime.UtcNow, dto.AccessPointId ?? 0, ct);
+                var updateDto = _mapper.Map<AttendanceDtoRequest>(open);
 
-                
-                // Recargar el registro actualizado con todas las relaciones directamente desde el contexto
-                var full = await _attendanceData.GetQueryable()
-                    .Include(a => a.AccessPointEntry)
-                        .ThenInclude(ap => ap.EventAccessPoints)
-                            .ThenInclude(eap => eap.Event)
-                    .Include(a => a.AccessPointExit)
-                        .ThenInclude(ap => ap.EventAccessPoints)
-                            .ThenInclude(eap => eap.Event)
-                    .FirstOrDefaultAsync(a => a.Id == updated.Id, ct);
+                updateDto.EventAccessPointExitId = eventAccessPointId;
+                updateDto.TimeOfExit = DateTime.UtcNow;
 
-                var response = _mapper.Map<AttendanceDtoResponse>(full);
+                // Update
+                var updated = await Update(updateDto);
 
-                // Cargar nombres de los puntos si existen
-                if (full?.AccessPointEntry != null)
-                    response.AccessPointOfEntryName = full.AccessPointEntry.Name;
+                // Recargar DTO completo
+                var reloaded = await GetById(updated.Id);
+                var response = _mapper.Map<AttendanceDtoResponse>(reloaded);
 
-                if (full?.AccessPointExit != null)
-                    response.AccessPointOfExitName = full.AccessPointExit.Name;
-
-                // Cargar nombre del evento
-                if (full?.EventId != null)
-                {
-                    var ev = full.AccessPointEntry?.EventAccessPoints
-                        ?.Select(eap => eap.Event?.Name)
-                        ?.FirstOrDefault();
-
-                    if (!string.IsNullOrEmpty(ev))
-                        response.EventName = ev;
-                }
+                await _notificationBusiness.SendTemplateAsync(
+                    NotificationTemplateType.AttendanceExit,
+                    response.TimeOfEntry,      // args[0]
+                    reloaded.EventName,           // args[1]
+                    reloaded.AccessPointOfEntryName      // args[2]
+                );
 
                 response.Success = true;
                 response.Message = "Salida registrada correctamente.";
@@ -295,39 +306,50 @@ namespace Business.Implementations.Operational
             }
         }
 
+
         public async Task<(IList<AttendanceDtoResponse> Items, int Total)> SearchAsync(
             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
             string? sortBy, string? sortDir, int page, int pageSize,
             CancellationToken ct = default)
         {
+            // 1️⃣ Obtener entidades desde Data
             var (entities, total) = await _attendanceData.QueryAsync(
                 personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize, ct);
 
-            var list = entities.Select(e => _mapper.Map<AttendanceDtoResponse>(e)).ToList();
+            // 2️⃣ Mapear DTOs
+            var list = entities
+                .Select(e => _mapper.Map<AttendanceDtoResponse>(e))
+                .ToList();
 
-            foreach (var it in list)
+            // 3️⃣ Completar propiedades calculadas
+            foreach (var dto in list)
             {
-                it.TimeOfEntryStr = it.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
-                if (it.TimeOfExit.HasValue)
-                    it.TimeOfExitStr = it.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
+                var entity = entities.First(e => e.Id == dto.Id);
 
-                var entity = entities.FirstOrDefault(e => e.Id == it.Id);
-                if (entity != null)
-                {
-                    var evFromEntry = entity.AccessPointEntry?.EventAccessPoints
-                        .Select(eap => eap.Event?.Name)
-                        .FirstOrDefault();
+                // Formato fechas
+                dto.TimeOfEntryStr = dto.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
 
-                    var evFromExit = entity.AccessPointExit?.EventAccessPoints
-                        .Select(eap => eap.Event?.Name)
-                        .FirstOrDefault();
+                if (dto.TimeOfExit.HasValue)
+                    dto.TimeOfExitStr = dto.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
 
-                    it.EventName = evFromEntry ?? evFromExit;
-                }
+                // Nombre del evento REAL tomando EventAccessPointEntry
+                var eventNameFromEntry = entity.EventAccessPointEntry?
+                    .Event?
+                    .Name;
+
+                // Nombre del evento desde EventAccessPointExit (si hubo salida)
+                var eventNameFromExit = entity.EventAccessPointExit?
+                    .Event?
+                    .Name;
+
+                // Asignación final
+                dto.EventName = eventNameFromEntry ?? eventNameFromExit;
+                dto.EventId = entity.EventAccessPointEntry?.EventId;
             }
 
             return (list, total);
         }
+
 
         public async Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default)
         {
@@ -340,5 +362,19 @@ namespace Business.Implementations.Operational
             return await Task.Run(() =>
                 ExportHelper.ExportAttendancesToExcel(data, "Asistencias"), ct);
         }
+
+        /// <summary>
+        /// Resuelve el EventAccessPointId usando el qrKey del QR.
+        /// </summary>
+        private async Task<int> ResolveEventAccessPointIdAsync(string qrKey)
+        {
+            var ap = await _eventAccessPointBusiness.GetByQrKey(qrKey);
+
+            if (ap == null)
+                throw new Exception("QR inválido o no registrado.");
+
+            return ap.Id;
+        }
+
     }
 }

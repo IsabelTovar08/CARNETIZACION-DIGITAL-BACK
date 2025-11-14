@@ -19,6 +19,11 @@ namespace Data.Implementations.Operational
         {
         }
 
+        public override Task<EventAccessPoint> SaveAsync(EventAccessPoint entity)
+        {
+            entity.QrCodeKey = Guid.NewGuid().ToString();
+            return base.SaveAsync(entity);
+        }
         public async override Task<IEnumerable<EventAccessPoint>> GetAllAsync()
         {
             return await _context.Set<EventAccessPoint>()
@@ -26,5 +31,15 @@ namespace Data.Implementations.Operational
                 .Include(x => x.Event)
                 .ToListAsync();
         }
+        /// <summary>
+        /// Obtiene un EventAccessPoint usando el QrCodeKey.
+        /// </summary>
+        public async Task<EventAccessPoint?> GetByQrKeyAsync(string qrKey)
+        {
+            return await _context.EventAccessPoints
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.QrCodeKey == qrKey && !x.IsDeleted);
+        }
+
     }
 }

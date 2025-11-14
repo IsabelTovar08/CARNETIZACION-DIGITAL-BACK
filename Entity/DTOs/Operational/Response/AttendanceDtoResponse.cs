@@ -14,25 +14,17 @@ namespace Entity.DTOs.Operational.Response
         public string? TimeOfEntryStr { get; set; }
         public string? TimeOfExitStr { get; set; }
 
-        public int? AccessPointOfEntry { get; set; }
+        public int? AccessPointEntryId { get; set; }
         public string? AccessPointOfEntryName { get; set; }
 
-        public int? AccessPointOfExit { get; set; }
+        public int? AccessPointExitId { get; set; }
         public string? AccessPointOfExitName { get; set; }
+        public int EventAccessPointEntryId { get; set; }
+        public int? EventAccessPointExitId { get; set; }
 
         public int? EventId { get; set; }
 
         public string? EventName { get; set; }
-
-        /// <summary>
-        /// Alias para compatibilidad con reportes
-        /// Usa internamente PersonFullName
-        /// </summary>
-        public string? PersonName
-        {
-            get => PersonFullName;
-            set => PersonFullName = value;
-        }
 
         /// <summary>
         /// Resultado de la operación

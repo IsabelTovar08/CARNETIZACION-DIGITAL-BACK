@@ -14,6 +14,9 @@ namespace Business.Interfaces.Operational
 {
     public interface IEventAccessPointBusiness : IBaseBusiness<EventAccessPoint, EventAccessPointDtoRequest, EventAccessPointDto>
     {
-
+        /// <summary>
+        /// Obtiene un EventAccessPoint por su QrCodeKey.
+        /// </summary>
+        Task<EventAccessPoint?> GetByQrKey(string qrKey);
     }
 }

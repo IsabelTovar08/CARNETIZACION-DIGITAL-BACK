@@ -15,5 +15,9 @@ namespace Entity.Models.Operational
 
         public int AccessPointId { get; set; }
         public AccessPoint AccessPoint { get; set; } = default!;
+
+        public List<Attendance>? AttendancesEntry { get; set; }
+        public List<Attendance>? AttendancesExit { get; set; }
+        public string? QrCodeKey { get; set; }
     }
 }
