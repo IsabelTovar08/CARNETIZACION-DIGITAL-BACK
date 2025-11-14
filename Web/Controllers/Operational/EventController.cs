@@ -6,7 +6,7 @@ using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Responses;
 using Web.Controllers.Base;
-using Entity.DTOs.Specifics;   // ✅ AGREGADO PARA QUE FUNCIONE EventFilterDto
+using Entity.DTOs.Specifics;   
 
 namespace Web.Controllers.Operational
 {

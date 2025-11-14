@@ -368,8 +368,8 @@ namespace Utilities.Helper
 
             // ENTIDAD -> DTO
             CreateMap<AccessPoint, AccessPointDtoResponsee>()
-             //.ForMember(d => d.EventId, opt => opt.MapFrom(s =>s.EventAccessPointsEntry.Select(eap => eap.EventId).FirstOrDefault()))
-             //.ForMember(d => d.EventName, opt => opt.MapFrom(s => s.EventAccessPointsExit.Select(eap => eap.Event.Name).FirstOrDefault()))
+             .ForMember(d => d.EventId, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()))
+             .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()))
              .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null));
 
 

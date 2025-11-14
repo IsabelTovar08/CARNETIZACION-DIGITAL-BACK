@@ -31,6 +31,17 @@ namespace Data.Implementations.Operational
                 .Include(x => x.Event)
                 .ToListAsync();
         }
+
+        public async Task<bool> ExistsDuplicateAsync(int eventId, int accessPointId)
+        {
+            return await _context.EventAccessPoints
+                .AsNoTracking()
+                .AnyAsync(x =>
+                    x.EventId == eventId &&
+                    x.AccessPointId == accessPointId &&
+                    !x.IsDeleted);
+        }
+
         /// <summary>
         /// Obtiene un EventAccessPoint usando el QrCodeKey.
         /// </summary>

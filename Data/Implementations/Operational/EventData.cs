@@ -60,11 +60,17 @@ namespace Data.Implementations.Operational
         /// <returns></returns>
         public async Task<List<Event>> GetAllEventsWithDetailsAsync()
         {
-            return await _context.Set<Event>()
+          
+               var ev = await _context.Set<Event>()
+
                 .AsSplitQuery()
                 .Include(e => e.EventType)
-                .Include(e => e.Status)
                 .Include(e => e.Schedule)
+                .Include(e => e.Status)
+
+               .Include(e => e.EventAccessPoints)
+                    .ThenInclude(eap => eap.AccessPoint)
+                        .ThenInclude(ap => ap.AccessPointType)
 
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.Profile)
@@ -76,6 +82,8 @@ namespace Data.Implementations.Operational
                     .ThenInclude(a => a.InternalDivision)
 
                 .ToListAsync();
+
+            return ev;
         }
 
 
