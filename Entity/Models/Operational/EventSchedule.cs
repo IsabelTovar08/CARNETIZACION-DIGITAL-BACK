@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Entity.Models.Operational
 {
-    public class EventSchedule : GenericModel
+    public class EventSchedule : BaseModel
     {
         public int EventId { get; set; }
         public Event Event { get; set; }

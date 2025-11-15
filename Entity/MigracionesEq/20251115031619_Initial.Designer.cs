@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Entity.MigracionesEq
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251115024013_Initial")]
+    [Migration("20251115031619_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -1030,10 +1030,6 @@ namespace Entity.MigracionesEq
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1051,7 +1047,6 @@ namespace Entity.MigracionesEq
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Id = 0,
                             IsDeleted = false,
-                            Name = "EventSchedule 1-1",
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
@@ -1061,7 +1056,6 @@ namespace Entity.MigracionesEq
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Id = 0,
                             IsDeleted = false,
-                            Name = "EventSchedule 1-2",
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
@@ -1071,7 +1065,6 @@ namespace Entity.MigracionesEq
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Id = 0,
                             IsDeleted = false,
-                            Name = "EventSchedule 2-3",
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });

@@ -29,9 +29,9 @@ namespace Entity.DataInit.Operational
 
             
             builder.HasData(
-                 new EventSchedule { EventId = 1, ScheduleId = 1, Name = "EventSchedule 1-1" },
-                 new EventSchedule { EventId = 1, ScheduleId = 2, Name = "EventSchedule 1-2" },
-                 new EventSchedule { EventId = 2, ScheduleId = 3, Name = "EventSchedule 2-3" }
+                 new EventSchedule { EventId = 1, ScheduleId = 1 },
+                 new EventSchedule { EventId = 1, ScheduleId = 2 },
+                 new EventSchedule { EventId = 2, ScheduleId = 3}
              );
 
         }

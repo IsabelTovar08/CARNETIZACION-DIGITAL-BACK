@@ -477,8 +477,7 @@ namespace Entity.MigracionesEq
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1477,12 +1476,12 @@ namespace Entity.MigracionesEq
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "EventSchedules",
-                columns: new[] { "EventId", "ScheduleId", "Code", "CreateAt", "Id", "IsDeleted", "Name", "UpdateAt" },
+                columns: new[] { "EventId", "ScheduleId", "Code", "CreateAt", "Id", "IsDeleted", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, "EventSchedule 1-1", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, "EventSchedule 1-2", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, "EventSchedule 2-3", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
