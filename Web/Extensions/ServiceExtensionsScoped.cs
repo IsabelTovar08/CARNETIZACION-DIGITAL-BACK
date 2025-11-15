@@ -250,6 +250,10 @@ namespace Web.Extensions
             services.AddScoped<IUserVerificationService, UserVerificationService>();
 
 
+            //EventSchedule
+            services.AddScoped<IEventScheduleData, EventScheduleData>();
+            services.AddScoped<IEventScheduleBusiness, EventScheduleBusiness>();
+
 
             //Enums
             services.AddScoped<IEnumCatalogService, EnumCatalogService>();

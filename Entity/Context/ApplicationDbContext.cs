@@ -89,6 +89,7 @@ namespace Entity.Context
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<AccessPoint> AccessPoints { get; set; }
         public DbSet<EventAccessPoint> EventAccessPoints { get; set; }
+        public DbSet<EventSchedule> EventSchedules { get; set; }
 
         //Others
         public DbSet<Status> Statuses { get; set; }
@@ -135,7 +136,7 @@ namespace Entity.Context
 
             configurationBuilder
         .Properties<DateTime>()
-        .HaveConversion<DateTimeToUtcConverter>()   // 👈 usamos un conversor genérico
+        .HaveConversion<DateTimeToUtcConverter>()   //usamos un conversor genérico
         .HaveColumnType("timestamp with time zone");
 
 

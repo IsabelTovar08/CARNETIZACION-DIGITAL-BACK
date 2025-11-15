@@ -38,9 +38,12 @@ namespace Entity.DTOs.Operational.Request
         public int StatusId { get; set; }
         //public List<string>? Days { get; set; }
 
+        [Required(ErrorMessage = "Debe seleccionar al menos una jornada.")]
+        public List<int> ScheduleIds { get; set; } = new();
         public List<int>? AccessPoints { get; set; } = new();
         public List<int>? ProfileIds { get; set; } = new();
         public List<int>? OrganizationalUnitIds { get; set; } = new();
         public List<int>? InternalDivisionIds { get; set; } = new();
+
     }
 }

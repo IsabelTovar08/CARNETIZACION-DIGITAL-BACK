@@ -1007,6 +1007,72 @@ namespace Entity.MigracionesEq
                         });
                 });
 
+            modelBuilder.Entity("Entity.Models.Operational.EventSchedule", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("EventId", "ScheduleId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("EventSchedules", "Operational");
+
+                    b.HasData(
+                        new
+                        {
+                            EventId = 1,
+                            ScheduleId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 0,
+                            IsDeleted = false,
+                            Name = "EventSchedule 1-1",
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            EventId = 1,
+                            ScheduleId = 2,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 0,
+                            IsDeleted = false,
+                            Name = "EventSchedule 1-2",
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            EventId = 2,
+                            ScheduleId = 3,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 0,
+                            IsDeleted = false,
+                            Name = "EventSchedule 2-3",
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
+                });
+
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
                 {
                     b.Property<int>("Id")
@@ -1491,9 +1557,6 @@ namespace Entity.MigracionesEq
                     b.Property<string>("QrCodeBase64")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ScheduleId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("StatusId")
                         .HasColumnType("integer");
 
@@ -1503,8 +1566,6 @@ namespace Entity.MigracionesEq
                     b.HasKey("Id");
 
                     b.HasIndex("EventTypeId");
-
-                    b.HasIndex("ScheduleId");
 
                     b.HasIndex("StatusId");
 
@@ -3593,6 +3654,25 @@ namespace Entity.MigracionesEq
                     b.Navigation("Event");
                 });
 
+            modelBuilder.Entity("Entity.Models.Operational.EventSchedule", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.Event", "Event")
+                        .WithMany("EventSchedules")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Schedule")
+                        .WithMany("EventSchedules")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Schedule");
+                });
+
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
                 {
                     b.HasOne("Entity.Models.Parameter.CustomType", "AccessPointType")
@@ -3705,10 +3785,6 @@ namespace Entity.MigracionesEq
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Schedule")
-                        .WithMany()
-                        .HasForeignKey("ScheduleId");
-
                     b.HasOne("Entity.Models.Parameter.Status", "Status")
                         .WithMany("Events")
                         .HasForeignKey("StatusId")
@@ -3716,8 +3792,6 @@ namespace Entity.MigracionesEq
                         .IsRequired();
 
                     b.Navigation("EventType");
-
-                    b.Navigation("Schedule");
 
                     b.Navigation("Status");
                 });
@@ -3962,6 +4036,8 @@ namespace Entity.MigracionesEq
                 {
                     b.Navigation("EventAccessPoints");
 
+                    b.Navigation("EventSchedules");
+
                     b.Navigation("EventTargetAudiences");
                 });
 
@@ -3997,6 +4073,11 @@ namespace Entity.MigracionesEq
                     b.Navigation("InternalDivissions");
 
                     b.Navigation("OrganizationalUnitBranches");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Structure.Schedule", b =>
+                {
+                    b.Navigation("EventSchedules");
                 });
 
             modelBuilder.Entity("Entity.Models.Parameter.CustomType", b =>
