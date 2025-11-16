@@ -185,9 +185,9 @@ namespace Business.Implementations.Operational
                     await _audienceRepo.BulkInsertAsync(audiences);
 
                 // 5️⃣ NUEVO: Registrar jornadas (Schedules)
-                if (dto.Event.ScheduleIds != null && dto.Event.ScheduleIds.Any())
+                if (dto.ScheduleIds != null && dto.ScheduleIds.Any())
                 {
-                    var scheduleLinks = dto.Event.ScheduleIds.Select(sid => new EventSchedule
+                    var scheduleLinks = dto.ScheduleIds.Select(sid => new EventSchedule
                     {
                         EventId = savedEvent.Id,
                         ScheduleId = sid
