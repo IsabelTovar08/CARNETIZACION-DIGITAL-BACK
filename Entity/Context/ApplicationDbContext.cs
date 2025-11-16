@@ -101,6 +101,9 @@ namespace Entity.Context
 
         public DbSet<CardTemplate> CardTemplates { get; set; }
 
+        public DbSet<ModificationRequest> modificationRequests { get; set; }
+
+
         /// <summary>
         /// Configura los modelos de la base de datos aplicando configuraciones desde ensamblados.
         /// </summary>

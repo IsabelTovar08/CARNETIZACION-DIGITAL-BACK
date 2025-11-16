@@ -57,7 +57,7 @@ namespace Business.Implementations.Operational
             try
             {
                 string payload = $"AP:{created.Id}|EVENT:{created.EventId}|DATE:{DateTime.UtcNow:O}";
-                created.QrCode = QrCodeHelper.ToPngBase64(payload);
+                created.QrCodeKey = QrCodeHelper.ToPngBase64(payload);
 
                 AccessPointDtoRequest updateRequest = _mapper.Map<AccessPointDtoRequest>(created);
                 await Update(updateRequest);
@@ -109,7 +109,7 @@ namespace Business.Implementations.Operational
                 {
                     PersonId = personId,
                     TimeOfEntry = DateTime.UtcNow,
-                    AccessPointOfEntry = null
+                    EventAccessPointEntryId = null
                 };
 
                 var entity = _mapper.Map<Attendance>(attendance);

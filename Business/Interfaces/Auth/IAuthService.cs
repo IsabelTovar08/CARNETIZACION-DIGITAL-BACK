@@ -16,5 +16,6 @@ namespace Business.Interfaces.Auth
 
         Task<string?> RequestPasswordResetAsync(string email);
         Task<bool> ResetPasswordAsync(string email, string token, string newPassword);
+        Task NotifyLogin(string userName);
     }
 }

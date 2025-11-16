@@ -102,5 +102,23 @@ namespace Utilities.Helpers.Excel
                        col >= tl.ColumnNumber && col <= br.ColumnNumber;
             });
         }
+
+        /// <summary>
+        /// Verifica si existe una imagen asociada a la celda indicada.
+        /// </summary>
+        /// <param name="ws">Hoja de Excel.</param>
+        /// <param name="row">Número de fila.</param>
+        /// <param name="col">Número de columna.</param>
+        /// <returns>True si la celda contiene una imagen; false en caso contrario.</returns>
+        public bool HasPictureAtCell(IXLWorksheet ws, int row, int col)
+        {
+            var cell = ws.Cell(row, col);
+            var cellAddress = cell.Address.ToString();
+
+            // Busca si hay imágenes que se superpongan con la celda
+            return ws.Pictures.Any(p =>
+                p.TopLeftCell.Address.ToString() == cellAddress ||
+                p.BottomRightCell.Address.ToString() == cellAddress);
+        }
     }
 }

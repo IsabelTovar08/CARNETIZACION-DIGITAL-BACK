@@ -217,7 +217,7 @@ namespace Web.Extensions
 
             //Card
             services.AddScoped<ICardConfigurationData, CardConfigurationData>();
-            services.AddScoped<ICardBusiness, CardBusiness>();
+            services.AddScoped<ICardConfigurationBusiness, CardConfigurationBusiness>();
 
             //Card Templates
             services.AddScoped<ICardTemplateData, CardTemplateData>();
@@ -285,6 +285,17 @@ namespace Web.Extensions
             services.AddScoped<IExportService, ExportService>();
 
             services.AddHttpClient<ICardPdfService, CardPdfService>();
+            services.AddHttpClient<ICardPdfService, CardPdfService>()
+            .ConfigureHttpClient(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(20);
+                client.DefaultRequestHeaders.Add("User-Agent", "CardPdfService");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AllowAutoRedirect = true,
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+            });
 
 
 

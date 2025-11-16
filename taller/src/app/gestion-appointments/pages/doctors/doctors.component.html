@@ -1,0 +1,16 @@
+<app-toolbar-section
+  title="Doctores"
+  addLabel="Agregar"
+  addSubtitle="nuevo"
+  [data]="dataSource"
+  [searchFields]="['fullName', 'specialtyName', 'emailDoctor']"
+  (onAdd)="crear()"
+  (filteredData)="dataSourceFiltered = $event">
+</app-toolbar-section>
+
+<app-generic-table
+  [dataSource]="dataSourceFiltered"
+  [columns]="columns"
+  [columnDefs]="columnDefs"
+  (actionClicked)="onAction($event)">
+</app-generic-table>

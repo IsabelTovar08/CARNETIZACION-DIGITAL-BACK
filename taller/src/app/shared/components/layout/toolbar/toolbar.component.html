@@ -1,0 +1,22 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <!-- Botón de menú -->
+  <button
+    mat-icon-button
+    class="menu-button"
+    (click)="onToggleMenu()"
+    aria-label="Toggle menu"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="toolbar-title">Gestión de Citas</span>
+
+  <span class="spacer"></span>
+
+  <!-- 🔹 Botón de cerrar sesión -->
+  <button mat-icon-button aria-label="Cerrar sesión" (click)="onLogout()">
+    <mat-icon>logout</mat-icon>
+  </button>
+
+
+</mat-toolbar>

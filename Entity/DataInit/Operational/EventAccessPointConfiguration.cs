@@ -14,19 +14,32 @@ namespace Entity.DataInit.Operational
             // Usa Id como clave principal (ya lo tienes en BaseModel)
             builder.HasKey(eap => eap.Id);
 
-            //  Relación con Event
+            // 🔹 Relación: EventAccessPoint tiene 1 Event
             builder.HasOne(eap => eap.Event)
                    .WithMany(e => e.EventAccessPoints)
                    .HasForeignKey(eap => eap.EventId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
-            //Relación con AccessPoint
+            // 🔹 Relación: EventAccessPoint tiene 1 AccessPoint
             builder.HasOne(eap => eap.AccessPoint)
                    .WithMany(ap => ap.EventAccessPoints)
                    .HasForeignKey(eap => eap.AccessPointId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-         
+            // 🔹 Relación inversa entrada
+            builder.HasMany(eap => eap.AttendancesEntry)
+                   .WithOne(a => a.EventAccessPointEntry)
+                   .HasForeignKey(a => a.EventAccessPointEntryId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔹 Relación inversa salida
+            builder.HasMany(eap => eap.AttendancesExit)
+                   .WithOne(a => a.EventAccessPointExit)
+                   .HasForeignKey(a => a.EventAccessPointExitId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+
+
             builder.HasData(
                 new EventAccessPoint
                 {

@@ -9,7 +9,7 @@ namespace Utilities.Enums.Specifics
 {
     public enum NotificationType
     {
-        [EnumDisplayEx("Sistema ")]
+        [EnumDisplayEx("Sistema")]
         System = 1,
 
         [EnumDisplayEx("Recordatorio")]

@@ -1,0 +1,64 @@
+/* 🔹 Fondo cielo con animación */
+.login-background {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(to top, #a2d9ff 0%, #e3f2fd 100%);
+  overflow: hidden;
+}
+
+/* 🔹 Nubes animadas con pseudo-elementos */
+.clouds::before,
+.clouds::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: url("https://i.imgur.com/BG1JzvG.png") repeat-x; /* Imagen de nubes suaves */
+  opacity: 0.4;
+  animation: moveClouds 60s linear infinite;
+  background-size: contain;
+}
+
+/* 🔹 Segunda capa para más profundidad */
+.clouds::after {
+  opacity: 0.6;
+  animation-duration: 120s;
+  background-size: cover;
+}
+
+/* 🔹 Animación flotante */
+@keyframes moveClouds {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+/* 🔹 Tarjeta con efecto “glass” */
+.glass-card {
+  position: relative;
+  z-index: 2;
+  max-width: 400px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(25, 118, 210, 0.3);
+}
+
+/* 🔹 Ajustes responsivos */
+@media (max-width: 768px) {
+  .glass-card {
+    margin: 0 1rem;
+  }
+}

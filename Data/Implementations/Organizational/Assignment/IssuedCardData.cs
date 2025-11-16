@@ -7,11 +7,12 @@ using Data.Classes.Base;
 using Data.Interfases.Organizational.Assignment;
 using Entity.Context;
 using Entity.DTOs.Organizational.Assigment.Request;
+using Entity.DTOs.Specifics;
 using Entity.DTOs.Specifics.Cards;
-using Entity.Models.Operational;
 using Entity.Models.Organizational.Assignment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static Utilities.Helpers.BarcodeHelper;
 
 namespace Data.Implementations.Organizational.Assignment
 {
@@ -32,6 +33,9 @@ namespace Data.Implementations.Organizational.Assignment
                 .Include(c => c.Card)
                 .Include(c => c.Status)
                 .ToListAsync();
+
+
+            var prueba = await GetCardDataByIssuedIdAsync(1);
             return cards;
         }
 
@@ -50,16 +54,33 @@ namespace Data.Implementations.Organizational.Assignment
         }
 
 
-        public override Task<IssuedCard> SaveAsync(IssuedCard entity)
+        /// <summary>
+        /// Guarda un carnet garantizando:
+        /// - Si no hay ninguno seleccionado, este se vuelve seleccionado.
+        /// - Si ya hay uno seleccionado, este se crea con IsCurrentlySelected = false.
+        /// </summary>
+        public override async Task<IssuedCard> SaveAsync(IssuedCard entity)
         {
-            //entity.QRCode = "123";
-            //entity.UniqueId = new Guid();
-            return base.SaveAsync(entity);
+            // Obtener si existe algún carnet seleccionado de esta persona
+            bool alreadySelected = await _context.IssuedCards
+                .AnyAsync(c => c.PersonId == entity.PersonId && c.IsCurrentlySelected);
+
+            if (!alreadySelected)
+            {
+                // Si no hay seleccionado → este se vuelve el seleccionado
+                entity.IsCurrentlySelected = true;
+            }
+            else
+            {
+                // Si ya existe uno seleccionado → este NO puede quedar seleccionado
+                entity.IsCurrentlySelected = false;
+            }
+
+            // Guardar normalmente
+            return await base.SaveAsync(entity);
         }
 
-        /// <summary>
-        /// Consulta la información completa del carnet, incluyendo organización y sucursal (vía OrganizationalUnitBranch).
-        /// </summary>
+        /// </<inheritdoc/>>
         public async Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId)
         {
             var issuedCard = await _context.IssuedCards
@@ -68,10 +89,13 @@ namespace Data.Implementations.Organizational.Assignment
                     .ThenInclude(c => c.CardTemplate)
                 .Include(x => x.Profile)
                 .Include(x => x.InternalDivision)
+                    .ThenInclude(d => d.AreaCategory)
+                .Include(x => x.InternalDivision)
                     .ThenInclude(d => d.OrganizationalUnit)
                         .ThenInclude(u => u.OrganizationalUnitBranches)
                             .ThenInclude(oub => oub.Branch)
                                 .ThenInclude(b => b.Organization)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == issuedCardId);
 
             if (issuedCard == null)
@@ -80,35 +104,129 @@ namespace Data.Implementations.Organizational.Assignment
             var division = issuedCard.InternalDivision;
             var unit = division?.OrganizationalUnit;
 
-            // 🔹 Obtener la primera relación con Branch
             var orgUnitBranch = unit?.OrganizationalUnitBranches?.FirstOrDefault();
             var branch = orgUnitBranch?.Branch;
             var org = branch?.Organization;
 
+            // Logo Base64 limpio
+            string base64Logo = CleanBase64Logo(org?.Logo);
+
             return new CardUserData
             {
-                // 🔸 Datos personales
-                Name = $"{issuedCard.Person?.FirstName} {issuedCard.Person?.LastName}".Trim(),
+                // Datos personales
+                Name = $"{issuedCard.Person?.FirstName} {issuedCard.Person?.MiddleName} {issuedCard.Person?.LastName} {issuedCard.Person?.SecondLastName} ".Trim(),
                 Email = issuedCard.Person?.Email ?? string.Empty,
                 PhoneNumber = issuedCard.Person?.Phone ?? string.Empty,
+                DocumentNumber = issuedCard.Person?.DocumentNumber ?? string.Empty,
+                //BloodTypeValue = issuedCard.Person?.BloodType.ToString() ?? string.Empty,
 
-                // 🔸 Datos organizacionales
+                // Datos organizacionales
                 CompanyName = org?.Name ?? "Sin organización",
                 BranchName = branch?.Name ?? "Sin sucursal",
                 BranchAddress = branch?.Address ?? "Sin dirección",
-                //BranchPhone = branch?.Phone ?? string.Empty,
-                //BranchEmail = branch?.Email ?? string.Empty,
+                BranchPhone = branch?.Phone ?? string.Empty,
+                BranchEmail = branch?.Email ?? string.Empty,
+                CategoryArea = division?.AreaCategory?.Name ?? string.Empty,
 
-                // 🔸 Datos del carnet
+                // Datos del carnet
                 CardId = issuedCard.UniqueId.ToString(),
                 Profile = issuedCard.Profile?.Name ?? "Sin perfil",
-                CategoryArea = division?.Name ?? "Sin división",
+                InternalDivisionName = division?.Name ?? "N/A",
+                OrganizationalUnit = unit?.Name ?? "N/A",
                 UserPhotoUrl = issuedCard.Person?.PhotoUrl ?? string.Empty,
-                LogoUrl = org?.Logo ?? "https://carnetgo.com/logo.png",
+
+                // Aquí queda el Base64 limpio del logo
+                LogoUrl = base64Logo,
+
                 QrUrl = issuedCard.QRCode,
-                UniqueId = issuedCard.UniqueId
+                UniqueId = issuedCard.UniqueId,
+                FrontTemplateUrl = issuedCard.Card.CardTemplate.FrontBackgroundUrl,
+                BackTemplateUrl = issuedCard.Card.CardTemplate.BackBackgroundUrl,
+                ValidFrom = issuedCard.Card.ValidFrom,
+                ValidUntil = issuedCard.Card.ValidTo,
+                IssuedDate = issuedCard.Card.CreateAt
             };
         }
 
+        ///// <summary>
+        ///// Carnets emitidos agrupados por Unidad Organizativa.
+        ///// </summary>
+        public async Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync()
+            {
+                return await _context.OrganizationalUnits
+                    .GroupJoin(
+                        _context.IssuedCards.Where(c => !c.IsDeleted),
+                        u => u.Id,
+                        c => c.InternalDivision.OrganizationalUnitId,
+                        (unidad, carnets) => new CarnetsByUnitDto
+                        {
+                            UnidadOrganizativaId = unidad.Id,
+                            UnidadOrganizativa = unidad.Name,
+                            TotalCarnets = carnets.Count()
+                        }
+                    )
+                    .OrderByDescending(x => x.TotalCarnets)
+                    .ToListAsync();
+            }
+
+        /// <summary>
+        /// Retorna carnets emitidos agrupados por División Interna
+        /// de una Unidad Organizativa específica.
+        /// </summary>
+        public async Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId)
+        {
+            return await _context.IssuedCards
+                .Where(c => !c.IsDeleted &&
+                            c.InternalDivision.OrganizationalUnitId == organizationalUnitId)
+                .GroupBy(c => c.InternalDivision.Name)
+                .Select(g => new CarnetsByDivisionDto
+                {
+                    DivisionInterna = g.Key,
+                    TotalCarnets = g.Count()
+                })
+                .OrderByDescending(x => x.TotalCarnets)
+                .ToListAsync();
+        }
+
+
+        ///// <summary>
+        ///// Carnets emitidos agrupados por Jornada (usando Schedule en CardConfiguration).
+        ///// </summary>
+        public async Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync()
+        {
+            return await _context.IssuedCards
+                .Where(c => !c.IsDeleted)
+                .GroupBy(c => c.Card.SheduleId)
+                .Select(g => new CarnetsBySheduleDto
+                {
+                    Jornada = g.Key.ToString(),
+                    TotalCarnets = g.Count()
+                })
+                .OrderByDescending(x => x.TotalCarnets)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Retorna el total de carnets que no están eliminados lógicamente
+        /// </summary>
+        /// <returns>Total de carnets</returns>
+        public async Task<int> GetTotalNumberOfIDCardsAsync()
+        {
+            try
+            {
+                // Contar los registros en la tabla CardConfiguration donde IsDeleted sea false
+                var total = await _context.Set<IssuedCard>()
+                    .Where(c => !c.IsDeleted)
+                    .CountAsync();
+
+                return total;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el total de carnets");
+                throw;
+            }
+        }
     }
+
 }

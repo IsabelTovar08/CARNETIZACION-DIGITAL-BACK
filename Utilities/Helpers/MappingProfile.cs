@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using AutoMapper;
+using DocumentFormat.OpenXml.Drawing;
 using Entity.DTOs;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
@@ -132,9 +133,8 @@ namespace Utilities.Helper
             .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
         s.UserRoles
          .SelectMany(ur => ur.Rol.RolFormPermissions.Select(rp => rp.Permission))
-         .DistinctBy(p => p.Id)))
-            .ForMember(d => d.CurrentProfile, opt => opt.MapFrom(s =>
-                s.Person.IssuedCard.FirstOrDefault(p => p.IsCurrentlySelected)));
+         .DistinctBy(p => p.Id)));
+           
 
             //Mapeo de la entidad UserROl
             CreateMap<UserRoles, UserRolDto>()
@@ -254,7 +254,7 @@ namespace Utilities.Helper
             CreateMap<Organization, OrganizationDto>()
                 .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.OrganizaionType.Name))
                 .ReverseMap();
-            CreateMap<Organization, OrganizationDtoRequest>();
+            CreateMap<Organization, OrganizationDtoRequest>().ReverseMap();
 
             //Area Categoria
             CreateMap<AreaCategory, AreaCategoryDto>()
@@ -398,18 +398,16 @@ namespace Utilities.Helper
                 .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
                 .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
                 .ForMember(d => d.TypeId, o => o.MapFrom(s => s.TypeId))
-                .ForMember(d => d.QrCode, o => o.Ignore())
-                .ForMember(d => d.EventAccessPoints, o => o.Ignore());
+                .ForMember(d => d.QrCode, o => o.Ignore());
 
             CreateMap<AccessPoint, AccessPointDtoRequest>().ReverseMap();
 
             // ENTIDAD -> DTO
             CreateMap<AccessPoint, AccessPointDtoResponsee>()
-             .ForMember(d => d.EventId, opt => opt.MapFrom(s =>
-                 s.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()))
-             .ForMember(d => d.EventName, opt => opt.MapFrom(s =>
-                 s.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()))
-             .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null));
+             .ForMember(d => d.EventId, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()))
+             .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()))
+             .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null))
+             .ForMember(d => d.QrCodeKey, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.QrCodeKey).FirstOrDefault()));
 
 
             // DTO -> ENTIDAD
@@ -464,10 +462,7 @@ namespace Utilities.Helper
             //EventAccessPoint
 
             //Notifications
-            CreateMap<Notification, NotificationDto>()
-                .ForMember(d => d.NotificationTypeName,
-                    opt => opt.MapFrom(s => ((NotificationType)s.NotificationType).ToString())) 
-                .ReverseMap();
+            CreateMap<Notification, NotificationDto>().ReverseMap();
 
             CreateMap<Notification, NotificationDtoRequest>()
                 .ReverseMap();
@@ -483,60 +478,68 @@ namespace Utilities.Helper
                 .ReverseMap();
 
 
-            CreateMap<ModificationRequest, ModificationRequestDtoResponse>()
+            CreateMap<ModificationRequest, ModificationRequestResponseDto>()
             .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => (int)src.Field))
-            .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Field.GetDisplayName()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.GetDisplayName()))
+            .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => ((ModificationField)src.Field).GetDisplayName()))
+            .ForMember(dest => dest.ReasonId, opt => opt.MapFrom(src => (int)src.Reason))
+            .ForMember(dest => dest.ReasonName, opt => opt.MapFrom(src => ((ModificationReason)src.Reason).GetDisplayName()))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ((ModificationRequestStatus)src.Status).GetDisplayName()))
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => (src.User.Person.FirstName + " " + src.User.Person.MiddleName + " "+ src.User.Person.LastName + " " + src.User.Person.SecondLastName)))
+            .ForMember(dest => dest.UserIdentification, opt => opt.MapFrom(src => (src.User.Person.DocumentNumber)))
+
+
             .ReverseMap();
 
             // De Create DTO a Entity
-            CreateMap<ModificationRequestDtoRequest, ModificationRequest>()
-                .ForMember(dest => dest.RequestDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => ModificationRequestStatus.Pending))
-                .ReverseMap();
+            //CreateMap<ModificationRequestResponseDto, ModificationRequest>()
+            //    .ForMember(dest => dest.RequestDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
+            //    .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => ModificationRequestStatus.Pending))
+            //    .ReverseMap();
 
+            CreateMap<ModificationRequest, ModificationRequestDto>().ReverseMap();
             // Attendance
 
             CreateMap<Attendance, AttendanceDtoRequest>().ReverseMap();
 
             CreateMap<Attendance, AttendanceDtoResponse>()
-                .ForMember(dest => dest.PersonFullName,
-                    opt => opt.MapFrom(src => src.Person != null ? src.Person.FirstName + " " + src.Person.LastName : string.Empty))
-                .ForMember(dest => dest.AccessPointOfEntryName,
-                    opt => opt.MapFrom(src => src.AccessPointEntry != null ? src.AccessPointEntry.Name : null))
-                .ForMember(dest => dest.AccessPointOfExitName,
-                    opt => opt.MapFrom(src => src.AccessPointExit != null ? src.AccessPointExit.Name : null))
-                .ForMember(dest => dest.EventName,
-                    opt => opt.MapFrom(src =>
-                        src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
-                            ? src.AccessPointEntry.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
-                            : (
-                                src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
-                                    ? src.AccessPointExit.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
-                                    : null
-                            )
-                    ))
-                .ForMember(dest => dest.EventId,
-                    opt => opt.MapFrom(src =>
-                        src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
-                            ? src.AccessPointEntry.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()
-                            : (
-                                src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
-                                    ? src.AccessPointExit.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()
-                                    : (int?)null
-                            )
-                    ))
-                // ➕ Formateo de fechas a string (cultura es-CO). Sin helpers externos.
-                .ForMember(dest => dest.TimeOfEntryStr,
-                    opt => opt.MapFrom(src => src.TimeOfEntry.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))))
-                .ForMember(dest => dest.TimeOfExitStr,
-                    opt => opt.MapFrom(src => src.TimeOfExit.HasValue
-                        ? src.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))
-                        : null))
-                .ReverseMap()
-                    .ForMember(dest => dest.Person, opt => opt.Ignore())
-                    .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())
-                    .ForMember(dest => dest.AccessPointExit, opt => opt.Ignore());
+                .ForMember(dest => dest.PersonFullName, opt => opt.MapFrom(src => src.Person != null ? src.Person.FirstName + " " + src.Person.MiddleName + " " + src.Person.LastName + " " + src.Person.SecondLastName : string.Empty))
+                .ForMember(dest => dest.AccessPointEntryId, opt => opt.MapFrom(src => src.EventAccessPointEntry.AccessPoint.Id))
+                .ForMember(dest => dest.AccessPointExitId, opt => opt.MapFrom(src => src.EventAccessPointExit.AccessPoint.Id))
+                .ForMember(dest => dest.AccessPointOfEntryName, opt => opt.MapFrom(src =>  src.EventAccessPointEntry.AccessPoint.Name))
+                .ForMember(dest => dest.AccessPointOfExitName, opt => opt.MapFrom(src => src.EventAccessPointExit.AccessPoint.Name))
+                .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.EventAccessPointEntry.Event.Name));
+
+            //.ForMember(dest => dest.EventName,
+            //    opt => opt.MapFrom(src =>
+            //        src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
+            //            ? src.AccessPointEntry.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
+            //            : (
+            //                src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
+            //                    ? src.AccessPointExit.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()
+            //                    : null
+            //            )
+            //    ))
+            //.ForMember(dest => dest.EventId,
+            //    opt => opt.MapFrom(src =>
+            //        src.AccessPointEntry != null && src.AccessPointEntry.EventAccessPoints.Any()
+            //            ? src.AccessPointEntry.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()
+            //            : (
+            //                src.AccessPointExit != null && src.AccessPointExit.EventAccessPoints.Any()
+            //                    ? src.AccessPointExit.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()
+            //                    : (int?)null
+            //            )
+            //    ))
+            //// ➕ Formateo de fechas a string (cultura es-CO). Sin helpers externos.
+            //.ForMember(dest => dest.TimeOfEntryStr,
+            //    opt => opt.MapFrom(src => src.TimeOfEntry.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))))
+            //.ForMember(dest => dest.TimeOfExitStr,
+            //    opt => opt.MapFrom(src => src.TimeOfExit.HasValue
+            //        ? src.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm", new CultureInfo("es-CO"))
+            //        : null))
+            //.ReverseMap()
+            //    .ForMember(dest => dest.Person, opt => opt.Ignore())
+            //    .ForMember(dest => dest.AccessPointEntry, opt => opt.Ignore())
+            //    .ForMember(dest => dest.AccessPointExit, opt => opt.Ignore());
 
 
             CreateMap<User, UserProfileDto>()

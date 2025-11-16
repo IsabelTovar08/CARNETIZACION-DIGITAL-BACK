@@ -9,6 +9,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using Entity.Context;
 using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Specifics;
+using Entity.Models.Operational;
 using Entity.Models.Organizational.Assignment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,7 @@ namespace Data.Implementations.Organizational.Assignment
                 .Where(c => !c.IsDeleted)
                 .Include(c => c.CardTemplate)
                 .Include(c => c.Shedule)
+                .Include(c => c.CardTemplate)
                 .ToListAsync();
 
             return cards;
@@ -41,67 +43,7 @@ namespace Data.Implementations.Organizational.Assignment
         //    return base.SaveAsync(entity);
         //}
 
-        ///// <summary>
-        ///// Carnets emitidos agrupados por Unidad Organizativa.
-        ///// </summary>
-        //public async Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync()
-        //{
-        //    return await _context.OrganizationalUnits
-        //        .GroupJoin(
-        //            _context.CardsConfigurations.Where(c => !c.IsDeleted),
-        //            u => u.Id,
-        //            c => c.PersonDivisionProfile.InternalDivision.OrganizationalUnitId,
-        //            (unidad, carnets) => new CarnetsByUnitDto
-        //            {
-        //                UnidadOrganizativaId = unidad.Id,
-        //                UnidadOrganizativa = unidad.Name,
-        //                TotalCarnets = carnets.Count()
-        //            }
-        //        )
-        //        .OrderByDescending(x => x.TotalCarnets)
-        //        .ToListAsync();
-        //}
-
-        /// <summary>
-        /// Retorna carnets emitidos agrupados por División Interna
-        /// de una Unidad Organizativa específica.
-        /// </summary>
-        //public async Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId)
-        //{
-        //    return await _context.CardsConfigurations
-        //        .Where(c => !c.IsDeleted &&
-        //                    c.PersonDivisionProfile.InternalDivision.OrganizationalUnitId == organizationalUnitId)
-        //        .GroupBy(c => c.PersonDivisionProfile.InternalDivision.Name)
-        //        .Select(g => new CarnetsByDivisionDto
-        //        {
-        //            DivisionInterna = g.Key,
-        //            TotalCarnets = g.Count()
-        //        })
-        //        .OrderByDescending(x => x.TotalCarnets)
-        //        .ToListAsync();
-        //}
-
-
-        ///// <summary>
-        ///// Carnets emitidos agrupados por Jornada (usando Schedule en CardConfiguration).
-        ///// </summary>
-        //public async Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync()
-        //{
-        //    return await _context.CardsConfigurations
-        //        .Where(c => !c.IsDeleted)
-        //        .Include(c => c.PersonDivisionProfile)
-        //        .GroupBy(c => c.SheduleId) 
-        //        .Select(g => new CarnetsBySheduleDto
-        //        {
-        //            Jornada = g.Key.ToString(),
-        //            TotalCarnets = g.Count()
-        //        })
-        //        .OrderByDescending(x => x.TotalCarnets)
-        //        .ToListAsync();
-        //}
-
-
-
+        
 
         /// <summary>
         /// Retorna el total de carnets que no están eliminados lógicamente
@@ -122,6 +64,34 @@ namespace Data.Implementations.Organizational.Assignment
             {
                 _logger.LogError(ex, "Error al obtener el total de carnets");
                 throw;
+            }
+        }
+
+
+        /// /<inheritdoc/>
+        public async Task<CardTemplate> GetTemplateByCardConfigurationIdAsync(int cardConfigurationId)
+        {
+            try
+            {
+                var configuration = await _context.CardsConfigurations
+                    .Include(c => c.CardTemplate)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == cardConfigurationId && !c.IsDeleted);
+
+                if (configuration == null)
+                    throw new InvalidOperationException($"No se encontró el CardConfiguration con ID {cardConfigurationId}.");
+
+                return configuration.CardTemplate!;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Error controlado al obtener la plantilla por CardConfigurationId {CardConfigurationId}", cardConfigurationId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al consultar la plantilla asociada al CardConfigurationId {CardConfigurationId}", cardConfigurationId);
+                throw new InvalidOperationException("Ocurrió un error al consultar la plantilla del carnet.", ex);
             }
         }
 

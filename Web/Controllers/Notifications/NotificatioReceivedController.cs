@@ -1,6 +1,8 @@
-﻿using Business.Interfaces.Notifications;
+﻿using Business.Implementations.Operational;
+using Business.Interfaces.Notifications;
 using Entity.DTOs.Notifications;
 using Entity.Models.Notifications;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Web.Controllers.Base;
 
@@ -15,5 +17,16 @@ namespace Web.Controllers.Notifications
         {
             _business = business;
         }
+        /// <summary>
+        /// Marca una notificación como leída.
+        /// </summary>
+        [HttpPut("mark-as-read/{id:int}")]
+        public async Task<IActionResult> MarkAsRead(int id)
+        {
+            await _business.MarkAsReadAsync(id);
+            return Ok(new { message = "Notificación marcada como leída" });
+        }
+
+
     }
 }

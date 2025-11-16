@@ -1,11 +1,13 @@
 ﻿using System.Text.Json;
 using Business.Interfaces.Auth;
+using Business.Interfaces.Notifications;
 using Business.Interfaces.Security;
-using Data.Classes.Specifics;
 using Data.Interfases.Security;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs;
 using Entity.DTOs.Auth;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.Enums.Specifics;
 using Entity.Models;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.Extensions.Configuration;
@@ -25,27 +27,34 @@ namespace Business.Services.Auth
         private readonly IConfiguration _config;
         private readonly ILogger<AuthService> _logger;
         private readonly INotify _notificationSender;
+        private readonly INotificationBusiness _notificationBusiness;
 
 
-        public AuthService(UserService userService, IConfiguration config, ILogger<AuthService> logger, IUserData userData, INotify notificationSender)
+        public AuthService(UserService userService, IConfiguration config, ILogger<AuthService> logger, IUserData userData, INotify notificationSender, INotificationBusiness notificationBusiness)
         {
             _userService = userService;
             _config = config;
             _logger = logger;
             _userData = userData;
             _notificationSender = notificationSender;
+            _notificationBusiness = notificationBusiness;
         }
 
         public async Task<User> LoginAsync(LoginRequest loginRequest)
         {
             // Validar usuario
-            var user = await _userData.ValidateUserAsync(loginRequest.Email, loginRequest.Password);
+            User? user = await _userData.ValidateUserAsync(loginRequest.Email, loginRequest.Password);
             if (user == null)
                 throw new ValidationException("Credenciales inválidas");
 
-
             // Generar token
             return user;
+        }
+
+        public async Task NotifyLogin(string user)
+        {
+            await _notificationBusiness.SendTemplateAsync(NotificationTemplateType.Login, user);
+
         }
 
         // Cambiar contraseña validando la contraseña actual

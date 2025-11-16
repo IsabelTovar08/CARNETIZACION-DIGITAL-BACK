@@ -40,37 +40,37 @@ namespace Web.Controllers.Operational
         // =========================================================
         // ✅ REGISTRO AUTOMÁTICO DE ASISTENCIA POR QR DEL EVENTO
         // =========================================================
-        [HttpPost("register-by-qr")]
-        public async Task<IActionResult> RegisterByQr([FromBody] AttendanceDtoRequest dto)
-        {
-            if (dto == null || string.IsNullOrWhiteSpace(dto.QrCode) || dto.PersonId <= 0)
-                return BadRequest(new { success = false, message = "Debe incluir el QrCode válido y el PersonId." });
+        //[HttpPost("register-by-qr")]
+        //public async Task<IActionResult> RegisterByQr([FromBody] AttendanceDtoRequest dto)
+        //{
+        //    if (dto == null || dto.PersonId <= 0)
+        //        return BadRequest(new { success = false, message = "Debe incluir el QrCode válido y el PersonId." });
 
-            try
-            {
-                var result = await _attendanceBusiness.RegisterAttendanceByQrAsync(dto.QrCode, dto.PersonId);
+        //    try
+        //    {
+        //        var result = await _attendanceBusiness.RegisterAttendanceByQrAsync(dto.QrCode, dto.PersonId);
 
-                if (result == null || !result.Success)
-                    return BadRequest(new { success = false, message = result?.Message ?? "No se pudo registrar la asistencia." });
+        //        if (result == null || !result.Success)
+        //            return BadRequest(new { success = false, message = result?.Message ?? "No se pudo registrar la asistencia." });
 
-                return Ok(new
-                {
-                    success = true,
-                    message = result.Message,
-                    data = result
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al registrar asistencia mediante QR.");
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    success = false,
-                    message = "Error interno al registrar asistencia mediante QR.",
-                    error = ex.Message
-                });
-            }
-        }
+        //        return Ok(new
+        //        {
+        //            success = true,
+        //            message = result.Message,
+        //            data = result
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al registrar asistencia mediante QR.");
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new
+        //        {
+        //            success = false,
+        //            message = "Error interno al registrar asistencia mediante QR.",
+        //            error = ex.Message
+        //        });
+        //    }
+        //}
 
         // =========================================================
         // REGISTRO GENERAL DE ASISTENCIA (MÓVIL O MANUAL)
@@ -99,28 +99,7 @@ namespace Web.Controllers.Operational
 
             try
             {
-                var userId = _currentUser.UserId;
-                var person = await _personData.GetPersonByUserIdAsync(userId);
-                if (person == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "No se encontró la persona asociada al usuario autenticado."
-                    });
-                }
-
-                dto.PersonId = person.Id;
-
-                var safeDto = new AttendanceDtoRequestSpecific
-                {
-                    PersonId = dto.PersonId ?? 0,
-                    AccessPointId = dto.AccessPointId ?? 0,
-                    EventId = dto.EventId ?? 0,
-                    Time = dto.Time ?? DateTime.UtcNow
-                };
-
-                var result = await _attendanceBusiness.RegisterEntryAsync(safeDto);
+                AttendanceDtoResponse result = await _attendanceBusiness.RegisterEntryAsync(dto);
 
                 return Ok(new
                 {
@@ -141,9 +120,7 @@ namespace Web.Controllers.Operational
             }
         }
 
-        // =========================================================
-        // ✅ REGISTRO MANUAL DE SALIDA (con token → persona asociada)
-        // =========================================================
+        // REGISTRO DE SALIDA 
         [HttpPost("register-exit")]
         public async Task<IActionResult> RegisterExit([FromBody] AttendanceDtoRequestSpecific dto)
         {
@@ -152,34 +129,8 @@ namespace Web.Controllers.Operational
 
             try
             {
-                // 1️⃣ Obtener usuario actual desde el token
-                var userId = _currentUser.UserId;
-
-                // 2️⃣ Buscar persona asociada al usuario autenticado
-                var person = await _personData.GetPersonByUserIdAsync(userId);
-                if (person == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "No se encontró la persona asociada al usuario autenticado."
-                    });
-                }
-
-                // 3️⃣ Asignar automáticamente el PersonId
-                dto.PersonId = person.Id;
-
-                // 4️⃣ Asegurar nullables con valores válidos
-                var safeDto = new AttendanceDtoRequestSpecific
-                {
-                    PersonId = dto.PersonId ?? 0,
-                    AccessPointId = dto.AccessPointId ?? 0,
-                    EventId = dto.EventId ?? 0,
-                    Time = dto.Time ?? DateTime.UtcNow
-                };
-
                 // 5️⃣ Registrar la salida
-                var result = await _attendanceBusiness.RegisterExitAsync(safeDto);
+                var result = await _attendanceBusiness.RegisterExitAsync(dto);
 
                 return Ok(new
                 {

@@ -17,8 +17,8 @@ namespace Entity.DataInit.Operational
                    PersonId = 1,
                    TimeOfEntry = DateTime.Parse("2023-01-01 08:00:00"),
                    TimeOfExit = DateTime.Parse("2023-01-01 12:00:00"),
-                   AccessPointOfEntry = 1,
-                   AccessPointOfExit = 2,
+                   EventAccessPointEntryId = 1,
+                   EventAccessPointExitId = 2,
                    IsDeleted = false
                },
                new Attendance
@@ -27,22 +27,22 @@ namespace Entity.DataInit.Operational
                    PersonId = 2,
                    TimeOfEntry = DateTime.Parse("2023-01-01 09:30:00"),
                    TimeOfExit = DateTime.Parse("2023-01-01 13:45:00"),
-                   AccessPointOfEntry = 1,
-                   AccessPointOfExit = 2,
+                   EventAccessPointEntryId = 1,
+                   EventAccessPointExitId = 2,
                    IsDeleted = false
                }
             );
 
-            // Relaciones
-            builder.HasOne(a => a.AccessPointEntry)
-                   .WithMany(ap => ap.AttendancesEntry)
-                   .HasForeignKey(a => a.AccessPointOfEntry)
+            builder.HasOne(a => a.EventAccessPointEntry)
+                   .WithMany(e => e.AttendancesEntry)
+                   .HasForeignKey(a => a.EventAccessPointEntryId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(a => a.AccessPointExit)
-                   .WithMany(ap => ap.AttendancesExit)
-                   .HasForeignKey(a => a.AccessPointOfExit)
+            builder.HasOne(a => a.EventAccessPointExit)
+                   .WithMany(e => e.AttendancesExit)
+                   .HasForeignKey(a => a.EventAccessPointExitId)
                    .OnDelete(DeleteBehavior.Restrict);
+
 
             // Propiedades
             builder.Property(a => a.TimeOfEntry).IsRequired();

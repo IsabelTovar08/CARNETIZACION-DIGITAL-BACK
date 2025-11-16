@@ -1,17 +1,22 @@
-﻿using AutoMapper;
-using Business.Classes.Base;
-using Business.Interfaces.Organizational.Assignment;
-using Data.Interfases;
-using Data.Interfases.Organizational.Assignment;
-using Entity.DTOs.Organizational.Assigment.Request;
-using Entity.DTOs.Organizational.Assigment.Response;
-using Entity.Models.Organizational.Assignment;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Business.Classes.Base;
+using Business.Interfaces.Operational;
+using Business.Interfaces.Organizational.Assignment;
+using Business.Services.Cards;
+using Data.Interfases;
+using Data.Interfases.Organizational.Assignment;
+using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Organizational.Assigment.Request;
+using Entity.DTOs.Organizational.Assigment.Response;
+using Entity.DTOs.Specifics;
+using Entity.DTOs.Specifics.Cards;
+using Entity.Models.Organizational.Assignment;
+using Microsoft.Extensions.Logging;
 using Utilities.Helpers;
 
 namespace Business.Implementations.Organizational.Assignment
@@ -19,9 +24,13 @@ namespace Business.Implementations.Organizational.Assignment
     public class IssuedCardBusiness : BaseBusiness<IssuedCard, IssuedCardDtoRequest, IssuedCardDto>, IIssuedCardBusiness
     {
         public readonly IIssuedCardData _issuedCardData;
-        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper) : base(data, logger, mapper)
+        protected readonly ICardTemplateBusiness _cardTemplateBusiness;
+        protected readonly ICardPdfService _cardPdfService;
+        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper, ICardTemplateBusiness cardTemplateBusiness, ICardPdfService cardPdfService) : base(data, logger, mapper)
         {
             _issuedCardData = data;
+            _cardTemplateBusiness = cardTemplateBusiness;
+            _cardPdfService = cardPdfService;
         }
 
         /// <summary>
@@ -52,7 +61,7 @@ namespace Business.Implementations.Organizational.Assignment
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al guardar el carnet con UUID y QR.");
+                _logger.LogError(ex, "Error al guardar el carnet con UUID y QR.");  
                 throw new Exception("Error al guardar el carnet con UUID y QR.", ex);
             }
         }
@@ -73,6 +82,169 @@ namespace Business.Implementations.Organizational.Assignment
             catch (Exception ex)
             {
                 throw new Exception("Error en la capa de negocio al actualizar la URL del PDF del carnet.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Consulta la información completa del carnet, incluyendo organización y sucursal.
+        /// </summary>
+        public async Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId)
+        {
+            try
+            {
+                CardUserData card = await _issuedCardData.GetCardDataByIssuedIdAsync(issuedCardId);
+                if (card == null)
+                    throw new Exception("No se encontró el carnet para actualizar la URL del PDF.");
+
+                //return _mapper.Map<IssuedCardDto>(card);
+                return card;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error en la capa de negocio al actualizar la URL del PDF del carnet.", ex);
+            }
+        }
+
+
+        public async Task<CardUserData> GetCardDataByIssuedId(int issuedCardId)
+        {
+            try
+            {
+                // 1. Obtener los datos del carnet emitido (CardUserData)
+                CardUserData userData = await _issuedCardData.GetCardDataByIssuedIdAsync(issuedCardId);
+                return userData;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Error controlado al generar el PDF del carnet {IssuedCardId}", issuedCardId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error interno al generar el PDF del carnet {IssuedCardId}", issuedCardId);
+                throw new InvalidOperationException("Error interno al generar el PDF del carnet.", ex);
+            }
+        }
+
+
+
+
+        /// <inheritdoc/>
+        public async Task<byte[]> GenerateCardPdfBase64Async(int issuedCardId)
+        {
+            try
+            {
+                // 1. Obtener los datos del carnet emitido (CardUserData)
+                CardUserData userData = await GetCardDataByIssuedId(issuedCardId);
+
+                if (userData == null)
+                    throw new InvalidOperationException($"No se encontraron datos para el carnet emitido {issuedCardId}.");
+
+                // 2. Obtener el ID de configuración desde el IssuedCard real
+                IssuedCardDto? issuedCardEntity = await GetById(issuedCardId);
+
+                if (issuedCardEntity == null)
+                    throw new InvalidOperationException($"No se encontró el registro IssuedCard con ID {issuedCardId}.");
+
+                int cardConfigurationId = issuedCardEntity.CardId; // aquí CardId = CardConfigurationId
+
+                // 3. Consultar la plantilla asociada a ese CardConfiguration
+                CardTemplateResponse cardTemplate = await _cardTemplateBusiness.GetTemplateByCardConfigurationId(cardConfigurationId);
+
+                if (cardTemplate == null)
+                    throw new InvalidOperationException($"No se encontró plantilla asociada al CardConfiguration {cardConfigurationId}.");
+
+                // 4. Generar el PDF en memoria
+                using var ms = new MemoryStream();
+
+                await _cardPdfService.GenerateCardAsync(cardTemplate, userData, ms);
+                ms.Position = 0;
+
+                return ms.ToArray();
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Error controlado al generar el PDF del carnet {IssuedCardId}", issuedCardId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error interno al generar el PDF del carnet {IssuedCardId}", issuedCardId);
+                throw new InvalidOperationException("Error interno al generar el PDF del carnet.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Obtiene el listado de carnets emitidos agrupados por Unidad Organizativa.
+        /// </summary>
+        public async Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync()
+        {
+            try
+            {
+                var result = await _issuedCardData.GetCarnetsByOrganizationalUnitAsync();
+
+                if (result == null || result.Count == 0)
+                    throw new Exception("No se encontraron carnets por unidad organizativa.");
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error en la capa de negocio al consultar carnets por unidad organizativa.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Obtiene carnets emitidos agrupados por División Interna de una Unidad.
+        /// </summary>
+        public async Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId)
+        {
+            try
+            {
+                return await _issuedCardData.GetCarnetsByInternalDivisionAsync(organizationalUnitId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error en la capa de negocio al consultar carnets por división interna.", ex);
+            }
+        }
+
+
+        /// <summary>
+        /// Obtiene el listado de carnets emitidos agrupados por Jornada (Schedule en Card).
+        /// </summary>
+        public async Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync()
+        {
+            try
+            {
+                var result = await _issuedCardData.GetCarnetsBySheduleAsync();
+
+                if (result == null || result.Count == 0)
+                    throw new Exception("No se encontraron carnets por jornada.");
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error en la capa de negocio al consultar carnets por jornada.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Retorna el total de carnets activos (no eliminados)
+        /// </summary>
+        /// <returns>Total de carnets</returns>
+        public async Task<int> GetTotalNumberOfIDCardsAsync()
+        {
+            try
+            {
+                return await _issuedCardData.GetTotalNumberOfIDCardsAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Business al obtener el total de carnets");
+                throw;
             }
         }
     }

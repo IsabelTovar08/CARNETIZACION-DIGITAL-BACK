@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Organizational.Assigment.Response;
+using Entity.DTOs.Specifics.Cards;
 
 namespace Entity.DTOs.Specifics
 {
@@ -18,7 +19,9 @@ namespace Entity.DTOs.Specifics
 
         public List<RolDto> Roles { get; set; } = new();
         public List<PermissionDto> Permissions { get; set; } = new();
-
-        public IssuedCardDto? CurrentProfile { get; set; }
+        /// <summary>Perfil completo del carnet seleccionado.</summary>
+        public CardUserData? CurrentProfile { get; set; }
+        /// <summary>Lista de todos los demás carnets completos.</summary>
+        public List<CardUserData> OtherCards { get; set; } = new();
     }
 }

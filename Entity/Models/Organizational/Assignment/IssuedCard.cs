@@ -2,7 +2,6 @@
 using Entity.Models.ModelSecurity;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
-using System;
 
 namespace Entity.Models.Organizational.Assignment
 {

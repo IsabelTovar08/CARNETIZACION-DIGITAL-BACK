@@ -7,7 +7,7 @@ using Entity.DTOs.Base;
 
 namespace Entity.DTOs.Operational.Request
 {
-    public class CardTemplateRequest : BaseDtoRequest
+    public class CardTemplateRequest : GenericDto
     {
         public string FrontBackgroundUrl { get; set; }
         public string BackBackgroundUrl { get; set; }

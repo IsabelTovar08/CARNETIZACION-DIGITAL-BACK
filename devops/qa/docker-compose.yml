@@ -4,7 +4,7 @@ services:
   carnetizacion-digital-api-qa:
     container_name: carnetizacion-digital-api-qa
     build:
-      context: ../..
+      context: ../..        # 🔹 sube dos niveles (desde devops/qa hasta raíz del proyecto)
       dockerfile: Dockerfile
     restart: always
     env_file:

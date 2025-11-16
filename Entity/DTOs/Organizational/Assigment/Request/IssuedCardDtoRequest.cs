@@ -21,7 +21,11 @@ namespace Entity.DTOs.Organizational.Assigment.Request
         public bool isCurrentlySelected { get; set; }
         public string? PdfUrl { get; set; }
         public int CardId { get; set; }
-        public CardConfiguration Card { get; set; }
         public int StatusId { get; set; }
+
+
+        public string QRCode { get; set; }
+        public Guid UniqueId { get; set; }
+
     }
 }

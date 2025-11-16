@@ -1,0 +1,29 @@
+.layout-container {
+  height: 100vh;
+}
+
+.layout-sidenav {
+  width: 240px;
+  background-color: #fafafa;
+  border-right: 1px solid #ddd;
+}
+
+.layout-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.layout-body {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background-color: #f5f6f8;
+}
+
+/* 🔹 Responsive: cambia a modo "over" cuando sea móvil */
+@media (max-width: 768px) {
+  .layout-sidenav {
+    width: 200px;
+  }
+}

@@ -4,7 +4,7 @@ namespace Entity.DTOs.Notifications
 {
     public class NotificationReceivedDto
     {
-        public int StatusId { get; set; }
+        public NotificationStatus Status { get; set; }
         public DateTime SendDate { get; set; }
         public DateTime? ReadDate { get; set; }
         public DateTime? ExpirationDate { get; set; }

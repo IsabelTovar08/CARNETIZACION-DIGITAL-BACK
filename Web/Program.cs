@@ -19,6 +19,14 @@ namespace Web
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
 
+            // CONFIGURAR LOGGING EXPLÍCITO PARA CONSOLE Y DEBUG
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
+
+            // Ajustar niveles para ver más detalle
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
+
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -167,6 +175,7 @@ namespace Web
 
 
             app.MapHub<NotificationHub>("/hubs/notifications");
+            app.MapHub<AttendanceHub>("/hubs/attendance");
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();

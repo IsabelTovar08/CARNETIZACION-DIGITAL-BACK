@@ -13,13 +13,8 @@ namespace Data.Interfases.Operational
         /// <summary>
         /// Devuelve la última asistencia abierta (TimeOfExit == null) para la persona, o null si no hay.
         /// </summary>
-        Task<Attendance?> GetOpenAttendanceAsync(int personId, CancellationToken ct = default);
+        Task<Attendance?> GetOpenAttendanceAsync(int personId, int eventAccessPointEntryId);
 
-        /// <summary>
-        /// Actualiza la salida (TimeOfExit y AccessPointOfExit) del registro con Id dado.
-        /// Retorna la entidad actualizada.
-        /// </summary>
-        Task<Attendance> UpdateExitAsync(int id, DateTime timeOfExit, int? accessPointOut, CancellationToken ct = default);
 
         /// <summary>
         /// Consulta filtrada y paginada de asistencias.

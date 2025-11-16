@@ -14,6 +14,13 @@ namespace Business.Interfaces.Operational
 {
     public interface IEventAccessPointBusiness : IBaseBusiness<EventAccessPoint, EventAccessPointDtoRequest, EventAccessPointDto>
     {
-
+        /// <summary>
+        /// Verifica si existe un registro con la misma relación EventId + AccessPointId.
+        /// </summary>
+        Task ValidateDuplicate(int eventId, int accessPointId);
+        /// <summary>
+        /// Obtiene un EventAccessPoint por su QrCodeKey.
+        /// </summary>
+        Task<EventAccessPoint?> GetByQrKey(string qrKey);
     }
 }

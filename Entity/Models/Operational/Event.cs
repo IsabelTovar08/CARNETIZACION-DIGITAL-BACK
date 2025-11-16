@@ -1,10 +1,12 @@
-﻿using Entity.Models.Base;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using Entity.Models.Base;
 using Entity.Models.Operational;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 namespace Entity.Models.Organizational
 {
     public class Event : GenericModel

@@ -22,10 +22,6 @@ namespace Entity.Models.Organizational
         //public Event? Event { get; set; }
         public CustomType? AccessPointType { get; set; }
 
-        // Si AttendanceConfiguration usa WithMany(ap => ap.AttendancesEntry/Exit)
-        public ICollection<Attendance> AttendancesEntry { get; set; } = new List<Attendance>();
-        public ICollection<Attendance> AttendancesExit { get; set; } = new List<Attendance>();
-
         public ICollection<EventAccessPoint> EventAccessPoints { get; set; } = new List<EventAccessPoint>();
     }
 }

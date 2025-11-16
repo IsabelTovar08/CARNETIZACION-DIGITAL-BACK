@@ -9,20 +9,44 @@ namespace Entity.Enums.Specifics
 {
     public enum ModificationField
     {
-        [EnumDisplayEx("Nombre")]
-        Name = 0,
+        [EnumDisplayEx("Primer nombre")]
+        FirstName = 0,
+
+        [EnumDisplayEx("Segundo nombre")]
+        MiddleName = 1,
+
+        [EnumDisplayEx("Primer apellido")]
+        LastName = 2,
+
+        [EnumDisplayEx("Segundo apellido")]
+        SecondLastName = 3,
+
+        [EnumDisplayEx("Número de documento")]
+        DocumentNumber = 4,
 
         [EnumDisplayEx("Correo electrónico")]
-        Email = 1,
+        Email = 5,
 
         [EnumDisplayEx("Teléfono")]
-        PhoneNumber = 2,
+        Phone = 6,
 
         [EnumDisplayEx("Dirección")]
-        Address = 3,
+        Address = 7,
 
-        [EnumDisplayEx("Foto")]
-        Photo = 4
+        [EnumDisplayEx("Tipo de documento")]
+        DocumentTypeId = 8,
+
+        [EnumDisplayEx("Tipo de sangre")]
+        BloodTypeId = 9,
+
+        [EnumDisplayEx("Foto de perfil (URL)")]
+        PhotoUrl = 10,
+
+        [EnumDisplayEx("Foto (ruta local)")]
+        PhotoPath = 11,
+
+        [EnumDisplayEx("Ciudad")]
+        CityId = 12
     }
 
 }

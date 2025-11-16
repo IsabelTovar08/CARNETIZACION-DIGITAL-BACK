@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Utilities.Exeptions;
 using Entity.DTOs.Specifics; 
+using static Utilities.Helpers.BarcodeHelper;
 
 namespace Business.Implementations.Operational
 {
@@ -145,7 +146,7 @@ namespace Business.Implementations.Operational
                 // 3️⃣ Crear QR
                 string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
                 string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
-                savedEvent.QrCodeBase64 = GenerateQrCodeBase64(qrContent);
+                savedEvent.QrCodeBase64 = GenerateQrBase64(qrContent);
                 await _data.UpdateAsync(savedEvent);
 
                 // 4️⃣ Crear Audiencias
@@ -321,17 +322,6 @@ namespace Business.Implementations.Operational
 
 
         #region Métodos Privados
-
-        private string GenerateQrCodeBase64(string content)
-        {
-            using var qrGen = new QRCodeGenerator();
-            using var qrData = qrGen.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
-            using var qrCode = new QRCode(qrData);
-            using var bitmap = qrCode.GetGraphic(6);
-            using var ms = new MemoryStream();
-            bitmap.Save(ms, ImageFormat.Png);
-            return Convert.ToBase64String(ms.ToArray());
-        }
 
         private async Task CreateEventAudiencesAsync(
             int eventId,
