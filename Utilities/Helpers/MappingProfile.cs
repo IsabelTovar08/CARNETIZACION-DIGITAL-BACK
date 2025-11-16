@@ -265,21 +265,55 @@ namespace Utilities.Helper
 
             //Event
             CreateMap<Event, EventDtoResponse>()
-            .ForMember(d => d.Ispublic, o => o.MapFrom(s => s.IsPublic))
-            .ForMember(d => d.Schedule, o => o.MapFrom(s => s.Schedule))
-            .ForMember(d => d.EventTypeName, o => o.MapFrom(s => s.EventType != null ? s.EventType.Name : null))
-            .ForMember(d => d.StatusName, o => o.MapFrom(s => s.Status != null ? s.Status.Name : null))
-            .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
-                s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
-                {
-                    Id = eap.AccessPoint.Id,
-                    Name = eap.AccessPoint.Name,
-                    Description = eap.AccessPoint.Description,
-                    TypeId = eap.AccessPoint.TypeId,
-                    Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null
-                })
+                .ForMember(d => d.Ispublic, o => o.MapFrom(s => s.IsPublic))
+                .ForMember(d => d.EventTypeName, o => o.MapFrom(s => s.EventType != null ? s.EventType.Name : null))
+                .ForMember(d => d.StatusName, o => o.MapFrom(s => s.Status != null ? s.Status.Name : null))
 
-             ));
+                // 🔹 Enviar TODOS los horarios del evento
+                .ForMember(d => d.Schedules, o => o.MapFrom(s =>
+                    s.EventSchedules.Select(es => new ScheduleDto
+                    {
+                        Id = es.Schedule.Id,
+                        Name = es.Schedule.Name,
+                        StartTime = es.Schedule.StartTime,
+                        EndTime = es.Schedule.EndTime,
+                        Days = es.Schedule.Days != null
+                            ? es.Schedule.Days.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(x => x.Trim()).ToList()
+                            : new List<string>()
+                    })
+                ))
+
+
+
+                // 🔹 Access points
+                .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
+                    s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
+                    {
+                        Id = eap.AccessPoint.Id,
+                        Name = eap.AccessPoint.Name,
+                        Description = eap.AccessPoint.Description,
+                        TypeId = eap.AccessPoint.TypeId,
+                        Type = eap.AccessPoint.AccessPointType != null
+                            ? eap.AccessPoint.AccessPointType.Name
+                            : null
+                    })
+                ));
+
+
+            //EventSchedule
+            CreateMap<EventSchedule, EventScheduleDtoResponse>()
+            .ForMember(d => d.ScheduleId, o => o.MapFrom(s => s.Schedule.Id))
+            .ForMember(d => d.Name, o => o.MapFrom(s => s.Schedule.Name))
+            .ForMember(d => d.StartTime, o => o.MapFrom(s => s.Schedule.StartTime))
+            .ForMember(d => d.EndTime, o => o.MapFrom(s => s.Schedule.EndTime))
+            .ForMember(d => d.Days, o => o.MapFrom(s =>
+                s.Schedule.Days != null
+                    ? s.Schedule.Days.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                          .Select(x => x.Trim())
+                          .ToList()
+                    : new List<string>()
+            ));
 
 
             CreateMap<Event, EventDetailsDtoResponse>()
@@ -296,20 +330,22 @@ namespace Utilities.Helper
              .ForMember(d => d.Audiences, opt => opt.MapFrom(s => s.EventTargetAudiences));
 
             CreateMap<EventDtoRequest, Event>()
-            .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
-            .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
-            .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
-            .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))
-            .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
-            .ForMember(d => d.EventStart, o => o.MapFrom(s => s.EventStart))
-            .ForMember(d => d.EventEnd, o => o.MapFrom(s => s.EventEnd))
-            .ForMember(d => d.ScheduleId, o => o.MapFrom(s => s.ScheduleId))
-            .ForMember(d => d.EventTypeId, o => o.MapFrom(s => s.EventTypeId))
-            .ForMember(d => d.StatusId, o => o.MapFrom(s => s.StatusId))
-            .ForMember(d => d.QrCodeBase64, o => o.Ignore())
-            // 🔹 Ignora relaciones — se manejan manualmente en el servicio
-            .ForMember(d => d.EventAccessPoints, o => o.Ignore())
-            .ForMember(d => d.EventTargetAudiences, o => o.Ignore());
+             .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+             .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+             .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+             .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))
+             .ForMember(d => d.IsPublic, o => o.MapFrom(s => s.Ispublic))
+             .ForMember(d => d.EventStart, o => o.MapFrom(s => s.EventStart))
+             .ForMember(d => d.EventEnd, o => o.MapFrom(s => s.EventEnd))
+             .ForMember(d => d.EventTypeId, o => o.MapFrom(s => s.EventTypeId))
+             .ForMember(d => d.StatusId, o => o.MapFrom(s => s.StatusId))
+             .ForMember(d => d.QrCodeBase64, o => o.Ignore())
+
+             // 🔹 Ignora relaciones — se manejan manualmente
+             .ForMember(d => d.EventAccessPoints, o => o.Ignore())
+             .ForMember(d => d.EventTargetAudiences, o => o.Ignore())
+             .ForMember(d => d.EventSchedules, o => o.Ignore());
+
 
 
 
@@ -426,10 +462,7 @@ namespace Utilities.Helper
             //EventAccessPoint
 
             //Notifications
-            CreateMap<Notification, NotificationDto>()
-                .ForMember(d => d.NotificationTypeName,
-                    opt => opt.MapFrom(s => ((NotificationType)s.NotificationType).ToString())) 
-                .ReverseMap();
+            CreateMap<Notification, NotificationDto>().ReverseMap();
 
             CreateMap<Notification, NotificationDtoRequest>()
                 .ReverseMap();

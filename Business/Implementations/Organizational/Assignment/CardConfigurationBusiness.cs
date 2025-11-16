@@ -32,62 +32,6 @@ namespace Business.Implementations.Organizational.Assignment
         }
 
         /// <summary>
-        /// Obtiene el listado de carnets emitidos agrupados por Unidad Organizativa.
-        /// </summary>
-        //public async Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync()
-        //{
-        //    try
-        //    {
-        //        var result = await _cardData.getTotalNumberOfIDCardConfigurations();
-
-        //        if (result == null || result.Count == 0)
-        //            throw new Exception("No se encontraron carnets por unidad organizativa.");
-
-        //        return result;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Error en la capa de negocio al consultar carnets por unidad organizativa.", ex);
-        //    }
-        //}
-
-        /// <summary>
-        /// Obtiene carnets emitidos agrupados por División Interna de una Unidad.
-        /// </summary>
-        //public async Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId)
-        //{
-        //    try
-        //    {
-        //        return await _cardData.getTotalNumberOfIDCardConfigurations(organizationalUnitId);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Error en la capa de negocio al consultar carnets por división interna.", ex);
-        //    }
-        //}
-
-
-        ///// <summary>
-        ///// Obtiene el listado de carnets emitidos agrupados por Jornada (Schedule en Card).
-        ///// </summary>
-        //public async Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync()
-        //{
-        //    try
-        //    {
-        //        var result = await _cardData.GetCarnetsBySheduleAsync();
-
-        //        if (result == null || result.Count == 0)
-        //            throw new Exception("No se encontraron carnets por jornada.");
-
-        //        return result;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Error en la capa de negocio al consultar carnets por jornada.", ex);
-        //    }
-        //}
-
-        /// <summary>
         /// Retorna el total de carnets activos (no eliminados)
         /// </summary>
         /// <returns>Total de carnets</returns>

@@ -17,9 +17,11 @@ namespace Entity.DTOs.Notifications.Request
         [Required]
         [MaxLength(1000)]
         public string Message { get; set; }
+        public string? RedirectUrl { get; set; }
+
 
         [Required]
-        public NotificationType NotificationTypeId { get; set; }
+        public NotificationType NotificationType { get; set; }
 
     }
 }

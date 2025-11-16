@@ -16,22 +16,6 @@ namespace Business.Interfaces.Organizational.Assignment
     {
 
         /// <summary>
-        /// Obtiene el listado de carnets emitidos agrupados por Unidad Organizativa.
-        /// </summary>
-        //Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync();
-
-        ///// <summary>
-        ///// Retorna carnets emitidos agrupados por División Interna
-        ///// de una Unidad Organizativa específica.
-        ///// </summary>
-        //Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId);
-
-        ///// <summary>
-        ///// Obtiene el listado de carnets emitidos agrupados por Jornada (Schedule en Card).
-        ///// </summary>
-        //Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync();
-
-        /// <summary>
         /// Retorna el total de carnets activos (no eliminados)
         /// </summary>
         Task<int> GetTotalNumberOfIDCardsAsync();

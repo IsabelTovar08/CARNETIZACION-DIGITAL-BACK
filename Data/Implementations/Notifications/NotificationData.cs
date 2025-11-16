@@ -38,10 +38,15 @@ namespace Data.Implementations.Notifications
                     Title = nr.Notification.Title,
                     Message = nr.Notification.Message,
                     NotificationTypeName = ((NotificationType)nr.Notification.NotificationType).GetDisplayName(),
-                    StatusId = nr.Status,
+                    NotificationTypeId = (int)nr.Notification.NotificationType,
+                    StatusId = (int)nr.Status,
+                    StatusName = ((NotificationStatus)nr.Status).GetDisplayName(),
                     SendDate = nr.SendDate,
-                    ReadDate = nr.ReadDate
+                    ReadDate = nr.ReadDate,
+                    RedirectUrl = nr.Notification.RedirectUrl,
+                    NotificationReceivedId = nr.Id
                 })
+                .OrderByDescending(nr => nr.SendDate)
                 .ToListAsync();
 
         }

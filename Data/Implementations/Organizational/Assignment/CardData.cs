@@ -43,67 +43,7 @@ namespace Data.Implementations.Organizational.Assignment
         //    return base.SaveAsync(entity);
         //}
 
-        ///// <summary>
-        ///// Carnets emitidos agrupados por Unidad Organizativa.
-        ///// </summary>
-        //public async Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync()
-        //{
-        //    return await _context.OrganizationalUnits
-        //        .GroupJoin(
-        //            _context.CardsConfigurations.Where(c => !c.IsDeleted),
-        //            u => u.Id,
-        //            c => c.PersonDivisionProfile.InternalDivision.OrganizationalUnitId,
-        //            (unidad, carnets) => new CarnetsByUnitDto
-        //            {
-        //                UnidadOrganizativaId = unidad.Id,
-        //                UnidadOrganizativa = unidad.Name,
-        //                TotalCarnets = carnets.Count()
-        //            }
-        //        )
-        //        .OrderByDescending(x => x.TotalCarnets)
-        //        .ToListAsync();
-        //}
-
-        /// <summary>
-        /// Retorna carnets emitidos agrupados por División Interna
-        /// de una Unidad Organizativa específica.
-        /// </summary>
-        //public async Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId)
-        //{
-        //    return await _context.CardsConfigurations
-        //        .Where(c => !c.IsDeleted &&
-        //                    c.PersonDivisionProfile.InternalDivision.OrganizationalUnitId == organizationalUnitId)
-        //        .GroupBy(c => c.PersonDivisionProfile.InternalDivision.Name)
-        //        .Select(g => new CarnetsByDivisionDto
-        //        {
-        //            DivisionInterna = g.Key,
-        //            TotalCarnets = g.Count()
-        //        })
-        //        .OrderByDescending(x => x.TotalCarnets)
-        //        .ToListAsync();
-        //}
-
-
-        ///// <summary>
-        ///// Carnets emitidos agrupados por Jornada (usando Schedule en CardConfiguration).
-        ///// </summary>
-        //public async Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync()
-        //{
-        //    return await _context.CardsConfigurations
-        //        .Where(c => !c.IsDeleted)
-        //        .Include(c => c.PersonDivisionProfile)
-        //        .GroupBy(c => c.SheduleId) 
-        //        .Select(g => new CarnetsBySheduleDto
-        //        {
-        //            Jornada = g.Key.ToString(),
-        //            TotalCarnets = g.Count()
-        //        })
-        //        .OrderByDescending(x => x.TotalCarnets)
-        //        .ToListAsync();
-        //}
-
-
-
+        
 
         /// <summary>
         /// Retorna el total de carnets que no están eliminados lógicamente

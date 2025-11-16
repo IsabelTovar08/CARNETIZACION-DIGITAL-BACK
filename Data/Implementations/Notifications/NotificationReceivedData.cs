@@ -27,6 +27,7 @@ namespace Data.Implementations.Notifications
             return await _context.NotificationReceiveds
                 .Include(nr => nr.Notification)
                 .Where(nr => nr.UserId == userId && !nr.IsDeleted)
+                .OrderByDescending(nr => nr.SendDate)
                 .ToListAsync();
         }
 

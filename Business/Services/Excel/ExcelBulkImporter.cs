@@ -249,7 +249,8 @@ namespace Business.Services.Excel
             await _notificationsBusiness.SendTemplateAsync(
                 NotificationTemplateType.BulkImportSuccess,
                 parsed.Count,
-                fileName
+                fileName,
+                batchId
             );
 
             return result;

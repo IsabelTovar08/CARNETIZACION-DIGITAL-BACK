@@ -70,7 +70,7 @@ namespace Business.Implementations.Operational
                 {
                     NotificationId = notification.Id,
                     UserId = userId,
-                    StatusId = (int)NotificationStatus.Sent,
+                    Status = NotificationStatus.Sent,
                     SendDate = DateTime.UtcNow
                 };
                 await _notificationReceivedBusiness.Save(received);
@@ -78,7 +78,7 @@ namespace Business.Implementations.Operational
                 await _unitOfWork.CommitAsync();
 
                 // Enviar al usuario vía SignalR (u otro dispatcher)
-                await _dispatcher.SendToUserAsync(userId.ToString(), new
+                await _dispatcher.SendToUserAsync(userId, new
                 {
                     notification.Id,
                     notification.Title,

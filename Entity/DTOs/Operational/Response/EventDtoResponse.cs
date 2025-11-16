@@ -19,7 +19,7 @@ namespace Entity.DTOs.Operational
         public DateTime? EventEnd{ get; set; }       
         public int? ScheduleId { get; set; }
 
-        public ScheduleDto? Schedule { get; set; }
+        public List<ScheduleDto> Schedules { get; set; } = new();
 
         public int EventTypeId { get; set; }
         public string? EventTypeName { get; set; }

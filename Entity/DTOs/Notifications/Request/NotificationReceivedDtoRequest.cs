@@ -1,17 +1,18 @@
-﻿using Entity.DTOs.Base;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entity.DTOs.Base;
+using Utilities.Enums.Specifics;
 
 namespace Entity.DTOs.Notifications.Request
 {
     public class NotificationReceivedDtoRequest : GenericDtoRequest
     {
         [Required]
-        public int StatusId { get; set; }
+        public NotificationStatus Status { get; set; }
 
         [Required]
         public DateTime SendDate { get; set; }

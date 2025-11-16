@@ -7,6 +7,7 @@ using Data.Classes.Base;
 using Data.Interfases.Organizational.Assignment;
 using Entity.Context;
 using Entity.DTOs.Organizational.Assigment.Request;
+using Entity.DTOs.Specifics;
 using Entity.DTOs.Specifics.Cards;
 using Entity.Models.Organizational.Assignment;
 using Microsoft.EntityFrameworkCore;
@@ -79,7 +80,6 @@ namespace Data.Implementations.Organizational.Assignment
             return await base.SaveAsync(entity);
         }
 
-
         /// </<inheritdoc/>>
         public async Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId)
         {
@@ -147,5 +147,86 @@ namespace Data.Implementations.Organizational.Assignment
                 IssuedDate = issuedCard.Card.CreateAt
             };
         }
+
+        ///// <summary>
+        ///// Carnets emitidos agrupados por Unidad Organizativa.
+        ///// </summary>
+        public async Task<List<CarnetsByUnitDto>> GetCarnetsByOrganizationalUnitAsync()
+            {
+                return await _context.OrganizationalUnits
+                    .GroupJoin(
+                        _context.IssuedCards.Where(c => !c.IsDeleted),
+                        u => u.Id,
+                        c => c.InternalDivision.OrganizationalUnitId,
+                        (unidad, carnets) => new CarnetsByUnitDto
+                        {
+                            UnidadOrganizativaId = unidad.Id,
+                            UnidadOrganizativa = unidad.Name,
+                            TotalCarnets = carnets.Count()
+                        }
+                    )
+                    .OrderByDescending(x => x.TotalCarnets)
+                    .ToListAsync();
+            }
+
+        /// <summary>
+        /// Retorna carnets emitidos agrupados por División Interna
+        /// de una Unidad Organizativa específica.
+        /// </summary>
+        public async Task<List<CarnetsByDivisionDto>> GetCarnetsByInternalDivisionAsync(int organizationalUnitId)
+        {
+            return await _context.IssuedCards
+                .Where(c => !c.IsDeleted &&
+                            c.InternalDivision.OrganizationalUnitId == organizationalUnitId)
+                .GroupBy(c => c.InternalDivision.Name)
+                .Select(g => new CarnetsByDivisionDto
+                {
+                    DivisionInterna = g.Key,
+                    TotalCarnets = g.Count()
+                })
+                .OrderByDescending(x => x.TotalCarnets)
+                .ToListAsync();
+        }
+
+
+        ///// <summary>
+        ///// Carnets emitidos agrupados por Jornada (usando Schedule en CardConfiguration).
+        ///// </summary>
+        public async Task<List<CarnetsBySheduleDto>> GetCarnetsBySheduleAsync()
+        {
+            return await _context.IssuedCards
+                .Where(c => !c.IsDeleted)
+                .GroupBy(c => c.Card.SheduleId)
+                .Select(g => new CarnetsBySheduleDto
+                {
+                    Jornada = g.Key.ToString(),
+                    TotalCarnets = g.Count()
+                })
+                .OrderByDescending(x => x.TotalCarnets)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Retorna el total de carnets que no están eliminados lógicamente
+        /// </summary>
+        /// <returns>Total de carnets</returns>
+        public async Task<int> GetTotalNumberOfIDCardsAsync()
+        {
+            try
+            {
+                // Contar los registros en la tabla CardConfiguration donde IsDeleted sea false
+                var total = await _context.Set<IssuedCard>()
+                    .Where(c => !c.IsDeleted)
+                    .CountAsync();
+
+                return total;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el total de carnets");
+                throw;
+            }
+        }
     }
+
 }

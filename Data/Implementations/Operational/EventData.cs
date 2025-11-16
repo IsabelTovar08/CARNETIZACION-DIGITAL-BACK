@@ -19,7 +19,7 @@ namespace Data.Implementations.Operational
     {
         public EventData(ApplicationDbContext context, ILogger<Event> logger) : base(context, logger) { }
 
-        // ✅ NUEVO MÉTODO para cumplir con la interfaz IEventData
+        // NUEVO MÉTODO para cumplir con la interfaz IEventData
         public IQueryable<Event> GetQueryable()
         {
             return _context.Set<Event>().AsQueryable();
@@ -30,12 +30,12 @@ namespace Data.Implementations.Operational
             var ev = await _context.Set<Event>()
                 .AsSplitQuery()
 
-                .Include(e => e.Schedule)
                 .Include(e => e.EventType)
-
-                //Incluye el estado (Status)
                 .Include(e => e.Status)
 
+                .Include(e => e.EventSchedules)
+                  .ThenInclude(es => es.Schedule)
+                    
                 .Include(e => e.EventAccessPoints)
                     .ThenInclude(eap => eap.AccessPoint)
                         .ThenInclude(ap => ap.AccessPointType)
@@ -65,8 +65,10 @@ namespace Data.Implementations.Operational
 
                 .AsSplitQuery()
                 .Include(e => e.EventType)
-                .Include(e => e.Schedule)
                 .Include(e => e.Status)
+
+                .Include(e => e.EventSchedules)
+                  .ThenInclude(es => es.Schedule)
 
                .Include(e => e.EventAccessPoints)
                     .ThenInclude(eap => eap.AccessPoint)
@@ -187,7 +189,8 @@ namespace Data.Implementations.Operational
         public async Task<IEnumerable<Event>> GetActiveEventsAsync()
         {
             return await _context.Set<Event>()
-                .Include(e => e.Schedule)
+                .Include(e => e.EventSchedules)
+                  .ThenInclude(es => es.Schedule)
                 .Where(e => e.StatusId == 1 || e.StatusId == 8)
                 .ToListAsync();
         }
@@ -202,5 +205,30 @@ namespace Data.Implementations.Operational
                 .Include(e => e.EventType)
                 .ToListAsync();
         }
+
+        /// <summary>
+        ///  Para la relacion entre eventos y jornadas con la nueva tabla pivote
+        /// </summary>
+        /// <param name="links"></param>
+        /// <returns></returns>
+        public async Task BulkInsertEventSchedulesAsync(List<EventSchedule> links)
+        {
+            await _context.EventSchedules.AddRangeAsync(links);
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// para eliminar la relacion entre el evento y las jornadas
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+
+        public async Task DeleteEventSchedulesByEventIdAsync(int eventId)
+        {
+            var existing = _context.EventSchedules.Where(x => x.EventId == eventId);
+            _context.EventSchedules.RemoveRange(existing);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

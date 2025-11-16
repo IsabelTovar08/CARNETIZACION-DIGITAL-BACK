@@ -46,5 +46,20 @@ namespace Data.Interfases.Operational
         /// </summary>
         Task<List<Event>> ToListAsync(IQueryable<Event> query);
 
+        /// <summary>
+        ///  para insertar mas de una jornada en un evento
+        /// </summary>
+        /// <param name="links"></param>
+        /// <returns></returns>
+        Task BulkInsertEventSchedulesAsync(List<EventSchedule> links);
+
+        /// <summary>
+        /// para eliminar la relacion de las jornadas con los eventos
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        Task DeleteEventSchedulesByEventIdAsync(int eventId);
+
+
     }
 }

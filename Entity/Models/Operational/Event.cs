@@ -16,8 +16,8 @@ namespace Entity.Models.Organizational
         public DateTime? EventStart { get; set; }
         public DateTime? EventEnd { get; set; }
 
-        public Schedule? Schedule { get; set; }
-        public int? ScheduleId { get; set; }
+        //public Schedule? Schedule { get; set; }
+        //public int? ScheduleId { get; set; }
 
 
         public bool IsPublic { get; set; }
@@ -32,5 +32,14 @@ namespace Entity.Models.Organizational
         public ICollection<EventTargetAudience> EventTargetAudiences { get; set; } = new List<EventTargetAudience>();
         public Status? Status { get; set; }
         public ICollection<EventAccessPoint> EventAccessPoints { get; set; } = new List<EventAccessPoint>();
-    }
+
+        /// <summary>
+        /// Conexion con la nueva tabla intermedia entre evento y schedule
+        /// </summary>
+        public ICollection<EventSchedule> EventSchedules { get; set; } = new List<EventSchedule>();
+
+        [NotMapped]
+        public IEnumerable<Schedule> Schedules => EventSchedules.Select(es => es.Schedule);
+
+    }   
 }

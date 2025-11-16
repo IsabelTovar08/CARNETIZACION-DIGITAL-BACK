@@ -18,7 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Utilities.Exeptions;
-using Entity.DTOs.Specifics;   // ✅ NECESARIO PARA EventFilterDto
+using Entity.DTOs.Specifics; 
 using static Utilities.Helpers.BarcodeHelper;
 
 namespace Business.Implementations.Operational
@@ -114,10 +114,13 @@ namespace Business.Implementations.Operational
         {
             try
             {
+                // 1️⃣ Crear el evento principal
                 var ev = _mapper.Map<Event>(dto.Event);
                 var savedEvent = await _data.SaveAsync(ev);
 
+                // 2️⃣ Crear Access Points
                 var createdAccessPoints = new List<AccessPoint>();
+
                 if (dto.AccessPoints?.Any() == true)
                 {
                     createdAccessPoints = dto.AccessPoints
@@ -127,8 +130,7 @@ namespace Business.Implementations.Operational
                             Description = apDto.Description,
                             TypeId = apDto.TypeId,
                             IsDeleted = false
-                        })
-                        .ToList();
+                        }).ToList();
 
                     await _apData.BulkInsertAsync(createdAccessPoints);
 
@@ -141,11 +143,13 @@ namespace Business.Implementations.Operational
                     await _data.BulkInsertEventAccessPointsAsync(links);
                 }
 
+                // 3️⃣ Crear QR
                 string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
                 string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
                 savedEvent.QrCodeBase64 = GenerateQrBase64(qrContent);
                 await _data.UpdateAsync(savedEvent);
 
+                // 4️⃣ Crear Audiencias
                 var audiences = new List<EventTargetAudience>();
 
                 if (dto.ProfileIds?.Any() == true)
@@ -181,6 +185,18 @@ namespace Business.Implementations.Operational
                 if (audiences.Any())
                     await _audienceRepo.BulkInsertAsync(audiences);
 
+                // 5️⃣ NUEVO: Registrar jornadas (Schedules)
+                if (dto.Event.ScheduleIds != null && dto.Event.ScheduleIds.Any())
+                {
+                    var scheduleLinks = dto.Event.ScheduleIds.Select(sid => new EventSchedule
+                    {
+                        EventId = savedEvent.Id,
+                        ScheduleId = sid
+                    }).ToList();
+
+                    await _data.BulkInsertEventSchedulesAsync(scheduleLinks);
+                }
+
                 return savedEvent.Id;
             }
             catch (Exception ex)
@@ -189,6 +205,7 @@ namespace Business.Implementations.Operational
                 throw;
             }
         }
+
 
         /// <summary>
         /// Actualiza el estado del evento automáticamente a "En curso" si coincide con su horario.
@@ -200,19 +217,20 @@ namespace Business.Implementations.Operational
 
             var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Local);
 
-            if (ev.EventStart.HasValue && ev.EventEnd.HasValue && ev.EventStart <= now && ev.EventEnd >= now)
+            if (ev.EventStart.HasValue && ev.EventEnd.HasValue &&
+                ev.EventStart <= now && ev.EventEnd >= now)
             {
-                if (ev.Schedule != null)
+                if (ev.Schedules != null && ev.Schedules.Any())
                 {
-                    var today = now.DayOfWeek.ToString();
-                    var scheduleDays = ev.Schedule.Days?.Split(',').Select(d => d.Trim()) ?? Enumerable.Empty<string>();
-
-                    if (scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
+                    foreach (var sch in ev.Schedules)
                     {
-                        var startTime = ev.Schedule.StartTime;
-                        var endTime = ev.Schedule.EndTime;
+                        var today = now.DayOfWeek.ToString();
+                        var scheduleDays = sch.Days?.Split(',').Select(d => d.Trim()) ?? Enumerable.Empty<string>();
 
-                        if (now.TimeOfDay >= startTime && now.TimeOfDay <= endTime)
+                        if (!scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
+                            continue;
+
+                        if (now.TimeOfDay >= sch.StartTime && now.TimeOfDay <= sch.EndTime)
                         {
                             if (ev.StatusId != 8)
                             {
@@ -222,11 +240,14 @@ namespace Business.Implementations.Operational
 
                                 _logger.LogInformation($"Evento {ev.Id} marcado como 'En curso'.");
                             }
+
+                            break; // ya no revisamos más
                         }
                     }
                 }
             }
         }
+
 
         /// <summary>
         /// Actualiza un evento existente con sus relaciones.
@@ -239,34 +260,55 @@ namespace Business.Implementations.Operational
                 if (existingEvent == null)
                     throw new EntityNotFoundException($"No se encontró el evento con Id {dto.Id}");
 
+                // 1️⃣ Datos principales
                 existingEvent.Name = dto.Name;
                 existingEvent.Description = dto.Description;
                 existingEvent.EventStart = dto.EventStart;
                 existingEvent.EventEnd = dto.EventEnd;
-                existingEvent.ScheduleId = dto.ScheduleId;
                 existingEvent.EventTypeId = dto.EventTypeId;
                 existingEvent.StatusId = dto.StatusId;
                 existingEvent.IsPublic = dto.Ispublic;
                 existingEvent.UpdateAt = DateTime.Now;
 
+                // 2️⃣ Actualizar Access Points
+                await _data.DeleteEventAccessPointsByEventIdAsync(existingEvent.Id);
+
                 if (dto.AccessPoints != null && dto.AccessPoints.Any())
                 {
-                    await _data.DeleteEventAccessPointsByEventIdAsync(existingEvent.Id);
                     var newLinks = dto.AccessPoints.Select(apId => new EventAccessPoint
                     {
                         EventId = existingEvent.Id,
                         AccessPointId = apId
                     }).ToList();
+
                     await _data.BulkInsertEventAccessPointsAsync(newLinks);
                 }
 
+                // 3️⃣ Actualizar Audiencias
                 await _audienceRepo.DeleteByEventIdAsync(existingEvent.Id);
+
                 await CreateEventAudiencesAsync(
                     existingEvent.Id,
                     dto.ProfileIds,
                     dto.OrganizationalUnitIds,
-                    dto.InternalDivisionIds);
+                    dto.InternalDivisionIds
+                );
 
+                // 4️⃣ NUEVO: Actualizar jornadas del evento
+                await _data.DeleteEventSchedulesByEventIdAsync(existingEvent.Id);
+
+                if (dto.ScheduleIds != null && dto.ScheduleIds.Any())
+                {
+                    var scheduleLinks = dto.ScheduleIds.Select(sid => new EventSchedule
+                    {
+                        EventId = existingEvent.Id,
+                        ScheduleId = sid
+                    }).ToList();
+
+                    await _data.BulkInsertEventSchedulesAsync(scheduleLinks);
+                }
+
+                // 5️⃣ Guardar actualización
                 await _data.UpdateAsync(existingEvent);
 
                 return existingEvent.Id;
@@ -277,6 +319,7 @@ namespace Business.Implementations.Operational
                 throw new ExternalServiceException("Error al actualizar el evento", ex.Message);
             }
         }
+
 
         #region Métodos Privados
 
