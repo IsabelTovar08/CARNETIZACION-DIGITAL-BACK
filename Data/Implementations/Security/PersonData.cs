@@ -26,7 +26,7 @@ namespace Data.Classes.Specifics
             _userData = userData;
         }
 
-        // ✅ NUEVO MÉTODO (para AttendanceBusiness)
+        // NUEVO MÉTODO (para AttendanceBusiness)
         public IQueryable<Person> GetQueryable()
         {
             return _context.Set<Person>().AsQueryable();

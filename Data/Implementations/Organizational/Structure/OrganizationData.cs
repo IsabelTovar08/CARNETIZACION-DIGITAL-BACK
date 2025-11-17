@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Data.Classes.Base;
 using Data.Interfases.Organizational.Structure;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Entity.Context;
 using Entity.Models.Organizational.Structure;
 using Microsoft.EntityFrameworkCore;
@@ -21,5 +22,21 @@ namespace Data.Implementations.Organizational.Structure
         {
             return await _context.Set<Organization>().Include(x => x.OrganizaionType.Organization).ToListAsync();
         }
+
+        public async Task<Organization?> GetOrganizationByPersonId(int userId)
+        {
+            return await _context.Users
+        .Where(u => u.Id == userId)
+        .Include(u => u.Organization)
+        .Select(u => u.Organization)
+        .FirstOrDefaultAsync();
+        }
+        public async Task<bool> UpdateOrganizationAsync(Organization organization)
+        {
+            _context.Organizations.Update(organization);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

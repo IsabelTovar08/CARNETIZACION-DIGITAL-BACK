@@ -3,20 +3,17 @@ using System;
 using Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Entity.Migrations.Postgres
+namespace Entity.MigracionesEq
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251113191900_UpdateRelationInEvent-Attendance")]
-    partial class UpdateRelationInEventAttendance
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -966,12 +963,6 @@ namespace Entity.Migrations.Postgres
                     b.Property<int>("AccessPointId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("AccessPointId1")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("AccessPointId2")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Code")
                         .HasColumnType("text");
 
@@ -981,11 +972,11 @@ namespace Entity.Migrations.Postgres
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("EventId1")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("QrCodeKey")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("timestamp with time zone");
@@ -994,13 +985,7 @@ namespace Entity.Migrations.Postgres
 
                     b.HasIndex("AccessPointId");
 
-                    b.HasIndex("AccessPointId1");
-
-                    b.HasIndex("AccessPointId2");
-
                     b.HasIndex("EventId");
-
-                    b.HasIndex("EventId1");
 
                     b.ToTable("EventAccessPoints", "Operational");
 
@@ -1020,6 +1005,65 @@ namespace Entity.Migrations.Postgres
                             AccessPointId = 2,
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EventId = 1,
+                            IsDeleted = false,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
+                });
+
+            modelBuilder.Entity("Entity.Models.Operational.EventSchedule", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("EventId", "ScheduleId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("EventSchedules", "Operational");
+
+                    b.HasData(
+                        new
+                        {
+                            EventId = 1,
+                            ScheduleId = 1,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 0,
+                            IsDeleted = false,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            EventId = 1,
+                            ScheduleId = 2,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 0,
+                            IsDeleted = false,
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            EventId = 2,
+                            ScheduleId = 3,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Id = 0,
                             IsDeleted = false,
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -1557,9 +1601,6 @@ namespace Entity.Migrations.Postgres
                     b.Property<string>("QrCodeBase64")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ScheduleId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("StatusId")
                         .HasColumnType("integer");
 
@@ -1569,8 +1610,6 @@ namespace Entity.Migrations.Postgres
                     b.HasKey("Id");
 
                     b.HasIndex("EventTypeId");
-
-                    b.HasIndex("ScheduleId");
 
                     b.HasIndex("StatusId");
 
@@ -3301,6 +3340,9 @@ namespace Entity.Migrations.Postgres
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Password")
                         .HasColumnType("text");
 
@@ -3345,6 +3387,8 @@ namespace Entity.Migrations.Postgres
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OrganizationId");
+
                     b.HasIndex("PersonId")
                         .IsUnique();
 
@@ -3361,6 +3405,7 @@ namespace Entity.Migrations.Postgres
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
+                            OrganizationId = 1,
                             Password = "123",
                             PersonId = 1,
                             TempCodeAttempts = 0,
@@ -3374,6 +3419,7 @@ namespace Entity.Migrations.Postgres
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
+                            OrganizationId = 2,
                             Password = "Marcos2025",
                             PersonId = 7,
                             TempCodeAttempts = 0,
@@ -3387,6 +3433,7 @@ namespace Entity.Migrations.Postgres
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
+                            OrganizationId = 3,
                             Password = "isa123",
                             PersonId = 5,
                             TempCodeAttempts = 0,
@@ -3400,6 +3447,7 @@ namespace Entity.Migrations.Postgres
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
+                            OrganizationId = 1,
                             Password = "Katalin@01",
                             PersonId = 6,
                             TempCodeAttempts = 0,
@@ -3413,6 +3461,7 @@ namespace Entity.Migrations.Postgres
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
+                            OrganizationId = 1,
                             Password = "L4d!Estudiante2025",
                             PersonId = 2,
                             TempCodeAttempts = 0,
@@ -3425,6 +3474,7 @@ namespace Entity.Migrations.Postgres
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
+                            OrganizationId = 2,
                             Password = "Adm!nCarnet2025",
                             PersonId = 3,
                             TempCodeAttempts = 0,
@@ -3437,6 +3487,7 @@ namespace Entity.Migrations.Postgres
                             CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DateCreated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
+                            OrganizationId = 3,
                             Password = "Usr!Carnet2025",
                             PersonId = 4,
                             TempCodeAttempts = 0,
@@ -3643,32 +3694,39 @@ namespace Entity.Migrations.Postgres
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
                 {
                     b.HasOne("Entity.Models.Organizational.AccessPoint", "AccessPoint")
-                        .WithMany()
+                        .WithMany("EventAccessPoints")
                         .HasForeignKey("AccessPointId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.AccessPoint", null)
-                        .WithMany("EventAccessPointsEntry")
-                        .HasForeignKey("AccessPointId1");
-
-                    b.HasOne("Entity.Models.Organizational.AccessPoint", null)
-                        .WithMany("EventAccessPointsExit")
-                        .HasForeignKey("AccessPointId2");
-
                     b.HasOne("Entity.Models.Organizational.Event", "Event")
-                        .WithMany()
+                        .WithMany("EventAccessPoints")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Event", null)
-                        .WithMany("EventAccessPoints")
-                        .HasForeignKey("EventId1");
-
                     b.Navigation("AccessPoint");
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Entity.Models.Operational.EventSchedule", b =>
+                {
+                    b.HasOne("Entity.Models.Organizational.Event", "Event")
+                        .WithMany("EventSchedules")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Schedule")
+                        .WithMany("EventSchedules")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Schedule");
                 });
 
             modelBuilder.Entity("Entity.Models.Operational.ModificationRequest", b =>
@@ -3789,10 +3847,6 @@ namespace Entity.Migrations.Postgres
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.Organizational.Structure.Schedule", "Schedule")
-                        .WithMany()
-                        .HasForeignKey("ScheduleId");
-
                     b.HasOne("Entity.Models.Parameter.Status", "Status")
                         .WithMany("Events")
                         .HasForeignKey("StatusId")
@@ -3800,8 +3854,6 @@ namespace Entity.Migrations.Postgres
                         .IsRequired();
 
                     b.Navigation("EventType");
-
-                    b.Navigation("Schedule");
 
                     b.Navigation("Status");
                 });
@@ -3861,7 +3913,7 @@ namespace Entity.Migrations.Postgres
                         .IsRequired();
 
                     b.HasOne("Entity.Models.Organizational.Structure.Organization", "Organization")
-                        .WithMany()
+                        .WithMany("Branches")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3971,11 +4023,19 @@ namespace Entity.Migrations.Postgres
 
             modelBuilder.Entity("Entity.Models.User", b =>
                 {
+                    b.HasOne("Entity.Models.Organizational.Structure.Organization", "Organization")
+                        .WithMany("Users")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithOne("User")
                         .HasForeignKey("Entity.Models.User", "PersonId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Organization");
 
                     b.Navigation("Person");
                 });
@@ -4037,9 +4097,7 @@ namespace Entity.Migrations.Postgres
 
             modelBuilder.Entity("Entity.Models.Organizational.AccessPoint", b =>
                 {
-                    b.Navigation("EventAccessPointsEntry");
-
-                    b.Navigation("EventAccessPointsExit");
+                    b.Navigation("EventAccessPoints");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.Assignment.Profiles", b =>
@@ -4050,6 +4108,8 @@ namespace Entity.Migrations.Postgres
             modelBuilder.Entity("Entity.Models.Organizational.Event", b =>
                 {
                     b.Navigation("EventAccessPoints");
+
+                    b.Navigation("EventSchedules");
 
                     b.Navigation("EventTargetAudiences");
                 });
@@ -4081,11 +4141,23 @@ namespace Entity.Migrations.Postgres
                     b.Navigation("OrganizationalUnits");
                 });
 
+            modelBuilder.Entity("Entity.Models.Organizational.Structure.Organization", b =>
+                {
+                    b.Navigation("Branches");
+
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("Entity.Models.Organizational.Structure.OrganizationalUnit", b =>
                 {
                     b.Navigation("InternalDivissions");
 
                     b.Navigation("OrganizationalUnitBranches");
+                });
+
+            modelBuilder.Entity("Entity.Models.Organizational.Structure.Schedule", b =>
+                {
+                    b.Navigation("EventSchedules");
                 });
 
             modelBuilder.Entity("Entity.Models.Parameter.CustomType", b =>

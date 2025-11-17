@@ -6,10 +6,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Entity.Migrations.Postgres
+namespace Entity.MigracionesEq
 {
     /// <inheritdoc />
-    public partial class InitialCreatePostgres : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -221,6 +221,7 @@ namespace Entity.Migrations.Postgres
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StartTime = table.Column<TimeSpan>(type: "interval", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    Days = table.Column<string>(type: "text", nullable: true),
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -367,15 +368,12 @@ namespace Entity.Migrations.Postgres
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Code = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    ScheduleDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ScheduleTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     EventStart = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     EventEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ScheduleId = table.Column<int>(type: "integer", nullable: true),
                     IsPublic = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     StatusId = table.Column<int>(type: "integer", nullable: false),
                     EventTypeId = table.Column<int>(type: "integer", nullable: false),
-                    Days = table.Column<string>(type: "text", nullable: true),
+                    QrCodeBase64 = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -391,12 +389,6 @@ namespace Entity.Migrations.Postgres
                         principalTable: "EventTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Events_Schedules_ScheduleId",
-                        column: x => x.ScheduleId,
-                        principalSchema: "Organizational",
-                        principalTable: "Schedules",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Events_Statuses_StatusId",
                         column: x => x.StatusId,
@@ -472,6 +464,38 @@ namespace Entity.Migrations.Postgres
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EventSchedules",
+                schema: "Operational",
+                columns: table => new
+                {
+                    EventId = table.Column<int>(type: "integer", nullable: false),
+                    ScheduleId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Code = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventSchedules", x => new { x.EventId, x.ScheduleId });
+                    table.ForeignKey(
+                        name: "FK_EventSchedules_Events_EventId",
+                        column: x => x.EventId,
+                        principalSchema: "Operational",
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventSchedules_Schedules_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalSchema: "Organizational",
+                        principalTable: "Schedules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -613,9 +637,11 @@ namespace Entity.Migrations.Postgres
                 schema: "Operational",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EventId = table.Column<int>(type: "integer", nullable: false),
                     AccessPointId = table.Column<int>(type: "integer", nullable: false),
-                    Id = table.Column<int>(type: "integer", nullable: false),
+                    QrCodeKey = table.Column<string>(type: "text", nullable: true),
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -623,7 +649,7 @@ namespace Entity.Migrations.Postgres
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventAccessPoints", x => new { x.EventId, x.AccessPointId });
+                    table.PrimaryKey("PK_EventAccessPoints", x => x.Id);
                     table.ForeignKey(
                         name: "FK_EventAccessPoints_AccessPoints_AccessPointId",
                         column: x => x.AccessPointId,
@@ -637,7 +663,7 @@ namespace Entity.Migrations.Postgres
                         principalSchema: "Operational",
                         principalTable: "Events",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -679,50 +705,6 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
-                name: "Attendances",
-                schema: "Operational",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TimeOfEntry = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TimeOfExit = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    AccessPointOfEntry = table.Column<int>(type: "integer", nullable: true),
-                    AccessPointOfExit = table.Column<int>(type: "integer", nullable: true),
-                    PersonId = table.Column<int>(type: "integer", nullable: false),
-                    QrCode = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Attendances", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Attendances_AccessPoints_AccessPointOfEntry",
-                        column: x => x.AccessPointOfEntry,
-                        principalSchema: "Operational",
-                        principalTable: "AccessPoints",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Attendances_AccessPoints_AccessPointOfExit",
-                        column: x => x.AccessPointOfExit,
-                        principalSchema: "Operational",
-                        principalTable: "AccessPoints",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Attendances_People_PersonId",
-                        column: x => x.PersonId,
-                        principalSchema: "ModelSecurity",
-                        principalTable: "People",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 schema: "ModelSecurity",
                 columns: table => new
@@ -744,6 +726,7 @@ namespace Entity.Migrations.Postgres
                     TempCodeAttempts = table.Column<int>(type: "integer", nullable: false),
                     TempCodeConsumedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     TempCodeResendBlockedUntil = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    OrganizationId = table.Column<int>(type: "integer", nullable: false),
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -753,12 +736,62 @@ namespace Entity.Migrations.Postgres
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Users_Organizations_OrganizationId",
+                        column: x => x.OrganizationId,
+                        principalSchema: "Organizational",
+                        principalTable: "Organizations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Users_People_PersonId",
                         column: x => x.PersonId,
                         principalSchema: "ModelSecurity",
                         principalTable: "People",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Attendances",
+                schema: "Operational",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TimeOfEntry = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TimeOfExit = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    EventAccessPointEntryId = table.Column<int>(type: "integer", nullable: false),
+                    EventAccessPointExitId = table.Column<int>(type: "integer", nullable: true),
+                    PersonId = table.Column<int>(type: "integer", nullable: false),
+                    Code = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attendances", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Attendances_EventAccessPoints_EventAccessPointEntryId",
+                        column: x => x.EventAccessPointEntryId,
+                        principalSchema: "Operational",
+                        principalTable: "EventAccessPoints",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendances_EventAccessPoints_EventAccessPointExitId",
+                        column: x => x.EventAccessPointExitId,
+                        principalSchema: "Operational",
+                        principalTable: "EventAccessPoints",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendances_People_PersonId",
+                        column: x => x.PersonId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "People",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -817,6 +850,38 @@ namespace Entity.Migrations.Postgres
                         principalSchema: "ModelSecurity",
                         principalTable: "Users",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "modificationRequests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    RequestDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Field = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<int>(type: "int", nullable: false),
+                    OldValue = table.Column<string>(type: "text", nullable: false),
+                    NewValue = table.Column<string>(type: "text", nullable: false),
+                    Message = table.Column<string>(type: "text", nullable: true),
+                    UpdatedById = table.Column<int>(type: "integer", nullable: true),
+                    Code = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_modificationRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_modificationRequests_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1099,9 +1164,9 @@ namespace Entity.Migrations.Postgres
                     Message = table.Column<string>(type: "text", nullable: true),
                     PersonId = table.Column<int>(type: "integer", nullable: true),
                     PersonDivisionProfileId = table.Column<int>(type: "integer", nullable: true),
+                    IssuedCardId = table.Column<int>(type: "integer", nullable: true),
                     CardId = table.Column<int>(type: "integer", nullable: true),
                     UpdatedPhoto = table.Column<bool>(type: "boolean", nullable: false),
-                    IssuedCardId = table.Column<int>(type: "integer", nullable: false),
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1121,8 +1186,13 @@ namespace Entity.Migrations.Postgres
                         column: x => x.IssuedCardId,
                         principalSchema: "Organizational",
                         principalTable: "IssuedCards",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ImportBatchRows_People_PersonId",
+                        column: x => x.PersonId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "People",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -1261,12 +1331,12 @@ namespace Entity.Migrations.Postgres
             migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "Schedules",
-                columns: new[] { "Id", "Code", "CreateAt", "EndTime", "Name", "StartTime", "UpdateAt" },
+                columns: new[] { "Id", "Code", "CreateAt", "Days", "EndTime", "Name", "StartTime", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1348,14 +1418,14 @@ namespace Entity.Migrations.Postgres
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Events",
-                columns: new[] { "Id", "Code", "CreateAt", "Days", "Description", "EventEnd", "EventStart", "EventTypeId", "IsPublic", "Name", "ScheduleDate", "ScheduleId", "ScheduleTime", "StatusId", "UpdateAt" },
-                values: new object[] { 1, "TECH2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, new DateTime(2023, 7, 30, 14, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 7, 30, 10, 0, 0, 0, DateTimeKind.Utc), 1, true, "Conferencia de Tecnología", new DateTime(2023, 7, 30, 0, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(1900, 1, 1, 10, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
+                columns: new[] { "Id", "Code", "CreateAt", "Description", "EventEnd", "EventStart", "EventTypeId", "IsPublic", "Name", "QrCodeBase64", "StatusId", "UpdateAt" },
+                values: new object[] { 1, "TECH2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2023, 7, 30, 14, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 7, 30, 10, 0, 0, 0, DateTimeKind.Utc), 1, true, "Conferencia de Tecnología", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Events",
-                columns: new[] { "Id", "Code", "CreateAt", "Days", "Description", "EventEnd", "EventStart", "EventTypeId", "Name", "ScheduleDate", "ScheduleId", "ScheduleTime", "StatusId", "UpdateAt" },
-                values: new object[] { 2, "SALUD2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, new DateTime(2023, 8, 5, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 8, 5, 9, 0, 0, 0, DateTimeKind.Utc), 2, "Charla de Salud", new DateTime(2023, 8, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(1900, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
+                columns: new[] { "Id", "Code", "CreateAt", "Description", "EventEnd", "EventStart", "EventTypeId", "Name", "QrCodeBase64", "StatusId", "UpdateAt" },
+                values: new object[] { 2, "SALUD2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2023, 8, 5, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 8, 5, 9, 0, 0, 0, DateTimeKind.Utc), 2, "Charla de Salud", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
@@ -1403,29 +1473,6 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.InsertData(
-                schema: "ModelSecurity",
-                table: "Users",
-                columns: new[] { "Id", "Active", "Code", "CreateAt", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "UpdateAt", "UserName" },
-                values: new object[,]
-                {
-                    { 1, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "123", 1, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin" },
-                    { 2, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Marcos2025", 7, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "marcosrojasalvarez09172007@gmail.com" },
-                    { 3, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "isa123", 5, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "isabeltovarp.18@gmail.com" },
-                    { 4, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Katalin@01", 6, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "cachape64@gmail.com" }
-                });
-
-            migrationBuilder.InsertData(
-                schema: "ModelSecurity",
-                table: "Users",
-                columns: new[] { "Id", "Code", "CreateAt", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "UpdateAt", "UserName" },
-                values: new object[,]
-                {
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "L4d!Estudiante2025", 2, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Adm!nCarnet2025", 3, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Usr!Carnet2025", 4, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null }
-                });
-
-            migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "AccessPoints",
                 columns: new[] { "Id", "Code", "CreateAt", "Description", "Name", "QrCode", "TypeId", "UpdateAt" },
@@ -1434,6 +1481,17 @@ namespace Entity.Migrations.Postgres
                     { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Acceso norte del evento", "Punto Norte", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Acceso sur del evento", "Punto Sur", null, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Acceso principal", "Punto Principal", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "Operational",
+                table: "EventSchedules",
+                columns: new[] { "EventId", "ScheduleId", "Code", "CreateAt", "Id", "IsDeleted", "UpdateAt" },
+                values: new object[,]
+                {
+                    { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1483,31 +1541,6 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.InsertData(
-                schema: "ModelSecurity",
-                table: "UserRoles",
-                columns: new[] { "Id", "Code", "CreateAt", "IsDeleted", "RolId", "UpdateAt", "UserId" },
-                values: new object[,]
-                {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1 },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2 },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3 },
-                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4 },
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2 },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3 },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4 }
-                });
-
-            migrationBuilder.InsertData(
-                schema: "Operational",
-                table: "Attendances",
-                columns: new[] { "Id", "AccessPointOfEntry", "AccessPointOfExit", "Code", "CreateAt", "PersonId", "QrCode", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
-                values: new object[,]
-                {
-                    { 1, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, null, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
-                });
-
-            migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "Branches",
                 columns: new[] { "Id", "Address", "CityId", "Code", "CreateAt", "Email", "Location", "Name", "OrganizationId", "Phone", "UpdateAt" },
@@ -1515,6 +1548,49 @@ namespace Entity.Migrations.Postgres
                 {
                     { 1, "Calle 1 # 2-34", 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "principal@org.com", "Centro", "Sucursal Principal", 1, "123456789", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { 2, "Carrera 45 # 67-89", 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "norte@org.com", "Zona Norte", "Sucursal Norte", 1, "987654321", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "Operational",
+                table: "EventAccessPoints",
+                columns: new[] { "Id", "AccessPointId", "Code", "CreateAt", "EventId", "IsDeleted", "QrCodeKey", "UpdateAt" },
+                values: new object[,]
+                {
+                    { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "Users",
+                columns: new[] { "Id", "Active", "Code", "CreateAt", "DateCreated", "IsDeleted", "OrganizationId", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "UpdateAt", "UserName" },
+                values: new object[,]
+                {
+                    { 1, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, "123", 1, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin" },
+                    { 2, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 2, "Marcos2025", 7, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "marcosrojasalvarez09172007@gmail.com" },
+                    { 3, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 3, "isa123", 5, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "isabeltovarp.18@gmail.com" },
+                    { 4, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, "Katalin@01", 6, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "cachape64@gmail.com" }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "Users",
+                columns: new[] { "Id", "Code", "CreateAt", "DateCreated", "IsDeleted", "OrganizationId", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "UpdateAt", "UserName" },
+                values: new object[,]
+                {
+                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, "L4d!Estudiante2025", 2, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null },
+                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 2, "Adm!nCarnet2025", 3, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null },
+                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 3, "Usr!Carnet2025", 4, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "Operational",
+                table: "Attendances",
+                columns: new[] { "Id", "Code", "CreateAt", "EventAccessPointEntryId", "EventAccessPointExitId", "PersonId", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
+                values: new object[,]
+                {
+                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, 2, 1, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, 2, 2, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1529,6 +1605,21 @@ namespace Entity.Migrations.Postgres
                     { 4, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
+            migrationBuilder.InsertData(
+                schema: "ModelSecurity",
+                table: "UserRoles",
+                columns: new[] { "Id", "Code", "CreateAt", "IsDeleted", "RolId", "UpdateAt", "UserId" },
+                values: new object[,]
+                {
+                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1 },
+                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2 },
+                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3 },
+                    { 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4 },
+                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2 },
+                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3 },
+                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AccessPoints_TypeId",
                 schema: "Operational",
@@ -1536,16 +1627,16 @@ namespace Entity.Migrations.Postgres
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attendances_AccessPointOfEntry",
+                name: "IX_Attendances_EventAccessPointEntryId",
                 schema: "Operational",
                 table: "Attendances",
-                column: "AccessPointOfEntry");
+                column: "EventAccessPointEntryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attendances_AccessPointOfExit",
+                name: "IX_Attendances_EventAccessPointExitId",
                 schema: "Operational",
                 table: "Attendances",
-                column: "AccessPointOfExit");
+                column: "EventAccessPointExitId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendances_PersonId",
@@ -1631,22 +1722,28 @@ namespace Entity.Migrations.Postgres
                 column: "AccessPointId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventAccessPoints_EventId",
+                schema: "Operational",
+                table: "EventAccessPoints",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_EventTypeId",
                 schema: "Operational",
                 table: "Events",
                 column: "EventTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_ScheduleId",
-                schema: "Operational",
-                table: "Events",
-                column: "ScheduleId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Events_StatusId",
                 schema: "Operational",
                 table: "Events",
                 column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventSchedules_ScheduleId",
+                schema: "Operational",
+                table: "EventSchedules",
+                column: "ScheduleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventTargetAudience_EventId",
@@ -1714,6 +1811,11 @@ namespace Entity.Migrations.Postgres
                 column: "IssuedCardId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ImportBatchRows_PersonId",
+                table: "ImportBatchRows",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InternalDivisions_AreaCategoryId",
                 schema: "Organizational",
                 table: "InternalDivisions",
@@ -1768,6 +1870,11 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 table: "IssuedCards",
                 column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_modificationRequests_UserId",
+                table: "modificationRequests",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Modules_Name",
@@ -1938,6 +2045,12 @@ namespace Entity.Migrations.Postgres
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_OrganizationId",
+                schema: "ModelSecurity",
+                table: "Users",
+                column: "OrganizationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_PersonId",
                 schema: "ModelSecurity",
                 table: "Users",
@@ -1960,7 +2073,7 @@ namespace Entity.Migrations.Postgres
                 schema: "Operational");
 
             migrationBuilder.DropTable(
-                name: "EventAccessPoints",
+                name: "EventSchedules",
                 schema: "Operational");
 
             migrationBuilder.DropTable(
@@ -1969,6 +2082,9 @@ namespace Entity.Migrations.Postgres
 
             migrationBuilder.DropTable(
                 name: "ImportBatchRows");
+
+            migrationBuilder.DropTable(
+                name: "modificationRequests");
 
             migrationBuilder.DropTable(
                 name: "NotificationReceived",
@@ -1991,11 +2107,7 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
-                name: "AccessPoints",
-                schema: "Operational");
-
-            migrationBuilder.DropTable(
-                name: "Events",
+                name: "EventAccessPoints",
                 schema: "Operational");
 
             migrationBuilder.DropTable(
@@ -2022,7 +2134,11 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
-                name: "EventTypes",
+                name: "AccessPoints",
+                schema: "Operational");
+
+            migrationBuilder.DropTable(
+                name: "Events",
                 schema: "Operational");
 
             migrationBuilder.DropTable(
@@ -2042,12 +2158,16 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational");
 
             migrationBuilder.DropTable(
-                name: "Statuses",
-                schema: "Parameter");
-
-            migrationBuilder.DropTable(
                 name: "Modules",
                 schema: "ModelSecurity");
+
+            migrationBuilder.DropTable(
+                name: "EventTypes",
+                schema: "Operational");
+
+            migrationBuilder.DropTable(
+                name: "Statuses",
+                schema: "Parameter");
 
             migrationBuilder.DropTable(
                 name: "People",
