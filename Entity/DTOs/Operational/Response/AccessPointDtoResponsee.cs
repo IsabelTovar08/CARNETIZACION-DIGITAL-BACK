@@ -17,6 +17,6 @@ namespace Entity.DTOs.Operational.Response
         public string? Type { get; set; }
 
         // NUEVO: expone el QR
-        public string? QrCodeKey { get; set; }
+        public string? QrCode { get; set; }
     }
 }

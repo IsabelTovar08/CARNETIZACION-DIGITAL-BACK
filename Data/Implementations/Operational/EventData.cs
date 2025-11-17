@@ -35,7 +35,9 @@ namespace Data.Implementations.Operational
 
                 .Include(e => e.EventSchedules)
                   .ThenInclude(es => es.Schedule)
-                    
+
+                .Include(e => e.EventAccessPoints)
+
                 .Include(e => e.EventAccessPoints)
                     .ThenInclude(eap => eap.AccessPoint)
                         .ThenInclude(ap => ap.AccessPointType)
@@ -48,6 +50,7 @@ namespace Data.Implementations.Operational
 
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.InternalDivision)
+
                 .FirstOrDefaultAsync(e => e.Id == eventId);
 
             return ev;

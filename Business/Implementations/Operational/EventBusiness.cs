@@ -7,6 +7,7 @@ using Data.Interfases.Operational;
 using Entity.DTOs.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Specifics; 
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Utilities.Exeptions;
-using Entity.DTOs.Specifics; 
+using Utilities.Helpers;
+using static QRCoder.PayloadGenerator;
 using static Utilities.Helpers.BarcodeHelper;
 
 namespace Business.Implementations.Operational
@@ -45,7 +47,7 @@ namespace Business.Implementations.Operational
             _mapper = mapper;
             _logger = logger;
         }
-
+            
         /// <summary>
         /// Obtiene los detalles completos del evento.
         /// </summary>
@@ -123,25 +125,37 @@ namespace Business.Implementations.Operational
 
                 if (dto.AccessPoints?.Any() == true)
                 {
+                    // 1️⃣ Crear AP con QR
                     createdAccessPoints = dto.AccessPoints
                         .Select(apDto => new AccessPoint
                         {
                             Name = apDto.Name,
                             Description = apDto.Description,
                             TypeId = apDto.TypeId,
-                            IsDeleted = false
+                            IsDeleted = false,
+                            QrCode = null
                         }).ToList();
 
                     await _apData.BulkInsertAsync(createdAccessPoints);
 
-                    var links = createdAccessPoints.Select(ap => new EventAccessPoint
+                    // 2️⃣ Crear Link EventAccessPoint con el QR
+                    var links = createdAccessPoints.Select(ap => 
                     {
-                        EventId = savedEvent.Id,
-                        AccessPointId = ap.Id
+                        string payload =
+                          $"AP:{ap.Id}|EVENT:{savedEvent.Id}|DATE:{DateTime.UtcNow:O}";
+
+                        return new EventAccessPoint
+                        {
+                            EventId = savedEvent.Id,
+                            AccessPointId = ap.Id,
+                            QrCodeKey = QrCodeHelper.ToPngBase64(payload) 
+                        };
                     }).ToList();
 
                     await _data.BulkInsertEventAccessPointsAsync(links);
                 }
+
+
 
                 // 3️⃣ Crear QR
                 string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";

@@ -286,8 +286,8 @@ namespace Utilities.Helper
 
 
 
-                // 🔹 Access points
-                .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
+               // 🔹 Access points
+               .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
                     s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
                     {
                         Id = eap.AccessPoint.Id,
@@ -296,9 +296,15 @@ namespace Utilities.Helper
                         TypeId = eap.AccessPoint.TypeId,
                         Type = eap.AccessPoint.AccessPointType != null
                             ? eap.AccessPoint.AccessPointType.Name
-                            : null
+                            : null,
+
+                        QrCode = eap.QrCodeKey,
+
+                        //// para agregar el code del AP
+                        Code = eap.AccessPoint.Code
                     })
                 ));
+
 
 
             //EventSchedule
@@ -324,7 +330,9 @@ namespace Utilities.Helper
                      Name = eap.AccessPoint.Name,
                      Description = eap.AccessPoint.Description,
                      TypeId = eap.AccessPoint.TypeId,
-                     Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null
+                     Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null,
+                     QrCode = eap.QrCodeKey,
+                     Code = eap.AccessPoint.Code
                  })
              ))
              .ForMember(d => d.Audiences, opt => opt.MapFrom(s => s.EventTargetAudiences));
@@ -407,7 +415,7 @@ namespace Utilities.Helper
              .ForMember(d => d.EventId, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.EventId).FirstOrDefault()))
              .ForMember(d => d.EventName, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.Event.Name).FirstOrDefault()))
              .ForMember(d => d.Type, opt => opt.MapFrom(s => s.AccessPointType != null ? s.AccessPointType.Name : null))
-             .ForMember(d => d.QrCodeKey, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.QrCodeKey).FirstOrDefault()));
+             .ForMember(d => d.QrCode, opt => opt.MapFrom(s => s.EventAccessPoints.Select(eap => eap.QrCodeKey).FirstOrDefault()));
 
 
             // DTO -> ENTIDAD
