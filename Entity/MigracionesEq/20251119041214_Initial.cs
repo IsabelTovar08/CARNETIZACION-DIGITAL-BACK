@@ -726,7 +726,7 @@ namespace Entity.MigracionesEq
                     TempCodeAttempts = table.Column<int>(type: "integer", nullable: false),
                     TempCodeConsumedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     TempCodeResendBlockedUntil = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    OrganizationId = table.Column<int>(type: "integer", nullable: false),
+                    OrganizationId = table.Column<int>(type: "integer", nullable: true),
                     Code = table.Column<string>(type: "text", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1456,7 +1456,8 @@ namespace Entity.MigracionesEq
                     { 21, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Catálogo de permisos", "lock_open_circle", 5, "Permisos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/permissions" },
                     { 22, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Catálogo de formularios", "lists", 5, "Formularios", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/forms" },
                     { 23, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Catálogo de módulos", "dashboard_2", 5, "Módulos", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "/dashboard/seguridad/modules" },
-                    { 24, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Consulta de generación masiva de carnets", "groups", 3, "Gestión de personas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "/dashboard/operational/people-management" }
+                    { 24, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Consulta de generación masiva de carnets", "groups", 3, "Gestión de personas", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "/dashboard/operational/people-management" },
+                    { 25, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "", "published_with_changes", 3, "Solicitudes de Modificación", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "/dashboard/operational/modification-request" }
                 });
 
             migrationBuilder.InsertData(

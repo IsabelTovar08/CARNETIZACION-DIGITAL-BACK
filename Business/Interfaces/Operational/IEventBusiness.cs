@@ -39,5 +39,7 @@ namespace Business.Interfaces.Operational
 
         Task<IEnumerable<EventDtoResponse>> FilterAsync(EventFilterDto filters);
 
+
+
     }
 }

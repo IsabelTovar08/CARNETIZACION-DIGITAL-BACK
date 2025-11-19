@@ -47,7 +47,42 @@ namespace Business.Implementations.Operational
             _mapper = mapper;
             _logger = logger;
         }
-            
+
+        /// <summary>
+        /// lista  de español a ingles las jornadas
+        /// </summary>
+
+        private static readonly Dictionary<string, string> DaysEsToEn = new()
+{
+            { "lunes", "Monday" },
+            { "martes", "Tuesday" },
+            { "miércoles", "Wednesday" },
+            { "miercoles", "Wednesday" },
+            { "jueves", "Thursday" },
+            { "viernes", "Friday" },
+            { "sábado", "Saturday" },
+            { "sabado", "Saturday" },
+            { "domingo", "Sunday" }
+        };
+
+        /// <summary>
+        /// Para la conversion de español a ingles
+        /// </summary>
+        /// <param name="days"></param>
+        /// <returns></returns>
+        private List<string> ConvertDaysToEnglish(string days)
+        {
+            if (string.IsNullOrWhiteSpace(days))
+                return new List<string>();
+
+            return days
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim().ToLower())
+                .Select(x => DaysEsToEn.ContainsKey(x) ? DaysEsToEn[x] : x)
+                .ToList();
+        }
+
+
         /// <summary>
         /// Obtiene los detalles completos del evento.
         /// </summary>
@@ -231,17 +266,14 @@ namespace Business.Implementations.Operational
 
             var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Local);
 
-            if (ev.EventStart.HasValue && ev.EventEnd.HasValue &&
-                ev.EventStart <= now && ev.EventEnd >= now)
+            if (ev.Schedules != null && ev.Schedules.Any())
             {
-                if (ev.Schedules != null && ev.Schedules.Any())
-                {
                     foreach (var sch in ev.Schedules)
                     {
                         var today = now.DayOfWeek.ToString();
-                        var scheduleDays = sch.Days?.Split(',').Select(d => d.Trim()) ?? Enumerable.Empty<string>();
+                        var scheduleDays = ConvertDaysToEnglish(sch.Days);
 
-                        if (!scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
+                    if (!scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
                             continue;
 
                         if (now.TimeOfDay >= sch.StartTime && now.TimeOfDay <= sch.EndTime)
@@ -254,11 +286,18 @@ namespace Business.Implementations.Operational
 
                                 _logger.LogInformation($"Evento {ev.Id} marcado como 'En curso'.");
                             }
-
-                            break; // ya no revisamos más
+                                
+                            return; // ya no revisamos más
                         }
                     }
                 }
+            if (ev.StatusId == 8)
+            {
+                ev.StatusId = 9; // Por ejemplo: Activo / Disponible / No iniciado
+                ev.UpdateAt = DateTime.Now;
+                await _data.UpdateAsync(ev);
+
+                _logger.LogInformation($"Evento {ev.Id} marcado como 'No en curso'.");
             }
         }
 

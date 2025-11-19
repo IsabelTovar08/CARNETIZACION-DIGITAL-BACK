@@ -181,20 +181,23 @@ namespace Data.Implementations.Operational
         {
             var localNow = DateTime.SpecifyKind(now, DateTimeKind.Local);
 
-            return await _context.Set<Event>()
+            return await _context.Events
                 .Where(e => (e.StatusId == 1 || e.StatusId == 8)
                     && e.EventEnd <= localNow
                     && !e.IsDeleted)
+                .Include(e => e.EventSchedules)
+                    .ThenInclude(es => es.Schedule)
                 .ToListAsync();
         }
+
 
         // metodo para el servicio que verifica y actualiza el estado de eventos "en curso"
         public async Task<IEnumerable<Event>> GetActiveEventsAsync()
         {
             return await _context.Set<Event>()
+                .Where(e => e.StatusId == 1 || e.StatusId == 8) 
                 .Include(e => e.EventSchedules)
-                  .ThenInclude(es => es.Schedule)
-                .Where(e => e.StatusId == 1 || e.StatusId == 8)
+                    .ThenInclude(es => es.Schedule)
                 .ToListAsync();
         }
 

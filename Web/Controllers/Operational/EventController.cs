@@ -177,5 +177,6 @@ namespace Web.Controllers.Operational
                 data = result
             });
         }
+
     }
 }

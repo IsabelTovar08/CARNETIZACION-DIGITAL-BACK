@@ -66,7 +66,9 @@ namespace Entity.DataInit.Security
               new Form { Id = 22, Name = "Formularios", Description = "Catálogo de formularios", Icon = "lists", Url = "/dashboard/seguridad/forms", ModuleId = 5 },
               new Form { Id = 23, Name = "Módulos", Description = "Catálogo de módulos", Icon = "dashboard_2", Url = "/dashboard/seguridad/modules", ModuleId = 5 },
 
-              new Form { Id = 24, Name = "Gestión de personas", Description = "Consulta de generación masiva de carnets", Icon = "groups", Url = "/dashboard/operational/people-management", ModuleId = 3 }
+              new Form { Id = 24, Name = "Gestión de personas", Description = "Consulta de generación masiva de carnets", Icon = "groups", Url = "/dashboard/operational/people-management", ModuleId = 3 },
+
+              new Form{ Id = 25, Name = "Solicitudes de Modificación", Description = "", Icon = "published_with_changes", Url= "/dashboard/operational/modification-request", ModuleId = 3 }
 
           );
 

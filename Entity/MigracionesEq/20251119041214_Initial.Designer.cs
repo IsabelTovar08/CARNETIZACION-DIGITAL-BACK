@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Entity.MigracionesEq
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251117005720_Initial")]
+    [Migration("20251119041214_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -420,6 +420,18 @@ namespace Entity.MigracionesEq
                             Name = "Gestión de personas",
                             UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Url = "/dashboard/operational/people-management"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            CreateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "",
+                            Icon = "published_with_changes",
+                            IsDeleted = false,
+                            ModuleId = 3,
+                            Name = "Solicitudes de Modificación",
+                            UpdateAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Url = "/dashboard/operational/modification-request"
                         });
                 });
 
@@ -3343,7 +3355,7 @@ namespace Entity.MigracionesEq
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("OrganizationId")
+                    b.Property<int?>("OrganizationId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Password")
@@ -4029,8 +4041,7 @@ namespace Entity.MigracionesEq
                     b.HasOne("Entity.Models.Organizational.Structure.Organization", "Organization")
                         .WithMany("Users")
                         .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Entity.Models.ModelSecurity.Person", "Person")
                         .WithOne("User")
