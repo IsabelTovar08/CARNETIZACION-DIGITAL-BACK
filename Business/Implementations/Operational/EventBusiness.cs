@@ -49,41 +49,6 @@ namespace Business.Implementations.Operational
         }
 
         /// <summary>
-        /// lista  de español a ingles las jornadas
-        /// </summary>
-
-        private static readonly Dictionary<string, string> DaysEsToEn = new()
-{
-            { "lunes", "Monday" },
-            { "martes", "Tuesday" },
-            { "miércoles", "Wednesday" },
-            { "miercoles", "Wednesday" },
-            { "jueves", "Thursday" },
-            { "viernes", "Friday" },
-            { "sábado", "Saturday" },
-            { "sabado", "Saturday" },
-            { "domingo", "Sunday" }
-        };
-
-        /// <summary>
-        /// Para la conversion de español a ingles
-        /// </summary>
-        /// <param name="days"></param>
-        /// <returns></returns>
-        private List<string> ConvertDaysToEnglish(string days)
-        {
-            if (string.IsNullOrWhiteSpace(days))
-                return new List<string>();
-
-            return days
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Trim().ToLower())
-                .Select(x => DaysEsToEn.ContainsKey(x) ? DaysEsToEn[x] : x)
-                .ToList();
-        }
-
-
-        /// <summary>
         /// Obtiene los detalles completos del evento.
         /// </summary>
         public async Task<EventDetailsDtoResponse?> GetEventFullDetailsAsync(int eventId)
@@ -271,7 +236,7 @@ namespace Business.Implementations.Operational
                     foreach (var sch in ev.Schedules)
                     {
                         var today = now.DayOfWeek.ToString();
-                        var scheduleDays = ConvertDaysToEnglish(sch.Days);
+                        var scheduleDays = sch.Days?.Split(',').Select(d => d.Trim()) ?? Enumerable.Empty<string>();
 
                     if (!scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
                             continue;
