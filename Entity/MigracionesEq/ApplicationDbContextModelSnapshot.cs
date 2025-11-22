@@ -1042,6 +1042,9 @@ namespace Entity.MigracionesEq
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("QrCodeKey")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1514,6 +1517,18 @@ namespace Entity.MigracionesEq
                     b.Property<int?>("EventAccessPointExitId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("EventScheduleEventId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EventScheduleEventId1")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EventScheduleScheduleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EventScheduleScheduleId1")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -1538,6 +1553,10 @@ namespace Entity.MigracionesEq
                     b.HasIndex("EventAccessPointExitId");
 
                     b.HasIndex("PersonId");
+
+                    b.HasIndex("EventScheduleEventId", "EventScheduleScheduleId");
+
+                    b.HasIndex("EventScheduleEventId1", "EventScheduleScheduleId1");
 
                     b.ToTable("Attendances", "Operational");
 
@@ -3844,6 +3863,14 @@ namespace Entity.MigracionesEq
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Entity.Models.Operational.EventSchedule", null)
+                        .WithMany("AttendancesEntry")
+                        .HasForeignKey("EventScheduleEventId", "EventScheduleScheduleId");
+
+                    b.HasOne("Entity.Models.Operational.EventSchedule", null)
+                        .WithMany("AttendancesExit")
+                        .HasForeignKey("EventScheduleEventId1", "EventScheduleScheduleId1");
+
                     b.Navigation("EventAccessPointEntry");
 
                     b.Navigation("EventAccessPointExit");
@@ -4100,6 +4127,13 @@ namespace Entity.MigracionesEq
                 });
 
             modelBuilder.Entity("Entity.Models.Operational.EventAccessPoint", b =>
+                {
+                    b.Navigation("AttendancesEntry");
+
+                    b.Navigation("AttendancesExit");
+                });
+
+            modelBuilder.Entity("Entity.Models.Operational.EventSchedule", b =>
                 {
                     b.Navigation("AttendancesEntry");
 

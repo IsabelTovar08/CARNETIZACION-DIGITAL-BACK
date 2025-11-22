@@ -17,5 +17,9 @@ namespace Entity.Models.Operational
 
         public int ScheduleId { get; set; }
         public Schedule Schedule { get; set; }
+
+        public List<Attendance>? AttendancesEntry { get; set; }
+        public List<Attendance>? AttendancesExit { get; set; }
+        public string? QrCodeKey { get; set; }
     }
 }

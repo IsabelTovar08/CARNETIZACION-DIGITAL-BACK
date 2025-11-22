@@ -36,7 +36,7 @@ namespace Data.Implementations.Operational
                 .Include(e => e.EventSchedules)
                   .ThenInclude(es => es.Schedule)
 
-                .Include(e => e.EventAccessPoints)
+                //.Include(e => e.EventAccessPoints)
 
                 .Include(e => e.EventAccessPoints)
                     .ThenInclude(eap => eap.AccessPoint)

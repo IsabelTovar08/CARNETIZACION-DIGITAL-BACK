@@ -112,43 +112,41 @@ namespace Business.Implementations.Operational
         /// <summary>
         /// Crea un evento con accesos, audiencias y genera un código QR.
         /// </summary>
-        public async Task<int> CreateEventAsync(CreateEventRequest dto)
-        {
-            try
+            public async Task<int> CreateEventAsync(CreateEventRequest dto)
             {
-                // 1️⃣ Crear el evento principal
-                var ev = _mapper.Map<Event>(dto.Event);
-                var savedEvent = await _data.SaveAsync(ev);
+                try
+                {
+                    // 1️⃣ Crear el evento principal
+                    var ev = _mapper.Map<Event>(dto.Event);
+                    var savedEvent = await _data.SaveAsync(ev);
 
-                // 2️⃣ Crear Access Points
-                var createdAccessPoints = new List<AccessPoint>();
+                    // 2️⃣ Crear Access Points
+                    var createdAccessPoints = new List<AccessPoint>();
+                    var links = new List<EventAccessPoint>();
+              
 
                 if (dto.AccessPoints?.Any() == true)
                 {
-                    // 1️⃣ Crear AP con QR
-                    createdAccessPoints = dto.AccessPoints
-                        .Select(apDto => new AccessPoint
-                        {
-                            Name = apDto.Name,
-                            Description = apDto.Description,
-                            TypeId = apDto.TypeId,
-                            IsDeleted = false,
-                            QrCode = null
-                        }).ToList();
+                    createdAccessPoints = dto.AccessPoints.Select(apDto => new AccessPoint
+                    {
+                        Name = apDto.Name,
+                        Description = apDto.Description,
+                        TypeId = apDto.TypeId,
+                        IsDeleted = false,
+                        QrCode = null
+                    }).ToList();
 
                     await _apData.BulkInsertAsync(createdAccessPoints);
 
-                    // 2️⃣ Crear Link EventAccessPoint con el QR
-                    var links = createdAccessPoints.Select(ap => 
+                    links = createdAccessPoints.Select(ap =>
                     {
-                        string payload =
-                          $"AP:{ap.Id}|EVENT:{savedEvent.Id}|DATE:{DateTime.UtcNow:O}";
+                        string payload = $"AP:{ap.Id}|EVENT:{savedEvent.Id}|DATE:{DateTime.UtcNow:O}";
 
                         return new EventAccessPoint
                         {
                             EventId = savedEvent.Id,
                             AccessPointId = ap.Id,
-                            QrCodeKey = QrCodeHelper.ToPngBase64(payload) 
+                            QrCodeKey = QrCodeHelper.ToPngBase64(payload)
                         };
                     }).ToList();
 
@@ -156,190 +154,203 @@ namespace Business.Implementations.Operational
                 }
 
 
+                // 3️⃣ Crear QR GENERAL DEL EVENTO
+                {
+                    string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
 
-                // 3️⃣ Crear QR
-                string firstAccessPoint = createdAccessPoints.FirstOrDefault()?.Name ?? "General";
-                string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
-                savedEvent.QrCodeBase64 = GenerateQrBase64(qrContent);
-                await _data.UpdateAsync(savedEvent);
+                    string qrContent = $"EVT|{savedEvent.Id}|{savedEvent.Name}|{firstAccessPoint}";
+
+                    savedEvent.QrCodeBase64 = GenerateQrBase64(qrContent);
+
+                    await _data.UpdateAsync(savedEvent);
+                }
+
+
 
                 // 4️⃣ Crear Audiencias
                 var audiences = new List<EventTargetAudience>();
 
-                if (dto.ProfileIds?.Any() == true)
-                {
-                    audiences.AddRange(dto.ProfileIds.Select(pid => new EventTargetAudience
+                    if (dto.ProfileIds?.Any() == true)
                     {
-                        TypeId = 1,
-                        ProfileId = pid,
-                        EventId = savedEvent.Id
-                    }));
-                }
-
-                if (dto.OrganizationalUnitIds?.Any() == true)
-                {
-                    audiences.AddRange(dto.OrganizationalUnitIds.Select(ouid => new EventTargetAudience
-                    {
-                        TypeId = 2,
-                        OrganizationalUnitId = ouid,
-                        EventId = savedEvent.Id
-                    }));
-                }
-
-                if (dto.InternalDivisionIds?.Any() == true)
-                {
-                    audiences.AddRange(dto.InternalDivisionIds.Select(did => new EventTargetAudience
-                    {
-                        TypeId = 3,
-                        InternalDivisionId = did,
-                        EventId = savedEvent.Id
-                    }));
-                }
-
-                if (audiences.Any())
-                    await _audienceRepo.BulkInsertAsync(audiences);
-
-                // 5️⃣ NUEVO: Registrar jornadas (Schedules)
-                if (dto.ScheduleIds != null && dto.ScheduleIds.Any())
-                {
-                    var scheduleLinks = dto.ScheduleIds.Select(sid => new EventSchedule
-                    {
-                        EventId = savedEvent.Id,
-                        ScheduleId = sid
-                    }).ToList();
-
-                    await _data.BulkInsertEventSchedulesAsync(scheduleLinks);
-                }
-
-                return savedEvent.Id;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear evento con access points");
-                throw;
-            }
-        }
-
-
-        /// <summary>
-        /// Actualiza el estado del evento automáticamente a "En curso" si coincide con su horario.
-        /// </summary>
-        public async Task CheckAndUpdateEventStatusAsync(int eventId)
-        {
-            var ev = await _data.GetEventWithDetailsAsync(eventId);
-            if (ev == null) return;
-
-            var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Local);
-
-            if (ev.Schedules != null && ev.Schedules.Any())
-            {
-                    foreach (var sch in ev.Schedules)
-                    {
-                        var today = now.DayOfWeek.ToString();
-                        var scheduleDays = sch.Days?.Split(',').Select(d => d.Trim()) ?? Enumerable.Empty<string>();
-
-                    if (!scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
-                            continue;
-
-                        if (now.TimeOfDay >= sch.StartTime && now.TimeOfDay <= sch.EndTime)
+                        audiences.AddRange(dto.ProfileIds.Select(pid => new EventTargetAudience
                         {
-                            if (ev.StatusId != 8)
-                            {
-                                ev.StatusId = 8;
-                                ev.UpdateAt = DateTime.Now;
-                                await _data.UpdateAsync(ev);
+                            TypeId = 1,
+                            ProfileId = pid,
+                            EventId = savedEvent.Id
+                        }));
+                    }
 
-                                _logger.LogInformation($"Evento {ev.Id} marcado como 'En curso'.");
-                            }
+                    if (dto.OrganizationalUnitIds?.Any() == true)
+                    {
+                        audiences.AddRange(dto.OrganizationalUnitIds.Select(ouid => new EventTargetAudience
+                        {
+                            TypeId = 2,
+                            OrganizationalUnitId = ouid,
+                            EventId = savedEvent.Id
+                        }));
+                    }
+
+                    if (dto.InternalDivisionIds?.Any() == true)
+                    {
+                        audiences.AddRange(dto.InternalDivisionIds.Select(did => new EventTargetAudience
+                        {
+                            TypeId = 3,
+                            InternalDivisionId = did,
+                            EventId = savedEvent.Id
+                        }));
+                    }
+
+                    if (audiences.Any())
+                        await _audienceRepo.BulkInsertAsync(audiences);
+
+                    // 5️⃣ NUEVO: Registrar jornadas (Schedules)
+                    if (dto.ScheduleIds != null && dto.ScheduleIds.Any())
+                    {
+                        var scheduleLinks = dto.ScheduleIds.Select(sid => new EventSchedule
+                        {
+                            EventId = savedEvent.Id,
+                            ScheduleId = sid
+                        }).ToList();
+
+                        await _data.BulkInsertEventSchedulesAsync(scheduleLinks);
+                    }
+
+                    return savedEvent.Id;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error al crear evento con access points");
+                    throw;
+                }
+            }
+
+            /// <summary>
+            /// Actualiza el estado del evento automáticamente a "En curso" si coincide con su horario.
+            /// </summary>
+            public async Task CheckAndUpdateEventStatusAsync(int eventId)
+            {
+                var ev = await _data.GetEventWithDetailsAsync(eventId);
+                if (ev == null) return;
+
+                var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Local);
+
+                if (ev.Schedules != null && ev.Schedules.Any())
+                {
+                        foreach (var sch in ev.Schedules)
+                        {
+                            var today = now.DayOfWeek.ToString();
+                            var scheduleDays = sch.Days?.Split(',').Select(d => d.Trim()) ?? Enumerable.Empty<string>();
+
+                        if (!scheduleDays.Contains(today, StringComparer.OrdinalIgnoreCase))
+                                continue;
+
+                            if (now.TimeOfDay >= sch.StartTime && now.TimeOfDay <= sch.EndTime)
+                            {
+                                if (ev.StatusId != 8)
+                                {
+                                    ev.StatusId = 8;
+                                    ev.UpdateAt = DateTime.Now;
+                                    await _data.UpdateAsync(ev);
+
+                                    _logger.LogInformation($"Evento {ev.Id} marcado como 'En curso'.");
+                                }
                                 
-                            return; // ya no revisamos más
+                                return; // ya no revisamos más
+                            }
                         }
                     }
-                }
-            if (ev.StatusId == 8)
-            {
-                ev.StatusId = 9; // Por ejemplo: Activo / Disponible / No iniciado
-                ev.UpdateAt = DateTime.Now;
-                await _data.UpdateAsync(ev);
-
-                _logger.LogInformation($"Evento {ev.Id} marcado como 'No en curso'.");
-            }
-        }
-
-
-        /// <summary>
-        /// Actualiza un evento existente con sus relaciones.
-        /// </summary>
-        public async Task<int> UpdateEventAsync(EventDtoRequest dto)
-        {
-            try
-            {
-                var existingEvent = await _data.GetEventWithDetailsAsync(dto.Id);
-                if (existingEvent == null)
-                    throw new EntityNotFoundException($"No se encontró el evento con Id {dto.Id}");
-
-                // 1️⃣ Datos principales
-                existingEvent.Name = dto.Name;
-                existingEvent.Description = dto.Description;
-                existingEvent.EventStart = dto.EventStart;
-                existingEvent.EventEnd = dto.EventEnd;
-                existingEvent.EventTypeId = dto.EventTypeId;
-                existingEvent.StatusId = dto.StatusId;
-                existingEvent.IsPublic = dto.Ispublic;
-                existingEvent.UpdateAt = DateTime.Now;
-
-                // 2️⃣ Actualizar Access Points
-                await _data.DeleteEventAccessPointsByEventIdAsync(existingEvent.Id);
-
-                if (dto.AccessPoints != null && dto.AccessPoints.Any())
+                if (ev.StatusId == 8)
                 {
-                    var newLinks = dto.AccessPoints.Select(apId => new EventAccessPoint
-                    {
-                        EventId = existingEvent.Id,
-                        AccessPointId = apId
-                    }).ToList();
+                    ev.StatusId = 1; // Por ejemplo:  No iniciado
+                    ev.UpdateAt = DateTime.Now;
+                    await _data.UpdateAsync(ev);
 
-                    await _data.BulkInsertEventAccessPointsAsync(newLinks);
+                    _logger.LogInformation($"Evento {ev.Id} marcado como 'No en curso'.");
                 }
-
-                // 3️⃣ Actualizar Audiencias
-                await _audienceRepo.DeleteByEventIdAsync(existingEvent.Id);
-
-                await CreateEventAudiencesAsync(
-                    existingEvent.Id,
-                    dto.ProfileIds,
-                    dto.OrganizationalUnitIds,
-                    dto.InternalDivisionIds
-                );
-
-                // 4️⃣ NUEVO: Actualizar jornadas del evento
-                await _data.DeleteEventSchedulesByEventIdAsync(existingEvent.Id);
-
-                if (dto.ScheduleIds != null && dto.ScheduleIds.Any())
-                {
-                    var scheduleLinks = dto.ScheduleIds.Select(sid => new EventSchedule
-                    {
-                        EventId = existingEvent.Id,
-                        ScheduleId = sid
-                    }).ToList();
-
-                    await _data.BulkInsertEventSchedulesAsync(scheduleLinks);
-                }
-
-                // 5️⃣ Guardar actualización
-                await _data.UpdateAsync(existingEvent);
-
-                return existingEvent.Id;
             }
-            catch (Exception ex)
+
+
+            /// <summary>
+            /// Actualiza un evento existente con sus relaciones.
+            /// </summary>
+            public async Task<int> UpdateEventAsync(EventDtoRequest dto)
             {
-                _logger.LogError(ex, $"Error al actualizar el evento con Id {dto.Id}");
-                throw new ExternalServiceException("Error al actualizar el evento", ex.Message);
+                try
+                {
+                    var existingEvent = await _data.GetEventWithDetailsAsync(dto.Id);
+                    if (existingEvent == null)
+                        throw new EntityNotFoundException($"No se encontró el evento con Id {dto.Id}");
+
+                    // 1️⃣ Datos principales
+                    existingEvent.Name = dto.Name;
+                    existingEvent.Description = dto.Description;
+                    existingEvent.EventStart = dto.EventStart;
+                    existingEvent.EventEnd = dto.EventEnd;
+                    existingEvent.EventTypeId = dto.EventTypeId;
+                    existingEvent.StatusId = dto.StatusId;
+                    existingEvent.IsPublic = dto.Ispublic;
+                    existingEvent.UpdateAt = DateTime.Now;
+
+                    // 2️⃣ Actualizar Access Points
+                    await _data.DeleteEventAccessPointsByEventIdAsync(existingEvent.Id);
+
+                    if (dto.AccessPoints != null && dto.AccessPoints.Any())
+                    {
+                        var newLinks = dto.AccessPoints.Select(apId => new EventAccessPoint
+                        {
+                            EventId = existingEvent.Id,
+                            AccessPointId = apId
+                        }).ToList();
+
+                        await _data.BulkInsertEventAccessPointsAsync(newLinks);
+                    }
+
+                    // 3️⃣ Actualizar Audiencias
+                    await _audienceRepo.DeleteByEventIdAsync(existingEvent.Id);
+
+                    await CreateEventAudiencesAsync(
+                        existingEvent.Id,
+                        dto.ProfileIds,
+                        dto.OrganizationalUnitIds,
+                        dto.InternalDivisionIds
+                    );
+
+                    // 4️⃣ NUEVO: Actualizar jornadas del evento
+                    await _data.DeleteEventSchedulesByEventIdAsync(existingEvent.Id);
+
+                    if (dto.ScheduleIds != null && dto.ScheduleIds.Any())
+                    {
+                        var scheduleLinks = dto.ScheduleIds.Select(sid => new EventSchedule
+                        {
+                            EventId = existingEvent.Id,
+                            ScheduleId = sid
+                        }).ToList();
+
+                        await _data.BulkInsertEventSchedulesAsync(scheduleLinks);
+                    }
+
+                    // 5️⃣ Guardar actualización
+                    await _data.UpdateAsync(existingEvent);
+
+                    return existingEvent.Id;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error al actualizar el evento con Id {dto.Id}");
+                    throw new ExternalServiceException("Error al actualizar el evento", ex.Message);
+                }
             }
-        }
 
 
         #region Métodos Privados
+
+        /// <summary>
+        /// Genera QR en Base64 usando QrCodeHelper (mismo que AccessPoints)
+        /// </summary>
+        private string GenerateQrBase64(string content)
+        {
+            return QrCodeHelper.ToPngBase64(content);
+        }
 
         private async Task CreateEventAudiencesAsync(
             int eventId,

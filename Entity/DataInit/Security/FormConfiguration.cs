@@ -31,7 +31,7 @@ namespace Entity.DataInit.Security
 
             // ====== SEED ======
             builder.HasData(
-              // Menú Principal (ModuleId = 1)
+              // Menú Principal (ModuleId = 1)  
               new Form { Id = 1, Name = "Inicio", Description = "Panel principal", Icon = "home", Url = "/dashboard", ModuleId = 1 },
               new Form { Id = 2, Name = "Ayuda", Description = "Centro de ayuda y documentación", Icon = "help", Url = "/dashboard/ayuda", ModuleId = 1 },
 
