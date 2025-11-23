@@ -178,5 +178,17 @@ namespace Web.Controllers.Operational
             });
         }
 
+        /// <summary>
+        /// Para obtener el conteo de eventos por tipo de evento
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpGet("types/count")]
+        public async Task<IActionResult> GetEventTypeCounts()
+        {
+            var result = await _eventBusiness.GetEventTypeCountsAsync();
+            return Ok(result);
+        }
+
     }
 }

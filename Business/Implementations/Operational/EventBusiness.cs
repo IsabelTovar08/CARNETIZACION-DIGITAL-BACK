@@ -10,6 +10,7 @@ using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Specifics; 
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using QRCoder;
 using System;
@@ -416,6 +417,15 @@ namespace Business.Implementations.Operational
 
             var list = await _data.ToListAsync(query);
             return list.Select(e => _mapper.Map<EventDtoResponse>(e));
+        }
+
+        /// <summary>
+        /// Para obtener el conteo de eventos por tipo de evento
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<EventTypeCountDtoResponse>> GetEventTypeCountsAsync()
+        {
+            return await _data.GetEventTypeCountsAsync();
         }
     }
 }

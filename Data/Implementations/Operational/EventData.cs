@@ -2,6 +2,7 @@
 using Data.Classes.Base;
 using Data.Interfases.Operational;
 using Entity.Context;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using Entity.Models.Organizational.Structure;
@@ -234,6 +235,24 @@ namespace Data.Implementations.Operational
             var existing = _context.EventSchedules.Where(x => x.EventId == eventId);
             _context.EventSchedules.RemoveRange(existing);
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Para obtener el conteo de eventos por tipo de evento
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<EventTypeCountDtoResponse>> GetEventTypeCountsAsync()
+        {
+            return await _context.Events
+                .Where(e => !e.IsDeleted)
+                .GroupBy(e => new { e.EventTypeId, e.EventType.Name })
+                .Select(g => new EventTypeCountDtoResponse
+                {
+                    EventTypeId = g.Key.EventTypeId,
+                    EventTypeName = g.Key.Name,
+                    TotalEvents = g.Count()
+                })
+                .ToListAsync();
         }
 
     }

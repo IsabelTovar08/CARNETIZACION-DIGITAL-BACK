@@ -1,4 +1,5 @@
 ﻿using Entity.DTOs.Operational;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using System.Collections.Generic;
@@ -59,6 +60,12 @@ namespace Data.Interfases.Operational
         /// <param name="eventId"></param>
         /// <returns></returns>
         Task DeleteEventSchedulesByEventIdAsync(int eventId);
+
+        /// <summary>
+        /// Obtiene el conteo de eventos por tipo de evento.
+        /// </summary>
+        /// <returns></returns>
+        Task<List<EventTypeCountDtoResponse>> GetEventTypeCountsAsync();
 
 
     }
