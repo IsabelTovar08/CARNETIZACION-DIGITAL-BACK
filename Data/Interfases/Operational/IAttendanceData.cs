@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Data.Interfases;
+using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Specifics.Attendances;
 using Entity.Models.Organizational;
 
 namespace Data.Interfases.Operational
@@ -31,5 +33,19 @@ namespace Data.Interfases.Operational
 
         // ✅ NUEVO MÉTODO: necesario para que el Business pueda hacer Include()
         IQueryable<Attendance> GetQueryable();
+
+        /// <summary>
+        /// Consultar todas las asistencias de una persona a un evento específico.
+        /// </summary>
+        Task<IList<AttendanceDtoResponse>> GetAllByPersonEventAsync(int personId, int eventId);
+
+        /// <summary>
+        /// Consultar si una persona tiene más de una asistencia en un evento específico
+        /// </summary>
+        /// <param name="personId"></param>
+        /// <param name="eventId"></param>
+        /// <param name="currentAttendanceId"></param>
+        /// <returns></returns>
+        Task<bool> PersonHasMoreAttendancesAsync(int personId, int eventId, int currentAttendanceId);
     }
 }

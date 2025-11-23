@@ -36,8 +36,6 @@ namespace Data.Classes.Specifics
         {
             return await _context.Set<Person>()
                 .Include(p => p.City)
-                .Include(p => p.DocumentType)
-                .Include(p => p.BloodType)
                 .ToListAsync();
         }
 

@@ -36,7 +36,7 @@ namespace Business.Implementations.Operational
         private readonly IUserBusiness _userBusiness;
         private readonly IEventAccessPointBusiness _eventAccessPointBusiness;
         private readonly INotificationBusiness _notificationBusiness;
-
+        private readonly IAttendanceNotifier _attendanceNotifier;
         public AttendanceBusiness(
             IAttendanceData attendanceData,
             IEventData eventData,
@@ -46,7 +46,8 @@ namespace Business.Implementations.Operational
             ICurrentUser currentUser,
             IUserBusiness userBusiness,
             IEventAccessPointBusiness eventAccessPointBusiness,
-            INotificationBusiness notificationBusiness
+            INotificationBusiness notificationBusiness,
+            IAttendanceNotifier attendanceNotifier
         ) : base(attendanceData, logger, mapper)
         {
             _attendanceData = attendanceData;
@@ -58,6 +59,7 @@ namespace Business.Implementations.Operational
             _userBusiness = userBusiness;
             _eventAccessPointBusiness = eventAccessPointBusiness;
             _notificationBusiness = notificationBusiness;
+            _attendanceNotifier = attendanceNotifier;
         }
 
         /// <summary>
@@ -223,6 +225,9 @@ namespace Business.Implementations.Operational
                     reloaded.AccessPointOfEntryName      // args[2]
                 );
 
+
+                await _attendanceNotifier.NotifyExitAsync(response);
+
                 response.Success = true;
                 response.Message = "Entrada registrada correctamente.";
                 response.TimeOfEntryStr = response.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
@@ -286,6 +291,8 @@ namespace Business.Implementations.Operational
                     reloaded.AccessPointOfEntryName      // args[2]
                 );
 
+                await _attendanceNotifier.NotifyExitAsync(response);
+
                 response.Success = true;
                 response.Message = "Salida registrada correctamente.";
                 response.TimeOfEntryStr = response.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
@@ -321,31 +328,26 @@ namespace Business.Implementations.Operational
                 .Select(e => _mapper.Map<AttendanceDtoResponse>(e))
                 .ToList();
 
-            // 3️⃣ Completar propiedades calculadas
+
             foreach (var dto in list)
             {
                 var entity = entities.First(e => e.Id == dto.Id);
 
-                // Formato fechas
-                dto.TimeOfEntryStr = dto.TimeOfEntry.ToString("dd/MM/yyyy HH:mm");
+                dto.AccessPointOfEntryName = entity.EventAccessPointEntry?.AccessPoint?.Name ?? "";
+                dto.AccessPointOfExitName = entity.EventAccessPointExit?.AccessPoint?.Name;
 
-                if (dto.TimeOfExit.HasValue)
-                    dto.TimeOfExitStr = dto.TimeOfExit.Value.ToString("dd/MM/yyyy HH:mm");
+                dto.EventName = entity.EventAccessPointEntry?.Event?.Name
+                              ?? entity.EventAccessPointExit?.Event?.Name;
 
-                // Nombre del evento REAL tomando EventAccessPointEntry
-                var eventNameFromEntry = entity.EventAccessPointEntry?
-                    .Event?
-                    .Name;
-
-                // Nombre del evento desde EventAccessPointExit (si hubo salida)
-                var eventNameFromExit = entity.EventAccessPointExit?
-                    .Event?
-                    .Name;
-
-                // Asignación final
-                dto.EventName = eventNameFromEntry ?? eventNameFromExit;
                 dto.EventId = entity.EventAccessPointEntry?.EventId;
+
+                dto.HasMoreAttendances = await _attendanceData.PersonHasMoreAttendancesAsync(
+                    entity.PersonId,
+                    dto.EventId!.Value,
+                    entity.Id
+                );
             }
+
 
             return (list, total);
         }
@@ -376,5 +378,17 @@ namespace Business.Implementations.Operational
             return ap.Id;
         }
 
+
+        public async Task<IList<AttendanceDtoResponse>> GetAllByPersonEventAsync(int personId, int eventId)
+        {
+            try
+            {
+                return await _attendanceData.GetAllByPersonEventAsync(personId, eventId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener todas las asistencias de la persona para el evento.");
+            }
+        }
     }
 }

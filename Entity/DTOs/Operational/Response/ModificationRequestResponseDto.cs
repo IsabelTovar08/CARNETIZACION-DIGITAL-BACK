@@ -12,7 +12,9 @@ namespace Entity.DTOs.Operational.Response
     {
         public int Id { get; set; }
         public DateTime RequestDate { get; set; }
-        public string Status { get; set; } = "";
+        public ModificationRequestStatus Status { get; set; }
+        public string? StatusName { get; set; }
+
 
         // Datos del usuario solicitante
         public int UserId { get; set; }
@@ -25,9 +27,12 @@ namespace Entity.DTOs.Operational.Response
         public string FieldName { get; set; } = "";
         public int ReasonId { get; set; }
         public string ReasonName { get; set; } = "";
-        public string OldValue { get; set; } = "";
-        public string NewValue { get; set; } = "";
-        public string? Message { get; set; }
+        public string OldValue { get; set; } = string.Empty;
+        public string? OldValueName { get; set; } 
 
+        public string NewValue { get; set; } = string.Empty;
+        public string? NewValueName { get; set; } 
+        public string? Message { get; set; }
+        public int? UpdatedById { get; set; }
     }
 }

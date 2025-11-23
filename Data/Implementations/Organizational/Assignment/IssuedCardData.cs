@@ -9,9 +9,11 @@ using Entity.Context;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Specifics;
 using Entity.DTOs.Specifics.Cards;
+using Entity.Enums.Extensions;
 using Entity.Models.Organizational.Assignment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Utilities.Enums.Specifics;
 using static Utilities.Helpers.BarcodeHelper;
 
 namespace Data.Implementations.Organizational.Assignment
@@ -113,12 +115,15 @@ namespace Data.Implementations.Organizational.Assignment
 
             return new CardUserData
             {
+                Id = issuedCardId,
                 // Datos personales
                 Name = $"{issuedCard.Person?.FirstName} {issuedCard.Person?.MiddleName} {issuedCard.Person?.LastName} {issuedCard.Person?.SecondLastName} ".Trim(),
                 Email = issuedCard.Person?.Email ?? string.Empty,
                 PhoneNumber = issuedCard.Person?.Phone ?? string.Empty,
                 DocumentNumber = issuedCard.Person?.DocumentNumber ?? string.Empty,
-                //BloodTypeValue = issuedCard.Person?.BloodType.ToString() ?? string.Empty,
+                DocumentCode = issuedCard.Person?.DocumentType.GetAcronym() ?? string.Empty,
+                DocumentName = issuedCard.Person?.DocumentType.GetDisplayName() ?? string.Empty,
+                BloodTypeValue = issuedCard.Person?.BloodType?.GetDisplayName() ?? string.Empty,
 
                 // Datos organizacionales
                 CompanyName = org?.Name ?? "Sin organización",

@@ -31,5 +31,10 @@ namespace Entity.DTOs.Operational.Response
         /// </summary>
         public bool Success { get; set; }
         public string? Message { get; set; }
+
+        /// <summary>
+        /// Indica si esta persona tiene más asistencias en este evento.
+        /// </summary>
+        public bool HasMoreAttendances { get; set; }
     }
 }

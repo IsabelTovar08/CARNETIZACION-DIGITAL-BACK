@@ -50,6 +50,18 @@ namespace Data.Implementations.Notifications
                 .ToListAsync();
 
         }
+
+
+        /// <summary>
+        /// Consulta cuántas notificaciones tiene un usuario.
+        /// </summary>
+        public async Task<int> GetUserNotificationCountAsync(int userId)
+        {
+            return await _context.NotificationReceiveds
+                .AsNoTracking()
+                .Where(x => x.UserId == userId && !x.IsDeleted && x.ReadDate == null)
+                .CountAsync();
+        }
     }
 }
 

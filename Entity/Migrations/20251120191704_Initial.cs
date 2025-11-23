@@ -1,15 +1,14 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Entity.Migrations.Postgres
+namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreatePostgres : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,14 +36,14 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,17 +55,17 @@ namespace Entity.Migrations.Postgres
                 schema: "Operational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FrontBackgroundUrl = table.Column<string>(type: "text", nullable: false),
-                    BackBackgroundUrl = table.Column<string>(type: "text", nullable: false),
-                    FrontElementsJson = table.Column<string>(type: "text", nullable: false),
-                    BackElementsJson = table.Column<string>(type: "text", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FrontBackgroundUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BackBackgroundUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FrontElementsJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BackElementsJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,13 +77,13 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,14 +95,14 @@ namespace Entity.Migrations.Postgres
                 schema: "Operational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -115,15 +114,15 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    Icon = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -131,18 +130,40 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notification",
+                schema: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RedirectUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NotificationType = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notification", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Permissions",
                 schema: "ModelSecurity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -154,14 +175,14 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -173,19 +194,19 @@ namespace Entity.Migrations.Postgres
                 schema: "Auth",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TokenHash = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    JwtId = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Expires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Revoked = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ReplacedByTokenHash = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TokenHash = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    JwtId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Expires = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Revoked = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReplacedByTokenHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -197,15 +218,15 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    HasAllPermissions = table.Column<bool>(type: "boolean", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HasAllPermissions = table.Column<bool>(type: "bit", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -217,15 +238,16 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    StartTime = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Days = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -237,13 +259,13 @@ namespace Entity.Migrations.Postgres
                 schema: "Parameter",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -255,13 +277,13 @@ namespace Entity.Migrations.Postgres
                 schema: "Parameter",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -273,15 +295,15 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DeparmentId = table.Column<int>(type: "integer", nullable: false),
-                    DepartmentId = table.Column<int>(type: "integer", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DeparmentId = table.Column<int>(type: "int", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -299,17 +321,17 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    Icon = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    Url = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
-                    ModuleId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    ModuleId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -328,16 +350,16 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ValidFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ValidTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CardTemplateId = table.Column<int>(type: "integer", nullable: false),
-                    SheduleId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ValidFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ValidTo = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CardTemplateId = table.Column<int>(type: "int", nullable: false),
+                    SheduleId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -363,23 +385,20 @@ namespace Entity.Migrations.Postgres
                 schema: "Operational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Code = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    ScheduleDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ScheduleTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    EventStart = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    EventEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ScheduleId = table.Column<int>(type: "integer", nullable: true),
-                    IsPublic = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    StatusId = table.Column<int>(type: "integer", nullable: false),
-                    EventTypeId = table.Column<int>(type: "integer", nullable: false),
-                    Days = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EventStart = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EventEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    EventTypeId = table.Column<int>(type: "int", nullable: false),
+                    QrCodeBase64 = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -391,12 +410,6 @@ namespace Entity.Migrations.Postgres
                         principalTable: "EventTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Events_Schedules_ScheduleId",
-                        column: x => x.ScheduleId,
-                        principalSchema: "Organizational",
-                        principalTable: "Schedules",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Events_Statuses_StatusId",
                         column: x => x.StatusId,
@@ -411,15 +424,15 @@ namespace Entity.Migrations.Postgres
                 schema: "Parameter",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    TypeCategoryId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    TypeCategoryId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -434,19 +447,55 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
+                name: "People",
+                schema: "ModelSecurity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MiddleName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SecondLastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CityId = table.Column<int>(type: "int", nullable: true),
+                    DocumentType = table.Column<int>(type: "int", nullable: false),
+                    BloodType = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_People", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_People_Cities_CityId",
+                        column: x => x.CityId,
+                        principalSchema: "Organizational",
+                        principalTable: "Cities",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RolFormPermissions",
                 schema: "ModelSecurity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RolId = table.Column<int>(type: "integer", nullable: false),
-                    FormId = table.Column<int>(type: "integer", nullable: false),
-                    PermissionId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RolId = table.Column<int>(type: "int", nullable: false),
+                    FormId = table.Column<int>(type: "int", nullable: false),
+                    PermissionId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -475,20 +524,52 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventSchedules",
+                schema: "Operational",
+                columns: table => new
+                {
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    ScheduleId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventSchedules", x => new { x.EventId, x.ScheduleId });
+                    table.ForeignKey(
+                        name: "FK_EventSchedules_Events_EventId",
+                        column: x => x.EventId,
+                        principalSchema: "Operational",
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventSchedules_Schedules_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalSchema: "Organizational",
+                        principalTable: "Schedules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AccessPoints",
                 schema: "Operational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    TypeId = table.Column<int>(type: "integer", nullable: false),
-                    QrCode = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeId = table.Column<int>(type: "int", nullable: false),
+                    QrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -503,49 +584,20 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
-                name: "Notification",
-                schema: "Notifications",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Message = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    RedirectUrl = table.Column<string>(type: "text", nullable: true),
-                    NotificationType = table.Column<int>(type: "int", nullable: false),
-                    CustomTypeId = table.Column<int>(type: "integer", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notification", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Notification_CustomTypes_CustomTypeId",
-                        column: x => x.CustomTypeId,
-                        principalSchema: "Parameter",
-                        principalTable: "CustomTypes",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Organizations",
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Logo = table.Column<string>(type: "text", nullable: true),
-                    TypeId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Logo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -560,52 +612,43 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
-                name: "People",
+                name: "Users",
                 schema: "ModelSecurity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FirstName = table.Column<string>(type: "text", nullable: false),
-                    MiddleName = table.Column<string>(type: "text", nullable: true),
-                    LastName = table.Column<string>(type: "text", nullable: false),
-                    SecondLastName = table.Column<string>(type: "text", nullable: true),
-                    DocumentNumber = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
-                    Phone = table.Column<string>(type: "text", nullable: true),
-                    Address = table.Column<string>(type: "text", nullable: true),
-                    DocumentTypeId = table.Column<int>(type: "integer", nullable: true),
-                    BloodTypeId = table.Column<int>(type: "integer", nullable: true),
-                    PhotoUrl = table.Column<string>(type: "text", nullable: true),
-                    PhotoPath = table.Column<string>(type: "text", nullable: true),
-                    CityId = table.Column<int>(type: "integer", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ResetCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResetCodeExpiration = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    TempCodeHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TempCodeCreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    TempCodeExpiresAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    TempCodeAttempts = table.Column<int>(type: "int", nullable: false),
+                    TempCodeConsumedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    TempCodeResendBlockedUntil = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_People", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_People_Cities_CityId",
-                        column: x => x.CityId,
-                        principalSchema: "Organizational",
-                        principalTable: "Cities",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_People_CustomTypes_BloodTypeId",
-                        column: x => x.BloodTypeId,
-                        principalSchema: "Parameter",
-                        principalTable: "CustomTypes",
+                        name: "FK_Users_People_PersonId",
+                        column: x => x.PersonId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "People",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_People_CustomTypes_DocumentTypeId",
-                        column: x => x.DocumentTypeId,
-                        principalSchema: "Parameter",
-                        principalTable: "CustomTypes",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -613,17 +656,19 @@ namespace Entity.Migrations.Postgres
                 schema: "Operational",
                 columns: table => new
                 {
-                    EventId = table.Column<int>(type: "integer", nullable: false),
-                    AccessPointId = table.Column<int>(type: "integer", nullable: false),
-                    Id = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    AccessPointId = table.Column<int>(type: "int", nullable: false),
+                    QrCodeKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventAccessPoints", x => new { x.EventId, x.AccessPointId });
+                    table.PrimaryKey("PK_EventAccessPoints", x => x.Id);
                     table.ForeignKey(
                         name: "FK_EventAccessPoints_AccessPoints_AccessPointId",
                         column: x => x.AccessPointId,
@@ -637,7 +682,7 @@ namespace Entity.Migrations.Postgres
                         principalSchema: "Operational",
                         principalTable: "Events",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -645,19 +690,19 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Location = table.Column<string>(type: "text", nullable: true),
-                    Phone = table.Column<string>(type: "text", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: false),
-                    CityId = table.Column<int>(type: "integer", nullable: false),
-                    OrganizationId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CityId = table.Column<int>(type: "int", nullable: false),
+                    OrganizationId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -679,134 +724,25 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
-                name: "Attendances",
-                schema: "Operational",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TimeOfEntry = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TimeOfExit = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    AccessPointOfEntry = table.Column<int>(type: "integer", nullable: true),
-                    AccessPointOfExit = table.Column<int>(type: "integer", nullable: true),
-                    PersonId = table.Column<int>(type: "integer", nullable: false),
-                    QrCode = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Attendances", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Attendances_AccessPoints_AccessPointOfEntry",
-                        column: x => x.AccessPointOfEntry,
-                        principalSchema: "Operational",
-                        principalTable: "AccessPoints",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Attendances_AccessPoints_AccessPointOfExit",
-                        column: x => x.AccessPointOfExit,
-                        principalSchema: "Operational",
-                        principalTable: "AccessPoints",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Attendances_People_PersonId",
-                        column: x => x.PersonId,
-                        principalSchema: "ModelSecurity",
-                        principalTable: "People",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                schema: "ModelSecurity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserName = table.Column<string>(type: "text", nullable: true),
-                    Password = table.Column<string>(type: "text", nullable: true),
-                    PersonId = table.Column<int>(type: "integer", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    RefreshToken = table.Column<string>(type: "text", nullable: true),
-                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ResetCode = table.Column<string>(type: "text", nullable: true),
-                    ResetCodeExpiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    TempCodeHash = table.Column<string>(type: "text", nullable: true),
-                    TempCodeCreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    TempCodeExpiresAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    TempCodeAttempts = table.Column<int>(type: "integer", nullable: false),
-                    TempCodeConsumedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    TempCodeResendBlockedUntil = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_People_PersonId",
-                        column: x => x.PersonId,
-                        principalSchema: "ModelSecurity",
-                        principalTable: "People",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrganizationalUnits",
-                schema: "Organizational",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    BranchId = table.Column<int>(type: "integer", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrganizationalUnits", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrganizationalUnits_Branches_BranchId",
-                        column: x => x.BranchId,
-                        principalSchema: "Organizational",
-                        principalTable: "Branches",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ImportBatches",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Source = table.Column<string>(type: "text", nullable: false),
-                    FileName = table.Column<string>(type: "text", nullable: true),
-                    StartedBy = table.Column<int>(type: "integer", nullable: true),
-                    StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    TotalRows = table.Column<int>(type: "integer", nullable: false),
-                    SuccessCount = table.Column<int>(type: "integer", nullable: false),
-                    ErrorCount = table.Column<int>(type: "integer", nullable: false),
-                    ContextJson = table.Column<string>(type: "text", nullable: true),
-                    StartedByUserId = table.Column<int>(type: "integer", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Source = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartedBy = table.Column<int>(type: "int", nullable: true),
+                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TotalRows = table.Column<int>(type: "int", nullable: false),
+                    SuccessCount = table.Column<int>(type: "int", nullable: false),
+                    ErrorCount = table.Column<int>(type: "int", nullable: false),
+                    ContextJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartedByUserId = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -820,23 +756,55 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
+                name: "modificationRequests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Field = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<int>(type: "int", nullable: false),
+                    OldValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NewValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_modificationRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_modificationRequests_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "NotificationReceived",
                 schema: "Notifications",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    SendDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ReadDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    NotificationId = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    StatusId = table.Column<int>(type: "integer", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    SendDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReadDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NotificationId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    StatusId = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -864,18 +832,50 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
+                name: "SupervisorsEvents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SupervisorsEvents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SupervisorsEvents_Events_EventId",
+                        column: x => x.EventId,
+                        principalSchema: "Operational",
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SupervisorsEvents_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserRoles",
                 schema: "ModelSecurity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    RolId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RolId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -897,21 +897,90 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
+                name: "Attendances",
+                schema: "Operational",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TimeOfEntry = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TimeOfExit = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EventAccessPointEntryId = table.Column<int>(type: "int", nullable: false),
+                    EventAccessPointExitId = table.Column<int>(type: "int", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attendances", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Attendances_EventAccessPoints_EventAccessPointEntryId",
+                        column: x => x.EventAccessPointEntryId,
+                        principalSchema: "Operational",
+                        principalTable: "EventAccessPoints",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendances_EventAccessPoints_EventAccessPointExitId",
+                        column: x => x.EventAccessPointExitId,
+                        principalSchema: "Operational",
+                        principalTable: "EventAccessPoints",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Attendances_People_PersonId",
+                        column: x => x.PersonId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "People",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrganizationalUnits",
+                schema: "Organizational",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BranchId = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrganizationalUnits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrganizationalUnits_Branches_BranchId",
+                        column: x => x.BranchId,
+                        principalSchema: "Organizational",
+                        principalTable: "Branches",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "InternalDivisions",
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    OrganizationalUnitId = table.Column<int>(type: "integer", nullable: false),
-                    AreaCategoryId = table.Column<int>(type: "integer", nullable: false),
-                    BranchId = table.Column<int>(type: "integer", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrganizationalUnitId = table.Column<int>(type: "int", nullable: false),
+                    AreaCategoryId = table.Column<int>(type: "int", nullable: false),
+                    BranchId = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -943,14 +1012,14 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    BranchId = table.Column<int>(type: "integer", nullable: false),
-                    OrganizationUnitId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BranchId = table.Column<int>(type: "int", nullable: false),
+                    OrganizationUnitId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -963,7 +1032,7 @@ namespace Entity.Migrations.Postgres
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrganizationalUnitBranches_OrganizationalUnits_Organization~",
+                        name: "FK_OrganizationalUnitBranches_OrganizationalUnits_OrganizationUnitId",
                         column: x => x.OrganizationUnitId,
                         principalSchema: "Organizational",
                         principalTable: "OrganizationalUnits",
@@ -976,18 +1045,18 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TypeId = table.Column<int>(type: "integer", nullable: false),
-                    ReferenceId = table.Column<int>(type: "integer", nullable: false),
-                    EventId = table.Column<int>(type: "integer", nullable: false),
-                    ProfileId = table.Column<int>(type: "integer", nullable: true),
-                    OrganizationalUnitId = table.Column<int>(type: "integer", nullable: true),
-                    InternalDivisionId = table.Column<int>(type: "integer", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TypeId = table.Column<int>(type: "int", nullable: false),
+                    ReferenceId = table.Column<int>(type: "int", nullable: false),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    ProfileId = table.Column<int>(type: "int", nullable: true),
+                    OrganizationalUnitId = table.Column<int>(type: "int", nullable: true),
+                    InternalDivisionId = table.Column<int>(type: "int", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1031,21 +1100,21 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PersonId = table.Column<int>(type: "integer", nullable: false),
-                    ProfileId = table.Column<int>(type: "integer", nullable: false),
-                    InternalDivisionId = table.Column<int>(type: "integer", nullable: false),
-                    IsCurrentlySelected = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    QRCode = table.Column<string>(type: "text", nullable: false),
-                    UniqueId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PdfUrl = table.Column<string>(type: "text", nullable: true),
-                    CardId = table.Column<int>(type: "integer", nullable: false),
-                    StatusId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    ProfileId = table.Column<int>(type: "int", nullable: false),
+                    InternalDivisionId = table.Column<int>(type: "int", nullable: false),
+                    IsCurrentlySelected = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    QRCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UniqueId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PdfUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CardId = table.Column<int>(type: "int", nullable: false),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1091,21 +1160,21 @@ namespace Entity.Migrations.Postgres
                 name: "ImportBatchRows",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ImportBatchId = table.Column<int>(type: "integer", nullable: false),
-                    RowNumber = table.Column<int>(type: "integer", nullable: false),
-                    Success = table.Column<bool>(type: "boolean", nullable: false),
-                    Message = table.Column<string>(type: "text", nullable: true),
-                    PersonId = table.Column<int>(type: "integer", nullable: true),
-                    PersonDivisionProfileId = table.Column<int>(type: "integer", nullable: true),
-                    CardId = table.Column<int>(type: "integer", nullable: true),
-                    UpdatedPhoto = table.Column<bool>(type: "boolean", nullable: false),
-                    IssuedCardId = table.Column<int>(type: "integer", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ImportBatchId = table.Column<int>(type: "int", nullable: false),
+                    RowNumber = table.Column<int>(type: "int", nullable: false),
+                    Success = table.Column<bool>(type: "bit", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: true),
+                    PersonDivisionProfileId = table.Column<int>(type: "int", nullable: true),
+                    IssuedCardId = table.Column<int>(type: "int", nullable: true),
+                    CardId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedPhoto = table.Column<bool>(type: "bit", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1121,8 +1190,13 @@ namespace Entity.Migrations.Postgres
                         column: x => x.IssuedCardId,
                         principalSchema: "Organizational",
                         principalTable: "IssuedCards",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ImportBatchRows_People_PersonId",
+                        column: x => x.PersonId,
+                        principalSchema: "ModelSecurity",
+                        principalTable: "People",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -1208,16 +1282,16 @@ namespace Entity.Migrations.Postgres
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
                 table: "People",
-                columns: new[] { "Id", "Address", "BloodTypeId", "CityId", "Code", "CreateAt", "DocumentNumber", "DocumentTypeId", "Email", "FirstName", "LastName", "MiddleName", "Phone", "PhotoPath", "PhotoUrl", "SecondLastName", "UpdateAt" },
+                columns: new[] { "Id", "Address", "BloodType", "CityId", "Code", "CreateAt", "DocumentNumber", "DocumentType", "Email", "FirstName", "LastName", "MiddleName", "Phone", "PhotoPath", "PhotoUrl", "SecondLastName", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1234567890", null, null, "Demo", "Funcionario", null, "3200001111", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "9876543210", null, null, "Laura", "Estudiante", null, "3100002222", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 3, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1122334455", null, null, "Ana", "Administrador", null, "3001234567", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 4, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "9988776655", null, null, "José", "Usuario", null, "3151234567", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 5, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1234561630", null, null, "María", "Tovar", null, "3200056311", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 6, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1245567890", null, null, "Camilo", "Charry", null, "3200014311", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 7, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1235267890", null, null, "Marcos", "Alvarez", null, "320026111", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1234567890", 0, null, "Demo", "Funcionario", null, "3200001111", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "9876543210", 0, null, "Laura", "Estudiante", null, "3100002222", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1122334455", 0, null, "Ana", "Administrador", null, "3001234567", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "9988776655", 0, null, "José", "Usuario", null, "3151234567", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1234561630", 0, null, "María", "Tovar", null, "3200056311", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 6, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1245567890", 0, null, "Camilo", "Charry", null, "3200014311", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 7, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1235267890", 0, null, "Marcos", "Alvarez", null, "320026111", null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1261,12 +1335,12 @@ namespace Entity.Migrations.Postgres
             migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "Schedules",
-                columns: new[] { "Id", "Code", "CreateAt", "EndTime", "Name", "StartTime", "UpdateAt" },
+                columns: new[] { "Id", "Code", "CreateAt", "Days", "EndTime", "Name", "StartTime", "UpdateAt" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 18, 0, 0, 0), "Horario Jornada A", new TimeSpan(0, 7, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 17, 0, 0, 0), "Horario Jornada B", new TimeSpan(0, 8, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new TimeSpan(0, 19, 0, 0, 0), "Horario Jornada C", new TimeSpan(0, 6, 30, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1348,14 +1422,14 @@ namespace Entity.Migrations.Postgres
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Events",
-                columns: new[] { "Id", "Code", "CreateAt", "Days", "Description", "EventEnd", "EventStart", "EventTypeId", "IsPublic", "Name", "ScheduleDate", "ScheduleId", "ScheduleTime", "StatusId", "UpdateAt" },
-                values: new object[] { 1, "TECH2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, new DateTime(2023, 7, 30, 14, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 7, 30, 10, 0, 0, 0, DateTimeKind.Utc), 1, true, "Conferencia de Tecnología", new DateTime(2023, 7, 30, 0, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(1900, 1, 1, 10, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
+                columns: new[] { "Id", "Code", "CreateAt", "Description", "EventEnd", "EventStart", "EventTypeId", "IsPublic", "Name", "QrCodeBase64", "StatusId", "UpdateAt" },
+                values: new object[] { 1, "TECH2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2023, 7, 30, 14, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 7, 30, 10, 0, 0, 0, DateTimeKind.Utc), 1, true, "Conferencia de Tecnología", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "Operational",
                 table: "Events",
-                columns: new[] { "Id", "Code", "CreateAt", "Days", "Description", "EventEnd", "EventStart", "EventTypeId", "Name", "ScheduleDate", "ScheduleId", "ScheduleTime", "StatusId", "UpdateAt" },
-                values: new object[] { 2, "SALUD2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, new DateTime(2023, 8, 5, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 8, 5, 9, 0, 0, 0, DateTimeKind.Utc), 2, "Charla de Salud", new DateTime(2023, 8, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(1900, 1, 1, 9, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
+                columns: new[] { "Id", "Code", "CreateAt", "Description", "EventEnd", "EventStart", "EventTypeId", "Name", "QrCodeBase64", "StatusId", "UpdateAt" },
+                values: new object[] { 2, "SALUD2025", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2023, 8, 5, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 8, 5, 9, 0, 0, 0, DateTimeKind.Utc), 2, "Charla de Salud", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
@@ -1405,24 +1479,24 @@ namespace Entity.Migrations.Postgres
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
                 table: "Users",
-                columns: new[] { "Id", "Active", "Code", "CreateAt", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "UpdateAt", "UserName" },
+                columns: new[] { "Id", "Active", "Code", "CreateAt", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "TwoFactorEnabled", "UpdateAt", "UserName" },
                 values: new object[,]
                 {
-                    { 1, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "123", 1, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin" },
-                    { 2, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Marcos2025", 7, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "marcosrojasalvarez09172007@gmail.com" },
-                    { 3, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "isa123", 5, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "isabeltovarp.18@gmail.com" },
-                    { 4, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Katalin@01", 6, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "cachape64@gmail.com" }
+                    { 1, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "123", 1, null, null, null, null, 0, null, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin" },
+                    { 2, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Marcos2025", 7, null, null, null, null, 0, null, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "marcosrojasalvarez09172007@gmail.com" },
+                    { 3, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "isa123", 5, null, null, null, null, 0, null, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "isabeltovarp.18@gmail.com" },
+                    { 4, true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Katalin@01", 6, null, null, null, null, 0, null, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "cachape64@gmail.com" }
                 });
 
             migrationBuilder.InsertData(
                 schema: "ModelSecurity",
                 table: "Users",
-                columns: new[] { "Id", "Code", "CreateAt", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "UpdateAt", "UserName" },
+                columns: new[] { "Id", "Code", "CreateAt", "DateCreated", "IsDeleted", "Password", "PersonId", "RefreshToken", "RefreshTokenExpiryTime", "ResetCode", "ResetCodeExpiration", "TempCodeAttempts", "TempCodeConsumedAt", "TempCodeCreatedAt", "TempCodeExpiresAt", "TempCodeHash", "TempCodeResendBlockedUntil", "TwoFactorEnabled", "UpdateAt", "UserName" },
                 values: new object[,]
                 {
-                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "L4d!Estudiante2025", 2, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null },
-                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Adm!nCarnet2025", 3, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null },
-                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Usr!Carnet2025", 4, null, null, null, null, 0, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null }
+                    { 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "L4d!Estudiante2025", 2, null, null, null, null, 0, null, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null },
+                    { 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Adm!nCarnet2025", 3, null, null, null, null, 0, null, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null },
+                    { 7, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Usr!Carnet2025", 4, null, null, null, null, 0, null, null, null, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null }
                 });
 
             migrationBuilder.InsertData(
@@ -1434,6 +1508,17 @@ namespace Entity.Migrations.Postgres
                     { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Acceso norte del evento", "Punto Norte", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Acceso sur del evento", "Punto Sur", null, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Acceso principal", "Punto Principal", null, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "Operational",
+                table: "EventSchedules",
+                columns: new[] { "EventId", "ScheduleId", "Code", "CreateAt", "Id", "IsDeleted", "UpdateAt" },
+                values: new object[,]
+                {
+                    { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1498,16 +1583,6 @@ namespace Entity.Migrations.Postgres
                 });
 
             migrationBuilder.InsertData(
-                schema: "Operational",
-                table: "Attendances",
-                columns: new[] { "Id", "AccessPointOfEntry", "AccessPointOfExit", "Code", "CreateAt", "PersonId", "QrCode", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
-                values: new object[,]
-                {
-                    { 1, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, 1, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, null, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
-                });
-
-            migrationBuilder.InsertData(
                 schema: "Organizational",
                 table: "Branches",
                 columns: new[] { "Id", "Address", "CityId", "Code", "CreateAt", "Email", "Location", "Name", "OrganizationId", "Phone", "UpdateAt" },
@@ -1515,6 +1590,26 @@ namespace Entity.Migrations.Postgres
                 {
                     { 1, "Calle 1 # 2-34", 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "principal@org.com", "Centro", "Sucursal Principal", 1, "123456789", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { 2, "Carrera 45 # 67-89", 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "norte@org.com", "Zona Norte", "Sucursal Norte", 1, "987654321", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "Operational",
+                table: "EventAccessPoints",
+                columns: new[] { "Id", "AccessPointId", "Code", "CreateAt", "EventId", "IsDeleted", "QrCodeKey", "UpdateAt" },
+                values: new object[,]
+                {
+                    { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "Operational",
+                table: "Attendances",
+                columns: new[] { "Id", "Code", "CreateAt", "EventAccessPointEntryId", "EventAccessPointExitId", "PersonId", "TimeOfEntry", "TimeOfExit", "UpdateAt" },
+                values: new object[,]
+                {
+                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, 2, 1, new DateTime(2023, 1, 1, 8, 0, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, 2, 2, new DateTime(2023, 1, 1, 9, 30, 0, 0, DateTimeKind.Utc), new DateTime(2023, 1, 1, 13, 45, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1536,16 +1631,16 @@ namespace Entity.Migrations.Postgres
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attendances_AccessPointOfEntry",
+                name: "IX_Attendances_EventAccessPointEntryId",
                 schema: "Operational",
                 table: "Attendances",
-                column: "AccessPointOfEntry");
+                column: "EventAccessPointEntryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attendances_AccessPointOfExit",
+                name: "IX_Attendances_EventAccessPointExitId",
                 schema: "Operational",
                 table: "Attendances",
-                column: "AccessPointOfExit");
+                column: "EventAccessPointExitId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendances_PersonId",
@@ -1631,22 +1726,28 @@ namespace Entity.Migrations.Postgres
                 column: "AccessPointId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventAccessPoints_EventId",
+                schema: "Operational",
+                table: "EventAccessPoints",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_EventTypeId",
                 schema: "Operational",
                 table: "Events",
                 column: "EventTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_ScheduleId",
-                schema: "Operational",
-                table: "Events",
-                column: "ScheduleId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Events_StatusId",
                 schema: "Operational",
                 table: "Events",
                 column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventSchedules_ScheduleId",
+                schema: "Operational",
+                table: "EventSchedules",
+                column: "ScheduleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventTargetAudience_EventId",
@@ -1714,6 +1815,11 @@ namespace Entity.Migrations.Postgres
                 column: "IssuedCardId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ImportBatchRows_PersonId",
+                table: "ImportBatchRows",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InternalDivisions_AreaCategoryId",
                 schema: "Organizational",
                 table: "InternalDivisions",
@@ -1770,17 +1876,16 @@ namespace Entity.Migrations.Postgres
                 column: "StatusId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_modificationRequests_UserId",
+                table: "modificationRequests",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Modules_Name",
                 schema: "ModelSecurity",
                 table: "Modules",
                 column: "Name",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Notification_CustomTypeId",
-                schema: "Notifications",
-                table: "Notification",
-                column: "CustomTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotificationReceived_NotificationId",
@@ -1839,12 +1944,6 @@ namespace Entity.Migrations.Postgres
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_People_BloodTypeId",
-                schema: "ModelSecurity",
-                table: "People",
-                column: "BloodTypeId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_People_CityId",
                 schema: "ModelSecurity",
                 table: "People",
@@ -1855,13 +1954,8 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity",
                 table: "People",
                 column: "DocumentNumber",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_People_DocumentTypeId",
-                schema: "ModelSecurity",
-                table: "People",
-                column: "DocumentTypeId");
+                unique: true,
+                filter: "[DocumentNumber] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Permissions_Name",
@@ -1918,6 +2012,16 @@ namespace Entity.Migrations.Postgres
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_SupervisorsEvents_EventId",
+                table: "SupervisorsEvents",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupervisorsEvents_UserId",
+                table: "SupervisorsEvents",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TypeCategories_Name",
                 schema: "Parameter",
                 table: "TypeCategories",
@@ -1949,7 +2053,8 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity",
                 table: "Users",
                 column: "UserName",
-                unique: true);
+                unique: true,
+                filter: "[UserName] IS NOT NULL");
         }
 
         /// <inheritdoc />
@@ -1960,7 +2065,7 @@ namespace Entity.Migrations.Postgres
                 schema: "Operational");
 
             migrationBuilder.DropTable(
-                name: "EventAccessPoints",
+                name: "EventSchedules",
                 schema: "Operational");
 
             migrationBuilder.DropTable(
@@ -1969,6 +2074,9 @@ namespace Entity.Migrations.Postgres
 
             migrationBuilder.DropTable(
                 name: "ImportBatchRows");
+
+            migrationBuilder.DropTable(
+                name: "modificationRequests");
 
             migrationBuilder.DropTable(
                 name: "NotificationReceived",
@@ -1987,15 +2095,14 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
+                name: "SupervisorsEvents");
+
+            migrationBuilder.DropTable(
                 name: "UserRoles",
                 schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
-                name: "AccessPoints",
-                schema: "Operational");
-
-            migrationBuilder.DropTable(
-                name: "Events",
+                name: "EventAccessPoints",
                 schema: "Operational");
 
             migrationBuilder.DropTable(
@@ -2022,7 +2129,11 @@ namespace Entity.Migrations.Postgres
                 schema: "ModelSecurity");
 
             migrationBuilder.DropTable(
-                name: "EventTypes",
+                name: "AccessPoints",
+                schema: "Operational");
+
+            migrationBuilder.DropTable(
+                name: "Events",
                 schema: "Operational");
 
             migrationBuilder.DropTable(
@@ -2042,12 +2153,16 @@ namespace Entity.Migrations.Postgres
                 schema: "Organizational");
 
             migrationBuilder.DropTable(
-                name: "Statuses",
-                schema: "Parameter");
-
-            migrationBuilder.DropTable(
                 name: "Modules",
                 schema: "ModelSecurity");
+
+            migrationBuilder.DropTable(
+                name: "EventTypes",
+                schema: "Operational");
+
+            migrationBuilder.DropTable(
+                name: "Statuses",
+                schema: "Parameter");
 
             migrationBuilder.DropTable(
                 name: "People",

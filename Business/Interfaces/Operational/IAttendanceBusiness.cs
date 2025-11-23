@@ -6,6 +6,7 @@ using Business.Interfases;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Reports;
+using Entity.DTOs.Specifics.Attendances;
 using Entity.Models.Organizational;
 
 namespace Business.Interfaces.Operational
@@ -57,5 +58,7 @@ namespace Business.Interfaces.Operational
         /// ✅ Exporta las asistencias a Excel
         /// </summary>
         Task<byte[]> ExportToExcelAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default);
+
+       Task<IList<AttendanceDtoResponse>> GetAllByPersonEventAsync(int personId, int eventId);
     }
 }

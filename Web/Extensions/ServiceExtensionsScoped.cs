@@ -62,6 +62,7 @@ using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client.Extensions.Msal;
+using Utilities.Helpers;
 using Utilities.Helpers.Excel;
 using Utilities.Notifications.Implementations;
 using Web.Auth;
@@ -278,6 +279,7 @@ namespace Web.Extensions
             services.AddScoped<ICurrentUser, CurrentUser>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IDeviceInfoService, DeviceInfoService>();
 
 
             // PDF Y EXCEL
@@ -297,7 +299,7 @@ namespace Web.Extensions
                 ServerCertificateCustomValidationCallback = (_, _, _, _) => true
             });
 
-
+            services.AddScoped<IAttendanceNotifier, AttendanceNotifier>();
 
             services.AddSignalR();
 

@@ -102,6 +102,8 @@ namespace Entity.Context
         public DbSet<CardTemplate> CardTemplates { get; set; }
 
         public DbSet<ModificationRequest> modificationRequests { get; set; }
+        public DbSet<SupervisorsEvent> SupervisorsEvents { get; set; }
+
 
 
         /// <summary>
@@ -138,10 +140,10 @@ namespace Entity.Context
                 .HavePrecision(18, 2);
 
             configurationBuilder
-        .Properties<DateTime>()
-        .HaveConversion<DateTimeToUtcConverter>()   //usamos un conversor genérico
-        .HaveColumnType("timestamp with time zone");
-
+                .Properties<DateTime>()
+                .HaveConversion<DateTimeToUtcConverter>()   //usamos un conversor genérico
+                 //.HaveColumnType("timestamp with time zone");
+                .HaveColumnType("datetime2");
 
             // Manejo de DateOnly (si se usa)
             configurationBuilder

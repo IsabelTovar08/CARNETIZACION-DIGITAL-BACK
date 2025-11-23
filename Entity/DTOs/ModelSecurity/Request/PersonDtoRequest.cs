@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Entity.DTOs.Base;
+using Utilities.Enums.Specifics;
 
 namespace Entity.DTOs.ModelSecurity.Request
 {
@@ -24,14 +25,14 @@ namespace Entity.DTOs.ModelSecurity.Request
         public string? SecondLastName { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "El tipo de documento debe ser un número entero mayor que 0.")]
-        public int? DocumentTypeId { get; set; }
+        public DocumentType? DocumentTypeId { get; set; }
 
         [StringLength(10, ErrorMessage = "El número de documento no puede exceder los 10 caracteres.")]
         [RegularExpression(@"(^$|^[0-9A-Za-z\-]+$)", ErrorMessage = "El número de documento solo puede contener letras, números y guiones.")]
         public string? DocumentNumber { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "El tipo de sangre debe ser un número entero mayor que 0.")]
-        public int? BloodTypeId { get; set; }
+        public BloodType? BloodTypeId { get; set; }
 
         [StringLength(20, ErrorMessage = "El teléfono no puede exceder los 20 caracteres.")]
         [RegularExpression(@"(^$|^[0-9\+]+$)", ErrorMessage = "El teléfono solo puede contener números y el signo +.")]

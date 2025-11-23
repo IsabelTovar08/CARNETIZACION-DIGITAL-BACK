@@ -267,5 +267,16 @@ namespace Business.Classes
 
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
+
+
+        /// <summary>
+        /// Consulta si el usuario tiene habilitada la autenticación en dos pasos.
+        /// Puede retornar null si no está configurado.
+        /// </summary>
+        public async Task<bool?> IsTwoFactorEnabledAsync(int userId)
+        {
+            return await _userData.IsTwoFactorEnabledAsync(userId);
+        }
+
     }
 }

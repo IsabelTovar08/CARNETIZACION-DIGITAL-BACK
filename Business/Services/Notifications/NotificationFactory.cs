@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Entity.DTOs.Notifications.Request;
 using Entity.Enums.Specifics;
+using Microsoft.AspNetCore.Http;
 using Utilities.Enums.Specifics;
+using Utilities.Helpers;
 
 namespace Business.Services.Notifications
 {
@@ -17,7 +19,7 @@ namespace Business.Services.Notifications
         /// <summary>
         /// Genera una notificación según el tipo de plantilla solicitado.
         /// </summary>
-        public static NotificationDtoRequest Create(
+        public async static Task<NotificationDtoRequest> Create(
             NotificationTemplateType type,
             params object[] args)
         {
@@ -83,7 +85,20 @@ namespace Business.Services.Notifications
                     {
                         Title = "Solicitud de modificación de datos",
                         Message = $"{args[0]} ha solicitado una modificación de datos: {args[1]}.",
-                        NotificationType = NotificationType.Warning
+                        NotificationType = NotificationType.Warning,
+                        RedirectUrl = $"dashboard/operational/modification-request",
+                        UserId = (int)args[2]
+                    };
+
+                case NotificationTemplateType.ModificationSent:
+                    return new NotificationDtoRequest
+                    {
+                        Title = "Solicitud registrada",
+                        Message = $"La solicitud de modificación del campo \"{args[0]}\" ha sido registrada. " +
+                                  "Será evaluada conforme y se informará el resultado oportunamente.",
+                        NotificationType = NotificationType.Info,
+                        UserId = (int)args[1],
+                        //RedirectUrl = 
                     };
 
                 case NotificationTemplateType.ModificationApproved:
@@ -92,7 +107,9 @@ namespace Business.Services.Notifications
                         Title = "Modificación aprobada",
                         Message = $"Tu solicitud de modificación en el campo \"{args[0]}\" ha sido aprobada " +
                                   "y actualizada en el sistema.",
-                        NotificationType = NotificationType.Info
+                        NotificationType = NotificationType.Info,
+                        UserId = (int)args[1],
+
                     };
 
                 case NotificationTemplateType.ModificationRejected:
@@ -100,8 +117,10 @@ namespace Business.Services.Notifications
                     {
                         Title = "Modificación rechazada",
                         Message = $"Tu solicitud de modificación en el campo \"{args[0]}\" ha sido rechazada. " +
-                                  $"Motivo: {args[1]}.",
-                        NotificationType = NotificationType.Warning
+                                  $"Motivo: {args[2]}.",
+                        NotificationType = NotificationType.Warning,
+                        UserId = (int)args[1],
+
                     };
 
                 case NotificationTemplateType.CardGenerated:
@@ -116,13 +135,40 @@ namespace Business.Services.Notifications
                 /// <summary>
                 /// Notificación al iniciar sesión correctamente.
                 /// </summary>
+                /// <summary>
+                /// Notificación al iniciar sesión correctamente.
+                /// </summary>
                 case NotificationTemplateType.Login:
-                    return new NotificationDtoRequest
                     {
-                        Title = "Inicio de sesión exitoso",
-                        Message = $"Bienvenido {args[0]}, tu acceso ha sido validado correctamente el {DateTime.Now:dd/MM/yyyy HH:mm}.",
-                        NotificationType = NotificationType.System
-                    };
+                        // args[0] = nombre usuario
+                        // args[1] = id usuario
+                        // args[2] = IDeviceInfoService
+                        // args[3] = IHttpContextAccessor
+
+                        var deviceInfoService = args[2] as IDeviceInfoService;
+                        var httpContextAccessor = args[3] as IHttpContextAccessor;
+
+                        var userAgent = httpContextAccessor?.HttpContext?.Request?.Headers["User-Agent"].ToString();
+
+                        // ✔️ Obtener la IP real (funciona en Azure)
+                        var realIp = deviceInfoService?.GetRealIp(httpContextAccessor);
+
+                        // ✔️ Obtener ubicación real mediante la IP real
+                        var location = deviceInfoService != null
+                            ? await deviceInfoService.GetLocationFromIpAsync(realIp)
+                            : "Ubicación desconocida";
+
+                        var deviceModel = deviceInfoService?.GetDeviceModel(userAgent) ?? "Dispositivo desconocido";
+
+                        return new NotificationDtoRequest
+                        {
+                            Title = "Inicio de sesión exitoso",
+                            Message = $"Bienvenido {args[0]}, tu acceso fue validado el {DateTime.Now:dd/MM/yyyy HH:mm}, " +
+                                      $"desde un {deviceModel} ubicado en {location}.",
+                            NotificationType = NotificationType.System,
+                            UserId = (int)args[1]
+                        };
+                    }
 
                 case NotificationTemplateType.AttendanceEntry:
                     return new NotificationDtoRequest

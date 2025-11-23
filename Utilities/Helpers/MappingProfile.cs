@@ -41,8 +41,13 @@ namespace Utilities.Helper
         {
             CreateMap<Person, PersonDto>()
      .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
-     .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType.Name))
-     .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
+     .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => ((DocumentType)src.DocumentType).GetDisplayName()))
+     .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src =>
+    src.BloodType.HasValue
+        ? ((BloodType)src.BloodType.Value).GetDisplayName()
+        : null
+))
+
 
 
      // 🔹 División actual
@@ -127,7 +132,7 @@ namespace Utilities.Helper
 
 
             CreateMap<User, UserMeDto>()
-            // ⬇️ AQUÍ el cambio clave: pasa Rol ENTIDAD, no Name string
+            .ForMember(d => d.PhotoUrl, opt => opt.MapFrom(s => s.Person.Id))
             .ForMember(d => d.PhotoUrl, opt => opt.MapFrom(s => s.Person.PhotoUrl))
             .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.UserRoles.Select(ur => ur.Rol)))
             .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
@@ -483,7 +488,7 @@ namespace Utilities.Helper
             .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => ((ModificationField)src.Field).GetDisplayName()))
             .ForMember(dest => dest.ReasonId, opt => opt.MapFrom(src => (int)src.Reason))
             .ForMember(dest => dest.ReasonName, opt => opt.MapFrom(src => ((ModificationReason)src.Reason).GetDisplayName()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ((ModificationRequestStatus)src.Status).GetDisplayName()))
+            .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => ((ModificationRequestStatus)src.Status).GetDisplayName()))
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => (src.User.Person.FirstName + " " + src.User.Person.MiddleName + " "+ src.User.Person.LastName + " " + src.User.Person.SecondLastName)))
             .ForMember(dest => dest.UserIdentification, opt => opt.MapFrom(src => (src.User.Person.DocumentNumber)))
 

@@ -40,6 +40,7 @@ namespace Entity.Models.Organizational
 
         [NotMapped]
         public IEnumerable<Schedule> Schedules => EventSchedules.Select(es => es.Schedule);
+        public List<SupervisorsEvent> SupervisorsEvent { get; set; }
 
     }   
 }

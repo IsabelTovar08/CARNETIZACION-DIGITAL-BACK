@@ -211,5 +211,18 @@ namespace Data.Classes.Specifics
                 .ToListAsync();
         }
 
+
+        /// <summary>
+        /// Retorna el estado de autenticación en dos pasos del usuario (nullable).
+        /// </summary>
+        public async Task<bool?> IsTwoFactorEnabledAsync(int userId)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(x => x.Id == userId)
+                .Select(x => x.TwoFactorEnabled)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

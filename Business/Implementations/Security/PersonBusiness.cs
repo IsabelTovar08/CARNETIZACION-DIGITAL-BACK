@@ -67,9 +67,9 @@ namespace Business.Classes
                 if (await _data.ExistsByAsync(x => x.DocumentNumber, entity.DocumentNumber))
                     errors.Add(("DocumentNumber ", "El DocumentNumber ya está registrado."));
             }
-            if ((int)entity.DocumentTypeId <= 0)
+            if ((int)entity.DocumentType <= 0)
                 errors.Add(("Tipo de documento", "Debe seleccionar un Tipo de documento válido."));
-            if ((int)entity.BloodTypeId <= 0)
+            if ((int)entity.BloodType <= 0)
                 errors.Add(("Tipo de sangre", "Debe seleccionar un Tipo de sangre válido."));
             if ((int)entity.CityId <= 0)
                 errors.Add(("Ciudad", "Debe seleccionar una ciudad válida."));

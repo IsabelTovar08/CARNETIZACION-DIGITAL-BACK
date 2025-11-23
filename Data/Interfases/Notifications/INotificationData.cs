@@ -12,5 +12,9 @@ namespace Data.Interfases.Notifications
     public interface INotificationData : ICrudBase<Notification>
     {
         Task<IEnumerable<NotificationWithReceivedDto>> GetNotificationsByUserAsync(int userId);
+        /// <summary>
+        /// Consulta cuántas notificaciones tiene un usuario.
+        /// </summary>
+        Task<int> GetUserNotificationCountAsync(int userId);
     }
 }

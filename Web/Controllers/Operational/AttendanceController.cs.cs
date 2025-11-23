@@ -1,4 +1,7 @@
-﻿using Business.Interfaces.Auth;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Business.Interfaces.Auth;
 using Business.Interfaces.Operational;
 using Data.Interfases.Security;
 using Entity.DTOs.Operational.Request;
@@ -7,9 +10,8 @@ using Entity.Models.Organizational;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Utilities.Exeptions;
+using Utilities.Responses;
 using Web.Controllers.Base;
 
 namespace Web.Controllers.Operational
@@ -205,5 +207,23 @@ namespace Web.Controllers.Operational
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"Reporte_Asistencias_{DateTime.Now:yyyyMMddHHmm}.xlsx");
         }
+
+
+        [HttpGet("all-by-person-event")]
+        public async Task<IActionResult> GetAllByPersonEvent([FromQuery] int personId, [FromQuery] int eventId)
+        {
+            try
+            {
+                IList<AttendanceDtoResponse> result = await _attendanceBusiness.GetAllByPersonEventAsync(personId, eventId);
+
+                return Ok(ApiResponse<IEnumerable<AttendanceDtoResponse>>.Ok(result, "Listado obtenido"));
+            }
+            catch (ExternalServiceException ex)
+            {
+                _logger.LogError(ex, "Error al obtener datos");
+                return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
+            }
+        }
+
     }
 }

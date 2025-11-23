@@ -74,10 +74,10 @@ namespace Entity.DataInit.Parameter
             //       .HasForeignKey(p => p.DocumentTypeId)
             //       .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasMany(ct => ct.PersonBlodType)
-                   .WithOne(p => p.BloodType)
-                   .HasForeignKey(p => p.BloodTypeId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasMany(ct => ct.PersonBlodType)
+            //       .WithOne(p => p.BloodType)
+            //       .HasForeignKey(p => p.BloodTypeId)
+            //       .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(ct => ct.Organization)
                    .WithOne(o => o.OrganizaionType)

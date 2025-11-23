@@ -60,7 +60,7 @@ namespace Business.Implementations.Operational
 
             try
             {
-                int userId = _currentUser.UserId;
+                int userId =  dto.UserId ?? _currentUser.UserId;
 
                 // Guardar notificación
                 NotificationDto notification = await Save(dto);
@@ -105,7 +105,7 @@ namespace Business.Implementations.Operational
 
             try
             {
-                var dto = NotificationFactory.Create(type, args);
+                var dto = await NotificationFactory.Create(type, args);
                 var notification = await CreateAndSendAsync(dto);
                 await _unitOfWork.CommitAsync();
                 return notification;
@@ -125,6 +125,21 @@ namespace Business.Implementations.Operational
             int userId = _currentUser.UserId;
             var notifications = await _notificationData.GetNotificationsByUserAsync(userId);
             return _mapper.Map<IEnumerable<NotificationWithReceivedDto>>(notifications);
+        }
+
+        /// <summary>
+        /// Obtiene el total de notificaciones del usuario.
+        /// </summary>
+        public async Task<int> GetUserNotificationCountAsync()
+        {
+            try
+            {
+                int userId = _currentUser.UserId;
+                return await _notificationData.GetUserNotificationCountAsync(userId);
+            }
+            catch (Exception ex) {
+                throw new Exception($"Error al obtener el conteo de notificaciones del usuario: {ex.Message}", ex);
+            }
         }
     }
 }

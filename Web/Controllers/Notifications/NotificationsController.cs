@@ -63,5 +63,18 @@ namespace Web.Controllers.Operational
             var result = await _business.SendTemplateAsync(type, args);
             return Ok(result);
         }
+
+
+        /// <summary>
+        /// Obtiene la cantidad de notificaciones del usuario autenticado.
+        /// </summary>
+        [HttpGet("count")]
+        public async Task<IActionResult> GetCountAsync()
+        {
+
+            int total = await _business.GetUserNotificationCountAsync();
+
+            return Ok(total);
+        }
     }
 }
