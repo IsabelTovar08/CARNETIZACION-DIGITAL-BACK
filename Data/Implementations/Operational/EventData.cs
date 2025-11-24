@@ -255,5 +255,31 @@ namespace Data.Implementations.Operational
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Para Tener el top 5 de los eventos con mas asistentes
+        /// </summary>
+        /// <param name="top"></param>
+        /// <returns></returns>
+        public async Task<List<EventAttendanceTopDtoResponse>>
+        GetTopEventsByTypeAsync(int eventTypeId, int top = 5)
+            {
+                return await _context.Attendances
+                    .Where(a => !a.IsDeleted
+                        && a.EventAccessPointEntry.Event.EventTypeId == eventTypeId)
+                    .GroupBy(a => new {
+                        a.EventAccessPointEntry.Event.Id,
+                        a.EventAccessPointEntry.Event.Name
+                    })
+                    .Select(g => new EventAttendanceTopDtoResponse
+                    {
+                        EventId = g.Key.Id,
+                        EventName = g.Key.Name,
+                        TotalAttendees = g.Count()
+                    })
+                    .OrderByDescending(x => x.TotalAttendees)
+                    .Take(top)
+                    .ToListAsync();
+        }
+
     }
 }

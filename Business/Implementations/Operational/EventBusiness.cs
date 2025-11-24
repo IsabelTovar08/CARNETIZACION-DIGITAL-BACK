@@ -427,5 +427,11 @@ namespace Business.Implementations.Operational
         {
             return await _data.GetEventTypeCountsAsync();
         }
+
+        public async Task<List<EventAttendanceTopDtoResponse>> GetTopEventsByTypeAsync(int eventTypeId, int top = 5)
+        {
+            return await _data.GetTopEventsByTypeAsync(eventTypeId, top);
+        }
+
     }
 }

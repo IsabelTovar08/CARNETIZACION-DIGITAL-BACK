@@ -67,6 +67,13 @@ namespace Data.Interfases.Operational
         /// <returns></returns>
         Task<List<EventTypeCountDtoResponse>> GetEventTypeCountsAsync();
 
+        /// <summary>
+        /// Para obtener los eventos con mayor asistencia.
+        /// </summary>
+        /// <param name="top"></param>
+        /// <returns></returns>
+        Task<List<EventAttendanceTopDtoResponse>> GetTopEventsByTypeAsync(int eventTypeId, int top = 5);
+
 
     }
 }

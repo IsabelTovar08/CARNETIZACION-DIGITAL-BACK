@@ -190,5 +190,12 @@ namespace Web.Controllers.Operational
             return Ok(result);
         }
 
+        [HttpGet("top-attendance-by-type/{typeId}")]
+        public async Task<IActionResult> GetTopByType(int typeId, int top = 5)
+        {
+            var result = await _eventBusiness.GetTopEventsByTypeAsync(typeId, top);
+            return Ok(result);
+        }
+
     }
 }
