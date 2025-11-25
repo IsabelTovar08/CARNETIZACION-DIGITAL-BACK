@@ -30,14 +30,12 @@ namespace Data.Implementations.Organizational.Assignment
                 .AsNoTracking()
                 .Where(c => !c.IsDeleted)
                 .Include(c => c.Person)
-                .Include(c => c.Profile)
+                .Include(c => c.Shedule)
                 .Include(c => c.InternalDivision)
                 .Include(c => c.Card)
                 .Include(c => c.Status)
                 .ToListAsync();
 
-
-            var prueba = await GetCardDataByIssuedIdAsync(1);
             return cards;
         }
 
@@ -89,7 +87,9 @@ namespace Data.Implementations.Organizational.Assignment
                 .Include(x => x.Person)
                 .Include(x => x.Card)
                     .ThenInclude(c => c.CardTemplate)
-                .Include(x => x.Profile)
+                .Include(x => x.Card)
+                    .ThenInclude(c => c.Profile)
+                .Include(x => x.Shedule)
                 .Include(x => x.InternalDivision)
                     .ThenInclude(d => d.AreaCategory)
                 .Include(x => x.InternalDivision)
@@ -135,11 +135,11 @@ namespace Data.Implementations.Organizational.Assignment
 
                 // Datos del carnet
                 CardId = issuedCard.UniqueId.ToString(),
-                Profile = issuedCard.Profile?.Name ?? "Sin perfil",
+                Profile = issuedCard.Card.Profile?.Name ?? "Sin perfil",
                 InternalDivisionName = division?.Name ?? "N/A",
                 OrganizationalUnit = unit?.Name ?? "N/A",
                 UserPhotoUrl = issuedCard.Person?.PhotoUrl ?? string.Empty,
-
+                SheduleName = issuedCard.Shedule.Name ?? "N/A",
                 // Aquí queda el Base64 limpio del logo
                 LogoUrl = base64Logo,
 
@@ -201,7 +201,7 @@ namespace Data.Implementations.Organizational.Assignment
         {
             return await _context.IssuedCards
                 .Where(c => !c.IsDeleted)
-                .GroupBy(c => c.Card.SheduleId)
+                .GroupBy(c => c.Card.Profile)
                 .Select(g => new CarnetsBySheduleDto
                 {
                     Jornada = g.Key.ToString(),

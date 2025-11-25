@@ -31,7 +31,9 @@ namespace Entity.Models.ModelSecurity
         public City? City { get; set; }
 
         public List<Attendance>? Attendances { get; set; }
-        public List<IssuedCard>? IssuedCard { get; set; }
+
+        /// <summary>Tarjetas emitidas de esta persona</summary>
+        public ICollection<IssuedCard> IssuedCard { get; set; } = new List<IssuedCard>();
         public DocumentType DocumentType { get; set; }
         public BloodType? BloodType { get; set; }
     }

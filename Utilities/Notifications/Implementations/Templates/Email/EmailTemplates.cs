@@ -32,7 +32,9 @@ namespace Utilities.Notifications.Implementations.Templates.Email
             ["welcome"] = "Welcome.html",
             ["reset"] = "ResetPassword.html",
             ["verify"] = "Verification.html",
-            ["notify"] = "GenericNotification.html"
+            ["notify"] = "GenericNotification.html",
+            ["ModificationRequest"] = "ModificationRequest.html",
+            ["CardAssigned"] = "CardAssigned.html",
         };
 
         // Cache por “origen” (ruta de archivo o nombre de recurso)

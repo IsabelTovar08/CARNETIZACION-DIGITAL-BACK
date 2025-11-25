@@ -117,7 +117,7 @@ namespace Business.Services.Notifications
                     {
                         Title = "Modificación rechazada",
                         Message = $"Tu solicitud de modificación en el campo \"{args[0]}\" ha sido rechazada. " +
-                                  $"Motivo: {args[2]}.",
+                                  $"Motivo: {args[3]}.",
                         NotificationType = NotificationType.Warning,
                         UserId = (int)args[1],
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Auth;
 using Business.Interfaces.Notifications;
@@ -12,19 +7,20 @@ using Business.Interfaces.Security;
 using Business.Interfases.Organizational.Location;
 using Business.Services.CodeGenerator;
 using Business.Services.Notifications;
-using Data.Interfases;
 using Data.Interfases.Operational;
 using Data.Interfases.Transaction;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
 using Entity.Enums.Extensions;
 using Entity.Enums.Specifics;
+using Entity.Models;
 using Entity.Models.Operational;
+using Infrastructure.Notifications.Interfases;
 using Microsoft.Extensions.Logging;
 using Utilities.Enums.Specifics;
+using Utilities.Notifications.Implementations.Templates.Email;
 
 namespace Business.Implementations.Operational
 {
@@ -41,6 +37,8 @@ namespace Business.Implementations.Operational
         private readonly IUnitOfWork _unitOfWork;
         private readonly INotificationBusiness _notificationBusiness;
         private readonly ICityBusiness _cityBusiness;
+        private readonly INotify _notificationSender;
+
 
         public ModificationRequestBusiness(
             IModificationRequestData data,
@@ -52,6 +50,7 @@ namespace Business.Implementations.Operational
             IUnitOfWork unitOfWork,
             INotificationBusiness notificationBusiness,
             ICityBusiness cityBusiness,
+            INotify notificationSender,
             ICodeGeneratorService<ModificationRequest>? codeService = null)
             : base(data, logger, mapper, codeService)
         {
@@ -62,6 +61,7 @@ namespace Business.Implementations.Operational
             _unitOfWork = unitOfWork;
             _notificationBusiness = notificationBusiness;
             _cityBusiness = cityBusiness;
+            _notificationSender = notificationSender;
         }
 
         /// <summary>
@@ -69,8 +69,7 @@ namespace Business.Implementations.Operational
         /// </summary>
         public override async Task<ModificationRequestResponseDto> Save(ModificationRequestDto entity)
         {
-            int userId = _currentUser.UserId;
-            entity.UserId = 3;
+            entity.UserId = _currentUser.UserId;
 
             // Obtener info del usuario y su persona
             UserDTO user = await _userBusiness.GetById(entity.UserId);
@@ -106,8 +105,11 @@ namespace Business.Implementations.Operational
             // Notificar a los administradores
             await NotifyAdminsOnCreationAsync(saved);
 
+            ModificationRequest requestEntity = _mapper.Map<ModificationRequest>(entity);
+
             // Notificar al usuario
-            await NotifyUserOnResultAsync( _mapper.Map<ModificationRequest>(entity), NotificationTemplateType.ModificationSent);
+            await NotifyUserOnResultAsync( requestEntity, NotificationTemplateType.ModificationSent);
+            await SendModificationRequestEmail(requestEntity, "Pending");
 
             return saved;
         }
@@ -146,7 +148,7 @@ namespace Business.Implementations.Operational
                 if (user == null)
                     throw new InvalidOperationException("No se encontró el usuario asociado a la solicitud.");
 
-                var person = await _personBusiness.GetById(user.PersonId);
+                PersonDto? person = await _personBusiness.GetById(user.PersonId);
                 if (person == null)
                     throw new InvalidOperationException("No se encontró la persona asociada al usuario.");
 
@@ -164,7 +166,10 @@ namespace Business.Implementations.Operational
                     Phone = person.Phone,
                     Email = person.Email,
                     Address = person.Address,
-                    CityId = person.CityId > 0 ? person.CityId : 1
+                    CityId = person.CityId > 0 ? person.CityId : 1,
+                    PhotoPath = person.PhotoPath,
+                    PhotoUrl = person.PhotoUrl
+                    
                 };
 
                 // 4️⃣ Aplicar cambio según campo
@@ -220,7 +225,10 @@ namespace Business.Implementations.Operational
                 }
 
                 // 5️⃣ Actualizar persona
-                await _personBusiness.Update(personUpdateDto);
+                if (request.Field != ModificationField.PhotoUrl)
+                {
+                    await _personBusiness.Update(personUpdateDto);
+                }
 
                 // 6️⃣ Actualizar solicitud
                 request.Status = ModificationRequestStatus.Approved;
@@ -234,6 +242,7 @@ namespace Business.Implementations.Operational
                 await NotifyUserOnResultAsync(request, NotificationTemplateType.ModificationApproved);
 
                 await _unitOfWork.CommitAsync();
+                await SendModificationRequestEmail(request, "Approved");
                 return true;
             }
             catch (Exception ex)
@@ -263,7 +272,7 @@ namespace Business.Implementations.Operational
 
             // 🔹 Notificar al usuario solicitante
             await NotifyUserOnResultAsync(request, NotificationTemplateType.ModificationRejected);
-
+            await SendModificationRequestEmail(request, "Rejected");
             return true;
         }
 
@@ -377,7 +386,7 @@ namespace Business.Implementations.Operational
         /// <summary>
         /// Obtiene el nombre legible del valor, soporta enums y foreign keys.
         /// </summary>
-        private async Task<string?> GetReadableValueAsync(ModificationField field, string rawValue, ModificationRequestStatus status,int personId)
+        private async Task<string?> GetReadableValueAsync(ModificationField field, string rawValue, ModificationRequestStatus status,int userId)
         {
             if (string.IsNullOrWhiteSpace(rawValue))
                 return null;
@@ -409,8 +418,10 @@ namespace Business.Implementations.Operational
                             return rawValue;
 
                         // Si YA está aprobada -> tomar la foto de la persona actualizada
-                        var person = await _personBusiness.GetById(personId);
+                        UserDTO? user = await _userBusiness.GetById(userId);
+                        PersonDto? person = await _personBusiness.GetById(user.PersonId);
                         return person.PhotoUrl;
+
                     }
 
                 default:
@@ -455,6 +466,61 @@ namespace Business.Implementations.Operational
             return publicUrl;
         }
 
+
+        /// <summary>
+        /// Envía un correo electrónico al usuario sobre el estado de su solicitud de modificación.
+        /// </summary>
+        private async Task<bool> SendModificationRequestEmail(ModificationRequest request, string status)
+        {
+            try
+            {
+                // Obtener usuario y persona
+                var user = await _userBusiness.GetById(request.UserId);
+                if (user == null)
+                {
+                    _logger.LogWarning("No se encontró el usuario {UserId} para enviar email", request.UserId);
+                    return false;
+                }
+
+
+                // Preparar datos para la plantilla
+                var model = new Dictionary<string, object>
+                {
+                    ["user_name"] = $"{user.NamePerson}".Trim(),
+                    ["status"] = status, // "Approved", "Rejected", "Pending"
+                    ["field"] = request.Field.GetDisplayName(),
+                    ["request_date"] = request.RequestDate.ToString("dd/MM/yyyy HH:mm"),
+                    ["company_name"] = "Sistema de Carnetización Digital",
+                    ["app_url"] = "https://carnet.tuempresa.com/solicitudes"
+                };
+
+                // Determinar asunto según el estado
+                string subject = status switch
+                {
+                    "Approved" => "Solicitud Aprobada",
+                    "Rejected" => "Solicitud Rechazada",
+                    _ => "Actualización de Solicitud"
+                };
+
+                // Renderizar plantilla HTML
+                var html = await EmailTemplates.RenderAsync("ModificationRequest.html", model);
+
+                // Enviar email
+                await _notificationSender.NotifyAsync(
+                    "email",
+                    user.EmailPerson,
+                    subject,
+                    html
+                );
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "No se pudo enviar email de solicitud de modificación al usuario {UserId}", request.UserId);
+                return false;
+            }
+        }
 
     }
 }

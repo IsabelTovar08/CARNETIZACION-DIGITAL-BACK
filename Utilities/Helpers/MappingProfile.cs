@@ -123,7 +123,7 @@ namespace Utilities.Helper
             //Mapeo de la entidad User
             CreateMap<User, UserDTO>()
              .ForMember(dest => dest.NamePerson, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
-             .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src => src.Person.Email))
+             .ForMember(dest => dest.EmailPerson, opt => opt.MapFrom(src => src.Person.Email ?? src.UserName))
              .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(R => R.Rol)))
              .ForMember(dest => dest.Active, opt => opt.MapFrom(src => src.Active))
              .ReverseMap();
@@ -211,7 +211,7 @@ namespace Utilities.Helper
             //.ForMember(d => d.DivisionId, o => o.MapFrom(s => s.IssuedCard.InternalDivision.Id))
             //.ForMember(d => d.DivisionName, o => o.MapFrom(s => s.IssuedCard.InternalDivision.Name))
             //.ForMember(d => d.ProfileId, o => o.MapFrom(s => s.IssuedCard.Profile.Id))
-            //.ForMember(d => d.ProfileName, o => o.MapFrom(s => s.IssuedCard.Profile.Name))
+            .ForMember(d => d.ProfileName, o => o.MapFrom(s => s.Profile.Name))
             //.ForMember(d => d.AreaCategoryName, o => o.MapFrom(s => s.IssuedCard.InternalDivision.AreaCategory.Name))
 
             .ReverseMap();
@@ -229,7 +229,7 @@ namespace Utilities.Helper
             CreateMap<IssuedCard, IssuedCardDto>()
                 .ForMember(dest => dest.PersonName, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
                 .ForMember(dest => dest.DivisionName, opt => opt.MapFrom(src => src.InternalDivision.Name))
-                .ForMember(dest => dest.ProfileName, opt => opt.MapFrom(src => src.Profile.Name))
+                .ForMember(dest => dest.ProfileName, opt => opt.MapFrom(src => src.Card.Profile.Name))
                 .ReverseMap();
 
             CreateMap<IssuedCard, IssuedCardDtoRequest>()
@@ -565,7 +565,9 @@ namespace Utilities.Helper
             CreateMap<ImportBatchStartDto, ImportBatch>().ReverseMap();
 
             CreateMap<ImportBatchRow, ImportBatchRowDto>()
-                .ForMember(d => d.PersonName, opt => opt.MapFrom(s => s.Person.FirstName + s.Person.MiddleName + s.Person.LastName + s.Person.SecondLastName))
+                .ForMember(d => d.PersonName, opt => opt.MapFrom(s => s.Person.FirstName +" "+ s.Person.MiddleName + " " + s.Person.LastName + " " + s.Person.SecondLastName))
+                .ForMember(d => d.Identification, opt => opt.MapFrom(s => s.Person.DocumentType +" - "+ s.Person.DocumentNumber))
+
                 .ReverseMap();
 
             // Mapear ImportBatch -> ImportBatchDto

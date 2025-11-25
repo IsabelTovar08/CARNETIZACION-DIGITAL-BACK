@@ -87,19 +87,27 @@ namespace Business.Services.Excel
             // Metadatos
             var fileName = _excel.GetFileName(excelStream);
             int startedBy = _currentUser.UserId;
+            int cardConfigId = 0;
 
-            // Crear la configuración base (Card) — solo una vez
-            var cardConfig = await _cardBusiness.Save(new CardConfigurationDtoRequest
+            if (ctx.CardConfigurationId != null)
             {
-                CreationDate = ctx.ValidFrom,
-                ExpirationDate = ctx.ValidTo,
-                CardTemplateId = ctx.CardTemplateId,
-                StatusId = 1,
-                SheduleId = 1
-            });
+                cardConfigId = ctx.CardConfigurationId ?? 0;
+            }
+            else 
+            {
+                // Crear la configuración base (Card) 
+                var cardConfig = await _cardBusiness.Save(new CardConfigurationDtoRequest
+                {
+                    CreationDate = ctx.ValidFrom,
+                    ExpirationDate = ctx.ValidTo,
+                    CardTemplateId = ctx.CardTemplateId,
+                    StatusId = 1,
+                    ProfileId = ctx.ProfileId,
+                    Name = ctx.CardConfigurationName
+                });
 
-            var cardConfigId = cardConfig.Id;
-            var template = await _templateBusiness.GetById(ctx.CardTemplateId);
+                cardConfigId = cardConfig.Id;
+            }
 
             // Guardar registro del batch
             var ctxJson = JsonSerializer.Serialize(new
@@ -113,7 +121,8 @@ namespace Business.Services.Excel
                 ctx.ProfileId,
                 ctx.CardTemplateId,
                 ctx.ValidFrom,
-                ctx.ValidTo
+                ctx.ValidTo,
+                ctx.CardConfigurationId
             });
 
             var batchId = await _history.StartBatchAsync(new ImportBatchStartDto
@@ -161,7 +170,7 @@ namespace Business.Services.Excel
                     {
                         PersonId = personId.Value,
                         InternalDivisionId = ctx.InternalDivisionId,
-                        ProfileId = ctx.ProfileId,
+                        SheduleId = ctx.SheduleId,
                         isCurrentlySelected = true,
                         CardId = cardConfigId,
                         StatusId = 1

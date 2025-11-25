@@ -25,6 +25,7 @@ namespace Entity.DTOs.Specifics.Cards
         public string BranchPhone { get; set; }
         public string BranchAddress { get; set; }
 
+        public string SheduleName { get; set; }
 
         public string Address { get; set; }
         public string Title { get; set; }

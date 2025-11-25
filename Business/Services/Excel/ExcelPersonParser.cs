@@ -11,6 +11,7 @@ using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.Specifics;
 using Microsoft.Extensions.Logging;
 using Utilities.Helpers.Excel;
+using static Utilities.Helpers.GeneratePassword;
 
 namespace Business.Services.Excel
 {
@@ -145,21 +146,6 @@ namespace Business.Services.Excel
                 if (!docsInFile.Add(r.DocumentNumber!)) return "Número de documento duplicado en el archivo.";
 
             return null;
-        }
-
-        /// <summary>
-        /// Genera una contraseña temporal aleatoria.
-        /// </summary>
-        private static string GenerateTempPassword(int length = 10)
-        {
-            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@$!#%*?";
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[length];
-            rng.GetBytes(bytes);
-            var sb = new StringBuilder(length);
-            for (int i = 0; i < length; i++)
-                sb.Append(chars[bytes[i] % chars.Length]);
-            return sb.ToString();
         }
     }
 }

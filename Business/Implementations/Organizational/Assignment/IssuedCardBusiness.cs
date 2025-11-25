@@ -16,8 +16,11 @@ using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Specifics;
 using Entity.DTOs.Specifics.Cards;
 using Entity.Models.Organizational.Assignment;
+using Entity.Models.Parameter;
+using Infrastructure.Notifications.Interfases;
 using Microsoft.Extensions.Logging;
 using Utilities.Helpers;
+using Utilities.Notifications.Implementations.Templates.Email;
 
 namespace Business.Implementations.Organizational.Assignment
 {
@@ -26,11 +29,19 @@ namespace Business.Implementations.Organizational.Assignment
         public readonly IIssuedCardData _issuedCardData;
         protected readonly ICardTemplateBusiness _cardTemplateBusiness;
         protected readonly ICardPdfService _cardPdfService;
-        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper, ICardTemplateBusiness cardTemplateBusiness, ICardPdfService cardPdfService) : base(data, logger, mapper)
+        private readonly ICardConfigurationBusiness _cardConfigurationBusiness;
+        private readonly INotify _notify;
+
+        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper, ICardTemplateBusiness cardTemplateBusiness, ICardPdfService cardPdfService, 
+            ICardConfigurationBusiness cardConfigurationBusiness,
+            INotify notify
+            ) : base(data, logger, mapper)
         {
             _issuedCardData = data;
             _cardTemplateBusiness = cardTemplateBusiness;
             _cardPdfService = cardPdfService;
+            _cardConfigurationBusiness = cardConfigurationBusiness;
+            _notify = notify;
         }
 
         /// <summary>
@@ -48,13 +59,37 @@ namespace Business.Implementations.Organizational.Assignment
                 // === 2️⃣ Generar QR Code basado en el UUID ===
                 string qrBase64 = QrCodeHelper.ToPngBase64(uuid.ToString());
 
+                if(request.CardId is null || request.CardId <= 0)
+                {
+                    CardConfigurationDtoRequest cardRequest = new CardConfigurationDtoRequest
+                    {
+                        ProfileId = request.ProfileId ?? 0,
+                        CardTemplateId = request.CardTemplateId ?? 0,
+                        Name = request.CardName ?? "",
+                        StatusId = 1,
+                        CreationDate = request.ValidFrom ?? new DateTime(),
+                        ExpirationDate = request.ValidFrom ?? new DateTime()
+
+                    };
+
+                    CardConfigurationDto cardSaved = await _cardConfigurationBusiness.Save(cardRequest);
+                    request.CardId = cardSaved.Id;
+                }
+
                 // === 3️⃣ Mapear DTO a entidad ===
                 IssuedCard entity = _mapper.Map<IssuedCard>(request);
                 entity.UniqueId = Guid.NewGuid();
                 entity.QRCode = qrBase64;
-
+                entity.Card = null;
+                entity.StatusId = 1;
                 // === 4️⃣ Guardar en base de datos usando la capa Data ===
                 IssuedCard saved = await _issuedCardData.SaveAsync(entity);
+
+                // Obtener datos completos para enviar correo
+                CardUserData userData = await _issuedCardData.GetCardDataByIssuedIdAsync(saved.Id);
+
+                // Enviar notificación
+                await SendCardAssignedNotificationAsync(saved, userData);
 
                 // === 5️⃣ Mapear de vuelta a DTO ===
                 return _mapper.Map<IssuedCardDto>(saved);
@@ -247,5 +282,40 @@ namespace Business.Implementations.Organizational.Assignment
                 throw;
             }
         }
+
+
+        private async Task SendCardAssignedNotificationAsync(IssuedCard card, CardUserData data)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(data.Email))
+                    return;
+
+                var model = new Dictionary<string, object>
+                {
+                    ["user_name"] = $"{data.Name}",
+                    ["division"] = data.InternalDivisionName,
+                    ["profile"] = data.Profile,
+                    ["valid_from"] = data.ValidFrom.ToString("dd/MM/yyyy") ?? "",
+                    ["valid_to"] = data.ValidUntil.ToString("dd/MM/yyyy") ?? "",
+                    ["company_name"] = "Sistema de Carnetización Digital",
+                    ["app_url"] = "https://carnet.go.com"
+                };
+
+                string html = await EmailTemplates.RenderAsync("CardAssigned.html", model);
+
+                await _notify.NotifyAsync(
+                    "email",
+                    data.Email,
+                    "Nuevo Carnet Asignado",
+                    html
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "No se pudo enviar correo de asignación del carnet.");
+            }
+        }
+
     }
 }

@@ -12,7 +12,7 @@ namespace Entity.DTOs.ModelSecurity.Request
         public string FirstName { get; set; } = string.Empty;
 
         [StringLength(100, ErrorMessage = "El segundo nombre no puede exceder los 100 caracteres.")]
-        [RegularExpression(@"(^$|^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$)", ErrorMessage = "El segundo nombre solo puede contener letras y espacios.")]
+        [RegularExpression(@"(^$|^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$)", ErrorMessage = "El segundo nombre solo puede conrstener letras y espacios.")]
         public string? MiddleName { get; set; }
 
         [Required(ErrorMessage = "El primer apellido es obligatorio.")]
@@ -50,6 +50,8 @@ namespace Entity.DTOs.ModelSecurity.Request
         [Required(ErrorMessage = "La ciudad es obligatoria.")]
         [Range(1, int.MaxValue, ErrorMessage = "El identificador de la ciudad debe ser un número entero mayor que 0.")]
         public int CityId { get; set; }
-
+        public string? PhotoUrl { get; set; }
+        public string? PhotoPath { get; set; }
+        public bool? CreateUser { get; set; } = false;
     }
 }

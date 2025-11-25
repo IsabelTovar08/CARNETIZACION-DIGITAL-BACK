@@ -37,11 +37,30 @@ namespace Data.Implementations.Logging
         /// <inheritdoc/>
         public async Task<IEnumerable<ImportBatch>> GetAllAsync()
         {
-            return await _context.Set<ImportBatch>()
-                .AsNoTracking()
-                 .Include(b => b.StartedByUser)
-                .OrderByDescending(b => b.StartedAt)
-                .ToListAsync();
+            var batches = await _context.ImportBatches
+            .AsNoTracking()
+            .OrderByDescending(b => b.StartedAt)
+            .Select(b => new ImportBatch
+            {
+                Id = b.Id,
+                StartedAt = b.StartedAt,
+                StartedBy = b.StartedBy,
+                TotalRows = b.TotalRows,
+                EndedAt = b.EndedAt,
+                SuccessCount = b.SuccessCount,
+                ErrorCount = b.ErrorCount,
+                ContextJson = b.ContextJson,
+                FileName = b.FileName,
+
+                // Trae el usuario directamente sin FK ni navegación
+                StartedByUser = _context.Users
+                    .Include(u => u.Person)
+                    .AsNoTracking()
+                    .FirstOrDefault(u => u.Id == b.StartedBy)
+            })
+            .ToListAsync();
+            return batches;
+
         }
 
         /// <inheritdoc/>
