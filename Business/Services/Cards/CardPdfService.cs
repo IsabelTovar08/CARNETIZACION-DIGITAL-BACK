@@ -103,7 +103,7 @@ namespace Business.Services.Cards
                 // Identificación (CC)
                 DrawTextAutoSize(
                     canvas,
-                    $"{userData.DocumentName ?? "CC"}: {userData.DocumentNumber}",
+                    $"{userData.DocumentCode ?? "CC"}: {userData.DocumentNumber}",
                     frontPos["identification"],
                     maxWidth: 260,
                     maxHeight: 40,
