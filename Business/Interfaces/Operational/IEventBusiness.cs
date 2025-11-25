@@ -39,5 +39,19 @@ namespace Business.Interfaces.Operational
 
         Task<IEnumerable<EventDtoResponse>> FilterAsync(EventFilterDto filters);
 
+        /// <summary>
+        /// Para obtener el conteo de eventos por tipo de evento
+        /// </summary>
+        /// <returns></returns>
+        Task<List<EventTypeCountDtoResponse>> GetEventTypeCountsAsync();
+
+
+        /// <summary>
+        /// Para obtener los 5 eventos con mas asistencia
+        /// </summary>
+        /// <param name="top"></param>
+        /// <returns></returns>
+        Task<List<EventAttendanceTopDtoResponse>> GetTopEventsByTypeAsync(int eventTypeId, int top = 5);
+
     }
 }

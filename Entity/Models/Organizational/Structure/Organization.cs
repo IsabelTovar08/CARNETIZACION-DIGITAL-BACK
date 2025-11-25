@@ -10,5 +10,8 @@ namespace Entity.Models.Organizational.Structure
         public int TypeId { get; set; }
 
         public CustomType OrganizaionType { get; set; }
+        public ICollection<User> Users { get; set; } = new List<User>();
+        public List<Branch> Branches { get; set; } = new();
+
     }
 }

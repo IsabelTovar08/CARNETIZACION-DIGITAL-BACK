@@ -41,30 +41,36 @@ namespace Utilities.Helper
         {
             CreateMap<Person, PersonDto>()
      .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
-     .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => ((DocumentType)src.DocumentType).GetDisplayName()))
-     .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src =>
-    src.BloodType.HasValue
-        ? ((BloodType)src.BloodType.Value).GetDisplayName()
-        : null
-))
+     .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType))
+     .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType))
+     .ForMember(dest => dest.HasCard,
+        opt => opt.MapFrom(src =>
+            src.IssuedCard.Any(pdp => pdp.Card != null)))
 
+         //ID DEL CARNET ACTUAL
+         .ForMember(dest => dest.IssuedCardId,
+        opt => opt.MapFrom(src =>
+            src.IssuedCard
+                .Where(c => !c.IsDeleted && c.IsCurrentlySelected)
+                .Select(c => c.Id)
+                .FirstOrDefault()
+        ))
 
-
-     // 🔹 División actual
-     .ForMember(dest => dest.InternalDivisionName,
-         opt => opt.MapFrom(src =>
-             src.IssuedCard
-                 .Where(pdp => pdp.IsCurrentlySelected)
-                 .Select(pdp => pdp.InternalDivision.Name)
-                 .FirstOrDefault()))
+         // 🔹 División actual
+         .ForMember(dest => dest.InternalDivisionName,
+             opt => opt.MapFrom(src =>
+                 src.IssuedCard
+                     .Where(pdp => pdp.IsCurrentlySelected)
+                     .Select(pdp => pdp.InternalDivision.Name)
+                     .FirstOrDefault()))
 
     
 
 
-     // 🔹 Si tiene carnet
-     .ForMember(dest => dest.HasCard,
-         opt => opt.MapFrom(src =>
-             src.IssuedCard.Any(pdp => pdp.Card != null)))
+         // 🔹 Si tiene carnet
+         .ForMember(dest => dest.HasCard,
+             opt => opt.MapFrom(src =>
+                 src.IssuedCard.Any(pdp => pdp.Card != null)))
 
      .ReverseMap();
 
@@ -273,6 +279,8 @@ namespace Utilities.Helper
                 .ForMember(d => d.Ispublic, o => o.MapFrom(s => s.IsPublic))
                 .ForMember(d => d.EventTypeName, o => o.MapFrom(s => s.EventType != null ? s.EventType.Name : null))
                 .ForMember(d => d.StatusName, o => o.MapFrom(s => s.Status != null ? s.Status.Name : null))
+                .ForMember(d => d.QrCodeBase64, o => o.MapFrom(s => s.QrCodeBase64))
+
 
                 // 🔹 Enviar TODOS los horarios del evento
                 .ForMember(d => d.Schedules, o => o.MapFrom(s =>
@@ -291,8 +299,8 @@ namespace Utilities.Helper
 
 
 
-                // 🔹 Access points
-                .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
+               // 🔹 Access points
+               .ForMember(d => d.AccessPoints, opt => opt.MapFrom(s =>
                     s.EventAccessPoints.Select(eap => new AccessPointDtoResponsee
                     {
                         Id = eap.AccessPoint.Id,
@@ -301,9 +309,17 @@ namespace Utilities.Helper
                         TypeId = eap.AccessPoint.TypeId,
                         Type = eap.AccessPoint.AccessPointType != null
                             ? eap.AccessPoint.AccessPointType.Name
-                            : null
+                            : null,
+
+                        
+                        QrCodeKey = eap.QrCodeKey,
+                         Code = eap.AccessPoint.Code,
+
+                        EventId = eap.EventId,
+                        EventName = eap.Event.Name
                     })
                 ));
+
 
 
             //EventSchedule
@@ -329,7 +345,9 @@ namespace Utilities.Helper
                      Name = eap.AccessPoint.Name,
                      Description = eap.AccessPoint.Description,
                      TypeId = eap.AccessPoint.TypeId,
-                     Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null
+                     Type = eap.AccessPoint.AccessPointType != null ? eap.AccessPoint.AccessPointType.Name : null,
+                     QrCodeKey = eap.QrCodeKey,
+                     Code = eap.AccessPoint.Code
                  })
              ))
              .ForMember(d => d.Audiences, opt => opt.MapFrom(s => s.EventTargetAudiences));
@@ -463,8 +481,6 @@ namespace Utilities.Helper
 
 
 
-
-            //EventAccessPoint
 
             //Notifications
             CreateMap<Notification, NotificationDto>().ReverseMap();

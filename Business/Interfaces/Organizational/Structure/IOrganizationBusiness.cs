@@ -12,5 +12,8 @@ namespace Business.Interfaces.Organizational.Structure
 {
     public interface IOrganizationBusiness : IBaseBusiness<Organization, OrganizationDtoRequest, OrganizationDto>
     {
+        Task<OrganizationDto?> GetMyOrganizationAsync();
+        Task<bool> UpdateMyOrganizationAsync(OrganizationUpdateDtoRequest dto);
+
     }
 }

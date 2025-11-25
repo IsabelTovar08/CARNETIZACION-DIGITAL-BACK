@@ -44,8 +44,8 @@ namespace Entity.Models
         public List<ImportBatch>? ImportBatches { get; set; } = new List<ImportBatch>();
         public List<SupervisorsEvent> SupervisorsEvent { get; set; }
 
+        public int? OrganizationId { get; set; }   
+        public Organization? Organization { get; set; }
 
-        //public int OrganizationId { get; set; }
-        //public Organization Organization { get; set; } = default!;
     }
 }

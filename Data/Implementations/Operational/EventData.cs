@@ -2,6 +2,7 @@
 using Data.Classes.Base;
 using Data.Interfases.Operational;
 using Entity.Context;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using Entity.Models.Organizational.Structure;
@@ -35,7 +36,9 @@ namespace Data.Implementations.Operational
 
                 .Include(e => e.EventSchedules)
                   .ThenInclude(es => es.Schedule)
-                    
+
+                //.Include(e => e.EventAccessPoints)
+
                 .Include(e => e.EventAccessPoints)
                     .ThenInclude(eap => eap.AccessPoint)
                         .ThenInclude(ap => ap.AccessPointType)
@@ -48,6 +51,7 @@ namespace Data.Implementations.Operational
 
                 .Include(e => e.EventTargetAudiences)
                     .ThenInclude(a => a.InternalDivision)
+
                 .FirstOrDefaultAsync(e => e.Id == eventId);
 
             return ev;
@@ -178,20 +182,23 @@ namespace Data.Implementations.Operational
         {
             var localNow = DateTime.SpecifyKind(now, DateTimeKind.Local);
 
-            return await _context.Set<Event>()
+            return await _context.Events
                 .Where(e => (e.StatusId == 1 || e.StatusId == 8)
                     && e.EventEnd <= localNow
                     && !e.IsDeleted)
+                .Include(e => e.EventSchedules)
+                    .ThenInclude(es => es.Schedule)
                 .ToListAsync();
         }
+
 
         // metodo para el servicio que verifica y actualiza el estado de eventos "en curso"
         public async Task<IEnumerable<Event>> GetActiveEventsAsync()
         {
             return await _context.Set<Event>()
+                .Where(e => e.StatusId == 1 || e.StatusId == 8) 
                 .Include(e => e.EventSchedules)
-                  .ThenInclude(es => es.Schedule)
-                .Where(e => e.StatusId == 1 || e.StatusId == 8)
+                    .ThenInclude(es => es.Schedule)
                 .ToListAsync();
         }
 
@@ -228,6 +235,50 @@ namespace Data.Implementations.Operational
             var existing = _context.EventSchedules.Where(x => x.EventId == eventId);
             _context.EventSchedules.RemoveRange(existing);
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Para obtener el conteo de eventos por tipo de evento
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<EventTypeCountDtoResponse>> GetEventTypeCountsAsync()
+        {
+            return await _context.Events
+                .Where(e => !e.IsDeleted)
+                .GroupBy(e => new { e.EventTypeId, e.EventType.Name })
+                .Select(g => new EventTypeCountDtoResponse
+                {
+                    EventTypeId = g.Key.EventTypeId,
+                    EventTypeName = g.Key.Name,
+                    TotalEvents = g.Count()
+                })
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Para Tener el top 5 de los eventos con mas asistentes
+        /// </summary>
+        /// <param name="top"></param>
+        /// <returns></returns>
+        public async Task<List<EventAttendanceTopDtoResponse>>
+        GetTopEventsByTypeAsync(int eventTypeId, int top = 5)
+            {
+                return await _context.Attendances
+                    .Where(a => !a.IsDeleted
+                        && a.EventAccessPointEntry.Event.EventTypeId == eventTypeId)
+                    .GroupBy(a => new {
+                        a.EventAccessPointEntry.Event.Id,
+                        a.EventAccessPointEntry.Event.Name
+                    })
+                    .Select(g => new EventAttendanceTopDtoResponse
+                    {
+                        EventId = g.Key.Id,
+                        EventName = g.Key.Name,
+                        TotalAttendees = g.Count()
+                    })
+                    .OrderByDescending(x => x.TotalAttendees)
+                    .Take(top)
+                    .ToListAsync();
         }
 
     }

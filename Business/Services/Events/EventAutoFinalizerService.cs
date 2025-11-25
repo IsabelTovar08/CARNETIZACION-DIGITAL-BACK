@@ -60,6 +60,9 @@ namespace Business.Services.Events
                         foreach (var ev in allActiveEvents)
                         {
                             await eventBusiness.CheckAndUpdateEventStatusAsync(ev.Id);
+
+                            _logger.LogInformation(
+                              $"[AutoFinalizer] Evento {ev.Id}: {ev.EventSchedules?.Count() ?? 0} jornadas cargadas.");
                         }
                     }
                 }

@@ -352,7 +352,6 @@ namespace Business.Implementations.Operational
             return (list, total);
         }
 
-
         public async Task<byte[]> ExportToPdfAsync(IEnumerable<AttendanceDtoResponse> data, CancellationToken ct = default)
         {
             return await Task.Run(() =>

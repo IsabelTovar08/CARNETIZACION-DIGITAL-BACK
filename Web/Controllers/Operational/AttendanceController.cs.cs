@@ -169,7 +169,8 @@ namespace Web.Controllers.Operational
             CancellationToken ct = default)
         {
             var (items, total) = await _attendanceBusiness.SearchAsync(
-                personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize, ct);
+                 personId, eventId, fromUtc, toUtc, sortBy, sortDir, page, pageSize, ct);
+
 
             if (total == 0)
                 return Ok(new { items = Array.Empty<object>(), total = 0, page, pageSize, message = "Sin resultados." });
