@@ -74,6 +74,13 @@ namespace Data.Interfases.Operational
         /// <returns></returns>
         Task<List<EventAttendanceTopDtoResponse>> GetTopEventsByTypeAsync(int eventTypeId, int top = 5);
 
+        /// <summary>
+        /// Para buscar los supervisores asociados a un evento
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        Task<List<EventSupervisor>> GetSupervisorsByEventIdAsync(int eventId);
+
 
     }
 }

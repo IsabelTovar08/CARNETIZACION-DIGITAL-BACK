@@ -2,13 +2,14 @@
 using Entity.DTOs.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Specifics;   // ✅ NECESARIO PARA EventFilterDto
+using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Entity.DTOs.Specifics;   // ✅ NECESARIO PARA EventFilterDto
 
 namespace Business.Interfaces.Operational
 {
@@ -52,6 +53,9 @@ namespace Business.Interfaces.Operational
         /// <param name="top"></param>
         /// <returns></returns>
         Task<List<EventAttendanceTopDtoResponse>> GetTopEventsByTypeAsync(int eventTypeId, int top = 5);
+
+        Task<IEnumerable<EventSupervisor>> FinalizeEventAndNotifyAsync(int eventId);
+
 
     }
 }

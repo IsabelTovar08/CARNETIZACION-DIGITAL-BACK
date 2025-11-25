@@ -176,5 +176,16 @@ namespace Data.Implementations.Operational
         {
             return _context.Set<Attendance>().AsQueryable();
         }
+
+        public async Task<List<Attendance>> GetByEventIdAsync(int eventId)
+        {
+            return await _context.Attendances
+                .Include(a => a.Person)
+                .Include(a => a.EventAccessPointEntry)
+                    .ThenInclude(eap => eap.Event)
+                .Where(a => !a.IsDeleted &&
+                            a.EventAccessPointEntry.EventId == eventId)
+                .ToListAsync();
+        }
     }
 }   

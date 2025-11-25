@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Operational;
+using Business.Services.Supervisors;
 using Data.Implementations.Operational;
 using Data.Interfases;
 using Data.Interfases.Operational;
@@ -10,6 +11,7 @@ using Entity.DTOs.Operational.Response;
 using Entity.DTOs.Specifics; 
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
+using Infrastructure.Notifications.Interfases;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using QRCoder;
@@ -21,6 +23,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Utilities.Exeptions;
 using Utilities.Helpers;
+using Utilities.Notifications.Implementations;
+using Utilities.Notifications.Interfases;
 using static QRCoder.PayloadGenerator;
 using static Utilities.Helpers.BarcodeHelper;
 
@@ -31,22 +35,39 @@ namespace Business.Implementations.Operational
         private readonly IEventData _data;
         private readonly IEventTargetAudienceData _audienceRepo;
         private readonly IAccessPointData _apData;
+        private readonly IEventSupervisorData _supervisorData;
         private readonly IMapper _mapper;
         private readonly ILogger<Event> _logger;
+        private readonly IAttendanceData _attendanceData;
+        private readonly IEventAttendancePdfService _pdfGenerator;
+        //private readonly IEventAttendancePdfService _pdfService;
+        private readonly INotify _notifier;
+        private readonly IEmailAttachmentSender _emailAttachmentSender;
+
 
         public EventBusiness(
             IEventData data,
             IEventTargetAudienceData audienceRepo,
+            IAttendanceData attendanceData,
             IAccessPointData apData,
+            IEventSupervisorData supervisorData,
             ILogger<Event> logger,
-            IMapper mapper
+            IMapper mapper,
+            INotify notifier,
+            IEmailAttachmentSender emailAttachmentSender,
+            IEventAttendancePdfService eventAttendancePdf
         ) : base(data, logger, mapper)
         {
             _data = data;
             _audienceRepo = audienceRepo;
             _apData = apData;
+            _attendanceData = attendanceData;
+            _supervisorData = supervisorData;
             _mapper = mapper;
             _logger = logger;
+            _notifier = notifier;
+            _emailAttachmentSender = emailAttachmentSender;
+            _pdfGenerator = eventAttendancePdf;
         }
 
         /// <summary>
@@ -216,7 +237,20 @@ namespace Business.Implementations.Operational
                         await _data.BulkInsertEventSchedulesAsync(scheduleLinks);
                     }
 
-                    return savedEvent.Id;
+                    // 6️⃣ Guardar Supervisores
+                    if (dto.SupervisorUserIds?.Any() == true)
+                    {
+                        var supervisors = dto.SupervisorUserIds.Select(uid => new EventSupervisor
+                        {
+                            EventId = savedEvent.Id,
+                            UserId = uid
+                        });
+
+                        await _supervisorData.BulkInsertAsync(supervisors);
+                    }
+
+
+                return savedEvent.Id;
                 }
                 catch (Exception ex)
                 {
@@ -433,5 +467,34 @@ namespace Business.Implementations.Operational
             return await _data.GetTopEventsByTypeAsync(eventTypeId, top);
         }
 
+        public async Task<IEnumerable<EventSupervisor>> FinalizeEventAndNotifyAsync(int eventId)
+        {
+            var ev = await _data.GetByIdAsync(eventId)
+                ?? throw new Exception("Evento no encontrado");
+
+            var supervisors = await _data.GetSupervisorsByEventIdAsync(eventId);
+            var attendees = await _attendanceData.GetByEventIdAsync(eventId);
+
+            var pdfBytes = await _pdfGenerator.GenerateEventAttendancePdfAsync(
+                ev,
+                attendees,
+                supervisors
+            );
+
+
+            foreach (var s in supervisors)
+            {
+                await _emailAttachmentSender.SendEmailWithAttachmentAsync(
+                 s.User.Person.Email,
+                 $"Reporte — {ev.Name}",
+                 "Adjunto encontrarás el PDF con las asistencias del evento.",
+                 pdfBytes,
+                 $"{ev.Name}_asistencias.pdf"
+             );
+
+            }
+
+            return supervisors;
+        }
     }
 }

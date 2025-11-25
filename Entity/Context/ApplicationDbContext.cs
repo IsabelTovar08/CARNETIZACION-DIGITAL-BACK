@@ -81,6 +81,8 @@ namespace Entity.Context
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationReceived> NotificationReceiveds { get; set; }
 
+        public DbSet<EventSupervisor> EventSupervisors { get; set; }
+
         //Events
         public DbSet<Event> Events { get; set; }
         public DbSet<EventType> EventTypes { get; set; }

@@ -260,8 +260,7 @@ namespace Data.Implementations.Operational
         /// </summary>
         /// <param name="top"></param>
         /// <returns></returns>
-        public async Task<List<EventAttendanceTopDtoResponse>>
-        GetTopEventsByTypeAsync(int eventTypeId, int top = 5)
+        public async Task<List<EventAttendanceTopDtoResponse>>GetTopEventsByTypeAsync(int eventTypeId, int top = 5)
             {
                 return await _context.Attendances
                     .Where(a => !a.IsDeleted
@@ -279,6 +278,15 @@ namespace Data.Implementations.Operational
                     .OrderByDescending(x => x.TotalAttendees)
                     .Take(top)
                     .ToListAsync();
+        }
+
+        public async Task<List<EventSupervisor>> GetSupervisorsByEventIdAsync(int eventId)
+        {
+            return await _context.EventSupervisors
+                .Include(es => es.User)
+                    .ThenInclude(u => u.Person)
+                .Where(es => es.EventId == eventId && !es.IsDeleted)
+                .ToListAsync();
         }
 
     }

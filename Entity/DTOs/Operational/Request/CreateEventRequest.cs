@@ -18,5 +18,7 @@ namespace Entity.DTOs.Operational.Request
         public List<int>? OrganizationalUnitIds { get; set; }
         public List<int>? InternalDivisionIds { get; set; }
         public List<int> ScheduleIds { get; set; }
+        public List<int>? SupervisorUserIds { get; set; }
+
     }
 }

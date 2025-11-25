@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
+using Utilities.Notifications.Implementations;
+using Utilities.Notifications.Interfases;
 using Web.Extensions;
 using Web.Realtime.Hubs;
 
@@ -18,6 +21,8 @@ namespace Web
 
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
+
+            QuestPDF.Settings.License = LicenseType.Community;
 
             // CONFIGURAR LOGGING EXPLÍCITO PARA CONSOLE Y DEBUG
             builder.Logging.ClearProviders();
@@ -71,7 +76,7 @@ namespace Web
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            builder.Services.AddSwaggerGen();
+            //builder.Services.AddSwaggerGen();
 
             // servicios y data
             builder.Services.AddProjectServices();
@@ -100,6 +105,10 @@ namespace Web
             // Twilio
             builder.Services.Configure<TwilioSettings>(
                 builder.Configuration.GetSection("Twilio"));
+
+            builder.Services.AddSingleton(provider =>
+               provider.GetRequiredService<Microsoft.Extensions.Options.IOptions<EmailSettings>>().Value);
+
 
             // Supabase para almacenar im�genes 
             builder.Services.Configure<SupabaseOptions>(builder.Configuration.GetSection("Supabase"));

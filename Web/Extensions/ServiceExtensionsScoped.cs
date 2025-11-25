@@ -32,6 +32,7 @@ using Business.Services.Export;
 using Business.Services.JWT;
 using Business.Services.Logging;
 using Business.Services.Storage;
+using Business.Services.Supervisors;
 using Data.Classes.Base;
 using Data.Classes.Specifics;
 using Data.Implementations.Auth;
@@ -54,6 +55,7 @@ using Data.Interfases.Organizational.Structure;
 using Data.Interfases.Parameters;
 using Data.Interfases.Security;
 using Data.Interfases.Transaction;
+using Entity.DTOs.Notifications;
 using Entity.DTOs.Organizational.Structure.Request;
 using Entity.DTOs.Organizational.Structure.Response;
 using Entity.Models;
@@ -64,6 +66,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client.Extensions.Msal;
 using Utilities.Helpers.Excel;
 using Utilities.Notifications.Implementations;
+using Utilities.Notifications.Interfases;
 using Web.Auth;
 using Web.Realtime.Dispatchers;
 
@@ -152,11 +155,16 @@ namespace Web.Extensions
             services.AddScoped<IAttendanceData, AttendanceData>();
             services.AddScoped<IAttendanceBusiness, AttendanceBusiness>();
 
-
+            //EventSupervisor
+            services.AddScoped<IEventSupervisorData, EventSupervisorData>();
+            services.AddScoped<IEventSupervisorBusiness, EventSupervisorBusiness>();
 
             // Event-target
             services.AddScoped<IEventTargetAudienceData, EventTargetAudienceData>();
             services.AddScoped<IEventTargetAudienceBusiness, EventTargetAudienceBusiness>();
+
+            services.AddScoped<IEventAttendancePdfService, EventAttendancePdfService>();
+
 
 
 
@@ -301,8 +309,9 @@ namespace Web.Extensions
 
             services.AddSignalR();
 
+            /// Servicio especial para el envío de correos con adjuntos de asistencias en el evento
 
-
+            services.AddTransient<IEmailAttachmentSender, EmailAttachmentSender>();
 
             return services;
         }

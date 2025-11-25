@@ -31,5 +31,8 @@ namespace Data.Interfases.Operational
 
         // ✅ NUEVO MÉTODO: necesario para que el Business pueda hacer Include()
         IQueryable<Attendance> GetQueryable();
+
+        Task<List<Attendance>> GetByEventIdAsync(int eventId);
+
     }
 }

@@ -197,5 +197,12 @@ namespace Web.Controllers.Operational
             return Ok(result);
         }
 
+        [HttpPost("{eventId}/finalize")]
+        public async Task<IActionResult> FinalizeEvents(int eventId)
+        {
+            await _eventBusiness.FinalizeEventAndNotifyAsync(eventId);
+            return Ok(ApiResponse<string>.Ok("Evento finalizado y supervisores notificados."));
+        }
+
     }
 }
