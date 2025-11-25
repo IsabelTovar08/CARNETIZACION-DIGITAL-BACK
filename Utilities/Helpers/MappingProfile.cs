@@ -43,23 +43,34 @@ namespace Utilities.Helper
      .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
      .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType.Name))
      .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType.Name))
+     .ForMember(dest => dest.HasCard,
+        opt => opt.MapFrom(src =>
+            src.IssuedCard.Any(pdp => pdp.Card != null)))
 
+         //ID DEL CARNET ACTUAL
+         .ForMember(dest => dest.IssuedCardId,
+        opt => opt.MapFrom(src =>
+            src.IssuedCard
+                .Where(c => !c.IsDeleted && c.IsCurrentlySelected)
+                .Select(c => c.Id)
+                .FirstOrDefault()
+        ))
 
-     // 🔹 División actual
-     .ForMember(dest => dest.InternalDivisionName,
-         opt => opt.MapFrom(src =>
-             src.IssuedCard
-                 .Where(pdp => pdp.IsCurrentlySelected)
-                 .Select(pdp => pdp.InternalDivision.Name)
-                 .FirstOrDefault()))
+         // 🔹 División actual
+         .ForMember(dest => dest.InternalDivisionName,
+             opt => opt.MapFrom(src =>
+                 src.IssuedCard
+                     .Where(pdp => pdp.IsCurrentlySelected)
+                     .Select(pdp => pdp.InternalDivision.Name)
+                     .FirstOrDefault()))
 
     
 
 
-     // 🔹 Si tiene carnet
-     .ForMember(dest => dest.HasCard,
-         opt => opt.MapFrom(src =>
-             src.IssuedCard.Any(pdp => pdp.Card != null)))
+         // 🔹 Si tiene carnet
+         .ForMember(dest => dest.HasCard,
+             opt => opt.MapFrom(src =>
+                 src.IssuedCard.Any(pdp => pdp.Card != null)))
 
      .ReverseMap();
 

@@ -26,5 +26,7 @@ namespace Entity.DTOs.ModelSecurity.Response
         public string? InternalDivisionName { get; set; }
 
         public bool HasCard { get; set; }   // true si tiene carnet
+        
+        public int? IssuedCardId { get; set; }
     }
 }
