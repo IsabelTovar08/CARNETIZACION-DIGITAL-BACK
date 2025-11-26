@@ -28,5 +28,7 @@ namespace Entity.DTOs.ModelSecurity.Response
         public bool HasCard { get; set; }   // true si tiene carnet
         
         public int? IssuedCardId { get; set; }
+
+        public int? UserId { get; set; }
     }
 }

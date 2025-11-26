@@ -2,6 +2,7 @@
 using Data.Interfases.Operational;
 using Entity.Context;
 using Entity.Models.Operational;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,15 @@ namespace Data.Implementations.Operational
         {
             await _context.EventSupervisors.AddRangeAsync(supervisors);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<EventSupervisor>> GetSupervisorsWithUserAsync(int eventId)
+        {
+            return await _context.EventSupervisors
+                .Where(x => x.EventId == eventId && !x.IsDeleted)
+                .Include(x => x.User)
+                    .ThenInclude(u => u.Person)
+                .ToListAsync();
         }
     }
 

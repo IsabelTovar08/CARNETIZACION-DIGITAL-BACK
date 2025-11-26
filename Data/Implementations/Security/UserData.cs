@@ -211,5 +211,14 @@ namespace Data.Classes.Specifics
                 .ToListAsync();
         }
 
+        public async Task<int?> GetUserIdByPersonIdAsync(int personId)
+        {
+            return await _context.Users
+                .Where(u => u.PersonId == personId)
+                .Select(u => (int?)u.Id)
+                .FirstOrDefaultAsync();
+        }
+
+
     }
 }

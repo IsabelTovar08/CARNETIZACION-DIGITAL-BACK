@@ -11,5 +11,8 @@ namespace Data.Interfases.Operational
     public interface IEventSupervisorData : ICrudBase<EventSupervisor>
     {
         Task BulkInsertAsync(IEnumerable<EventSupervisor> supervisors);
+
+        Task<List<EventSupervisor>> GetSupervisorsWithUserAsync(int eventId);
+
     }
 }

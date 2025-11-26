@@ -127,8 +127,36 @@ namespace Business.Implementations.Operational
         /// <returns></returns>
         public async Task<IEnumerable<EventDetailsDtoResponse>> GetFullListAsync()
         {
+            // 1. Obtener eventos completos desde Data
             var events = await _data.GetAllEventsWithDetailsAsync();
-            return _mapper.Map<IEnumerable<EventDetailsDtoResponse>>(events);
+
+            // 2. Crear lista final
+            var result = new List<EventDetailsDtoResponse>();
+
+            foreach (var ev in events)
+            {
+                // 3. Obtener supervisores (por evento)
+                var supervisors = await _supervisorData.GetSupervisorsWithUserAsync(ev.Id);
+
+                // 4. Mapear el evento
+                var dto = _mapper.Map<EventDetailsDtoResponse>(ev);
+
+                // 5. Agregar supervisores al DTO
+                dto.Supervisors = supervisors.Select(s => new EventSupervisorDtoResponse
+                {
+                    Id = s.Id, // viene de BaseDTO
+                    EventId = s.EventId,
+                    EventName = ev.Name,
+                    UserId = s.UserId,
+                    FullName = $"{s.User?.Person?.FirstName} {s.User?.Person?.LastName}".Trim(),
+                    UserEmail = s.User?.Person?.Email
+                }).ToList();
+
+                // 6. Agregar a la respuesta
+                result.Add(dto);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -472,6 +500,10 @@ namespace Business.Implementations.Operational
             var ev = await _data.GetByIdAsync(eventId)
                 ?? throw new Exception("Evento no encontrado");
 
+            var eventEntity = await _data.GetByIdAsync(eventId);
+            if (eventEntity == null)
+                throw new Exception("Evento no encontrado.");
+
             var supervisors = await _data.GetSupervisorsByEventIdAsync(eventId);
             var attendees = await _attendanceData.GetByEventIdAsync(eventId);
 
@@ -481,18 +513,57 @@ namespace Business.Implementations.Operational
                 supervisors
             );
 
+            var subject = $"Reporte de Asistencia - {eventEntity.Name}";
+            var pdfName = $"Asistencia_{eventEntity.Name}_{DateTime.UtcNow:yyyyMMdd_HHmm}.pdf";
+            var body = $@"
+            Hola,
 
-            foreach (var s in supervisors)
+            Adjunto encontrarás el reporte de asistencia del evento: {eventEntity.Name}.
+
+            Fecha de inicio: {eventEntity.EventStart:dd/MM/yyyy HH:mm}
+            Fecha de finalización: {eventEntity.EventEnd:dd/MM/yyyy HH:mm}
+
+            Cordial saludo,
+            Sistema de Carnetización Digital
+            ";
+
+
+            foreach (var sup in supervisors)
             {
-                await _emailAttachmentSender.SendEmailWithAttachmentAsync(
-                 s.User.Person.Email,
-                 $"Reporte — {ev.Name}",
-                 "Adjunto encontrarás el PDF con las asistencias del evento.",
-                 pdfBytes,
-                 $"{ev.Name}_asistencias.pdf"
-             );
+                if (string.IsNullOrWhiteSpace(sup.User.Person.Email))
+                {
+                    // Registrar y saltar
+                    _logger.LogWarning(
+                     "[FinalizeEvent] Supervisor {FullName} (UserId {UserId}) no tiene correo. Se omitió notificación.",
+                     $"{sup.User.Person.FirstName} {sup.User.Person.LastName}",
+                     sup.UserId
+                 );
 
+                    continue;
+                }
+
+                try
+                {
+                    await _emailAttachmentSender.SendEmailWithAttachmentAsync(
+                        sup.User.Person.Email,
+                        subject,
+                        body,
+                        pdfBytes,
+                        pdfName
+                    );
+                }
+                catch (Exception ex)
+                {
+                    // Error controlado
+                    _logger.LogError(ex,
+                        "[FinalizeEvent] Error enviando correo al supervisor {Email}.",
+                        sup.User.Person.Email);
+
+                    // Opcional: devolver mensaje al front
+                    throw new Exception($"No se pudo enviar correo al supervisor {sup.User.UserName} ({sup.User.Person.Email}). Verifique la configuración.");
+                }
             }
+
 
             return supervisors;
         }

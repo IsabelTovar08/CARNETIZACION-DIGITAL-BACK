@@ -32,5 +32,8 @@ namespace Data.Interfases.Security
         /// </summary>
         Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName);
 
+        Task<int?> GetUserIdByPersonIdAsync(int personId);
+
+
     }
 }

@@ -214,7 +214,7 @@ namespace Utilities.Helper
             CreateMap<EventSupervisor, EventSupervisorDtoResponse>()
             .ForMember(d => d.EventName,
                        opt => opt.MapFrom(s => s.Event != null ? s.Event.Name : null))
-            .ForMember(d => d.UserName,
+            .ForMember(d => d.FullName,
                        opt => opt.MapFrom(s => s.User != null ? s.User.UserName : null))
             .ForMember(d => d.UserEmail,
                        opt => opt.MapFrom(s => s.User != null ? s.User.Person.Email : null));
