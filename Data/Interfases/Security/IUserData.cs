@@ -37,5 +37,11 @@ namespace Data.Interfases.Security
         /// </summary>
         Task<bool?> IsTwoFactorEnabledAsync(int userId);
 
+        /// <summary>
+        /// Cambia el estado del 2FA para un usuario
+        /// </summary>
+        Task<bool> ToggleTwoFactorAsync(int userId);
+
+
     }
 }
