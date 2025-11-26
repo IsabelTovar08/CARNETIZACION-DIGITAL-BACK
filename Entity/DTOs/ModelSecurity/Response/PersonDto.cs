@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Entity.DTOs.Base;
+using Entity.DTOs.Specifics.Cards;
 using Entity.Models.ModelSecurity;
 
 namespace Entity.DTOs.ModelSecurity.Response
@@ -29,5 +30,7 @@ namespace Entity.DTOs.ModelSecurity.Response
         public bool HasCard { get; set; }   // true si tiene carnet
         
         public int? IssuedCardId { get; set; }
+        /// <summary>Lista básica de todos los carnets de la persona</summary>
+        public IList<IssuedCardBasicDto>? Cards { get; set; } = new List<IssuedCardBasicDto>();
     }
 }

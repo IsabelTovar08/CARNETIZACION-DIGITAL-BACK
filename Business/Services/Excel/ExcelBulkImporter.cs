@@ -98,10 +98,9 @@ namespace Business.Services.Excel
                 // Crear la configuración base (Card) 
                 var cardConfig = await _cardBusiness.Save(new CardConfigurationDtoRequest
                 {
-                    CreationDate = ctx.ValidFrom,
-                    ExpirationDate = ctx.ValidTo,
+                    ValidFrom = ctx.ValidFrom,
+                    ValidTo = ctx.ValidTo,
                     CardTemplateId = ctx.CardTemplateId,
-                    StatusId = 1,
                     ProfileId = ctx.ProfileId,
                     Name = ctx.CardConfigurationName
                 });

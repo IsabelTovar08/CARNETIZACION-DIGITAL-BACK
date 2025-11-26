@@ -22,7 +22,7 @@ namespace Business.Interfaces.Storage
             string? previousStoragePath,
             Stream content,
             string contentType,
-            string fileName // se usa SOLO para extraer la extensión
-        );
+            string fileName,
+            string bucket);
     }
 }

@@ -19,6 +19,7 @@ using Entity.DTOs.Parameter;
 using Entity.DTOs.Parameter.Request;
 using Entity.DTOs.Parameter.Response;
 using Entity.DTOs.Specifics;
+using Entity.DTOs.Specifics.Cards;
 using Entity.Enums.Extensions;
 using Entity.Enums.Specifics;
 using Entity.Models;
@@ -40,39 +41,17 @@ namespace Utilities.Helper
         public MappingProfile()
         {
             CreateMap<Person, PersonDto>()
-     .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
-     .ForMember(dest => dest.DocumentTypeName, opt => opt.MapFrom(src => src.DocumentType))
-     .ForMember(dest => dest.BloodTypeName, opt => opt.MapFrom(src => src.BloodType))
-     .ForMember(dest => dest.HasCard,
-        opt => opt.MapFrom(src =>
-            src.IssuedCard.Any(pdp => pdp.Card != null)))
+                .ForMember(dest => dest.HasCard,
+                    opt => opt.MapFrom(src =>
+                        src.IssuedCard.Any(c => c.Card != null && !c.IsDeleted)))
 
-         //ID DEL CARNET ACTUAL
-         .ForMember(dest => dest.IssuedCardId,
-        opt => opt.MapFrom(src =>
-            src.IssuedCard
-                .Where(c => !c.IsDeleted && c.IsCurrentlySelected)
-                .Select(c => c.Id)
-                .FirstOrDefault()
-        ))
+                .ForMember(dest => dest.Cards,
+                    opt => opt.MapFrom(src =>
+                        src.IssuedCard
+                            .Where(c => !c.IsDeleted)
+                    ))
+                .ReverseMap();
 
-         // 🔹 División actual
-         .ForMember(dest => dest.InternalDivisionName,
-             opt => opt.MapFrom(src =>
-                 src.IssuedCard
-                     .Where(pdp => pdp.IsCurrentlySelected)
-                     .Select(pdp => pdp.InternalDivision.Name)
-                     .FirstOrDefault()))
-
-    
-
-
-         // 🔹 Si tiene carnet
-         .ForMember(dest => dest.HasCard,
-             opt => opt.MapFrom(src =>
-                 src.IssuedCard.Any(pdp => pdp.Card != null)))
-
-     .ReverseMap();
 
             CreateMap<PersonDtoRequest, Person>().ReverseMap();
 
@@ -224,9 +203,9 @@ namespace Utilities.Helper
             //.ForMember(s => s.IssuedCard, o => o.Ignore());
 
             CreateMap<CardConfiguration, CardConfigurationDtoRequest>()
-                .ReverseMap()
-                    .ForMember(s => s.Id, o => o.Ignore())
-                    .ForMember(s => s.IsDeleted, o => o.Ignore());
+                .ReverseMap();
+
+
 
             CreateMap<CardTemplate, CardTemplateRequest>().ReverseMap();
             CreateMap<CardTemplate, CardTemplateResponse>().ReverseMap();
@@ -240,6 +219,13 @@ namespace Utilities.Helper
 
             CreateMap<IssuedCard, IssuedCardDtoRequest>()
                 .ReverseMap();
+
+
+            CreateMap<IssuedCard, IssuedCardBasicDto>()
+                .ForMember(dest => dest.ProfileName, opt => opt.MapFrom(src => src.Card.Profile.Name))
+                .ForMember(dest => dest.InternalDivisionName,  opt => opt.MapFrom(src => src.InternalDivision.Name))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.StatusId));
+
 
             //Profiles
             CreateMap<Profiles, ProfileDto>()

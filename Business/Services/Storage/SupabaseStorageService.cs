@@ -24,14 +24,17 @@ namespace Business.Implementations.Storage
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _opt.ServiceRoleKey);
         }
 
-        public async Task<(string PublicUrl, string StoragePath)> UploadAsync(
-            Stream content,
-            string contentType,
-            string destinationPath)
+        public async Task<(string PublicUrl, string StoragePath)> UploadAsync(Stream content,string contentType,string destinationPath,string bucket)
         {
-            _client.DefaultRequestHeaders.Add("x-upsert", "true");
+            // Limpieza de path
+            destinationPath = destinationPath.TrimStart('/');
 
-            var uri = $"{_opt.Url}/storage/v1/object/{_opt.Bucket}/{destinationPath}";
+            // Permitir reemplazo
+            if (!_client.DefaultRequestHeaders.Contains("x-upsert"))
+                _client.DefaultRequestHeaders.Add("x-upsert", "true");
+
+            var uri = $"{_opt.Url}/storage/v1/object/{bucket}/{destinationPath}";
+
             using var streamContent = new StreamContent(content);
             streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
@@ -39,19 +42,29 @@ namespace Business.Implementations.Storage
             if (!res.IsSuccessStatusCode)
                 throw new Exception($"Supabase upload failed: {res.StatusCode}");
 
-            var publicUrl = $"{_opt.PublicBaseUrl}/{_opt.Bucket}/{destinationPath}";
+            var publicUrl = $"{_opt.PublicBaseUrl}/{bucket}/{destinationPath}";
+
             return (publicUrl, destinationPath);
         }
 
-        public async Task DeleteIfExistsAsync(string storagePath)
-        {
-            if (string.IsNullOrEmpty(storagePath)) return;
 
-            var uri = $"{_opt.Url}/{_opt.Bucket}/delete";
+        public async Task DeleteIfExistsAsync(string storagePath, string bucket)
+        {
+            if (string.IsNullOrEmpty(storagePath))
+                return;
+
+            storagePath = storagePath.TrimStart('/');
+
+            var endpoint = $"storage/v1/object/{bucket}/delete";
+
             var payload = new { prefixes = new[] { storagePath } };
 
-            await _client.PostAsJsonAsync(uri, payload);
+            var res = await _client.PostAsJsonAsync(endpoint, payload);
+
+            if (!res.IsSuccessStatusCode)
+                throw new Exception($"Supabase delete failed: {res.StatusCode}");
         }
+
     }
 
 }

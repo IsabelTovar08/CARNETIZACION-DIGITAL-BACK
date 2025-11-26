@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Business.Classes.Base;
 using Business.Interfaces.Operational;
+using Business.Interfaces.Storage;
 using Business.Services.CodeGenerator;
+using Data.Implementations.Operational;
 using Data.Interfases;
 using Data.Interfases.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
 using Entity.Models.Operational;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Business.Implementations.Operational
@@ -19,9 +22,14 @@ namespace Business.Implementations.Operational
     public class CardTemplateBusiness : BaseBusiness<CardTemplate, CardTemplateRequest, CardTemplateResponse>, ICardTemplateBusiness
     {
         protected readonly ICardTemplateData _cardTemplateData;
-        public CardTemplateBusiness(ICrudBase<CardTemplate> data, ILogger<CardTemplate> logger, IMapper mapper, ICardTemplateData cardTemplateData, ICodeGeneratorService<CardTemplate>? codeService = null) : base(data, logger, mapper, codeService)
+        private readonly IAssetUploader _assetUploader;
+        public CardTemplateBusiness(ICrudBase<CardTemplate> data, ILogger<CardTemplate> logger, IMapper mapper, ICardTemplateData cardTemplateData,
+            IAssetUploader assetUploader,
+            ICodeGeneratorService<CardTemplate>? codeService = null
+            ) : base(data, logger, mapper, codeService)
         {
             _cardTemplateData = cardTemplateData;
+            _assetUploader = assetUploader;
         }
 
         /// <summary>
@@ -51,5 +59,86 @@ namespace Business.Implementations.Operational
             }
         }
 
+
+        // ============================================================
+        // 🚀 CREATE
+        // ============================================================
+        public override async Task<CardTemplateResponse> Save(CardTemplateRequest dto)
+        {
+            var entity = _mapper.Map<CardTemplate>(dto);
+
+            entity.FrontBackgroundUrl = "Pending";
+            entity.BackBackgroundUrl = "Pending";
+            entity.FrontElementsJson = "Pending";
+            entity.BackElementsJson = "Pending";
+
+            // guardar primero para obtener ID
+            entity = await _data.SaveAsync(entity);
+
+            // subir front/back si vienen
+            var frontUrl = await UploadSvgAsync(dto.FrontFile, entity.Id, "front");
+            var backUrl = await UploadSvgAsync(dto.BackFile, entity.Id, "back");
+
+            if (frontUrl != null) entity.FrontBackgroundUrl = frontUrl;
+            if (backUrl != null) entity.BackBackgroundUrl = backUrl;
+
+            await _data.UpdateAsync(entity);
+
+            return _mapper.Map<CardTemplateResponse>(entity);
+        }
+
+
+        // ============================================================
+        // 🔄 UPDATE
+        // ============================================================
+        public override async Task<CardTemplateResponse> Update(CardTemplateRequest dto)
+        {
+            var entity = await _data.GetByIdAsync(dto.Id)
+                ?? throw new KeyNotFoundException("Plantilla no encontrada.");
+
+            entity.Name = dto.Name;
+            entity.FrontElementsJson = dto.FrontElementsJson;
+            entity.BackElementsJson = dto.BackElementsJson;
+
+            var frontUrl = await UploadSvgAsync(dto.FrontFile, dto.Id, "front");
+            var backUrl = await UploadSvgAsync(dto.BackFile, dto.Id, "back");
+
+            if (frontUrl != null) entity.FrontBackgroundUrl = frontUrl;
+            if (backUrl != null) entity.BackBackgroundUrl = backUrl;
+
+            var updated = await _data.UpdateAsync(entity);
+
+            return _mapper.Map<CardTemplateResponse>(updated);
+        }
+
+
+
+        // ============================================================
+        // 🔥 MÉTODO PRIVADO REUTILIZABLE PARA SUBIR FRONT/BACK
+        // ============================================================
+        private async Task<string> UploadSvgAsync(
+            IFormFile? file,
+            int templateId,
+            string side // "front" o "back"
+        )
+        {
+            if (file == null)
+                return null;
+
+            using var stream = file.OpenReadStream();
+
+            var (url, _) = await _assetUploader.UpsertAsync(
+                new[] { "templates", templateId.ToString(), side },
+                null,                  
+                stream,
+                "image/svg+xml",
+                $"{side}.svg",
+                "Templates"
+            );
+
+            return url;
+        }
+
     }
 }
+

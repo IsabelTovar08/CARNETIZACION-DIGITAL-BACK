@@ -7,14 +7,11 @@ namespace Entity.DTOs.Organizational.Assigment.Request
     public class CardConfigurationDtoRequest : GenericDtoRequest
     {
         [Required(ErrorMessage = "La fecha de creación es obligatoria.")]
-        public DateTime CreationDate { get; set; }
+        public DateTime ValidFrom { get; set; }
 
         [Required(ErrorMessage = "La fecha de expiración es obligatoria.")]
-        public DateTime ExpirationDate { get; set; }
+        public DateTime ValidTo { get; set; }
 
-        [Required(ErrorMessage = "El estado es obligatorio.")]
-        [Range(1, int.MaxValue, ErrorMessage = "El identificador del estado debe ser un número entero mayor que 0.")]
-        public int StatusId { get; set; }
 
         [Required(ErrorMessage = "El identificador de la asignación persona–división–perfil es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El identificador de la asignación persona–división–perfil debe ser un número entero mayor que 0.")]

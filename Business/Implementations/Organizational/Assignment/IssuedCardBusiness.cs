@@ -66,9 +66,8 @@ namespace Business.Implementations.Organizational.Assignment
                         ProfileId = request.ProfileId ?? 0,
                         CardTemplateId = request.CardTemplateId ?? 0,
                         Name = request.CardName ?? "",
-                        StatusId = 1,
-                        CreationDate = request.ValidFrom ?? new DateTime(),
-                        ExpirationDate = request.ValidFrom ?? new DateTime()
+                        ValidFrom = request.ValidFrom ?? new DateTime(),
+                        ValidTo = request.ValidFrom ?? new DateTime()
 
                     };
 

@@ -317,12 +317,13 @@ namespace Business.Classes
 
             // 3) Subir y reemplazar, delegando en el servicio genérico
             var (publicUrl, storagePath) = await _assetUploader.UpsertAsync(
-                pathParts,
-                person.PhotoPath,             // previous path
-                fileStream,
-                contentType,
-                fileName
-            );
+                 pathParts,
+                 person.PhotoPath,
+                 fileStream,
+                 contentType,
+                 fileName,
+                 bucket: "people"
+             );
 
             // 4) Persistir cambios en entidad
             person.PhotoUrl = publicUrl;
