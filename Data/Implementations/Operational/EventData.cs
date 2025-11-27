@@ -289,5 +289,48 @@ namespace Data.Implementations.Operational
                 .ToListAsync();
         }
 
+        public async Task AddSupervisorAsync(int eventId, int userId)
+        {
+            var supervisor = new EventSupervisor
+            {
+                EventId = eventId,
+                UserId = userId,
+                CreateAt = DateTime.UtcNow,
+                UpdateAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            await _context.EventSupervisors.AddAsync(supervisor);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> SupervisorExistsAsync(int eventId, int userId)
+        {
+            return await _context.EventSupervisors
+                .AnyAsync(s => s.EventId == eventId && s.UserId == userId && !s.IsDeleted);
+        }
+
+        public async Task<bool> RemoveSupervisorAsync(int eventId, int userId)
+        {
+            var supervisor = await _context.EventSupervisors
+                .FirstOrDefaultAsync(s =>
+                    s.EventId == eventId &&
+                    s.UserId == userId &&
+                    !s.IsDeleted);
+
+            if (supervisor == null)
+                return false;
+
+            supervisor.IsDeleted = true;
+            supervisor.UpdateAt = DateTime.UtcNow;
+
+            _context.EventSupervisors.Update(supervisor);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+
+
     }
 }

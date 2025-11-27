@@ -8,7 +8,8 @@ using Data.Interfases.Operational;
 using Entity.DTOs.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
-using Entity.DTOs.Specifics; 
+using Entity.DTOs.Specifics;
+using Entity.Models.ModelSecurity;
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using Infrastructure.Notifications.Interfases;
@@ -106,20 +107,96 @@ namespace Business.Implementations.Operational
         /// <summary>
         /// Finaliza un evento manualmente.
         /// </summary>
-        public async Task<bool> FinalizeEventAsync(int eventId)
+        public async Task<IEnumerable<EventSupervisorDtoResponse>> FinalizeEventUnifiedAsync(int eventId)
         {
-            var existingEvent = await _data.GetByIdAsync(eventId);
+            // Obtener evento
+            var ev = await _data.GetByIdAsync(eventId)
+                ?? throw new Exception("Evento no encontrado.");
 
-            if (existingEvent == null)
-                throw new EntityNotFoundException($"Evento con Id {eventId} no encontrado.");
+            // Cambiar estado
+            ev.StatusId = 10;
+            ev.IsPublic = false;
+            ev.UpdateAt = DateTime.UtcNow;
 
-            existingEvent.StatusId = 10;
-            existingEvent.IsPublic = false;
-            existingEvent.UpdateAt = DateTime.UtcNow;
+            await _data.UpdateAsync(ev);
 
-            await _data.UpdateAsync(existingEvent);
-            return true;
+            // Supervisores
+            var supervisors = await _data.GetSupervisorsByEventIdAsync(eventId);
+
+            // Asistentes
+            var attendees = await _attendanceData.GetByEventIdAsync(eventId);
+
+            // PDF
+            var pdfBytes = await _pdfGenerator.GenerateEventAttendancePdfAsync(
+                ev,
+                attendees,
+                supervisors
+            );
+
+            var subject = $"Reporte de Asistencia - {ev.Name}";
+            var pdfName = $"Asistencia_{ev.Name}_{DateTime.UtcNow:yyyyMMdd_HHmm}.pdf";
+
+            var body = $@"
+Hola,
+
+Adjunto encontrarás el reporte de asistencia del evento: {ev.Name}.
+
+Fecha de inicio: {ev.EventStart:dd/MM/yyyy HH:mm}
+Fecha de finalización: {ev.EventEnd:dd/MM/yyyy HH:mm}
+
+Cordial saludo,
+Sistema de Carnetización Digital
+";
+
+            // Enviar correos
+            foreach (var sup in supervisors)
+            {
+                var email = sup.User?.Person?.Email;
+
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    _logger.LogWarning(
+                        "[FinalizeEvent] Supervisor {FullName} (UserId {UserId}) no tiene correo.",
+                        $"{sup.User.Person.FirstName} {sup.User.Person.LastName}",
+                        sup.UserId
+                    );
+                    continue;
+                }
+
+                try
+                {
+                    await _emailAttachmentSender.SendEmailWithAttachmentAsync(
+                        email!,
+                        subject,
+                        body,
+                        pdfBytes,
+                        pdfName
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex,
+                        "[FinalizeEvent] Error enviando correo a {Email}",
+                        email);
+
+                    throw new Exception($"Error enviando correo al supervisor {email}");
+                }
+            }
+
+            // DEVOLVER DTO LIMPIO PARA EVITAR CICLOS
+            return supervisors.Select(s => new EventSupervisorDtoResponse
+            {
+                EventId = ev.Id,
+                EventName = ev.Name,
+                UserId = s.UserId,
+                FullName = $"{s.User.Person.FirstName} {s.User.Person.LastName}",
+                UserEmail = s.User.Person.Email
+            });
         }
+
+
+
+
 
         /// <summary>
         /// Para listar todos los eventos con su informacion completa
@@ -567,5 +644,38 @@ namespace Business.Implementations.Operational
 
             return supervisors;
         }
+
+        public async Task<bool> AddSupervisorToEventAsync(int eventId, int userId)
+        {
+            // Validar existencia del evento
+            var ev = await _data.GetByIdAsync(eventId);
+            if (ev == null)
+                throw new Exception($"Evento con Id {eventId} no existe.");
+
+            // Validar que el usuario no esté ya asignado
+            var exists = await _data.SupervisorExistsAsync(eventId, userId);
+            if (exists)
+                throw new Exception("Este supervisor ya está asignado al evento.");
+
+            // Insertar supervisor
+            await _data.AddSupervisorAsync(eventId, userId);
+            return true;
+        }
+
+        public async Task<bool> RemoveSupervisorFromEventAsync(int eventId, int userId)
+        {
+            var ev = await _data.GetByIdAsync(eventId);
+            if (ev == null)
+                throw new Exception($"El evento con Id {eventId} no existe.");
+
+            var success = await _data.RemoveSupervisorAsync(eventId, userId);
+
+            if (!success)
+                throw new Exception("El supervisor no está asignado al evento o ya fue eliminado.");
+
+            return true;
+        }
+
+
     }
 }

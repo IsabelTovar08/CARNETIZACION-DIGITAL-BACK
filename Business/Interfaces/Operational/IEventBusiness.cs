@@ -25,7 +25,8 @@ namespace Business.Interfaces.Operational
 
         Task<int> UpdateEventAsync(EventDtoRequest dto);
 
-        Task<bool> FinalizeEventAsync(int eventId);
+        Task<IEnumerable<EventSupervisorDtoResponse>> FinalizeEventUnifiedAsync(int eventId);
+
 
         /// <summary>
         /// Para que el servicio que verifica y actualiza el estado de eventos "en curso"
@@ -54,8 +55,11 @@ namespace Business.Interfaces.Operational
         /// <returns></returns>
         Task<List<EventAttendanceTopDtoResponse>> GetTopEventsByTypeAsync(int eventTypeId, int top = 5);
 
-        Task<IEnumerable<EventSupervisor>> FinalizeEventAndNotifyAsync(int eventId);
+        //Task<IEnumerable<EventSupervisor>> FinalizeEventAndNotifyAsync(int eventId);
+        Task<bool> AddSupervisorToEventAsync(int eventId, int userId);
 
+
+        Task<bool> RemoveSupervisorFromEventAsync(int eventId, int userId);
 
     }
 }

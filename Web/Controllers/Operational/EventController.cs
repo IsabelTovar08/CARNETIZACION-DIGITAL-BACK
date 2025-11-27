@@ -135,19 +135,21 @@ namespace Web.Controllers.Operational
         /// <summary>
         /// cancelar o finalizar un evento manualmente
         /// </summary>
-        [HttpPut("finalize/{id}")]
-        public async Task<IActionResult> FinalizeEvent(int id)
+        [HttpPut("{eventId}/finalize")]
+        public async Task<IActionResult> FinalizeUnified(int eventId)
         {
-            var success = await _eventBusiness.FinalizeEventAsync(id);
+            var supervisors = await _eventBusiness.FinalizeEventUnifiedAsync(eventId);
 
             return Ok(new
             {
-                success,
-                message = success
-                    ? "El evento ha sido finalizado correctamente."
-                    : "No se pudo finalizar el evento."
+                success = true,
+                message = "Evento finalizado y supervisores notificados.",
+                supervisors
             });
         }
+
+
+
 
         // ============================================================
         // 🚀 NUEVO ENDPOINT: FILTRO POR ESTADO, TIPO Y PÚBLICO/PRIVADO
@@ -197,12 +199,60 @@ namespace Web.Controllers.Operational
             return Ok(result);
         }
 
-        [HttpPost("{eventId}/finalize")]
-        public async Task<IActionResult> FinalizeEvents(int eventId)
+        //[HttpPost("{eventId}/finalize")]
+        //public async Task<IActionResult> FinalizeEvents(int eventId)
+        //{
+        //    await _eventBusiness.FinalizeEventAndNotifyAsync(eventId);
+        //    return Ok(ApiResponse<string>.Ok("Evento finalizado y supervisores no1tificados."));
+        //}
+
+        [HttpPost("{eventId}/supervisors/{userId}")]
+        public async Task<IActionResult> AddSupervisor(int eventId, int userId)
         {
-            await _eventBusiness.FinalizeEventAndNotifyAsync(eventId);
-            return Ok(ApiResponse<string>.Ok("Evento finalizado y supervisores notificados."));
+            try
+            {
+                var result = await _eventBusiness.AddSupervisorToEventAsync(eventId, userId);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Supervisor agregado correctamente al evento."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
+
+
+        [HttpDelete("{eventId}/supervisors/{userId}")]
+        public async Task<IActionResult> RemoveSupervisor(int eventId, int userId)
+        {
+            try
+            {
+                var result = await _eventBusiness.RemoveSupervisorFromEventAsync(eventId, userId);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Supervisor eliminado correctamente del evento."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
 
     }
 }
