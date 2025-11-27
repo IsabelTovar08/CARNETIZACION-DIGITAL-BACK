@@ -11,6 +11,7 @@ namespace Entity.DTOs.Specifics.Cards
     /// </summary>
     public class CardUserData
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Profile { get; set; }
         public string CategoryArea { get; set; }
@@ -24,6 +25,7 @@ namespace Entity.DTOs.Specifics.Cards
         public string BranchPhone { get; set; }
         public string BranchAddress { get; set; }
 
+        public string SheduleName { get; set; }
 
         public string Address { get; set; }
         public string Title { get; set; }
@@ -34,6 +36,10 @@ namespace Entity.DTOs.Specifics.Cards
         public string InternalDivisionName { get; set; }
         public string OrganizationalUnit { get; set; }
         public string DocumentNumber { get; set; }
+        public string DocumentCode { get; set; }
+        public string DocumentName { get; set; }
+
+
         public Guid UniqueId { get; set; }
         public string FrontTemplateUrl { get; set; }
         public string BackTemplateUrl { get; set; }

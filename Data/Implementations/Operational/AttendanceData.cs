@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Data.Classes.Base;
 using Data.Interfases.Operational;
 using Entity.Context;
+using Entity.DTOs.Operational.Response;
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using Microsoft.EntityFrameworkCore;
@@ -107,67 +108,76 @@ namespace Data.Implementations.Operational
         }
 
         public async Task<(IList<Attendance> Items, int Total)> QueryAsync(
-            int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
-            string? sortBy, string? sortDir, int page, int pageSize,
-            CancellationToken ct = default)
+             int? personId, int? eventId, DateTime? fromUtc, DateTime? toUtc,
+             string? sortBy, string? sortDir, int page, int pageSize,
+             CancellationToken ct = default)
         {
-            var q = _context.Set<Attendance>()
+            // QUERY BASE SIN INCLUDE
+            var baseQuery = _context.Attendances
+                .AsNoTracking()
+                .Where(a => !a.IsDeleted);
+
+            // Filtros
+            if (personId.HasValue)
+                baseQuery = baseQuery.Where(a => a.PersonId == personId.Value);
+
+            if (eventId.HasValue)
+            {
+                baseQuery = baseQuery.Where(a =>
+                    a.EventAccessPointEntry.EventId == eventId.Value ||
+                    (a.EventAccessPointExit != null && a.EventAccessPointExit.EventId == eventId.Value)
+                );
+            }
+
+            if (fromUtc.HasValue)
+                baseQuery = baseQuery.Where(a => a.TimeOfEntry >= fromUtc.Value);
+
+            if (toUtc.HasValue)
+                baseQuery = baseQuery.Where(a => a.TimeOfEntry <= toUtc.Value);
+
+            // 1️⃣ **Solo obtener los IDs de la asistencia más reciente por persona**
+            var lastIdsQuery = baseQuery
+                .GroupBy(a => a.PersonId)
+                .Select(g => g
+                    .OrderByDescending(x => x.TimeOfEntry)
+                    .Select(x => x.Id)
+                    .First());
+
+            // Total (cantidad de personas únicas)
+            int total = await lastIdsQuery.CountAsync(ct);
+
+            // Paginación aplicada sobre los IDs
+            var pagedIds = await lastIdsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(ct);
+
+            // 2️⃣ Ahora sí traer las entidades completas con Includes
+            var items = await _context.Attendances
                 .AsNoTracking()
                 .Include(a => a.Person)
-                .Include(a => a.EventAccessPointEntry) 
+                .Include(a => a.EventAccessPointEntry)
                     .ThenInclude(ep => ep.AccessPoint)
                 .Include(a => a.EventAccessPointEntry)
                     .ThenInclude(ep => ep.Event)
                 .Include(a => a.EventAccessPointExit)
                     .ThenInclude(ep => ep.AccessPoint)
-                .Where(a => !a.IsDeleted);
+                .Where(a => pagedIds.Contains(a.Id))
+                .ToListAsync(ct);
 
-            // 1️ Filtro por persona
-            if (personId.HasValue)
-                q = q.Where(a => a.PersonId == personId.Value);
-
-            // 2️ Filtro por EVENTO usando EventAccessPoint
-            if (eventId.HasValue)
-            {
-                q = q.Where(a =>
-                    _context.EventAccessPoints.Any(ep =>
-                        ep.Id == a.EventAccessPointEntryId &&
-                        ep.EventId == eventId.Value
-                    )
-                    ||
-                    _context.EventAccessPoints.Any(ep =>
-                        ep.Id == a.EventAccessPointExitId &&
-                        ep.EventId == eventId.Value
-                    )
-                );
-            }
-
-            // 3️ Filtro por fechas
-            if (fromUtc.HasValue)
-                q = q.Where(a => a.TimeOfEntry >= fromUtc.Value);
-
-            if (toUtc.HasValue)
-                q = q.Where(a => a.TimeOfEntry <= toUtc.Value);
-
-            // 4️⃣ Sorting
+            // 3️⃣ Ordenar en memoria (ya no se puede ordenar en SQL porque tenemos IDs)
             bool desc = string.Equals(sortDir, "DESC", StringComparison.OrdinalIgnoreCase);
-            q = (sortBy ?? "TimeOfEntry") switch
+
+            items = (sortBy ?? "TimeOfEntry") switch
             {
-                "TimeOfExit" => desc ? q.OrderByDescending(a => a.TimeOfExit) : q.OrderBy(a => a.TimeOfExit),
-                "PersonId" => desc ? q.OrderByDescending(a => a.PersonId) : q.OrderBy(a => a.PersonId),
-                _ => desc ? q.OrderByDescending(a => a.TimeOfEntry) : q.OrderBy(a => a.TimeOfEntry)
+                "TimeOfExit" => desc ? items.OrderByDescending(a => a.TimeOfExit).ToList() : items.OrderBy(a => a.TimeOfExit).ToList(),
+                "PersonId" => desc ? items.OrderByDescending(a => a.PersonId).ToList() : items.OrderBy(a => a.PersonId).ToList(),
+                _ => desc ? items.OrderByDescending(a => a.TimeOfEntry).ToList() : items.OrderBy(a => a.TimeOfEntry).ToList()
             };
-
-            // 5️⃣ Paginación
-            int total = await q.CountAsync(ct);
-            page = page <= 0 ? 1 : page;
-            pageSize = pageSize <= 0 ? 20 : pageSize;
-            int skip = (page - 1) * pageSize;
-
-            var items = await q.Skip(skip).Take(pageSize).ToListAsync(ct);
 
             return (items, total);
         }
+
 
 
         // ✅ NUEVO MÉTODO — necesario para el AttendanceBusiness
@@ -177,6 +187,7 @@ namespace Data.Implementations.Operational
             return _context.Set<Attendance>().AsQueryable();
         }
 
+<<<<<<< HEAD
         public async Task<List<Attendance>> GetByEventIdAsync(int eventId)
         {
             return await _context.Attendances
@@ -187,5 +198,58 @@ namespace Data.Implementations.Operational
                             a.EventAccessPointEntry.EventId == eventId)
                 .ToListAsync();
         }
+=======
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="personId"></param>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        public async Task<IList<AttendanceDtoResponse>> GetAllByPersonEventAsync(int personId, int eventId)
+        {
+            return await _context.Attendances
+                .AsNoTracking()
+                .Where(a =>
+                    a.PersonId == personId &&
+                    (a.EventAccessPointEntry.EventId == eventId ||
+                    (a.EventAccessPointExit != null && a.EventAccessPointExit.EventId == eventId))
+                )
+                .OrderByDescending(a => a.TimeOfEntry)
+                .Select(a => new AttendanceDtoResponse
+                {
+                    Id = a.Id,
+                    PersonId = a.PersonId,
+                    TimeOfEntry = a.TimeOfEntry,
+                    TimeOfExit = a.TimeOfExit,
+                    AccessPointOfEntryName = a.EventAccessPointEntry.AccessPoint.Name,
+                    AccessPointOfExitName = a.EventAccessPointExit != null
+                        ? a.EventAccessPointExit.AccessPoint.Name
+                        : null
+                })
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="personId"></param>
+        /// <param name="eventId"></param>
+        /// <param name="currentAttendanceId"></param>
+        /// <returns></returns>
+        public async Task<bool> PersonHasMoreAttendancesAsync(int personId, int eventId, int currentAttendanceId)
+        {
+            return await _context.Attendances
+                .AsNoTracking()
+                .Where(a => a.PersonId == personId &&
+                            !a.IsDeleted &&
+                            (
+                                a.EventAccessPointEntry.EventId == eventId ||
+                                (a.EventAccessPointExit != null && a.EventAccessPointExit.EventId == eventId)
+                            ) &&
+                            a.Id != currentAttendanceId)
+                .AnyAsync();
+        }
+
+>>>>>>> dbb3ae7329436426bd662644e6e47a99652d88b7
     }
 }   

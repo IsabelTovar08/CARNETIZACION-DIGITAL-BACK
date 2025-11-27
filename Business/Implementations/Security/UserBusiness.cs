@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Classes.Base;
 using Business.Implementations.Organizational.Assignment;
+using Business.Interfaces.Auth;
 using Business.Interfaces.Organizational.Assignment;
 using Business.Interfaces.Security;
 using Business.Services.Auth;
@@ -30,10 +31,12 @@ namespace Business.Classes
         public readonly IUserData _userData;
         private readonly IUserRoleBusiness _userRolBusiness;
         private readonly IIssuedCardBusiness _issuedCardBusiness;
+        private readonly ICurrentUser _currentUser;
 
         // Constructor para inyectar dependencias
         public UserBusiness(IUserData userData, ILogger<User> logger, IMapper mapper, UserService userService, IUserRoleBusiness userRolBusiness,
-            IIssuedCardBusiness issuedCardBusiness
+            IIssuedCardBusiness issuedCardBusiness,
+            ICurrentUser currentUser
             )
             : base(userData, logger, mapper)
         {
@@ -41,6 +44,7 @@ namespace Business.Classes
             _userService = userService;
             _userRolBusiness = userRolBusiness;
             _issuedCardBusiness = issuedCardBusiness;
+            _currentUser = currentUser;
         }
 
         // Validación del DTO
@@ -267,5 +271,31 @@ namespace Business.Classes
 
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
+
+
+        /// <summary>
+        /// Consulta si el usuario tiene habilitada la autenticación en dos pasos.
+        /// Puede retornar null si no está configurado.
+        /// </summary>
+        public async Task<bool?> IsTwoFactorEnabledAsync(int userId)
+        {
+            return await _userData.IsTwoFactorEnabledAsync(userId);
+        }
+
+
+        /// <summary>
+        /// Alterna el estado del 2FA solo con el id del usuario
+        /// </summary>
+        public async Task<bool> ToggleTwoFactorAsync()
+        {
+            int userId = _currentUser.UserId;
+            var user = await _userData.GetByIdAsync(userId);
+
+            if (user == null)
+                throw new ValidationException("El usuario no existe");
+
+            return await _userData.ToggleTwoFactorAsync(userId);
+        }
+
     }
 }

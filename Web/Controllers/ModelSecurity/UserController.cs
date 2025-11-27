@@ -108,6 +108,25 @@ namespace Web.Controllers.ModelSecurity
 
             return Ok(new { success = true, message = "Perfil actualizado correctamente", data = updated });
         }
+
+        [HttpPost("two-factor/toggle")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> ToggleTwoFactor()
+        {
+            // Alternar estado del 2FA solo con el Id
+            var result = await _userBusiness.ToggleTwoFactorAsync();
+
+            if (!result)
+                return BadRequest("No se pudo alternar el estado del 2FA");
+
+            return Ok(new
+            {
+                message = "Estado de autenticación en dos pasos actualizado correctamente"
+            });
+        }
+
+
     }
 }
 

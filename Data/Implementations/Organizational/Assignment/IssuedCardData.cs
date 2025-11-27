@@ -9,9 +9,11 @@ using Entity.Context;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Specifics;
 using Entity.DTOs.Specifics.Cards;
+using Entity.Enums.Extensions;
 using Entity.Models.Organizational.Assignment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Utilities.Enums.Specifics;
 using static Utilities.Helpers.BarcodeHelper;
 
 namespace Data.Implementations.Organizational.Assignment
@@ -28,14 +30,12 @@ namespace Data.Implementations.Organizational.Assignment
                 .AsNoTracking()
                 .Where(c => !c.IsDeleted)
                 .Include(c => c.Person)
-                .Include(c => c.Profile)
+                .Include(c => c.Shedule)
                 .Include(c => c.InternalDivision)
                 .Include(c => c.Card)
                 .Include(c => c.Status)
                 .ToListAsync();
 
-
-            var prueba = await GetCardDataByIssuedIdAsync(1);
             return cards;
         }
 
@@ -87,7 +87,9 @@ namespace Data.Implementations.Organizational.Assignment
                 .Include(x => x.Person)
                 .Include(x => x.Card)
                     .ThenInclude(c => c.CardTemplate)
-                .Include(x => x.Profile)
+                .Include(x => x.Card)
+                    .ThenInclude(c => c.Profile)
+                .Include(x => x.Shedule)
                 .Include(x => x.InternalDivision)
                     .ThenInclude(d => d.AreaCategory)
                 .Include(x => x.InternalDivision)
@@ -113,12 +115,15 @@ namespace Data.Implementations.Organizational.Assignment
 
             return new CardUserData
             {
+                Id = issuedCardId,
                 // Datos personales
                 Name = $"{issuedCard.Person?.FirstName} {issuedCard.Person?.MiddleName} {issuedCard.Person?.LastName} {issuedCard.Person?.SecondLastName} ".Trim(),
                 Email = issuedCard.Person?.Email ?? string.Empty,
                 PhoneNumber = issuedCard.Person?.Phone ?? string.Empty,
                 DocumentNumber = issuedCard.Person?.DocumentNumber ?? string.Empty,
-                //BloodTypeValue = issuedCard.Person?.BloodType.ToString() ?? string.Empty,
+                DocumentCode = issuedCard.Person?.DocumentType.GetAcronym() ?? string.Empty,
+                DocumentName = issuedCard.Person?.DocumentType.GetDisplayName() ?? string.Empty,
+                BloodTypeValue = issuedCard.Person?.BloodType?.GetDisplayName() ?? string.Empty,
 
                 // Datos organizacionales
                 CompanyName = org?.Name ?? "Sin organización",
@@ -130,11 +135,11 @@ namespace Data.Implementations.Organizational.Assignment
 
                 // Datos del carnet
                 CardId = issuedCard.UniqueId.ToString(),
-                Profile = issuedCard.Profile?.Name ?? "Sin perfil",
+                Profile = issuedCard.Card.Profile?.Name ?? "Sin perfil",
                 InternalDivisionName = division?.Name ?? "N/A",
                 OrganizationalUnit = unit?.Name ?? "N/A",
                 UserPhotoUrl = issuedCard.Person?.PhotoUrl ?? string.Empty,
-
+                SheduleName = issuedCard.Shedule.Name ?? "N/A",
                 // Aquí queda el Base64 limpio del logo
                 LogoUrl = base64Logo,
 
@@ -196,7 +201,7 @@ namespace Data.Implementations.Organizational.Assignment
         {
             return await _context.IssuedCards
                 .Where(c => !c.IsDeleted)
-                .GroupBy(c => c.Card.SheduleId)
+                .GroupBy(c => c.Card.Profile)
                 .Select(g => new CarnetsBySheduleDto
                 {
                     Jornada = g.Key.ToString(),

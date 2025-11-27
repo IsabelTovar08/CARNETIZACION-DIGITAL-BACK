@@ -29,8 +29,22 @@ namespace Data.Implementations.Organizational.Assignment
                 .AsNoTracking()
                 .Where(c => !c.IsDeleted)
                 .Include(c => c.CardTemplate)
-                .Include(c => c.Shedule)
+                .Include(c => c.Profile)
                 .Include(c => c.CardTemplate)
+                .ToListAsync();
+
+            return cards;
+        }
+
+        public override async Task<IEnumerable<CardConfiguration>> GetActiveAsync()
+        {
+            var cards = await _context.Set<CardConfiguration>()
+                .AsNoTracking()
+                .Where(c => !c.IsDeleted)
+                .Include(c => c.CardTemplate)
+                .Include(c => c.Profile)
+                .Include(c => c.CardTemplate)
+                .Where(x => !x.IsDeleted)
                 .ToListAsync();
 
             return cards;
@@ -43,7 +57,7 @@ namespace Data.Implementations.Organizational.Assignment
         //    return base.SaveAsync(entity);
         //}
 
-        
+
 
         /// <summary>
         /// Retorna el total de carnets que no están eliminados lógicamente

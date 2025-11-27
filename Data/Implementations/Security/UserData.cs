@@ -211,6 +211,7 @@ namespace Data.Classes.Specifics
                 .ToListAsync();
         }
 
+<<<<<<< HEAD
         public async Task<int?> GetUserIdByPersonIdAsync(int personId)
         {
             return await _context.Users
@@ -219,6 +220,40 @@ namespace Data.Classes.Specifics
                 .FirstOrDefaultAsync();
         }
 
+=======
+
+        /// <summary>
+        /// Retorna el estado de autenticación en dos pasos del usuario (nullable).
+        /// </summary>
+        public async Task<bool?> IsTwoFactorEnabledAsync(int userId)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(x => x.Id == userId)
+                .Select(x => x.TwoFactorEnabled)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Alterna el valor actual de TwoFactorEnabled para un usuario
+        /// </summary>
+        public async Task<bool> ToggleTwoFactorAsync(int userId)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+
+            if (user == null)
+                return false;
+
+            // Alternar estado
+            user.TwoFactorEnabled = !(user.TwoFactorEnabled ?? false);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+>>>>>>> dbb3ae7329436426bd662644e6e47a99652d88b7
 
     }
 }

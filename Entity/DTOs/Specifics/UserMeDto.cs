@@ -16,6 +16,8 @@ namespace Entity.DTOs.Specifics
         public string Email { get; set; } = null!;
         public string? PhoneNumber { get; set; }
         public string? PhotoUrl { get; set; }
+        public int PersonId { get; set; }
+        public bool? TwoFactorEnabled { get; set; }
 
         public List<RolDto> Roles { get; set; } = new();
         public List<PermissionDto> Permissions { get; set; } = new();

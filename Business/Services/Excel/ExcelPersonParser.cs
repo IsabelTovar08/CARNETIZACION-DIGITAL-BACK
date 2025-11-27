@@ -11,6 +11,7 @@ using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.Specifics;
 using Microsoft.Extensions.Logging;
 using Utilities.Helpers.Excel;
+using static Utilities.Helpers.GeneratePassword;
 
 namespace Business.Services.Excel
 {
@@ -74,9 +75,9 @@ namespace Business.Services.Excel
                         MiddleName = _excel.ReadNullableString(ws, row, COL_MIDDLENAME),
                         LastName = _excel.ReadString(ws, row, COL_LASTNAME),
                         SecondLastName = _excel.ReadNullableString(ws, row, COL_SECONDLASTNAME),
-                        DocumentTypeId = _excel.ReadNullableInt(ws, row, COL_DOCUMENTTYPEID),
+                        DocumentTypeId = (Utilities.Enums.Specifics.DocumentType?)_excel.ReadNullableInt(ws, row, COL_DOCUMENTTYPEID),
                         DocumentNumber = _excel.ReadNullableString(ws, row, COL_DOCUMENTNUMBER),
-                        BloodTypeId = _excel.ReadNullableInt(ws, row, COL_BLOODTYPEID),
+                        BloodTypeId = (Utilities.Enums.Specifics.BloodType?)_excel.ReadNullableInt(ws, row, COL_BLOODTYPEID),
                         Phone = _excel.ReadNullableString(ws, row, COL_PHONE),
                         Email = _excel.ReadString(ws, row, COL_EMAIL),
                         Address = _excel.ReadNullableString(ws, row, COL_ADDRESS),
@@ -145,21 +146,6 @@ namespace Business.Services.Excel
                 if (!docsInFile.Add(r.DocumentNumber!)) return "Número de documento duplicado en el archivo.";
 
             return null;
-        }
-
-        /// <summary>
-        /// Genera una contraseña temporal aleatoria.
-        /// </summary>
-        private static string GenerateTempPassword(int length = 10)
-        {
-            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@$!#%*?";
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[length];
-            rng.GetBytes(bytes);
-            var sb = new StringBuilder(length);
-            for (int i = 0; i < length; i++)
-                sb.Append(chars[bytes[i] % chars.Length]);
-            return sb.ToString();
         }
     }
 }

@@ -9,18 +9,23 @@ namespace Entity.DTOs.Specifics
     public class ImportContextCard
     {
         public int OrganizationId { get; set; }
-        public string OrganizationCode { get; set; } = default!;
+        public string? OrganizationCode { get; set; } = default!;
 
         public int OrganizationalUnitId { get; set; }
-        public string OrganizationalUnitCode { get; set; } = default!;
+        public string? OrganizationalUnitCode { get; set; } = default!;
 
         public int InternalDivisionId { get; set; }
-        public string InternalDivisionCode { get; set; } = default!;
+        public string? InternalDivisionCode { get; set; } = default!;
 
 
         public int CardTemplateId { get; set; }
-        public string CardTemplateCode { get; set; } = default!;
+        public string? CardTemplateCode { get; set; } = default!;
 
+        public int SheduleId { get; set; }
+        public string? SheduleCode { get; set; } = default!;
+
+        public int? CardConfigurationId { get; set; }
+        public string? CardConfigurationName { get; set; }
 
         public int ProfileId { get; set; }                // Perfil de la división
         public DateTime ValidFrom { get; set; }           // Inicio de vigencia del carnet

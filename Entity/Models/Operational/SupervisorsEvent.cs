@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entity.Models.Base;
+using Entity.Models.Organizational;
+
+namespace Entity.Models.Operational
+{
+    public class SupervisorsEvent: BaseModel
+    {
+        public int UserId { get; set; }
+        public int EventId { get; set; }
+        public User User { get; set; }
+        public Event Event { get; set; }
+    }
+}

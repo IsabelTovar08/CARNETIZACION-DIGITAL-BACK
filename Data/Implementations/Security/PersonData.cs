@@ -36,8 +36,6 @@ namespace Data.Classes.Specifics
         {
             return await _context.Set<Person>()
                 .Include(p => p.City)
-                .Include(p => p.DocumentType)
-                .Include(p => p.BloodType)
                 .ToListAsync();
         }
 
@@ -158,9 +156,8 @@ namespace Data.Classes.Specifics
                     .ThenInclude(pdp => pdp.InternalDivision)
                         .ThenInclude(id => id.OrganizationalUnit)
                 .Include(p => p.IssuedCard)
-                    .ThenInclude(pdp => pdp.Profile)
-                .Include(p => p.IssuedCard)
                     .ThenInclude(pdp => pdp.Card)
+                    .ThenInclude(pdp => pdp.Profile)
                 .Where(p => !p.IsDeleted)
                 .Where(p => p.IssuedCard.Any(pdp => pdp.Card != null));
 
@@ -174,7 +171,7 @@ namespace Data.Classes.Specifics
 
             if (profileId.HasValue)
                 q = q.Where(p => p.IssuedCard
-                    .Any(pdp => pdp.ProfileId == profileId.Value));
+                    .Any(pdp => pdp.Card.ProfileId == profileId.Value));
 
             int total = await q.CountAsync(ct);
 

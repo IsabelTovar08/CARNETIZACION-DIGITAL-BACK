@@ -2,6 +2,7 @@
 using Business.Interfases;
 using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Organizational.Assigment.Response;
+using Entity.DTOs.Specifics.Cards;
 using Entity.Models.Organizational.Assignment;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Responses;
@@ -178,6 +179,26 @@ namespace Web.Controllers.Organizational.Assignment
             {
                 _logger.LogError(ex, "Error en Business al obtener el total de carnets");
                 return BadRequest(ApiResponse<int>.Fail("Error al obtener el total de carnets", new[] { ex.Message }));
+            }
+        }
+
+
+        /// <summary>
+        /// Retorna el total general de carnets emitidos en el sistema.
+        /// </summary>
+        [HttpGet("get-data-complete/{id}")]
+        public async Task<IActionResult> GetCardDataByIssuedId(int id)
+        {
+            try
+            {
+                CardUserData total = await _business.GetCardDataByIssuedId(id);
+
+                return Ok(ApiResponse<CardUserData>.Ok(total, "Información obtenida exitosamente"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener informacipon del carnet");
+                return BadRequest(ApiResponse<CardUserData>.Fail("Error al obtener el carnets", new[] { ex.Message }));
             }
         }
     }

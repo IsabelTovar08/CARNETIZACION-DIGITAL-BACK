@@ -40,10 +40,14 @@ namespace Entity.Models.Organizational
 
         [NotMapped]
         public IEnumerable<Schedule> Schedules => EventSchedules.Select(es => es.Schedule);
+<<<<<<< HEAD
         /// <summary>
         /// Para asignar supervisor a los eventos
         /// </summary>
         public ICollection<EventSupervisor> Supervisors { get; set; } = new List<EventSupervisor>();
+=======
+        public List<SupervisorsEvent> SupervisorsEvent { get; set; }
+>>>>>>> dbb3ae7329436426bd662644e6e47a99652d88b7
 
 
     }

@@ -98,12 +98,12 @@ namespace Business.Services.Cards
                 DrawImage(canvas, qrImg, frontPos["qr"], preserveSharpness: true);
 
                 // Nombre (nombres arriba, apellidos abajo, auto-ajuste)
-                DrawNameWithAutoSize(canvas, userData.Name, frontPos["name"], maxWidth: 260f);
+                DrawNameWithAutoSize(canvas, userData.Name, frontPos["name"], maxWidth: 200f);
 
                 // Identificación (CC)
                 DrawTextAutoSize(
                     canvas,
-                    $"CC: {userData.DocumentNumber}",
+                    $"{userData.DocumentCode ?? "CC"}: {userData.DocumentNumber}",
                     frontPos["identification"],
                     maxWidth: 260,
                     maxHeight: 40,

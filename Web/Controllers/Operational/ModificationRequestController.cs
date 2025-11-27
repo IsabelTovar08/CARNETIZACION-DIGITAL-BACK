@@ -2,6 +2,7 @@
 using Business.Interfases;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
+using Entity.DTOs.Specifics;
 using Entity.Models.Operational;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Responses;
@@ -36,11 +37,11 @@ namespace Web.Controllers.Operational
         /// Aprueba una solicitud de modificación, actualiza la persona y marca la solicitud como aprobada.
         /// </summary>
         [HttpPost("approve/{id:int}")]
-        public async Task<IActionResult> ApproveAsync(int id, [FromBody] string? message = null)
+        public async Task<IActionResult> ApproveAsync(int id, [FromBody] MessageDto? message)
         {
             try
             {
-                bool result = await _business.ApproveRequestAsync(id, message);
+                bool result = await _business.ApproveRequestAsync(id, message?.Message);
                 return Ok(ApiResponse<bool>.Ok(result, "Solicitud aprobada correctamente."));
             }
             catch (InvalidOperationException ex)
@@ -59,11 +60,11 @@ namespace Web.Controllers.Operational
         /// Rechaza una solicitud de modificación y actualiza su estado.
         /// </summary>
         [HttpPost("reject/{id:int}")]
-        public async Task<IActionResult> RejectAsync(int id, [FromBody] string? message = null)
+        public async Task<IActionResult> RejectAsync(int id, [FromBody] MessageDto? message)
         {
             try
             {
-                bool result = await _business.RejectRequestAsync(id, message);
+                bool result = await _business.RejectRequestAsync(id, message?.Message);
                 return Ok(ApiResponse<bool>.Ok(result, "Solicitud rechazada correctamente."));
             }
             catch (InvalidOperationException ex)

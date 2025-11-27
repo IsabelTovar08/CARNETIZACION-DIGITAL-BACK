@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>
+        {{ if title != null && title != "" }}
+        {{ title }}
+        {{ else }}
+        Nuevo Carnet Asignado — {{ if company_name != null && company_name != "" }}{{ company_name }}{{ else }}Sistema de Carnetización{{ end }}
+        {{ end }}
+    </title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(59, 130, 246, .12);
+            border: 1px solid #e0f2fe;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+            .header h1 {
+                color: #fff;
+                font-size: 22px;
+                font-weight: 600;
+            }
+
+        .content {
+            padding: 35px 30px;
+        }
+
+        .greeting {
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .message-text {
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border: 2px solid #86efac;
+            color: #166534;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 2px solid #93c5fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .info-item {
+            margin-bottom: 12px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #1e40af;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: .5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .cta-button {
+            text-align: center;
+            margin: 30px 0 20px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #fff;
+            padding: 12px 28px;
+            text-decoration: none;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 15px;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, .25);
+            transition: .2s;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 28px rgba(59, 130, 246, .35);
+            }
+
+        .footer {
+            background: #f8fafc;
+            color: #64748b;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Nuevo Carnet Asignado</h1>
+        </div>
+
+        <div class="content">
+
+            <p class="greeting">
+                Hola <strong>{{ if user_name != "" }}{{ user_name }}{{ else }}Usuario{{ end }}</strong>,
+            </p>
+
+            <p class="message-text">
+                Te informamos que se te ha asignado un nuevo carnet institucional.
+                A partir de este momento, este carnet queda vinculado a tu perfil dentro del sistema.
+            </p>
+
+            <div style="text-align:center;">
+                <div class="status-badge">Asignado</div>
+            </div>
+
+            <div class="info-box">
+
+                <div class="info-item">
+                    <div class="info-label">División Interna</div>
+                    <div class="info-value">{{ division }}</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Perfil Asociado</div>
+                    <div class="info-value">{{ profile }}</div>
+                </div>
+
+                {{ if valid_from != "" }}
+                <div class="info-item">
+                    <div class="info-label">Válido Desde</div>
+                    <div class="info-value">{{ valid_from }}</div>
+                </div>
+                {{ end }}
+
+                {{ if valid_to != "" }}
+                <div class="info-item">
+                    <div class="info-label">Válido Hasta</div>
+                    <div class="info-value">{{ valid_to }}</div>
+                </div>
+                {{ end }}
+
+            </div>
+
+            <p class="message-text">
+                Puedes consultar tu carnet y descargar el PDF directamente desde la plataforma.
+            </p>
+
+            <div class="cta-button">
+                <a class="btn" href="{{ if app_url != "" }}{{ app_url }}{{ else }}#{{ end }}">
+                    Ver mi Carnet
+                </a>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>
+                    {{ if company_name != "" }}{{ company_name }}{{ else }}Sistema de Carnetización Digital{{ end }}
+                </strong>
+            </p>
+            <p>Este es un correo automático, por favor no responder.</p>
+        </div>
+    </div>
+</body>
+</html>

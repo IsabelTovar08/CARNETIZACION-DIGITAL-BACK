@@ -28,5 +28,10 @@ namespace Business.Interfaces.Security
         /// </summary>
         Task<IEnumerable<UserDTO>> GetUsersByRoleAsync(string roleName);
 
+        /// <summary>
+        /// Alterna el estado del 2FA para un usuario
+        /// </summary>
+        Task<bool> ToggleTwoFactorAsync();
+
     }
 }

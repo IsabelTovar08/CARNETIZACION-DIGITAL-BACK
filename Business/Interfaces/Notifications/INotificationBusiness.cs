@@ -18,5 +18,9 @@ namespace Business.Interfaces.Notifications
         /// Envía una notificación utilizando una plantilla predefinida.
         /// </summary>
         Task<NotificationDto> SendTemplateAsync(NotificationTemplateType type, params object[] args);
+        /// <summary>
+        /// Obtiene el total de notificaciones del usuario.
+        /// </summary>
+        Task<int> GetUserNotificationCountAsync();
     }
 }

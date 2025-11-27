@@ -2,6 +2,7 @@
 using Business.Interfaces.Auth;
 using Business.Interfaces.Notifications;
 using Business.Interfaces.Security;
+using Business.Services.JWT;
 using Data.Interfases.Security;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs;
@@ -10,9 +11,11 @@ using Entity.DTOs.ModelSecurity.Response;
 using Entity.Enums.Specifics;
 using Entity.Models;
 using Infrastructure.Notifications.Interfases;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
+using Utilities.Helpers;
 using Utilities.Notifications.Implementations.Templates.Email;
 using static Utilities.Helper.EncryptedPassword;
 
@@ -28,9 +31,16 @@ namespace Business.Services.Auth
         private readonly ILogger<AuthService> _logger;
         private readonly INotify _notificationSender;
         private readonly INotificationBusiness _notificationBusiness;
+        private readonly IJwtService _jwtService;
+        private readonly IRefreshTokenService _refreshTokenService;
+        private readonly IUserVerificationService _verifier;
+        private readonly IDeviceInfoService _deviceInfoService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-
-        public AuthService(UserService userService, IConfiguration config, ILogger<AuthService> logger, IUserData userData, INotify notificationSender, INotificationBusiness notificationBusiness)
+        public AuthService(UserService userService, IConfiguration config, ILogger<AuthService> logger, IUserData userData, INotify notificationSender, INotificationBusiness notificationBusiness, IJwtService jwtService, IRefreshTokenService refreshTokenService, IUserVerificationService verifier,
+             IDeviceInfoService deviceInfoService,
+            IHttpContextAccessor httpContextAccessor
+            )
         {
             _userService = userService;
             _config = config;
@@ -38,6 +48,11 @@ namespace Business.Services.Auth
             _userData = userData;
             _notificationSender = notificationSender;
             _notificationBusiness = notificationBusiness;
+            _jwtService = jwtService;
+            _refreshTokenService = refreshTokenService;
+            _verifier = verifier;
+            _deviceInfoService = deviceInfoService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<User> LoginAsync(LoginRequest loginRequest)
@@ -51,9 +66,9 @@ namespace Business.Services.Auth
             return user;
         }
 
-        public async Task NotifyLogin(string user)
+        public async Task NotifyLogin(string user, int userId)
         {
-            await _notificationBusiness.SendTemplateAsync(NotificationTemplateType.Login, user);
+            await _notificationBusiness.SendTemplateAsync(NotificationTemplateType.Login, user, userId, _deviceInfoService, _httpContextAccessor);
 
         }
 
@@ -151,5 +166,56 @@ namespace Business.Services.Auth
                 throw new BusinessException("An error occurred while resetting the password.", ex);
             }
         }
+
+
+        /// <summary>
+        /// Maneja el flujo completo de login:
+        /// - Si el usuario NO tiene 2FA: devuelve tokens inmediatamente.
+        /// - Si el usuario SÍ tiene 2FA: envía código y pide verify-code.
+        /// </summary>
+        public async Task<LoginResultDto> LoginWithTwoFactorFlowAsync(LoginRequest loginRequest, string? ip)
+        {
+            // 1) Validar usuario y credenciales
+            User? user = await _userData.ValidateUserAsync(loginRequest.Email, loginRequest.Password);
+            if (user == null)
+                throw new ValidationException("Credenciales inválidas");
+
+            // 2) Si el usuario NO tiene 2FA → generar tokens inmediato
+            if (user.TwoFactorEnabled == false || user.TwoFactorEnabled == null)
+            {
+                var (accessToken, jti) = _jwtService.GenerateToken(
+                    user.Id.ToString(),
+                    user.UserName ?? user.Person.FirstName + " " + user.Person.LastName
+                );
+
+                var tokens = await _refreshTokenService.IssueAsync(
+                    user.Id,
+                    accessToken,
+                    jti,
+                    ip
+                );
+
+                await NotifyLogin(user.Person.FirstName + " " + user.Person.LastName, user.Id);
+
+                return new LoginResultDto
+                {
+                    RequiresTwoFactor = false,
+                    Tokens = tokens,
+                    IsFirstLogin = user.Active,
+                    UserId = user.Id
+                };
+            }
+
+            // 3) Si SÍ tiene 2FA → enviar código
+            await _verifier.GenerateAndSendAsync(user);
+
+            return new LoginResultDto
+            {
+                RequiresTwoFactor = true,
+                UserId = user.Id,
+                IsFirstLogin = user.Active
+            };
+        }
+
     }
 }

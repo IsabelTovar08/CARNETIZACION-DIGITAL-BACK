@@ -18,6 +18,7 @@ namespace Entity.Enums.Specifics
         EventReminder,
         EventAttendance,
         ModificationRequest,
+        ModificationSent,
         ModificationApproved,
         ModificationRejected,
         CardGenerated,

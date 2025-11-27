@@ -6,6 +6,7 @@ using Entity.Models.Organizational;
 using Entity.Models.Organizational.Assignment;
 using Entity.Models.Organizational.Location;
 using Entity.Models.Parameter;
+using Utilities.Enums.Specifics;
 
 namespace Entity.Models.ModelSecurity
 {
@@ -19,9 +20,7 @@ namespace Entity.Models.ModelSecurity
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
-        public int? DocumentTypeId { get; set; }
 
-        public int? BloodTypeId { get; set; }
         public string? PhotoUrl { get; set; }
         public string? PhotoPath { get; set; }
 
@@ -32,8 +31,10 @@ namespace Entity.Models.ModelSecurity
         public City? City { get; set; }
 
         public List<Attendance>? Attendances { get; set; }
-        public List<IssuedCard>? IssuedCard { get; set; }
-        public CustomType DocumentType { get; set; }
-        public CustomType? BloodType { get; set; }
+
+        /// <summary>Tarjetas emitidas de esta persona</summary>
+        public ICollection<IssuedCard> IssuedCard { get; set; } = new List<IssuedCard>();
+        public DocumentType DocumentType { get; set; }
+        public BloodType? BloodType { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace Entity.DTOs.ModelSecurity.Request
         public PersonDtoRequest Person { get; set; } = null!;
 
         [Required(ErrorMessage = "La información del usuario es obligatoria.")]
-        public UserDtoRequest User { get; set; } = null!;
+        public UserDtoRequest? User { get; set; } = null!;
     }
 }
