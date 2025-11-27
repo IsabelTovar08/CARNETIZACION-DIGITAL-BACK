@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Data.Interfases.Organizational.Structure
 {
-    public interface IOrganizationnalUnitData : ICrudBase<OrganizationalUnit>
+    public interface IOrganizationalUnitData : ICrudBase<OrganizationalUnit>
     {
+        Task<OrganizationalUnit?> GetFullByIdAsync(int id);
     }
 }

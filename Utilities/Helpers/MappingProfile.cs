@@ -205,7 +205,9 @@ namespace Utilities.Helper
                 .ForMember(d => d.DivisionsCount,
                     m => m.MapFrom(s => s.InternalDivissions.Count))
                 .ForMember(d => d.BranchesCount,
-                    m => m.MapFrom(s => s.OrganizationalUnitBranches.Count));
+                    m => m.MapFrom(s => s.OrganizationalUnitBranches.Count))
+                .ForMember(d => d.OrganizationalUnitBranches,
+                    m => m.MapFrom(s => s.OrganizationalUnitBranches));
             CreateMap<OrganizationalUnitDtoRequest, OrganizationalUnit>();
 
             //OPERATIONAL
@@ -419,6 +421,7 @@ namespace Utilities.Helper
             CreateMap<OrganizationalUnitBranch, OrganizationalUnitBranchDto>()
                 .ForMember(d => d.OrganizationalUnitName, o => o.MapFrom(s => s.OrganizationUnit.Name))
                 .ForMember(d => d.BranchName, o => o.MapFrom(s => s.Branch.Name))
+                 .ForMember(d => d.Branch,m => m.MapFrom(s => s.Branch)).ReverseMap()
                 .ReverseMap();
 
             CreateMap<OrganizationalUnitBranch, OrganizationalUnitBranchDtoRequest>()

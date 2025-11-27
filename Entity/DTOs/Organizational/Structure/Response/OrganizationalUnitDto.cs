@@ -12,6 +12,7 @@ namespace Entity.DTOs.Organizational.Structure.Response
         public string? Description { get; set; }
         public int DivisionsCount { get; set; }
         public int BranchesCount { get; set; }
+        public List<OrganizationalUnitBranchDto> OrganizationalUnitBranches { get; set; } = new();
 
     }
 }

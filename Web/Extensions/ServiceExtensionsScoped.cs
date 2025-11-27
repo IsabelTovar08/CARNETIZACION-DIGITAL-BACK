@@ -213,7 +213,7 @@ namespace Web.Extensions
             services.AddScoped<IOrganizationBusiness, OrganizationBusiness>();
 
             //OrganizationUnit
-            services.AddScoped<IOrganizationnalUnitData, OrganizationnalUnitData>();
+            services.AddScoped<Data.Interfases.Organizational.Structure.IOrganizationalUnitData, OrganizationalUnitData>();
             services.AddScoped<IOrganizationUnitBusiness, OrganizationalUnitBusiness>();
 
             //OrganizationalUnitBranch

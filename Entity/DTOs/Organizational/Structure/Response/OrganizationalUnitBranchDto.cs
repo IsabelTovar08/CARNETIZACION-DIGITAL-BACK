@@ -11,6 +11,7 @@ namespace Entity.DTOs.Organizational.Structure.Response
     public  class OrganizationalUnitBranchDto : BaseDTO
     {
         public int BranchId { get; set; }
+        public BranchDto? Branch { get; set; }
         public string? BranchName { get; set; }
 
         public int OrganizationalUnitId { get; set; }

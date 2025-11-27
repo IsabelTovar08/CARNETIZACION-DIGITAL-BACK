@@ -44,4 +44,63 @@ public class OrganizationalUnitController
         var count = await _orgUnitBusiness.CountBranchesAsync(id);
         return Ok(count);
     }
+
+    /// <summary>
+    /// Entpoint para crear unidad organizativa con surcursales
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPost("organizational-units/create-with-branches")]
+    public async Task<IActionResult> CreateWithBranches(
+    [FromBody] OrganizationalUnitCreateWithBranchesDtoRequest dto)
+    {
+        var result = await _orgUnitBusiness.CreateOrganizationalUnitWithBranchesAsync(dto);
+
+        return Ok(new
+        {
+            success = true,
+            message = "Unidad organizacional creada y asignada correctamente.",
+            data = result
+        });
+    }
+
+    [HttpPost("branches/assign")]
+    public async Task<IActionResult> AssignBranch([FromBody] OrganizationalUnitBranchDtoRequest dto)
+    {
+        var result = await _orgUnitBusiness.AddBranchToOrganizationalUnitAsync(dto);
+
+        return Ok(new
+        {
+            success = true,
+            message = "Branch asignada correctamente."
+        });
+    }
+
+    [HttpDelete("branches/remove")]
+    public async Task<IActionResult> RemoveBranch([FromBody] OrganizationalUnitBranchDtoRequest dto)
+    {
+        var result = await _orgUnitBusiness.RemoveBranchFromOrganizationalUnitAsync(dto);
+
+        return Ok(new
+        {
+            success = true,
+            message = "Branch removida correctamente de la unidad organizacional."
+        });
+    }
+
+    [HttpGet("{id:int}/detail")]
+    public async Task<IActionResult> GetDetail(int id)
+    {
+        var dto = await _orgUnitBusiness.GetByIdFullAsync(id);
+
+        return Ok(new
+        {
+            success = true,
+            message = "Entidad encontrada",
+            data = dto
+        });
+    }
+
+
+
 }

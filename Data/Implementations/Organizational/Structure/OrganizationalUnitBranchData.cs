@@ -24,6 +24,15 @@ namespace Data.Implementations.Organizational.Structure
                 .CountAsync(x => x.OrganizationUnitId == organizationalUnitId);
         }
 
+        public async Task<OrganizationalUnitBranch?> GetLinkAsync(int unitId, int branchId)
+        {
+            return await _context.OrganizationalUnitBranches
+                .FirstOrDefaultAsync(x =>
+                    x.OrganizationUnitId == unitId &&
+                    x.BranchId == branchId &&
+                    !x.IsDeleted);
+        }
+
 
     }
 }
