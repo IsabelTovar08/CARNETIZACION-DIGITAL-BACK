@@ -94,6 +94,30 @@ namespace Business.Services.Enums
                             })
                     );
 
+                case "modification-fields":
+                    return Task.FromResult(
+                        EnumExtensions.ToItems<ModificationField>()
+                            .Select(i => new EnumOptionDto
+                            {
+                                Id = i.Id,
+                                Name = i.Name,
+                                Acronym = null,
+                                Code = Enum.GetName(typeof(ModificationField), i.Id)
+                            })
+                    );
+
+                case "modification-reason":
+                    return Task.FromResult(
+                        EnumExtensions.ToItems<ModificationReason>()
+                            .Select(i => new EnumOptionDto
+                            {
+                                Id = i.Id,
+                                Name = i.Name,
+                                Acronym = null,
+                                Code = Enum.GetName(typeof(ModificationReason), i.Id)
+                            })
+                    );
+
                 default:
                     throw new ArgumentException($"Enum type '{enumType}' not supported.");
             }

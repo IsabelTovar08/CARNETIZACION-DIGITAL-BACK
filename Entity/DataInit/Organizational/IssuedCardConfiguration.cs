@@ -18,7 +18,7 @@ namespace Entity.DataInit.Organizational
                 {
                     Id = 1,
                     PersonId = 1,
-                    ProfileId = 1, // Estudiante
+                    SheduleId = 1, // Estudiante
                     InternalDivisionId = 1,
                     IsCurrentlySelected = true,
                     IsDeleted = false,
@@ -31,7 +31,7 @@ namespace Entity.DataInit.Organizational
                 {
                     Id = 2,
                     PersonId = 2,
-                    ProfileId = 2, // Profesor
+                    SheduleId = 2, // Profesor
                     InternalDivisionId = 1,
                     IsCurrentlySelected = true,
                     IsDeleted = false,
@@ -44,7 +44,7 @@ namespace Entity.DataInit.Organizational
                 {
                     Id = 3,
                     PersonId = 5,
-                    ProfileId = 2, // Profesor
+                    SheduleId = 2, // Profesor
                     InternalDivisionId = 1,
                     IsCurrentlySelected = true,
                     IsDeleted = false,
@@ -57,7 +57,7 @@ namespace Entity.DataInit.Organizational
                 {
                     Id = 4,
                     PersonId = 6,
-                    ProfileId = 2, // Profesor
+                    SheduleId = 2, // Profesor
                     InternalDivisionId = 1,
                     IsCurrentlySelected = true,
                     IsDeleted = false,
@@ -70,7 +70,7 @@ namespace Entity.DataInit.Organizational
                 {
                     Id = 5,
                     PersonId = 7,
-                    ProfileId = 2, // Profesor
+                    SheduleId = 2, // Profesor
                     InternalDivisionId = 1,
                     IsCurrentlySelected = true,
                     IsDeleted = false,
@@ -81,8 +81,15 @@ namespace Entity.DataInit.Organizational
                 }
             );
 
-            builder.HasIndex(p => new { p.PersonId, p.ProfileId, p.InternalDivisionId })
-                   .IsUnique();
+            builder.HasIndex(p => new { p.SheduleId, p.InternalDivisionId })
+                   .IsUnique(false);
+
+            builder.HasOne(x => x.Person)
+              .WithMany(x => x.IssuedCard)
+              .HasForeignKey(x => x.PersonId)
+              .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => x.PersonId).IsUnique(false);
 
             builder.Property(x => x.IsCurrentlySelected)
                    .HasDefaultValue(false);

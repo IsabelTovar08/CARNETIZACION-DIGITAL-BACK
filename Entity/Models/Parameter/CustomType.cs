@@ -18,9 +18,6 @@ namespace Entity.Models.Parameter
         public TypeCategory TypeCategory { get; set; }
 
 
-        public List<Notification>? Notifications { get; set; }
-        public List<Person>? PersonDocumentType { get; set; }
-        public List<Person>? PersonBlodType { get; set; }
         public List<Organization>? Organization { get; set; }
         public List<AccessPoint>? AccessPoints { get; set; }
 

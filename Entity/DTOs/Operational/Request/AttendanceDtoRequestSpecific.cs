@@ -6,24 +6,19 @@ namespace Entity.DTOs.Operational.Request
 {
     public class AttendanceDtoRequestSpecific : BaseDtoRequest
     {
-        [Required(ErrorMessage = "El identificador de la persona es obligatorio.")]
-        [Range(1, int.MaxValue, ErrorMessage = "El identificador de la persona debe ser un número entero mayor que 0.")]
-        public int PersonId { get; set; }
-
-        [Required(ErrorMessage = "La hora de registro es obligatoria.")]
-        public DateTime Time { get; set; }
-
-        [Range(1, int.MaxValue, ErrorMessage = "El identificador del punto de acceso debe ser un número entero mayor que 0.")]
-        public int? AccessPoint { get; set; }
+        /// <summary>
+        /// Se asigna automáticamente desde el token (no es obligatorio en la solicitud).
+        /// </summary>
+        public int PersonId { get; set; } // ✅ nullable para que Swagger no valide antes de tiempo
 
         /// <summary>
-        ///  Nueva propiedad para compatibilidad con la lógica existente.
-        /// Alias de AccessPoint, usada en Business y Controller.
+        /// Hora de registro (opcional, normalmente asignada por backend).
         /// </summary>
-        public int? AccessPointId
-        {
-            get => AccessPoint;
-            set => AccessPoint = value;
-        }
+        public DateTime? Time { get; set; } // ✅ también opcional, el backend usa DateTime.UtcNow
+
+        /// <summary>
+        /// Identificador del punto de acceso donde se registra la asistencia.
+        /// </summary>
+        public string? QrCodeKey { get; set; } = default!;
     }
 }

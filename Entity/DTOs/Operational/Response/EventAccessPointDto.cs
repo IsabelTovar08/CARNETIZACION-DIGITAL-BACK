@@ -16,5 +16,6 @@ namespace Entity.DTOs.Operational.Response
 
         //public DateTime CreationDate { get; set; }
         //public DateTime? UpdateDate { get; set; }
+        public string? QrCodeKey { get; set; }
     }
 }

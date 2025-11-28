@@ -1,19 +1,27 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System.Collections.Concurrent;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Web.Realtime.Hubs
 {
     public class NotificationHub : Hub
     {
-        // Enviar a un usuario específico
-        public async Task SendNotificationToUser(string userId, object notification)
+        private static readonly ConcurrentDictionary<int, string> _connections
+                = new ConcurrentDictionary<int, string>();
+
+        public override Task OnConnectedAsync()
         {
-            await Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            Console.WriteLine($"🔌 Cliente conectado: {Context.ConnectionId}");
+            return base.OnConnectedAsync();
         }
 
-        // Enviar a todos
-        public async Task SendNotificationToAll(object notification)
+        public Task RegisterConnection(int userId)
         {
-            await Clients.All.SendAsync("ReceiveNotification", notification);
+            _connections[userId] = Context.ConnectionId;
+            Console.WriteLine($"🔗 Usuario {userId} registrado con conexión {Context.ConnectionId}");
+            return Task.CompletedTask;
         }
+
+        public static string? GetConnection(int userId)
+            => _connections.TryGetValue(userId, out var conn) ? conn : null;
     }
 }

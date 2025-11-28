@@ -1,0 +1,16 @@
+<app-toolbar-section
+  title="Especialidades"
+  addLabel="Agregar"
+  addSubtitle="nueva"
+  [data]="dataSource"
+  [searchFields]="['name', 'description']"
+  (onAdd)="crear()"
+  (filteredData)="dataSourceFiltered = $event">
+</app-toolbar-section>
+
+<app-generic-table
+  [dataSource]="dataSourceFiltered"
+  [columns]="columns"
+  [columnDefs]="columnDefs"
+  (actionClicked)="onAction($event)">
+</app-generic-table>

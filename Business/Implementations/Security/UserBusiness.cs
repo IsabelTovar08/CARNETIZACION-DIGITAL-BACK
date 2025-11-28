@@ -1,15 +1,22 @@
 ﻿using AutoMapper;
 using Business.Classes.Base;
+using Business.Implementations.Organizational.Assignment;
+using Business.Interfaces.Auth;
+using Business.Interfaces.Organizational.Assignment;
 using Business.Interfaces.Security;
 using Business.Services.Auth;
 using Data.Classes.Specifics;
+using Data.Implementations.Organizational.Assignment;
 using Data.Interfases;
 using Data.Interfases.Security;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.DTOs;
 using Entity.DTOs.Auth;
 using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.ModelSecurity.Response;
+using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Specifics;
+using Entity.DTOs.Specifics.Cards;
 using Entity.Models;
 using Microsoft.Extensions.Logging;
 using Utilities.Exeptions;
@@ -23,14 +30,21 @@ namespace Business.Classes
         private readonly UserService _userService;
         public readonly IUserData _userData;
         private readonly IUserRoleBusiness _userRolBusiness;
+        private readonly IIssuedCardBusiness _issuedCardBusiness;
+        private readonly ICurrentUser _currentUser;
 
         // Constructor para inyectar dependencias
-        public UserBusiness(IUserData userData, ILogger<User> logger, IMapper mapper, UserService userService, IUserRoleBusiness userRolBusiness)
+        public UserBusiness(IUserData userData, ILogger<User> logger, IMapper mapper, UserService userService, IUserRoleBusiness userRolBusiness,
+            IIssuedCardBusiness issuedCardBusiness,
+            ICurrentUser currentUser
+            )
             : base(userData, logger, mapper)
         {
             _userData = userData;
             _userService = userService;
             _userRolBusiness = userRolBusiness;
+            _issuedCardBusiness = issuedCardBusiness;
+            _currentUser = currentUser;
         }
 
         // Validación del DTO
@@ -136,28 +150,58 @@ namespace Business.Classes
         }
 
 
+        /// <summary>
+        /// Devuelve información del usuario, incluyendo:
+        /// - CurrentProfile: carnet seleccionado con toda su información.
+        /// - OtherCards: lista de todos los demás carnets completos.
+        /// </summary>
         public async Task<UserMeDto?> GetByIdForMe(int userId, List<string> roles)
         {
-            // Define aquí qué roles SON "web" y NO deben traer perfil
+            // Determinar si los roles Web pueden traer perfil
             bool isWebRole = roles.Any(r =>
                 r.Equals("AdminOrg", StringComparison.OrdinalIgnoreCase) ||
                 r.Equals("Backoffice", StringComparison.OrdinalIgnoreCase) ||
                 r.Equals("AdminWeb", StringComparison.OrdinalIgnoreCase));
 
-            bool includeProfile = !isWebRole;
-
-            // Trae la entidad con o sin includes, según el rol
-            var user = await _userData.GetByIdForMeAsync(userId, true);
+            // Obtener usuario desde Data
+            User? user = await _userData.GetByIdForMeAsync(userId);
             if (user == null) return null;
 
-            // Mapeo completo con AutoMapper
+            // Mapear información base
             var dto = _mapper.Map<UserMeDto>(user);
 
-            // Por contrato: si es rol web, CurrentProfile debe ir null
-            if (!includeProfile) dto.CurrentProfile = null;
+            // Lista completa de IssuedCards del usuario
+            var issuedCards = user.Person.IssuedCard.ToList();
+
+            // Carnet seleccionado
+            var selectedCard = issuedCards.FirstOrDefault(ic => ic.IsCurrentlySelected);
+
+            // 1️⃣ CurrentProfile → solo si NO es rol Web
+            if (!isWebRole && selectedCard != null)
+            {
+                dto.CurrentProfile =
+                    await _issuedCardBusiness.GetCardDataByIssuedId(selectedCard.Id);
+            }
+            else
+            {
+                dto.CurrentProfile = null;
+            }
+
+            // 2️⃣ OtherCards → todos menos el seleccionado
+            dto.OtherCards = new List<CardUserData>();
+
+            foreach (var card in issuedCards.Where(c => !c.IsCurrentlySelected))
+            {
+                // Cargar información completa del carnet
+                var fullCardInfo = await _issuedCardBusiness.GetCardDataByIssuedId(card.Id);
+
+                if (fullCardInfo != null)
+                    dto.OtherCards.Add(fullCardInfo);
+            }
 
             return dto;
         }
+
 
         public async Task<User?> GetUserByIdAsync(int userId)
         {
@@ -214,6 +258,43 @@ namespace Business.Classes
                 _logger.LogError(ex, "Error al actualizar el perfil del usuario {UserId}", userId);
                 throw new ExternalServiceException("Base de datos", "No se pudo actualizar el perfil del usuario.");
             }
+        }
+
+
+
+        /// <summary>
+        /// Obtiene todos los usuarios que pertenecen a un rol específico.
+        /// </summary>
+        public async Task<IEnumerable<UserDTO>> GetUsersByRoleAsync(string roleName)
+        {
+            IEnumerable<User> users = await _userData.GetUsersByRoleAsync(roleName);
+
+            return _mapper.Map<IEnumerable<UserDTO>>(users);
+        }
+
+
+        /// <summary>
+        /// Consulta si el usuario tiene habilitada la autenticación en dos pasos.
+        /// Puede retornar null si no está configurado.
+        /// </summary>
+        public async Task<bool?> IsTwoFactorEnabledAsync(int userId)
+        {
+            return await _userData.IsTwoFactorEnabledAsync(userId);
+        }
+
+
+        /// <summary>
+        /// Alterna el estado del 2FA solo con el id del usuario
+        /// </summary>
+        public async Task<bool> ToggleTwoFactorAsync()
+        {
+            int userId = _currentUser.UserId;
+            var user = await _userData.GetByIdAsync(userId);
+
+            if (user == null)
+                throw new ValidationException("El usuario no existe");
+
+            return await _userData.ToggleTwoFactorAsync(userId);
         }
 
     }

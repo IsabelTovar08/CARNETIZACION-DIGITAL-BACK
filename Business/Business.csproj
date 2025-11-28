@@ -7,24 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Implementations\Organization\**" />
-    <EmbeddedResource Remove="Implementations\Organization\**" />
-    <None Remove="Implementations\Organization\**" />
+      <PackageReference Include="ClosedXML" Version="0.105.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+      <PackageReference Include="QRCoder" Version="1.6.0" />
+
+  
+      <PackageReference Include="SkiaSharp" Version="2.88.8" />
+      <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.8" />
+      <PackageReference Include="Svg.Skia" Version="2.0.0" />
+
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.105.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.7" />
-    <PackageReference Include="QRCoder" Version="1.6.0" />
-    <PackageReference Include="SkiaSharp" Version="3.119.1" />
-    <PackageReference Include="Svg.Skia" Version="3.2.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Entity\Entity.csproj" />
-    <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
 
 </Project>

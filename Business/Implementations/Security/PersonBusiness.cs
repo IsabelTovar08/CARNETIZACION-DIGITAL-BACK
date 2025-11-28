@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 using Utilities.Exeptions;
 using Utilities.Notifications.Implementations.Templates.Email;
 using ValidationException = Utilities.Exeptions.ValidationException;
+using static Utilities.Helpers.GeneratePassword;
 
 namespace Business.Classes
 {
@@ -67,9 +68,9 @@ namespace Business.Classes
                 if (await _data.ExistsByAsync(x => x.DocumentNumber, entity.DocumentNumber))
                     errors.Add(("DocumentNumber ", "El DocumentNumber ya está registrado."));
             }
-            if ((int)entity.DocumentTypeId <= 0)
+            if ((int)entity.DocumentType <= 0)
                 errors.Add(("Tipo de documento", "Debe seleccionar un Tipo de documento válido."));
-            if ((int)entity.BloodTypeId <= 0)
+            if ((int)entity.BloodType <= 0)
                 errors.Add(("Tipo de sangre", "Debe seleccionar un Tipo de sangre válido."));
             if ((int)entity.CityId <= 0)
                 errors.Add(("Ciudad", "Debe seleccionar una ciudad válida."));
@@ -96,19 +97,46 @@ namespace Business.Classes
         /// <summary>
         /// Crea una nueva entidad.
         /// </summary>
-        public override async Task<PersonDto> Save(PersonDtoRequest personDTO)
+        /// <summary>
+        /// Crea una nueva persona. Si createUser = true, también crea un usuario automáticamente.
+        /// </summary>
+        public async Task<PersonDto> Save(PersonDtoRequest personDTO)
         {
             try
             {
+                // Validación básica
                 Validate(personDTO);
 
+                // Validación de identificación única
                 await EnsureIdentificationIsUnique(personDTO.DocumentNumber);
 
+                // Si también debe crear el usuario
+                if (personDTO.CreateUser != null && personDTO.CreateUser == true)
+                {
+                    var wrapper = new PersonRegistrer
+                    {
+                        Person = personDTO,
+                        User = null // para que genere user automático
+                    };
+
+                    var result = await SavePersonAndUser(wrapper);
+
+                    _logger.LogInformation(
+                        "Persona + Usuario creados correctamente con ID Persona {Id} y Usuario {UserId}",
+                        result.Person.Id,
+                        result.User.Id
+                    );
+
+                    return result.Person;
+                }
+
+                // Caso normal: solo persona
                 var person = _mapper.Map<Person>(personDTO);
 
                 await ValidateAsync(person);
 
                 var created = await _data.SaveAsync(person);
+
                 await SendWelcomeNotifications(person, null);
 
                 _logger.LogInformation("Persona registrada correctamente con ID {Id}", created.Id);
@@ -121,10 +149,11 @@ namespace Business.Classes
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al crear el usuario.");
-                throw new ExternalServiceException("Base de datos", "No se pudo crear el usuario.");
+                _logger.LogError(ex, "Error al crear la persona.");
+                throw new ExternalServiceException("Base de datos", "No se pudo crear la persona.");
             }
         }
+
 
         private async Task EnsureIdentificationIsUnique(string identification)
         {
@@ -140,7 +169,21 @@ namespace Business.Classes
             await EnsureIdentificationIsUnique(personUser.Person.DocumentNumber);
 
             Person personEntity = _mapper.Map<Person>(personUser.Person);
-            User userEntity = _mapper.Map<User>(personUser.User);
+
+            User userEntity = new User();
+
+            if (personUser.User == null)
+            {
+                userEntity = new User
+                {
+                    UserName = personEntity.Email,
+                    Password = GenerateTempPassword()
+                };
+            }
+            else
+            {
+                userEntity = _mapper.Map<User>(personUser.User);
+            }
             (Person Person, User User) result = await _personData.SavePersonAndUser(personEntity, userEntity);
 
             // devuelve si se envió o no
@@ -274,12 +317,13 @@ namespace Business.Classes
 
             // 3) Subir y reemplazar, delegando en el servicio genérico
             var (publicUrl, storagePath) = await _assetUploader.UpsertAsync(
-                pathParts,
-                person.PhotoPath,             // previous path
-                fileStream,
-                contentType,
-                fileName
-            );
+                 pathParts,
+                 person.PhotoPath,
+                 fileStream,
+                 contentType,
+                 fileName,
+                 bucket: "people"
+             );
 
             // 4) Persistir cambios en entidad
             person.PhotoUrl = publicUrl;

@@ -16,10 +16,17 @@ namespace Web.Realtime.Dispatchers
             _hub = hub;
         }
 
-        public async Task SendToUserAsync(string userId, object notification)
+        public async Task SendToUserAsync(int userId, object notification)
         {
-            await _hub.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            var conn = NotificationHub.GetConnection(userId);
+
+            if (string.IsNullOrEmpty(conn))
+                return;
+
+            await _hub.Clients.Client(conn)
+                .SendAsync("ReceiveNotification", notification);
         }
+
 
         public async Task SendToAllAsync(object notification)
         {

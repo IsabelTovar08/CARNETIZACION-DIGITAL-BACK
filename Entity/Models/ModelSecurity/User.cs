@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Entity.Models.Base;
 using Entity.Models.ModelSecurity;
+using Entity.Models.Operational;
 using Entity.Models.Operational.BulkLoading;
 using Entity.Models.Organizational.Structure;
 
@@ -39,11 +40,12 @@ namespace Entity.Models
         //Este atributo lo que hace es guardar la fecha de los intentos de codigo
         public DateTimeOffset? TempCodeConsumedAt { get; set; }
         public DateTimeOffset? TempCodeResendBlockedUntil { get; set; }
-
+        public bool? TwoFactorEnabled { get; set; }
         public List<ImportBatch>? ImportBatches { get; set; } = new List<ImportBatch>();
+        public List<SupervisorsEvent> SupervisorsEvent { get; set; }
 
+        public int? OrganizationId { get; set; }   
+        public Organization? Organization { get; set; }
 
-        //public int OrganizationId { get; set; }
-        //public Organization Organization { get; set; } = default!;
     }
 }

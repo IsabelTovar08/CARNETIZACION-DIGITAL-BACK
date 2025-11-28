@@ -14,6 +14,7 @@ namespace Entity.DTOs.Specifics
         public string? Message { get; set; }
         public int? PersonId { get; set; }
         public string? PersonName { get; set; }
+        public string? Identification { get; set; }
         public int? PersonDivisionProfileId { get; set; }
         public int? CardId { get; set; }
         public bool UpdatedPhoto { get; set; }

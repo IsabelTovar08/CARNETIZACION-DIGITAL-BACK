@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Entity.DTOs.Base;
+using Utilities.Enums.Specifics;
 
 namespace Entity.DTOs.ModelSecurity.Request
 {
@@ -11,7 +12,7 @@ namespace Entity.DTOs.ModelSecurity.Request
         public string FirstName { get; set; } = string.Empty;
 
         [StringLength(100, ErrorMessage = "El segundo nombre no puede exceder los 100 caracteres.")]
-        [RegularExpression(@"(^$|^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$)", ErrorMessage = "El segundo nombre solo puede contener letras y espacios.")]
+        [RegularExpression(@"(^$|^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$)", ErrorMessage = "El segundo nombre solo puede conrstener letras y espacios.")]
         public string? MiddleName { get; set; }
 
         [Required(ErrorMessage = "El primer apellido es obligatorio.")]
@@ -24,14 +25,14 @@ namespace Entity.DTOs.ModelSecurity.Request
         public string? SecondLastName { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "El tipo de documento debe ser un número entero mayor que 0.")]
-        public int? DocumentTypeId { get; set; }
+        public DocumentType? DocumentTypeId { get; set; }
 
         [StringLength(10, ErrorMessage = "El número de documento no puede exceder los 10 caracteres.")]
         [RegularExpression(@"(^$|^[0-9A-Za-z\-]+$)", ErrorMessage = "El número de documento solo puede contener letras, números y guiones.")]
         public string? DocumentNumber { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "El tipo de sangre debe ser un número entero mayor que 0.")]
-        public int? BloodTypeId { get; set; }
+        public BloodType? BloodTypeId { get; set; }
 
         [StringLength(20, ErrorMessage = "El teléfono no puede exceder los 20 caracteres.")]
         [RegularExpression(@"(^$|^[0-9\+]+$)", ErrorMessage = "El teléfono solo puede contener números y el signo +.")]
@@ -49,6 +50,8 @@ namespace Entity.DTOs.ModelSecurity.Request
         [Required(ErrorMessage = "La ciudad es obligatoria.")]
         [Range(1, int.MaxValue, ErrorMessage = "El identificador de la ciudad debe ser un número entero mayor que 0.")]
         public int CityId { get; set; }
-
+        public string? PhotoUrl { get; set; }
+        public string? PhotoPath { get; set; }
+        public bool? CreateUser { get; set; } = false;
     }
 }

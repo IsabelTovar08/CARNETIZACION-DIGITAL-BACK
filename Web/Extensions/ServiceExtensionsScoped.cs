@@ -62,6 +62,7 @@ using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client.Extensions.Msal;
+using Utilities.Helpers;
 using Utilities.Helpers.Excel;
 using Utilities.Notifications.Implementations;
 using Web.Auth;
@@ -217,7 +218,7 @@ namespace Web.Extensions
 
             //Card
             services.AddScoped<ICardConfigurationData, CardConfigurationData>();
-            services.AddScoped<ICardBusiness, CardBusiness>();
+            services.AddScoped<ICardConfigurationBusiness, CardConfigurationBusiness>();
 
             //Card Templates
             services.AddScoped<ICardTemplateData, CardTemplateData>();
@@ -250,6 +251,10 @@ namespace Web.Extensions
             services.AddScoped<IUserVerificationService, UserVerificationService>();
 
 
+            //EventSchedule
+            services.AddScoped<IEventScheduleData, EventScheduleData>();
+            services.AddScoped<IEventScheduleBusiness, EventScheduleBusiness>();
+
 
             //Enums
             services.AddScoped<IEnumCatalogService, EnumCatalogService>();
@@ -274,6 +279,7 @@ namespace Web.Extensions
             services.AddScoped<ICurrentUser, CurrentUser>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IDeviceInfoService, DeviceInfoService>();
 
 
             // PDF Y EXCEL
@@ -281,8 +287,19 @@ namespace Web.Extensions
             services.AddScoped<IExportService, ExportService>();
 
             services.AddHttpClient<ICardPdfService, CardPdfService>();
+            services.AddHttpClient<ICardPdfService, CardPdfService>()
+            .ConfigureHttpClient(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(20);
+                client.DefaultRequestHeaders.Add("User-Agent", "CardPdfService");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AllowAutoRedirect = true,
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+            });
 
-
+            services.AddScoped<IAttendanceNotifier, AttendanceNotifier>();
 
             services.AddSignalR();
 

@@ -9,5 +9,7 @@ namespace Data.Interfases.Organizational.Structure
 {
     public interface IOrganizationData : ICrudBase<Organization>
     {
+        Task<Organization?> GetOrganizationByPersonId(int userId);
+        Task<bool> UpdateOrganizationAsync(Organization organization);
     }
 }

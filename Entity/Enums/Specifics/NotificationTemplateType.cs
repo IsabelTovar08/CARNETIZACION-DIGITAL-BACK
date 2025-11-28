@@ -18,8 +18,12 @@ namespace Entity.Enums.Specifics
         EventReminder,
         EventAttendance,
         ModificationRequest,
+        ModificationSent,
         ModificationApproved,
         ModificationRejected,
-        CardGenerated
+        CardGenerated,
+        Login,
+        AttendanceEntry,
+        AttendanceExit
     }
 }

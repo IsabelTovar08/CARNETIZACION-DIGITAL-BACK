@@ -46,65 +46,34 @@ namespace Web.Controllers.ModelSecurity
         [ProducesResponseType(typeof(ApiResponse<LoginStep1ResponseDto>), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<LoginStep1ResponseDto>), (int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(ApiResponse<LoginStep1ResponseDto>), 500)]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (!ModelState.IsValid)
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+            var result = await _authService.LoginWithTwoFactorFlowAsync(request, ip);
+
+            if (!result.RequiresTwoFactor)
             {
-                return BadRequest(new ApiResponse<LoginStep1ResponseDto>
-                {
-                    Success = false,
-                    Message = "Solicitud inválida.",
-                    Data = null
-                });
-            }
-
-            try
-            {
-                var user = await _authService.LoginAsync(request);
-                if (user is null)
-                {
-                    return Unauthorized(new ApiResponse<LoginStep1ResponseDto>
-                    {
-                        Success = false,
-                        Message = "Credenciales inválidas.",
-                        Data = null
-                    });
-                }
-
-                await _verifier.GenerateAndSendAsync(user);
-
-                return Ok(new ApiResponse<LoginStep1ResponseDto>
+                return Ok(new ApiResponse<AuthTokens>
                 {
                     Success = true,
-                    Message = "El código fue enviado exitosamente a tu correo.",
-                    Data = new LoginStep1ResponseDto
-                    {
-                        isFirtsLogin = user.Active,
-                        UserId = user.Id
-                    }
+                    Message = "Inicio de sesión exitoso.",
+                    Data = result.Tokens
                 });
             }
-            catch (Utilities.Exeptions.ValidationException ex)
+
+            return Ok(new ApiResponse<LoginStep1ResponseDto>
             {
-                _logger.LogWarning(ex, "Validación en /login para {Email}", request.Email);
-                return BadRequest(new ApiResponse<LoginStep1ResponseDto>
+                Success = true,
+                Message = "Se envió el código de verificación.",
+                Data = new LoginStep1ResponseDto
                 {
-                    Success = false,
-                    Message = ex.Message,
-                    Data = null
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error inesperado en /login");
-                return StatusCode(500, new ApiResponse<LoginStep1ResponseDto>
-                {
-                    Success = false,
-                    Message = "No se pudo enviar el código, revisa los datos ingresados o vuelve a intentarlo.",
-                    Data = null
-                });
-            }
+                    isFirtsLogin = result.IsFirstLogin,
+                    UserId = result.UserId!.Value
+                }
+            });
         }
+
 
         /// <summary>
         /// 2) Verify code and issue Access/Refresh tokens.
@@ -119,7 +88,7 @@ namespace Web.Controllers.ModelSecurity
                 return BadRequest(new ApiResponse<AuthTokens> { Success = false, Message = result.Error });
 
             // Cargar usuario solo si fue exitoso (1 sola lectura si quieres: puedes mover el GenerateToken al servicio)
-            var user = await _userBusiness.GetById(dto.UserId);
+            UserDTO? user = await _userBusiness.GetById(dto.UserId);
             var (accessToken, jti) = _jwtService.GenerateToken(user.Id.ToString(), user.UserName ?? user.EmailPerson);
 
             AuthTokens pair = await _refreshTokenService.IssueAsync(
@@ -128,6 +97,12 @@ namespace Web.Controllers.ModelSecurity
                 jti: jti,
                 ip: HttpContext.Connection.RemoteIpAddress?.ToString()
             );
+
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName ?? user.EmailPerson));
+            HttpContext.User = new ClaimsPrincipal(identity);
+            await _authService.NotifyLogin(user.NamePerson, user.Id);
 
             return Ok( pair );
         }

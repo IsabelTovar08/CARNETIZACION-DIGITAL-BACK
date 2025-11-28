@@ -10,7 +10,7 @@ namespace Entity.Models.Organizational.Assignment
     /// Define la configuración base de un conjunto de carnets.
     /// Contiene la plantilla, vigencia y reglas generales.
     /// </summary>
-    public class CardConfiguration : BaseModel
+    public class CardConfiguration : GenericModel
     {
         /// <summary>Fecha desde la cual los carnets bajo esta configuración son válidos.</summary>
         public DateTime ValidFrom { get; set; }
@@ -23,7 +23,7 @@ namespace Entity.Models.Organizational.Assignment
         public CardTemplate CardTemplate { get; set; }
 
         /// <summary>Horario o tipo de emisión asociado.</summary>
-        public int SheduleId { get; set; }
-        public Schedule Shedule { get; set; }
+        public int ProfileId { get; set; }
+        public Profiles Profile { get; set; }
     }
 }

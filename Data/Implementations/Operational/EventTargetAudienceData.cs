@@ -30,5 +30,16 @@ namespace Data.Implementations.Operational
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteByEventIdAsync(int eventId)
+        {
+            var audiences = _context.EventTargetAudiences.Where(a => a.EventId == eventId);
+            if (audiences.Any())
+            {
+                _context.EventTargetAudiences.RemoveRange(audiences);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+
     }
 }

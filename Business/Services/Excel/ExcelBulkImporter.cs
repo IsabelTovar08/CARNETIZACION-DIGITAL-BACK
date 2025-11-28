@@ -33,7 +33,7 @@ namespace Business.Services.Excel
         private readonly IExcelPersonParser _parser;
         private readonly IPersonBusiness _personBusiness;
         private readonly IIssuedCardBusiness _pdpBusiness;
-        private readonly ICardBusiness _cardBusiness;
+        private readonly ICardConfigurationBusiness _cardBusiness;
         private readonly ICardTemplateBusiness _templateBusiness;
         private readonly IUnitOfWork _uow;
         private readonly IImportHistoryBusiness _history;
@@ -48,7 +48,7 @@ namespace Business.Services.Excel
             IExcelPersonParser parser,
             IPersonBusiness personBusiness,
             IIssuedCardBusiness pdpBusiness,
-            ICardBusiness cardBusiness,
+            ICardConfigurationBusiness cardBusiness,
             ICardTemplateBusiness templateBusiness,
             IUnitOfWork uow,
             IImportHistoryBusiness history,
@@ -87,19 +87,26 @@ namespace Business.Services.Excel
             // Metadatos
             var fileName = _excel.GetFileName(excelStream);
             int startedBy = _currentUser.UserId;
+            int cardConfigId = 0;
 
-            // Crear la configuración base (Card) — solo una vez
-            var cardConfig = await _cardBusiness.Save(new CardConfigurationDtoRequest
+            if (ctx.CardConfigurationId != null)
             {
-                CreationDate = ctx.ValidFrom,
-                ExpirationDate = ctx.ValidTo,
-                CardTemplateId = ctx.CardTemplateId,
-                StatusId = 1,
-                SheduleId = 1
-            });
+                cardConfigId = ctx.CardConfigurationId ?? 0;
+            }
+            else 
+            {
+                // Crear la configuración base (Card) 
+                var cardConfig = await _cardBusiness.Save(new CardConfigurationDtoRequest
+                {
+                    ValidFrom = ctx.ValidFrom,
+                    ValidTo = ctx.ValidTo,
+                    CardTemplateId = ctx.CardTemplateId,
+                    ProfileId = ctx.ProfileId,
+                    Name = ctx.CardConfigurationName
+                });
 
-            var cardConfigId = cardConfig.Id;
-            var template = await _templateBusiness.GetById(ctx.CardTemplateId);
+                cardConfigId = cardConfig.Id;
+            }
 
             // Guardar registro del batch
             var ctxJson = JsonSerializer.Serialize(new
@@ -113,7 +120,8 @@ namespace Business.Services.Excel
                 ctx.ProfileId,
                 ctx.CardTemplateId,
                 ctx.ValidFrom,
-                ctx.ValidTo
+                ctx.ValidTo,
+                ctx.CardConfigurationId
             });
 
             var batchId = await _history.StartBatchAsync(new ImportBatchStartDto
@@ -161,7 +169,7 @@ namespace Business.Services.Excel
                     {
                         PersonId = personId.Value,
                         InternalDivisionId = ctx.InternalDivisionId,
-                        ProfileId = ctx.ProfileId,
+                        SheduleId = ctx.SheduleId,
                         isCurrentlySelected = true,
                         CardId = cardConfigId,
                         StatusId = 1
@@ -176,41 +184,6 @@ namespace Business.Services.Excel
                         var photo = await _personBusiness.UpsertPersonPhotoAsync(personId.Value, ms, contentType, $"excel-upload{ext}");
                         rowRes.UpdatedPhoto = true;
                         personCreated.Person.PhotoUrl = contentType;
-                    }
-
-                    /// <summary>
-                    /// Genera el PDF en memoria, lo convierte a Base64 y lo guarda en la base de datos.
-                    /// </summary>
-                    try
-                    {
-                        var userData = new CardUserData
-                        {
-                            Name = $"{row.Person.FirstName} {row.Person.MiddleName} {row.Person.LastName} {row.Person.SecondLastName}",
-                            Email = row.Person.Email,
-                            PhoneNumber = row.Person.Phone ?? "",
-                            CardId = pdpSaved.UniqueId.ToString(),
-                            Profile = ctx.ProfileId.ToString(),
-                            CategoryArea = ctx.InternalDivisionCode ?? "",
-                            CompanyName = ctx.OrganizationCode ?? "",
-                            UserPhotoUrl = personCreated.Person.PhotoUrl ?? "",
-                            LogoUrl = "https://carnetgo.com/logo.png",
-                            QrUrl = pdpSaved.QRCode
-                        };
-
-                        // Crear stream del PDF en memoria
-                        using var pdfStream = new MemoryStream();
-                        await _cardPdfService.GenerateCardAsync(template, userData, pdfStream);
-                        pdfStream.Position = 0;
-
-                        // Convertir el PDF en Base64
-                        string base64Pdf = Convert.ToBase64String(pdfStream.ToArray());
-
-                        // Guardar en la entidad (por ejemplo en un campo PdfBase64)
-                        await _pdpBusiness.UpdatePdfUrlAsync(pdpId.Value, base64Pdf);
-                    }
-                    catch (Exception pdfEx)
-                    {
-                        _logger.LogWarning(pdfEx, "Error generando PDF para PDP {PdpId}", pdpId);
                     }
 
 
@@ -284,7 +257,8 @@ namespace Business.Services.Excel
             await _notificationsBusiness.SendTemplateAsync(
                 NotificationTemplateType.BulkImportSuccess,
                 parsed.Count,
-                fileName
+                fileName,
+                batchId
             );
 
             return result;

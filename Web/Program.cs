@@ -19,6 +19,14 @@ namespace Web
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
 
+            // CONFIGURAR LOGGING EXPLÍCITO PARA CONSOLE Y DEBUG
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
+
+            // Ajustar niveles para ver más detalle
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
+
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -68,6 +76,9 @@ namespace Web
             // servicios y data
             builder.Services.AddProjectServices();
             builder.Services.AddCorsConfiguration(configuration);
+
+            //Servicio en segundo plano para auto-finalizar eventos
+            builder.Services.AddHostedService<Business.Services.Events.EventAutoFinalizerService>();
 
             // Automapper
             builder.Services.AddAutoMapper(typeof(Utilities.Helper.MappingProfile));
@@ -136,7 +147,7 @@ namespace Web
                 }
             }
 
-            // 👇 Función auxiliar para ejecutar comandos dotnet dentro del contenedor
+            //  Función auxiliar para ejecutar comandos dotnet dentro del contenedor
             static void RunMigrationCommand(string command)
             {
                 var process = new System.Diagnostics.Process
@@ -164,13 +175,14 @@ namespace Web
 
 
             app.MapHub<NotificationHub>("/hubs/notifications");
+            app.MapHub<AttendanceHub>("/hubs/attendance");
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseHttpsRedirection();
-            app.UseCors();
+            app.UseRouting(); 
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

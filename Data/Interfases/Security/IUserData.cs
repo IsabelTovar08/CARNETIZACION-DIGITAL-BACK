@@ -24,7 +24,24 @@ namespace Data.Interfases.Security
         //Task<UserMeDto?> GetMeMinimalAsync(int userId);      
         //Task<UserMeDto?> GetMeWithProfileAsync(int userId);
 
-        Task<User?> GetByIdForMeAsync(int userId, bool includeProfile);
+        Task<User?> GetByIdForMeAsync(int userId);
         Task<User?> GetByIdWithPersonAsync(int userId);
+
+        /// <summary>
+        /// Devuelve todos los usuarios que tengan asignado el rol especificado.
+        /// </summary>
+        Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName);
+
+        /// <summary>
+        /// Retorna el estado de autenticación en dos pasos del usuario (nullable).
+        /// </summary>
+        Task<bool?> IsTwoFactorEnabledAsync(int userId);
+
+        /// <summary>
+        /// Cambia el estado del 2FA para un usuario
+        /// </summary>
+        Task<bool> ToggleTwoFactorAsync(int userId);
+
+
     }
 }

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utilities.Enums.Specifics;
 
 namespace Entity.DTOs.Notifications.Request
 {
@@ -16,9 +17,12 @@ namespace Entity.DTOs.Notifications.Request
         [Required]
         [MaxLength(1000)]
         public string Message { get; set; }
+        public string? RedirectUrl { get; set; }
+        public int? UserId { get; set; }
+
 
         [Required]
-        public int NotificationTypeId { get; set; }
+        public NotificationType NotificationType { get; set; }
 
     }
 }

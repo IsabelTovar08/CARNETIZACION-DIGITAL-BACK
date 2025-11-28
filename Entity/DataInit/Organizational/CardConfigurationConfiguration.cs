@@ -17,8 +17,9 @@ namespace Entity.DataInit.Organizational
                 new CardConfiguration
                 {
                     Id = 1,
+                    Name = "Default Card",
                     IsDeleted = false,
-                    SheduleId = 1,
+                    ProfileId = 1,
                     CardTemplateId = 1,
                     ValidFrom = DateTime.SpecifyKind(new DateTime(2025, 7, 27, 10, 0, 0), DateTimeKind.Utc),
                     ValidTo = DateTime.SpecifyKind(new DateTime(2027, 7, 27, 10, 0, 0), DateTimeKind.Utc)

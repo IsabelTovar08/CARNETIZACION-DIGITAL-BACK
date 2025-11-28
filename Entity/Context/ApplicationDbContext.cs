@@ -89,6 +89,7 @@ namespace Entity.Context
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<AccessPoint> AccessPoints { get; set; }
         public DbSet<EventAccessPoint> EventAccessPoints { get; set; }
+        public DbSet<EventSchedule> EventSchedules { get; set; }
 
         //Others
         public DbSet<Status> Statuses { get; set; }
@@ -99,6 +100,11 @@ namespace Entity.Context
         public DbSet<ImportBatchRow> ImportBatchRows { get; set; }
 
         public DbSet<CardTemplate> CardTemplates { get; set; }
+
+        public DbSet<ModificationRequest> modificationRequests { get; set; }
+        public DbSet<SupervisorsEvent> SupervisorsEvents { get; set; }
+
+
 
         /// <summary>
         /// Configura los modelos de la base de datos aplicando configuraciones desde ensamblados.
@@ -134,10 +140,10 @@ namespace Entity.Context
                 .HavePrecision(18, 2);
 
             configurationBuilder
-        .Properties<DateTime>()
-        .HaveConversion<DateTimeToUtcConverter>()   // 👈 usamos un conversor genérico
-        .HaveColumnType("timestamp with time zone");
-
+                .Properties<DateTime>()
+                .HaveConversion<DateTimeToUtcConverter>()   //usamos un conversor genérico
+                 //.HaveColumnType("timestamp with time zone");
+                .HaveColumnType("datetime2");
 
             // Manejo de DateOnly (si se usa)
             configurationBuilder

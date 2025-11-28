@@ -11,7 +11,7 @@ namespace Business.Interfaces.Notifications
     /// </summary>
     public interface INotificationDispatcher
     {
-        Task SendToUserAsync(string userId, object notification);
+        Task SendToUserAsync(int userId, object notification);
         Task SendToAllAsync(object notification);
     }
 }

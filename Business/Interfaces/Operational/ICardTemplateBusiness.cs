@@ -12,5 +12,11 @@ namespace Business.Interfaces.Operational
 {
     public interface ICardTemplateBusiness : IBaseBusiness<CardTemplate, CardTemplateRequest, CardTemplateResponse>
     {
+        /// <summary>
+        /// Obtiene el CardTemplate asociado a un CardConfiguration específico.
+        /// </summary>
+        /// <param name="cardConfigurationId">Identificador del CardConfiguration.</param>
+        /// <returns>Entidad CardTemplate encontrada.</returns>
+        Task<CardTemplateResponse> GetTemplateByCardConfigurationId(int cardConfigurationId);
     }
 }

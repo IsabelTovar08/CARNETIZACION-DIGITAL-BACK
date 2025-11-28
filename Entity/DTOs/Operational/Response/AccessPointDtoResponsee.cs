@@ -16,7 +16,10 @@ namespace Entity.DTOs.Operational.Response
         public int TypeId { get; set; }
         public string? Type { get; set; }
 
-        // NUEVO: expone el QR
-        public string? QrCode { get; set; }
+        //// NUEVO: expone el QR
+        public string? QrCodeKey { get; set; }
+
+       
+        public string? Code { get; set; }
     }
 }

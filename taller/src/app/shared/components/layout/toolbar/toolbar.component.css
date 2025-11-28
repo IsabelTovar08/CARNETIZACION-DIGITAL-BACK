@@ -1,0 +1,29 @@
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 1rem;
+}
+
+.toolbar-title {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.menu-button {
+  margin-right: 1rem;
+}
+
+/* 🔹 En pantallas grandes el botón del menú no se muestra */
+@media (min-width: 769px) {
+  .menu-button {
+    display: none;
+  }
+}

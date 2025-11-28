@@ -1,4 +1,4 @@
-﻿using Entity.Models.Base;
+﻿    using Entity.Models.Base;
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using Entity.Models.Parameter;
@@ -21,10 +21,6 @@ namespace Entity.Models.Organizational
         // Navegaciones: NULLABLE y SIN inicializar (para que EF NO inserte Event/CustomType en blanco)
         //public Event? Event { get; set; }
         public CustomType? AccessPointType { get; set; }
-
-        // Si AttendanceConfiguration usa WithMany(ap => ap.AttendancesEntry/Exit)
-        public ICollection<Attendance> AttendancesEntry { get; set; } = new List<Attendance>();
-        public ICollection<Attendance> AttendancesExit { get; set; } = new List<Attendance>();
 
         public ICollection<EventAccessPoint> EventAccessPoints { get; set; } = new List<EventAccessPoint>();
     }

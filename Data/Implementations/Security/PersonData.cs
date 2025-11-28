@@ -26,12 +26,16 @@ namespace Data.Classes.Specifics
             _userData = userData;
         }
 
+        // NUEVO MÉTODO (para AttendanceBusiness)
+        public IQueryable<Person> GetQueryable()
+        {
+            return _context.Set<Person>().AsQueryable();
+        }
+
         public override async Task<IEnumerable<Person>> GetAllAsync()
         {
             return await _context.Set<Person>()
                 .Include(p => p.City)
-                .Include(p => p.DocumentType)
-                .Include(p => p.BloodType)
                 .ToListAsync();
         }
 
@@ -45,12 +49,23 @@ namespace Data.Classes.Specifics
         public async Task<Person?> GetPersonInfo(int id)
         {
             return await _context.Set<Person>()
+                // Relaciones base necesarias para el DTO
+                .Include(p => p.City)
+                .Include(p => p.DocumentType)
+                .Include(p => p.BloodType)
+
+                // IssuedCard filtrado por el carnet actualmente seleccionado y sus caminos
                 .Include(u => u.IssuedCard.Where(up => up.IsCurrentlySelected))
                     .ThenInclude(pdp => pdp.InternalDivision)
-                        .ThenInclude(id => id.OrganizationalUnit)
+                        .ThenInclude(idiv => idiv.OrganizationalUnit)
                             .ThenInclude(ou => ou.OrganizationalUnitBranches)
                                 .ThenInclude(oub => oub.Branch)
                                     .ThenInclude(b => b.Organization)
+
+                // También incluir la entidad Card para que HasCard funcione correctamente
+                .Include(u => u.IssuedCard.Where(up => up.IsCurrentlySelected))
+                    .ThenInclude(pdp => pdp.Card)
+
                 .Where(u => !u.IsDeleted)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -80,7 +95,6 @@ namespace Data.Classes.Specifics
             }
             catch
             {
-                // Revertir cambios si hay error
                 if (!hasAmbientTx)
                     await _context.Database.RollbackTransactionAsync();
                 throw;
@@ -138,19 +152,15 @@ namespace Data.Classes.Specifics
         {
             var q = _context.Set<Person>()
                 .AsNoTracking()
-                // Incluir relaciones relevantes
                 .Include(p => p.IssuedCard)
                     .ThenInclude(pdp => pdp.InternalDivision)
                         .ThenInclude(id => id.OrganizationalUnit)
                 .Include(p => p.IssuedCard)
+                    .ThenInclude(pdp => pdp.Card)
                     .ThenInclude(pdp => pdp.Profile)
-                .Include(p => p.IssuedCard)
-                    .ThenInclude(pdp => pdp.Card) // carnet singular
-                                                  // Reglas de negocio
                 .Where(p => !p.IsDeleted)
                 .Where(p => p.IssuedCard.Any(pdp => pdp.Card != null));
 
-            // Filtros opcionales
             if (internalDivisionId.HasValue)
                 q = q.Where(p => p.IssuedCard
                     .Any(pdp => pdp.InternalDivisionId == internalDivisionId.Value));
@@ -161,17 +171,14 @@ namespace Data.Classes.Specifics
 
             if (profileId.HasValue)
                 q = q.Where(p => p.IssuedCard
-                    .Any(pdp => pdp.ProfileId == profileId.Value));
+                    .Any(pdp => pdp.Card.ProfileId == profileId.Value));
 
-            // Total antes de paginar
             int total = await q.CountAsync(ct);
 
-            // Paginación defensiva
             page = page <= 0 ? 1 : page;
             pageSize = pageSize <= 0 ? 20 : pageSize;
             int skip = (page - 1) * pageSize;
 
-            // Orden básico (alfabético por nombre completo)
             var items = await q
                 .OrderBy(p => p.FirstName)
                 .ThenBy(p => p.LastName)

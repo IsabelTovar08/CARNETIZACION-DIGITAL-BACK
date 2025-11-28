@@ -1,12 +1,13 @@
-﻿using Data.Classes.Base;
+﻿using System.Security.Cryptography;
+using Data.Classes.Base;
 using Data.Interfases;
 using Data.Interfases.Security;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.Context;
 using Entity.Models;
 using Entity.Models.ModelSecurity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
 using Utilities.Helper;
 using Utilities.Helpers;
 using static Utilities.Helper.EncryptedPassword;
@@ -28,6 +29,14 @@ namespace Data.Classes.Specifics
                 .ToListAsync();
         }
 
+        public async override Task<User?> GetByIdAsync(int id)
+        {
+            return await _context.Set<User>()
+                .Include(u => u.Person)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Rol)
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
 
         public async Task<List<string>> GetUserRolesByIdAsync(int userId)
         {
@@ -39,33 +48,31 @@ namespace Data.Classes.Specifics
             return user?.UserRoles.Select(ur => ur.Rol.Name).ToList() ?? new List<string>();
         }
 
-        public async Task<User?> GetByIdForMeAsync(int userId, bool includeProfile)
+        /// <summary>
+        /// Obtiene un usuario por Id con sus carnets:
+        /// - El seleccionado (IsCurrentlySelected)
+        /// - Los demás
+        /// </summary>
+        public async Task<User?> GetByIdForMeAsync(int userId)
         {
-            var query = _context.Users
-                .AsNoTrackingWithIdentityResolution() // <- permite fix-up sin tracking
+            return await _context.Users
+                .AsNoTrackingWithIdentityResolution()
                 .Where(u => u.Id == userId && !u.IsDeleted)
-                // Roles / Permisos
+
+                // Roles
                 .Include(u => u.UserRoles)
                     .ThenInclude(ur => ur.Rol)
                         .ThenInclude(r => r.RolFormPermissions)
                             .ThenInclude(rp => rp.Permission)
-                .AsQueryable();
 
-            if (includeProfile)
-            {
-                query = query
-                    // Person + City desde el root (NO volver a Person desde PDP)
-                    .Include(u => u.Person)
-                        .ThenInclude(p => p.City)
+                // Person + City
+                .Include(u => u.Person)
+                    .ThenInclude(p => p.City)
 
-                    // Solo el perfil actual y sus dependencias HACIA ADELANTE
-                    .Include(u => u.Person.IssuedCard.Where(pdp => pdp.IsCurrentlySelected))
-                        .ThenInclude(pdp => pdp.Profile)
-                    .Include(u => u.Person.IssuedCard.Where(pdp => pdp.IsCurrentlySelected))
-                        .ThenInclude(pdp => pdp.InternalDivision); 
-            }
+                // Todos los IssuedCards, pero SIN profile completo
+                .Include(u => u.Person.IssuedCard)
 
-            return await query.FirstOrDefaultAsync();
+                .FirstOrDefaultAsync();
         }
 
 
@@ -184,6 +191,57 @@ namespace Data.Classes.Specifics
                 .Include(u => u.Person)
                 .Select(u => u.Person)
                 .FirstOrDefaultAsync();
+        }
+
+
+        /// <summary>
+        /// Obtiene todos los usuarios que tienen asignado un rol específico (por nombre del rol).
+        /// </summary>
+        public async Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName)
+        {
+            if (string.IsNullOrWhiteSpace(roleName))
+                return Enumerable.Empty<User>();
+
+            return await _context.Users
+                .Where(u => !u.IsDeleted &&
+                            u.UserRoles.Any(ur => ur.Rol.Name.ToLower() == roleName.ToLower()))
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Rol)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+
+        /// <summary>
+        /// Retorna el estado de autenticación en dos pasos del usuario (nullable).
+        /// </summary>
+        public async Task<bool?> IsTwoFactorEnabledAsync(int userId)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(x => x.Id == userId)
+                .Select(x => x.TwoFactorEnabled)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Alterna el valor actual de TwoFactorEnabled para un usuario
+        /// </summary>
+        public async Task<bool> ToggleTwoFactorAsync(int userId)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+
+            if (user == null)
+                return false;
+
+            // Alternar estado
+            user.TwoFactorEnabled = !(user.TwoFactorEnabled ?? false);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
     }

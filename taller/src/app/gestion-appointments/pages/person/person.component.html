@@ -1,0 +1,16 @@
+<app-toolbar-section
+  title="Personas"
+  addLabel="Agregar"
+  addSubtitle="nuevo registro"
+  [data]="dataSource"
+  [searchFields]="['firstName', 'lastName', 'identification', 'phoneNumber']"
+  (onAdd)="crear()"
+  (filteredData)="dataSourceFiltered = $event">
+</app-toolbar-section>
+
+<app-generic-table
+  [dataSource]="dataSourceFiltered"
+  [columns]="columns"
+  [columnDefs]="columnDefs"
+  (actionClicked)="onAction($event)">
+</app-generic-table>

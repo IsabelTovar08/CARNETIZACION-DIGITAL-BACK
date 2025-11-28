@@ -2,7 +2,6 @@
 using Entity.Models.ModelSecurity;
 using Entity.Models.Organizational.Structure;
 using Entity.Models.Parameter;
-using System;
 
 namespace Entity.Models.Organizational.Assignment
 {
@@ -15,8 +14,8 @@ namespace Entity.Models.Organizational.Assignment
         public int PersonId { get; set; }
         public Person Person { get; set; }
 
-        public int ProfileId { get; set; }
-        public Profiles Profile { get; set; }
+        public int SheduleId { get; set; }
+        public Schedule Shedule { get; set; }
 
         public int InternalDivisionId { get; set; }
         public InternalDivision InternalDivision { get; set; }
@@ -31,7 +30,7 @@ namespace Entity.Models.Organizational.Assignment
 
         /// <summary>Referencia a la configuración base del carnet.</summary>
         public int CardId { get; set; }
-        public CardConfiguration Card { get; set; }
+        public CardConfiguration? Card { get; set; }
 
         /// <summary>Estado del carnet personal (Activo, Revocado, etc.)</summary>
         public int StatusId { get; set; }
