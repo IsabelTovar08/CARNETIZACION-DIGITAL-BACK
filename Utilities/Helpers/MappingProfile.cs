@@ -212,10 +212,26 @@ namespace Utilities.Helper
 
             //IssuedCard
             CreateMap<IssuedCard, IssuedCardDto>()
-                .ForMember(dest => dest.PersonName, opt => opt.MapFrom(src => src.Person.FirstName + " " + src.Person.LastName))
-                .ForMember(dest => dest.DivisionName, opt => opt.MapFrom(src => src.InternalDivision.Name))
-                .ForMember(dest => dest.ProfileName, opt => opt.MapFrom(src => src.Card.Profile.Name))
-                .ReverseMap();
+     .ForMember(dest => dest.PersonName,
+         opt => opt.MapFrom(src =>
+             (src.Person != null
+                 ? $"{src.Person.FirstName} {src.Person.LastName}"
+                 : string.Empty)
+         ))
+     .ForMember(dest => dest.DivisionName,
+         opt => opt.MapFrom(src =>
+             src.InternalDivision != null
+                 ? src.InternalDivision.Name
+                 : string.Empty
+         ))
+     .ForMember(dest => dest.ProfileName,
+         opt => opt.MapFrom(src =>
+             src.Card != null && src.Card.Profile != null
+                 ? src.Card.Profile.Name
+                 : string.Empty
+         ))
+     .ReverseMap();
+
 
             CreateMap<IssuedCard, IssuedCardDtoRequest>()
                 .ReverseMap();
@@ -509,12 +525,37 @@ namespace Utilities.Helper
             CreateMap<Attendance, AttendanceDtoRequest>().ReverseMap();
 
             CreateMap<Attendance, AttendanceDtoResponse>()
-                .ForMember(dest => dest.PersonFullName, opt => opt.MapFrom(src => src.Person != null ? src.Person.FirstName + " " + src.Person.MiddleName + " " + src.Person.LastName + " " + src.Person.SecondLastName : string.Empty))
-                .ForMember(dest => dest.AccessPointEntryId, opt => opt.MapFrom(src => src.EventAccessPointEntry.AccessPoint.Id))
-                .ForMember(dest => dest.AccessPointExitId, opt => opt.MapFrom(src => src.EventAccessPointExit.AccessPoint.Id))
-                .ForMember(dest => dest.AccessPointOfEntryName, opt => opt.MapFrom(src =>  src.EventAccessPointEntry.AccessPoint.Name))
-                .ForMember(dest => dest.AccessPointOfExitName, opt => opt.MapFrom(src => src.EventAccessPointExit.AccessPoint.Name))
-                .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.EventAccessPointEntry.Event.Name));
+                .ForMember(dest => dest.PersonFullName,
+                    opt => opt.MapFrom(src => ($"{src.Person.FirstName} {src.Person.MiddleName} {src.Person.LastName} {src.Person.SecondLastName}".Trim())))
+                .ForMember(dest => dest.AccessPointEntryId,
+                    opt => opt.MapFrom(src => src.EventAccessPointEntry != null
+                        ? src.EventAccessPointEntry.AccessPoint != null
+                            ? (int?)src.EventAccessPointEntry.AccessPoint.Id
+                            : null
+                        : null))
+                .ForMember(dest => dest.AccessPointExitId,
+                    opt => opt.MapFrom(src => src.EventAccessPointExit != null
+                        ? src.EventAccessPointExit.AccessPoint != null
+                            ? (int?)src.EventAccessPointExit.AccessPoint.Id
+                            : null
+                        : null))
+                .ForMember(dest => dest.AccessPointOfEntryName,
+                    opt => opt.MapFrom(src => src.EventAccessPointEntry != null &&
+                                               src.EventAccessPointEntry.AccessPoint != null
+                        ? src.EventAccessPointEntry.AccessPoint.Name
+                        : null))
+                .ForMember(dest => dest.AccessPointOfExitName,
+                    opt => opt.MapFrom(src => src.EventAccessPointExit != null &&
+                                               src.EventAccessPointExit.AccessPoint != null
+                        ? src.EventAccessPointExit.AccessPoint.Name
+                        : null))
+                .ForMember(dest => dest.EventName,
+                    opt => opt.MapFrom(src => src.EventAccessPointEntry != null &&
+                                               src.EventAccessPointEntry.Event != null
+                        ? src.EventAccessPointEntry.Event.Name
+                        : null));
+
+
 
             //.ForMember(dest => dest.EventName,
             //    opt => opt.MapFrom(src =>
