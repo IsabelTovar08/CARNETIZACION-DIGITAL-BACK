@@ -211,7 +211,6 @@ namespace Data.Classes.Specifics
                 .ToListAsync();
         }
 
-<<<<<<< HEAD
         public async Task<int?> GetUserIdByPersonIdAsync(int personId)
         {
             return await _context.Users
@@ -219,8 +218,6 @@ namespace Data.Classes.Specifics
                 .Select(u => (int?)u.Id)
                 .FirstOrDefaultAsync();
         }
-
-=======
 
         /// <summary>
         /// Retorna el estado de autenticación en dos pasos del usuario (nullable).
@@ -253,7 +250,7 @@ namespace Data.Classes.Specifics
 
             return true;
         }
->>>>>>> dbb3ae7329436426bd662644e6e47a99652d88b7
+
 
     }
 }

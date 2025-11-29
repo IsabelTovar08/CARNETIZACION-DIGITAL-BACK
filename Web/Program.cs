@@ -85,7 +85,8 @@ namespace Web
             //Servicio en segundo plano para auto-finalizar eventos
             builder.Services.AddHostedService<Business.Services.Events.EventAutoFinalizerService>();
 
-            // Automapper
+            // Auto
+            // er
             builder.Services.AddAutoMapper(typeof(Utilities.Helper.MappingProfile));
 
             // JWT

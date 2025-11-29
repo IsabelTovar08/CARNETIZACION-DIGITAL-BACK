@@ -80,7 +80,7 @@ namespace Data.Implementations.Organizational.Assignment
             return await base.SaveAsync(entity);
         }
 
-        /// </<inheritdoc/>>
+        /// </<inheritdoc/>> 
         public async Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId)
         {
             var issuedCard = await _context.IssuedCards
@@ -232,6 +232,28 @@ namespace Data.Implementations.Organizational.Assignment
                 throw;
             }
         }
+
+        /// <summary>
+        /// Para mostrar los carnets que tiene la persona 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+
+        public async Task<List<IssuedCard>> GetIssuedCardsByUserIdAsync(int userId)
+        {
+            return await _context.IssuedCards
+                .Where(x => x.PersonId == userId && !x.IsDeleted)
+                .Include(x => x.Person)
+                .Include(x => x.Card).ThenInclude(c => c.Profile)
+                .Include(x => x.Shedule)
+                .Include(x => x.InternalDivision).ThenInclude(d => d.OrganizationalUnit)
+                .Include(x => x.Status)
+                .OrderByDescending(x => x.CreateAt)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+
     }
 
 }

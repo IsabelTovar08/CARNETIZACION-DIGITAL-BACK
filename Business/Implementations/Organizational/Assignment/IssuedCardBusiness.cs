@@ -316,5 +316,20 @@ namespace Business.Implementations.Organizational.Assignment
             }
         }
 
+        /// <summary>
+        /// Para traer todos los carnets que tiene la persona
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<List<IssuedCardDto>> GetIssuedCardsByUserIdAsync(int userId)
+        {
+            var cards = await _issuedCardData.GetIssuedCardsByUserIdAsync(userId);
+
+            if (cards == null || !cards.Any())
+                return new List<IssuedCardDto>();
+
+            return _mapper.Map<List<IssuedCardDto>>(cards);
+        }
+
     }
 }

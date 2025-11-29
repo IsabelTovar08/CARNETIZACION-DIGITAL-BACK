@@ -32,9 +32,8 @@ namespace Data.Interfases.Security
         /// </summary>
         Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName);
 
-<<<<<<< HEAD
         Task<int?> GetUserIdByPersonIdAsync(int personId);
-=======
+
         /// <summary>
         /// Retorna el estado de autenticación en dos pasos del usuario (nullable).
         /// </summary>
@@ -44,7 +43,6 @@ namespace Data.Interfases.Security
         /// Cambia el estado del 2FA para un usuario
         /// </summary>
         Task<bool> ToggleTwoFactorAsync(int userId);
->>>>>>> dbb3ae7329436426bd662644e6e47a99652d88b7
 
 
     }

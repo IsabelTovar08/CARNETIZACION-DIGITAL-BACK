@@ -34,10 +34,8 @@ namespace Data.Interfases.Operational
         // ✅ NUEVO MÉTODO: necesario para que el Business pueda hacer Include()
         IQueryable<Attendance> GetQueryable();
 
-<<<<<<< HEAD
         Task<List<Attendance>> GetByEventIdAsync(int eventId);
 
-=======
         /// <summary>
         /// Consultar todas las asistencias de una persona a un evento específico.
         /// </summary>
@@ -51,6 +49,6 @@ namespace Data.Interfases.Operational
         /// <param name="currentAttendanceId"></param>
         /// <returns></returns>
         Task<bool> PersonHasMoreAttendancesAsync(int personId, int eventId, int currentAttendanceId);
->>>>>>> dbb3ae7329436426bd662644e6e47a99652d88b7
+
     }
 }

@@ -187,7 +187,6 @@ namespace Data.Implementations.Operational
             return _context.Set<Attendance>().AsQueryable();
         }
 
-<<<<<<< HEAD
         public async Task<List<Attendance>> GetByEventIdAsync(int eventId)
         {
             return await _context.Attendances
@@ -198,7 +197,6 @@ namespace Data.Implementations.Operational
                             a.EventAccessPointEntry.EventId == eventId)
                 .ToListAsync();
         }
-=======
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
@@ -250,6 +248,5 @@ namespace Data.Implementations.Operational
                 .AnyAsync();
         }
 
->>>>>>> dbb3ae7329436426bd662644e6e47a99652d88b7
     }
 }   

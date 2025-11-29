@@ -30,12 +30,11 @@ namespace Entity.DTOs.ModelSecurity.Response
         public bool HasCard { get; set; }   // true si tiene carnet
         
         public int? IssuedCardId { get; set; }
-<<<<<<< HEAD
 
         public int? UserId { get; set; }
-=======
+
         /// <summary>Lista básica de todos los carnets de la persona</summary>
         public IList<IssuedCardBasicDto>? Cards { get; set; } = new List<IssuedCardBasicDto>();
->>>>>>> dbb3ae7329436426bd662644e6e47a99652d88b7
+
     }
 }

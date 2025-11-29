@@ -31,5 +31,8 @@ namespace Business.Interfaces.Operational
         /// Obtiene todas las solicitudes realizadas por el usuario autenticado.
         /// </summary>
         Task<IEnumerable<ModificationRequestResponseDto>> GetByCurrentUserAsync();
+
+        Task<IEnumerable<ModificationRequestResponseDto>> GetByUserIdAsync(int userId);
+
     }
 }

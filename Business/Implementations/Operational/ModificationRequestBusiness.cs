@@ -522,5 +522,20 @@ namespace Business.Implementations.Operational
             }
         }
 
+        /// <summary>
+        /// Obtiene todas las solicitudes de modificación realizadas por un usuario específico.
+        /// </summary>
+        public async Task<IEnumerable<ModificationRequestResponseDto>> GetByUserIdAsync(int userId)
+        {
+            // Obtener desde Data
+            var list = await _data.GetByUserIdAsync(userId);
+
+            if (list == null || !list.Any())
+                return Enumerable.Empty<ModificationRequestResponseDto>();
+
+            // Mapear entidad → DTO
+            return list.Select(r => _mapper.Map<ModificationRequestResponseDto>(r));
+        }
+
     }
 }
