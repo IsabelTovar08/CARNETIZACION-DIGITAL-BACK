@@ -47,5 +47,8 @@ namespace Data.Interfases.Operational
         /// <param name="currentAttendanceId"></param>
         /// <returns></returns>
         Task<bool> PersonHasMoreAttendancesAsync(int personId, int eventId, int currentAttendanceId);
+
+        Task<List<Attendance>> GetByEventIdAsync(int eventId);
+
     }
 }

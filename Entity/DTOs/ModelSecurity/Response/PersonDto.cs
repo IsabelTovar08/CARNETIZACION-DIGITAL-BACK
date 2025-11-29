@@ -32,5 +32,7 @@ namespace Entity.DTOs.ModelSecurity.Response
         public int? IssuedCardId { get; set; }
         /// <summary>Lista básica de todos los carnets de la persona</summary>
         public IList<IssuedCardBasicDto>? Cards { get; set; } = new List<IssuedCardBasicDto>();
+
+        public int? UserId { get; set; }
     }
 }

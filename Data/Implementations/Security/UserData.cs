@@ -244,5 +244,14 @@ namespace Data.Classes.Specifics
             return true;
         }
 
+        public async Task<int?> GetUserIdByPersonIdAsync(int personId)
+        {
+            return await _context.Users
+                .Where(u => u.PersonId == personId)
+                .Select(u => (int?)u.Id)
+                .FirstOrDefaultAsync();
+        }
+
+
     }
 }

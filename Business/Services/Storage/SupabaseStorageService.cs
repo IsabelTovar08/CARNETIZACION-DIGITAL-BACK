@@ -24,28 +24,54 @@ namespace Business.Implementations.Storage
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _opt.ServiceRoleKey);
         }
 
-        public async Task<(string PublicUrl, string StoragePath)> UploadAsync(Stream content,string contentType,string destinationPath,string bucket)
+        /// <summary>
+        /// Sube un archivo a Supabase Storage.
+        /// </summary>
+        /// <summary>
+        /// Sube o reemplaza un archivo en Supabase Storage usando PUT.
+        /// </summary>
+        public async Task<(string PublicUrl, string StoragePath)> UploadAsync(
+            Stream content,
+            string contentType,
+            string destinationPath,
+            string bucket)
         {
-            // Limpieza de path
-            destinationPath = destinationPath.TrimStart('/');
+            // ❗ destinationPath NO debe contener el bucket
+            // Ejemplo correcto: "5/person_5.jpg"
+            var storagePath = destinationPath;
 
-            // Permitir reemplazo
-            if (!_client.DefaultRequestHeaders.Contains("x-upsert"))
-                _client.DefaultRequestHeaders.Add("x-upsert", "true");
+            // Construcción correcta del endpoint
+            var requestUrl = $"storage/v1/object/{bucket}/{storagePath}";
 
-            var uri = $"{_opt.Url}/storage/v1/object/{bucket}/{destinationPath}";
+            using var request = new HttpRequestMessage(HttpMethod.Put, requestUrl)
+            {
+                Content = new StreamContent(content)
+            };
 
-            using var streamContent = new StreamContent(content);
-            streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+            // Headers de contenido
+            request.Content.Headers.ContentType =
+                new MediaTypeHeaderValue(contentType);
 
-            var res = await _client.PutAsync(uri, streamContent);
-            if (!res.IsSuccessStatusCode)
-                throw new Exception($"Supabase upload failed: {res.StatusCode}");
+            // Headers de autorización
+            request.Headers.Add("apikey", _opt.ServiceRoleKey);
 
-            var publicUrl = $"{_opt.PublicBaseUrl}/{bucket}/{destinationPath}";
+            // Ejecución
+            var response = await _client.SendAsync(request);
 
-            return (publicUrl, destinationPath);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Upload failed => {error}");
+            }
+
+            // URL pública correcta
+            var publicUrl = $"{_opt.PublicBaseUrl}/{bucket}/{storagePath}";
+
+            return (publicUrl, storagePath);
         }
+
+
+
 
 
         public async Task DeleteIfExistsAsync(string storagePath, string bucket)

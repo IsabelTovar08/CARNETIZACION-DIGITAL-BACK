@@ -43,5 +43,8 @@ namespace Data.Interfases.Security
         Task<bool> ToggleTwoFactorAsync(int userId);
 
 
+        Task<int?> GetUserIdByPersonIdAsync(int personId);
+
+
     }
 }

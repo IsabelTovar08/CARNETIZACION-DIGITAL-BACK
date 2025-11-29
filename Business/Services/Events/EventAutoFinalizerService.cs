@@ -72,7 +72,7 @@ namespace Business.Services.Events
                 }
 
                 // Espera 1 minuto antes de volver a revisar
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
     }

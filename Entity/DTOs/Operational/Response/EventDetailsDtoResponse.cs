@@ -10,5 +10,7 @@ namespace Entity.DTOs.Operational.Response
     {
         public List<AccessPointDtoResponsee>? AccessPoints { get; set; }
         public List<EventTargetAudienceViewDtoResponse> Audiences { get; set; } = new();
+
+        public List<EventSupervisorDtoResponse> Supervisors { get; set; } = new();
     }
 }

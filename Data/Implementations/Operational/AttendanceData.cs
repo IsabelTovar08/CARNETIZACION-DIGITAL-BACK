@@ -7,6 +7,7 @@ using Data.Classes.Base;
 using Data.Interfases.Operational;
 using Entity.Context;
 using Entity.DTOs.Operational.Response;
+using Entity.Enums.Extensions;
 using Entity.Models.Operational;
 using Entity.Models.Organizational;
 using Microsoft.EntityFrameworkCore;
@@ -193,6 +194,10 @@ namespace Data.Implementations.Operational
         /// <param name="personId"></param>
         /// <param name="eventId"></param>
         /// <returns></returns>
+        /// <summary>
+        /// Obtiene todas las asistencias de una persona en un evento,
+        /// incluyendo información adicional de la persona.
+        /// </summary>
         public async Task<IList<AttendanceDtoResponse>> GetAllByPersonEventAsync(int personId, int eventId)
         {
             return await _context.Attendances
@@ -200,22 +205,66 @@ namespace Data.Implementations.Operational
                 .Where(a =>
                     a.PersonId == personId &&
                     (a.EventAccessPointEntry.EventId == eventId ||
-                    (a.EventAccessPointExit != null && a.EventAccessPointExit.EventId == eventId))
+                    (a.EventAccessPointExit != null &&
+                     a.EventAccessPointExit.EventId == eventId))
                 )
                 .OrderByDescending(a => a.TimeOfEntry)
                 .Select(a => new AttendanceDtoResponse
                 {
                     Id = a.Id,
                     PersonId = a.PersonId,
+
+                    // ✔️ Datos de persona
+                    PersonFullName = a.Person.FirstName + " " + a.Person.LastName,
+                    DocumentNumber = a.Person.DocumentNumber,
+                    DocumentTypeName = a.Person.DocumentType != null
+                        ? a.Person.DocumentType.GetAcronym()
+                        : null,
+                    Phone = a.Person.Phone,
+                    Email = a.Person.Email ?? a.Person.User.UserName,
+                    PhotoUrl = a.Person.PhotoUrl,
+
+                    // ✔️ Información de asistencia
                     TimeOfEntry = a.TimeOfEntry,
                     TimeOfExit = a.TimeOfExit,
+
+                    TimeOfEntryStr = a.TimeOfEntry.ToString("yyyy-MM-dd HH:mm"),
+                    TimeOfExitStr = a.TimeOfExit.HasValue
+                        ? a.TimeOfExit.Value.ToString("yyyy-MM-dd HH:mm")
+                        : null,
+
+                    // ✔️ Access points
+                    AccessPointEntryId = a.EventAccessPointEntry.AccessPointId,
                     AccessPointOfEntryName = a.EventAccessPointEntry.AccessPoint.Name,
+
+                    AccessPointExitId = a.EventAccessPointExit != null
+                        ? a.EventAccessPointExit.AccessPointId
+                        : null,
                     AccessPointOfExitName = a.EventAccessPointExit != null
                         ? a.EventAccessPointExit.AccessPoint.Name
-                        : null
+                        : null,
+
+                    EventAccessPointEntryId = a.EventAccessPointEntryId,
+                    EventAccessPointExitId = a.EventAccessPointExitId,
+
+                    // ✔️ Evento
+                    EventId = a.EventAccessPointEntry.EventId,
+                    EventName = a.EventAccessPointEntry.Event.Name,
+
+                    // No calculamos Success/Message aquí (eso es de capa de negocio)
+                    Success = true,
+
+                    // ✔️ Extra: si tiene más asistencias en el evento
+                    HasMoreAttendances = _context.Attendances
+                        .Any(x => x.PersonId == personId &&
+                                 x.Id != a.Id &&
+                                 (x.EventAccessPointEntry.EventId == eventId ||
+                                  (x.EventAccessPointExit != null &&
+                                   x.EventAccessPointExit.EventId == eventId)))
                 })
                 .ToListAsync();
         }
+
 
         /// <summary>
         /// <inheritdoc/>
@@ -238,5 +287,16 @@ namespace Data.Implementations.Operational
                 .AnyAsync();
         }
 
+
+        public async Task<List<Attendance>> GetByEventIdAsync(int eventId)
+        {
+            return await _context.Attendances
+                .Include(a => a.Person)
+                .Include(a => a.EventAccessPointEntry)
+                    .ThenInclude(eap => eap.Event)
+                .Where(a => !a.IsDeleted &&
+                            a.EventAccessPointEntry.EventId == eventId)
+                .ToListAsync();
+        }
     }
 }   

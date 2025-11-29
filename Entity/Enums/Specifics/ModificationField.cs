@@ -39,14 +39,11 @@ namespace Entity.Enums.Specifics
         [EnumDisplayEx("Tipo de sangre")]
         BloodTypeId = 9,
 
-        [EnumDisplayEx("Foto de perfil (URL)")]
+        [EnumDisplayEx("Foto de perfil")]
         PhotoUrl = 10,
 
-        [EnumDisplayEx("Foto (ruta local)")]
-        PhotoPath = 11,
-
         [EnumDisplayEx("Ciudad")]
-        CityId = 12
+        CityId = 11
     }
 
 }

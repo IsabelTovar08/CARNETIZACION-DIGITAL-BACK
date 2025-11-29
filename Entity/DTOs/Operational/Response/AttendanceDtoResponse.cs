@@ -3,10 +3,20 @@ using System;
 
 namespace Entity.DTOs.Operational.Response
 {
+    /// <summary>
+    /// DTO de asistencia, enriquecido con más información de la persona.
+    /// </summary>
     public class AttendanceDtoResponse : BaseDTO
     {
         public int PersonId { get; set; }
         public string PersonFullName { get; set; }
+
+        // ✔️ Nuevo: información adicional
+        public string? DocumentNumber { get; set; }
+        public string? DocumentTypeName { get; set; }
+        public string? Phone { get; set; }
+        public string? Email { get; set; }
+        public string? PhotoUrl { get; set; }
 
         public DateTime TimeOfEntry { get; set; }
         public DateTime? TimeOfExit { get; set; }
@@ -19,11 +29,11 @@ namespace Entity.DTOs.Operational.Response
 
         public int? AccessPointExitId { get; set; }
         public string? AccessPointOfExitName { get; set; }
+
         public int EventAccessPointEntryId { get; set; }
         public int? EventAccessPointExitId { get; set; }
 
         public int? EventId { get; set; }
-
         public string? EventName { get; set; }
 
         /// <summary>

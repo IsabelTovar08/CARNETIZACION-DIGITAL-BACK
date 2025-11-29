@@ -11,7 +11,7 @@ namespace Business.Interfases.Storage
         /// <summary>
         /// Upload or replace a file at destinationPath. Returns (publicUrl, storagePath).
         /// </summary>
-        Task<(string PublicUrl, string StoragePath)> UploadAsync(Stream content, string contentType, string destinationPath, string bucket);
+        Task<(string PublicUrl, string StoragePath)> UploadAsync(Stream content, string contentType, string destinationPath, string bucket);    
 
 
         /// <summary>

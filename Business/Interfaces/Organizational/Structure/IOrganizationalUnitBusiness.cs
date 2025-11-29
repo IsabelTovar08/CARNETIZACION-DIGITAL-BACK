@@ -16,8 +16,16 @@ namespace Business.Interfaces.Organizational.Structure
         Task<int> CountDivisionAsync(int organizationalUnitId);
         Task<int> CountBranchesAsync(int organizationalUnitId);
         void Validate(OrganizationalUnitDtoRequest dto);
+        Task<bool> AddBranchToOrganizationalUnitAsync(OrganizationalUnitBranchDtoRequest dto);
+
+        Task<bool> RemoveBranchFromOrganizationalUnitAsync(OrganizationalUnitBranchDtoRequest dto);
+
+        Task<OrganizationalUnitDto> GetByIdFullAsync(int id);
+
+     
+
 
         //LLamado a las Divisiones internas que tiene La unidad organizativa
-        
+
     }
 }

@@ -69,7 +69,7 @@ namespace Business.Implementations.Operational
         /// </summary>
         public override async Task<ModificationRequestResponseDto> Save(ModificationRequestDto entity)
         {
-            entity.UserId = _currentUser.UserId;
+            entity.UserId = _currentUser.UserId > 0 ? _currentUser.UserId: entity.UserId;
 
             // Obtener info del usuario y su persona
             UserDTO user = await _userBusiness.GetById(entity.UserId);

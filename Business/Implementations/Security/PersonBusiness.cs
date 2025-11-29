@@ -36,10 +36,11 @@ namespace Business.Classes
         private readonly IPersonData _personData;
         private readonly INotify _notificationSender;
         private readonly IUserRoleBusiness _userRolBusiness;
+        private readonly IUserData _userData;
         private readonly IAssetUploader _assetUploader;
         private readonly ICurrentUser _currentUser;
 
-        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserRoleBusiness userRolBusiness, IAssetUploader assetUploader, ICurrentUser currentUser)
+        public PersonBusiness(IPersonData personData, ILogger<Person> logger, IMapper mapper, INotify messageSender, IUserRoleBusiness userRolBusiness,IUserData userData ,IAssetUploader assetUploader, ICurrentUser currentUser)
             : base(personData, logger, mapper)
         {
             _notificationSender = messageSender;
@@ -47,6 +48,7 @@ namespace Business.Classes
             _userRolBusiness = userRolBusiness;
             _assetUploader = assetUploader;
             _currentUser = currentUser;
+            _userData = userData;
         }
 
         public override async Task ValidateAsync(Person entity)
@@ -322,7 +324,7 @@ namespace Business.Classes
                  fileStream,
                  contentType,
                  fileName,
-                 bucket: "people"
+                 bucket: "img-people"
              );
 
             // 4) Persistir cambios en entidad
@@ -381,6 +383,12 @@ namespace Business.Classes
                 internalDivisionId, organizationalUnitId, profileId, page, pageSize, ct);
 
             var items = entities.Select(e => _mapper.Map<PersonDto>(e)).ToList();
+
+            // 3. Agregar UserId (consulta aparte)
+            foreach (var person in items)
+            {
+                person.UserId = await _userData.GetUserIdByPersonIdAsync(person.Id);
+            }
             return (items, total);
         }
     

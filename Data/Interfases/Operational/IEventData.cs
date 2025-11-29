@@ -74,6 +74,38 @@ namespace Data.Interfases.Operational
         /// <returns></returns>
         Task<List<EventAttendanceTopDtoResponse>> GetTopEventsByTypeAsync(int eventTypeId, int top = 5);
 
+        /// <summary>
+        /// Para buscar los supervisores asociados a un evento
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        Task<List<EventSupervisor>> GetSupervisorsByEventIdAsync(int eventId);
+
+        /// <summary>
+        /// Para agregar supervisores
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task AddSupervisorAsync(int eventId, int userId);
+
+        /// <summary>
+        /// Para verificar si ya esta asignado
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<bool> SupervisorExistsAsync(int eventId, int userId);
+
+
+        /// <summary>
+        /// Para borrar supervisores del evento
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<bool> RemoveSupervisorAsync(int eventId, int userId);
+
 
     }
 }
