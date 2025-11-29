@@ -45,6 +45,7 @@ namespace Entity.Models.Organizational
         /// </summary>
         public ICollection<EventSupervisor> Supervisors { get; set; } = new List<EventSupervisor>();
 
+        public List<SupervisorsEvent> SupervisorsEvent { get; set; }
 
     }
 }

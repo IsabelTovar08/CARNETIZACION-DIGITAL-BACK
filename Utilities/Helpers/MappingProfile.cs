@@ -50,6 +50,13 @@ namespace Utilities.Helper
                         src.IssuedCard
                             .Where(c => !c.IsDeleted)
                     ))
+                .ForMember(dest => dest.IssuedCardId,
+                    opt => opt.MapFrom(src =>
+                        src.IssuedCard
+                            .Where(c => !c.IsDeleted && c.IsCurrentlySelected)
+                            .Select(c => c.Id)
+                .FirstOrDefault()
+                     ))
                 .ReverseMap();
 
 
@@ -84,6 +91,20 @@ namespace Utilities.Helper
                     .Select(oub => oub.Branch.Organization.Name)
                     .FirstOrDefault()));
 
+            //IssuedCard
+
+            CreateMap<IssuedCard, IssuedCardDto>()
+            .ForMember(dest => dest.PersonName,
+                opt => opt.MapFrom(src =>
+                    src.Person != null
+                        ? $"{src.Person.FirstName} {src.Person.MiddleName} {src.Person.LastName} {src.Person.SecondLastName}"
+                            .Replace("  ", " ").Trim()
+                        : "N/A"))
+            .ForMember(dest => dest.DivisionName,
+                opt => opt.MapFrom(src => src.InternalDivision.Name))
+            .ForMember(dest => dest.ProfileName,
+                opt => opt.MapFrom(src => src.Card.Profile.Name))
+            .ReverseMap();
 
 
 

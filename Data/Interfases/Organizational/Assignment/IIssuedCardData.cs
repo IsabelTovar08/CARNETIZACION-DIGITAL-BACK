@@ -42,5 +42,13 @@ namespace Data.Interfases.Organizational.Assignment
         /// Retorna el total de carnets activos (no eliminados)
         /// </summary>
         Task<int> GetTotalNumberOfIDCardsAsync();
+
+        /// <summary>
+        /// Para mostrar TODOS los carnets que tiene la persona
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+
+        Task<List<IssuedCard>> GetIssuedCardsByUserIdAsync(int userId);
     }
 }

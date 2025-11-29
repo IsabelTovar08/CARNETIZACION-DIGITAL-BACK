@@ -184,7 +184,7 @@ namespace Web.Controllers.Organizational.Assignment
 
 
         /// <summary>
-        /// Retorna el total general de carnets emitidos en el sistema.
+        /// Retorna el total general de carnets emitidos en el sistema. este muestra todos los datos de la persona 
         /// </summary>
         [HttpGet("get-data-complete/{id}")]
         public async Task<IActionResult> GetCardDataByIssuedId(int id)
@@ -201,6 +201,22 @@ namespace Web.Controllers.Organizational.Assignment
                 return BadRequest(ApiResponse<CardUserData>.Fail("Error al obtener el carnets", new[] { ex.Message }));
             }
         }
+
+        /// <summary>
+        /// Para traer todos los carnets
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+
+
+        [HttpGet("by-user/{userId:int}")]
+        public async Task<IActionResult> GetByUser(int userId)
+        {
+            var cards = await _business.GetIssuedCardsByUserIdAsync(userId);
+
+            return Ok(ApiResponse<object>.Ok(cards, "Carnets del usuario obtenidos correctamente"));
+        }
+
     }
 }
 

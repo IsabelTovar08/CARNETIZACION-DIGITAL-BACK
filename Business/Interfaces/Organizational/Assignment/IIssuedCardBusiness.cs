@@ -49,5 +49,13 @@ namespace Business.Interfaces.Organizational.Assignment
         /// Retorna el total de carnets activos (no eliminados)
         /// </summary>
         Task<int> GetTotalNumberOfIDCardsAsync();
+
+        /// <summary>
+        /// Para traer todos los carnets de las personas
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<List<IssuedCardDto>> GetIssuedCardsByUserIdAsync(int userId);
+
     }
 }

@@ -76,5 +76,16 @@ namespace Web.Controllers.Operational
                 return StatusCode(500, ApiResponse<bool>.Fail("Ocurrió un error al rechazar la solicitud.", new[] { ex.Message }));
             }
         }
+
+        /// <summary>
+        /// Obtiene todas las solicitudes de modificación realizadas por un usuario específico.
+        /// </summary>
+        [HttpGet("by-user/{userId:int}")]
+        public async Task<IActionResult> GetByUser(int userId)
+        {
+            var cards = await _business.GetByUserIdAsync(userId);
+
+            return Ok(ApiResponse<object>.Ok(cards, "Carnets del usuario obtenidos correctamente"));
+        }
     }
 }
