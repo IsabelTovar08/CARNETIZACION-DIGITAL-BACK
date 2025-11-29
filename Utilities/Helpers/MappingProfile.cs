@@ -56,7 +56,7 @@ namespace Utilities.Helper
                             .Where(c => !c.IsDeleted && c.IsCurrentlySelected)
                             .Select(c => c.Id)
                 .FirstOrDefault()
-                    ))
+                     ))
                 .ReverseMap();
 
 

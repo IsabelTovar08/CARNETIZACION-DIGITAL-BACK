@@ -122,23 +122,23 @@ namespace Business.Implementations.Organizational.Assignment
         /// <summary>
         /// Consulta la información completa del carnet, incluyendo organización y sucursal.
         /// </summary>
-        public async Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId)
-        {
-            try
-            {
-                CardUserData card = await _issuedCardData.GetCardDataByIssuedIdAsync(issuedCardId);
-                if (card == null)
-                    throw new Exception("No se encontró el carnet para actualizar la URL del PDF.");
+        //public async Task<CardUserData> GetCardDataByIssuedIdAsync(int issuedCardId)
+        //{
+        //    try
+        //    {
+        //        CardUserData card = await _issuedCardData.GetCardDataByIssuedIdAsync(issuedCardId);
+        //        if (card == null)
+        //            throw new Exception("No se encontró el carnet para actualizar la URL del PDF.");
 
-                //return _mapper.Map<IssuedCardDto>(card);
-                return card;
+        //        //return _mapper.Map<IssuedCardDto>(card);
+        //        return card;
 
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error en la capa de negocio al actualizar la URL del PDF del carnet.", ex);
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Error en la capa de negocio al actualizar la URL del PDF del carnet.", ex);
+        //    }
+        //}
 
 
         public async Task<CardUserData> GetCardDataByIssuedId(int issuedCardId)
