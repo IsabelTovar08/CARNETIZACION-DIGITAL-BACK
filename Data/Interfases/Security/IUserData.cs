@@ -43,9 +43,6 @@ namespace Data.Interfases.Security
         /// Cambia el estado del 2FA para un usuario
         /// </summary>
         Task<bool> ToggleTwoFactorAsync(int userId);
-=========
-        Task<int?> GetUserIdByPersonIdAsync(int personId);
->>>>>>>>> Temporary merge branch 2
 
 
     }

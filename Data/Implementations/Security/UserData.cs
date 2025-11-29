@@ -211,7 +211,6 @@ namespace Data.Classes.Specifics
                 .ToListAsync();
         }
 
-<<<<<<<<< Temporary merge branch 1
 
         /// <summary>
         /// Retorna el estado de autenticación en dos pasos del usuario (nullable).

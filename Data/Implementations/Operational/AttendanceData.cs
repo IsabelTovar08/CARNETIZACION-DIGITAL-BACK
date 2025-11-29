@@ -188,7 +188,6 @@ namespace Data.Implementations.Operational
             return _context.Set<Attendance>().AsQueryable();
         }
 
-<<<<<<<<< Temporary merge branch 1
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
