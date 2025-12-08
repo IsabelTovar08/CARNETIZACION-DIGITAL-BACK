@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251129052057_UpdateModel")]
-    partial class UpdateModel
+    [Migration("20251208183001_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -3851,7 +3851,7 @@ namespace Entity.Migrations
             modelBuilder.Entity("Entity.Models.Operational.SupervisorsEvent", b =>
                 {
                     b.HasOne("Entity.Models.Organizational.Event", "Event")
-                        .WithMany()
+                        .WithMany("SupervisorsEvent")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -4244,6 +4244,8 @@ namespace Entity.Migrations
                     b.Navigation("EventTargetAudiences");
 
                     b.Navigation("Supervisors");
+
+                    b.Navigation("SupervisorsEvent");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.EventType", b =>

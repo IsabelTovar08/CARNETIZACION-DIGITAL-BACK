@@ -204,7 +204,7 @@ namespace Data.Implementations.Organizational.Assignment
                 .GroupBy(c => c.Card.Profile)
                 .Select(g => new CarnetsBySheduleDto
                 {
-                    Jornada = g.Key.ToString(),
+                    Jornada = g.Key.Name,
                     TotalCarnets = g.Count()
                 })
                 .OrderByDescending(x => x.TotalCarnets)
