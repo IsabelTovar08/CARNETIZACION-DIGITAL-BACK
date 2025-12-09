@@ -48,11 +48,10 @@ jobs:
           target: "/var/www/api"
 
       - name: Restart API service
-        uses: appleboy/ssh-action@v0.1.11
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
             sudo systemctl restart carnetgo
-
