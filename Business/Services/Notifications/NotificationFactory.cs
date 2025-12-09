@@ -163,8 +163,7 @@ namespace Business.Services.Notifications
                         return new NotificationDtoRequest
                         {
                             Title = "Inicio de sesión exitoso",
-                            Message = $"Bienvenido {args[0]}, tu acceso fue validado el {DateTime.Now:dd/MM/yyyy HH:mm}, " +
-                                      $"desde un {deviceModel} ubicado en {location}.",
+                            Message = $"Bienvenido {args[0]}, tu acceso fue validado el {DateTime.Now:dd/MM/yyyy HH:mm}",
                             NotificationType = NotificationType.System,
                             UserId = (int)args[1]
                         };

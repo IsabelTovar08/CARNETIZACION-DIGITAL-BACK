@@ -3848,7 +3848,7 @@ namespace Entity.Migrations
             modelBuilder.Entity("Entity.Models.Operational.SupervisorsEvent", b =>
                 {
                     b.HasOne("Entity.Models.Organizational.Event", "Event")
-                        .WithMany()
+                        .WithMany("SupervisorsEvent")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -4241,6 +4241,8 @@ namespace Entity.Migrations
                     b.Navigation("EventTargetAudiences");
 
                     b.Navigation("Supervisors");
+
+                    b.Navigation("SupervisorsEvent");
                 });
 
             modelBuilder.Entity("Entity.Models.Organizational.EventType", b =>
