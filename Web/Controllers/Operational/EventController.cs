@@ -61,7 +61,7 @@ namespace Web.Controllers.Operational
         [HttpGet("list-full")]
         public async Task<IActionResult> GetFullList()
         {
-            var result = await _eventBusiness.GetFullListAsync();
+            IEnumerable<Entity.DTOs.Operational.Response.EventDetailsDtoResponse> result = await _eventBusiness.GetFullListAsync();
 
             return Ok(new
             {

@@ -1,10 +1,19 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Business.Classes;
 using Business.Classes.Base;
 using Business.Interfaces.Operational;
+using Business.Interfaces.Security;
 using Business.Services.Supervisors;
 using Data.Implementations.Operational;
 using Data.Interfases;
 using Data.Interfases.Operational;
+using Entity.DTOs.ModelSecurity.Request;
 using Entity.DTOs.Operational;
 using Entity.DTOs.Operational.Request;
 using Entity.DTOs.Operational.Response;
@@ -16,12 +25,6 @@ using Infrastructure.Notifications.Interfases;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using QRCoder;
-using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Utilities.Exeptions;
 using Utilities.Helpers;
 using Utilities.Notifications.Implementations;
@@ -44,6 +47,8 @@ namespace Business.Implementations.Operational
         //private readonly IEventAttendancePdfService _pdfService;
         private readonly INotify _notifier;
         private readonly IEmailAttachmentSender _emailAttachmentSender;
+        private readonly IEventAccessPointBusiness _eventAccessPointBusiness;
+        private readonly IUserRoleBusiness _userRoleBusiness;
 
 
         public EventBusiness(
@@ -56,7 +61,9 @@ namespace Business.Implementations.Operational
             IMapper mapper,
             INotify notifier,
             IEmailAttachmentSender emailAttachmentSender,
-            IEventAttendancePdfService eventAttendancePdf
+            IEventAttendancePdfService eventAttendancePdf,
+            IEventAccessPointBusiness eventAccessPointBusiness,
+            IUserRoleBusiness userRoleBusiness
         ) : base(data, logger, mapper)
         {
             _data = data;
@@ -69,6 +76,9 @@ namespace Business.Implementations.Operational
             _notifier = notifier;
             _emailAttachmentSender = emailAttachmentSender;
             _pdfGenerator = eventAttendancePdf;
+            _eventAccessPointBusiness = eventAccessPointBusiness;
+            _userRoleBusiness = userRoleBusiness;
+
         }
 
         /// <summary>
@@ -183,6 +193,12 @@ Sistema de Carnetización Digital
                 }
             }
 
+            foreach (var sup in supervisors)
+            {
+                await _userRoleBusiness.RemoveSupervisorRoleAsync(sup.UserId);
+            }
+
+
             // DEVOLVER DTO LIMPIO PARA EVITAR CICLOS
             return supervisors.Select(s => new EventSupervisorDtoResponse
             {
@@ -265,19 +281,24 @@ Sistema de Carnetización Digital
 
                     await _apData.BulkInsertAsync(createdAccessPoints);
 
-                    links = createdAccessPoints.Select(ap =>
+
+                    foreach (var ap in createdAccessPoints)
                     {
                         string payload = $"AP:{ap.Id}|EVENT:{savedEvent.Id}|DATE:{DateTime.UtcNow:O}";
 
-                        return new EventAccessPoint
+                        // Traer info necesaria
+
+                        // Crear nuevo registro
+                        var newAP = new EventAccessPointDtoRequest
                         {
                             EventId = savedEvent.Id,
-                            AccessPointId = ap.Id,
-                            QrCodeKey = QrCodeHelper.ToPngBase64(payload)
+                            AccessPointId = ap.Id
                         };
-                    }).ToList();
 
-                    await _data.BulkInsertEventAccessPointsAsync(links);
+                        // GUARDAR UNO POR UNO COMO QUIERES
+                        var savedAp = await _eventAccessPointBusiness.Save(newAP);
+
+                    }
                 }
 
 
@@ -432,7 +453,7 @@ Sistema de Carnetización Digital
                     existingEvent.UpdateAt = DateTime.Now;
 
                     // 2️⃣ Actualizar Access Points
-                    await _data.DeleteEventAccessPointsByEventIdAsync(existingEvent.Id);
+                    //await _data.DeleteEventAccessPointsByEventIdAsync(existingEvent.Id);
 
                     if (dto.AccessPoints != null && dto.AccessPoints.Any())
                     {
@@ -445,8 +466,25 @@ Sistema de Carnetización Digital
                         await _data.BulkInsertEventAccessPointsAsync(newLinks);
                     }
 
-                    // 3️⃣ Actualizar Audiencias
-                    await _audienceRepo.DeleteByEventIdAsync(existingEvent.Id);
+                foreach (var ap in dto.AccessPoints)
+                {
+
+                    // Traer info necesaria
+
+                    // Crear nuevo registro
+                    var newAP = new EventAccessPointDtoRequest
+                    {
+                        EventId = dto.Id,
+                        AccessPointId = ap
+                    };
+
+                    // GUARDAR UNO POR UNO COMO QUIERES
+                    var savedAp = await _eventAccessPointBusiness.Save(newAP);
+
+                }
+
+                // 3️⃣ Actualizar Audiencias
+                await _audienceRepo.DeleteByEventIdAsync(existingEvent.Id);
 
                     await CreateEventAudiencesAsync(
                         existingEvent.Id,
@@ -641,6 +679,10 @@ Sistema de Carnetización Digital
                 }
             }
 
+            foreach (var sup in supervisors)
+            {
+                await _userRoleBusiness.RemoveSupervisorRoleAsync(sup.UserId);
+            }
 
             return supervisors;
         }
@@ -659,6 +701,16 @@ Sistema de Carnetización Digital
 
             // Insertar supervisor
             await _data.AddSupervisorAsync(eventId, userId);
+
+            // ================
+            // ASIGNAR EL ROL 3
+            // ================
+            await _userRoleBusiness.Save(new UserRoleDtoRequest
+            {
+                UserId = userId,
+                RolId = 3 // Supervisor
+            });
+
             return true;
         }
 
@@ -672,6 +724,8 @@ Sistema de Carnetización Digital
 
             if (!success)
                 throw new Exception("El supervisor no está asignado al evento o ya fue eliminado.");
+
+            await _userRoleBusiness.RemoveSupervisorRoleAsync(userId);
 
             return true;
         }

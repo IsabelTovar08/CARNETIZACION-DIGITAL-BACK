@@ -56,8 +56,8 @@ namespace Business.Implementations.Operational
 
             try
             {
-                string payload = $"AP:{created.Id}|EVENT:{created.EventId}|DATE:{DateTime.UtcNow:O}";
-                created.QrCodeKey = QrCodeHelper.ToPngBase64(payload);
+                //string payload = $"AP:{created.Id}|EVENT:{created.EventId}|DATE:{DateTime.UtcNow:O}";
+                //created.QrCodeKey = QrCodeHelper.ToPngBase64(payload);
 
                 AccessPointDtoRequest updateRequest = _mapper.Map<AccessPointDtoRequest>(created);
                 await Update(updateRequest);

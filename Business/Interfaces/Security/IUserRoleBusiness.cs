@@ -26,5 +26,7 @@ namespace Business.Interfaces.Security
         /// <returns>True si se guardaron correctamente, false si ocurrió un error.</returns>
 
         Task<bool> SaveUserRolesAsync(UserRolesRequest request);
+
+       Task<bool> RemoveSupervisorRoleAsync(int userId);
     }
 }

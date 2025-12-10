@@ -24,6 +24,7 @@ namespace Entity.Enums.Specifics
         CardGenerated,
         Login,
         AttendanceEntry,
-        AttendanceExit
+        AttendanceExit,
+        CardAssigned
     }
 }

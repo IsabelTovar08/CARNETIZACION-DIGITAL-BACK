@@ -98,5 +98,41 @@ namespace Business.Classes
                 throw;
             }
         }
+
+
+        /// <summary>
+        /// Intenta eliminar el rol Supervisor (Id = 3) de un usuario.
+        /// Si ocurre un error, se captura internamente para no afectar la operación principal.
+        /// </summary>
+        public async Task<bool> RemoveSupervisorRoleAsync(int userId)
+        {
+            const int supervisorRoleId = 3;
+
+            try
+            {
+                // Obtener roles asignados
+                var roles = await _dataUserRol.GetRolesByUserIdAsync(userId);
+                var supervisorRole = roles.FirstOrDefault(r => r.RolId == supervisorRoleId);
+
+                if (supervisorRole == null)
+                    return false; // Nada que eliminar
+
+                // Intentar eliminar usando el UserRoleId
+                await Delete(supervisorRole.Id);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "[UserRoleBusiness] Error al eliminar rol Supervisor del usuario {UserId}. Operación ignorada.",
+                    userId);
+
+                // No se lanza excepción — evita romper la ejecución
+                return false;
+            }
+        }
+
+
     }
 }

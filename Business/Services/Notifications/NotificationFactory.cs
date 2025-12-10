@@ -183,7 +183,16 @@ namespace Business.Services.Notifications
                         Title = "Salida registrada",
                         Message = $"Saliste de {args[1]} por el punto de acceso {args[2]} el {((DateTime)args[0]):dd/MM/yyyy HH:mm}.",
                         NotificationType = NotificationType.Info
+                    }; 
+
+                case NotificationTemplateType.CardAssigned:
+                    return new NotificationDtoRequest
+                    {
+                        Title = "Carnet asignado",
+                        Message = $"Se te ha asignado un nuevo carnet en el sistema. Nombre: {args[0]}, Código: {args[1]}.",
+                        NotificationType = NotificationType.Info
                     };
+
 
 
                 default:

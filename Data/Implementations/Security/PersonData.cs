@@ -38,6 +38,12 @@ namespace Data.Classes.Specifics
                 .Include(p => p.City)
                 .ToListAsync();
         }
+        public async override Task<Person?> GetByIdAsync(int id)
+        {
+            return await _context.Set<Person>()
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(i => i.Id == id);
+        }
 
         public async Task<Person?> FindByIdentification(string identification)
         {

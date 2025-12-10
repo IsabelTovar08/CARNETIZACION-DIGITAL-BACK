@@ -23,5 +23,6 @@ namespace Data.Interfases.Security
         /// <returns>True si se guardaron correctamente, false si ocurrió un error.</returns>
 
         Task<bool> SaveUserRoles(UserRolesRequest request);
+        Task<IEnumerable<UserRoles>> GetRolesByUserIdAsync(int userId);
     }
 }

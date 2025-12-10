@@ -5,9 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Business.Classes.Base;
+using Business.Interfaces.Notifications;
 using Business.Interfaces.Operational;
 using Business.Interfaces.Organizational.Assignment;
+using Business.Interfaces.Security;
 using Business.Services.Cards;
+using Business.Services.Notifications;
 using Data.Interfases;
 using Data.Interfases.Organizational.Assignment;
 using Entity.DTOs.Operational.Response;
@@ -15,6 +18,7 @@ using Entity.DTOs.Organizational.Assigment.Request;
 using Entity.DTOs.Organizational.Assigment.Response;
 using Entity.DTOs.Specifics;
 using Entity.DTOs.Specifics.Cards;
+using Entity.Enums.Specifics;
 using Entity.Models.Organizational.Assignment;
 using Entity.Models.Parameter;
 using Infrastructure.Notifications.Interfases;
@@ -31,10 +35,15 @@ namespace Business.Implementations.Organizational.Assignment
         protected readonly ICardPdfService _cardPdfService;
         private readonly ICardConfigurationBusiness _cardConfigurationBusiness;
         private readonly INotify _notify;
+        private readonly INotificationBusiness _notificationBusiness;
+        private readonly IPersonBusiness _personBusiness;
 
-        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper, ICardTemplateBusiness cardTemplateBusiness, ICardPdfService cardPdfService, 
+
+        public IssuedCardBusiness(IIssuedCardData data, ILogger<IssuedCard> logger, IMapper mapper, ICardTemplateBusiness cardTemplateBusiness, ICardPdfService cardPdfService,
             ICardConfigurationBusiness cardConfigurationBusiness,
-            INotify notify
+            INotify notify,
+            INotificationBusiness notificationBusiness,
+            IPersonBusiness personBusiness
             ) : base(data, logger, mapper)
         {
             _issuedCardData = data;
@@ -42,6 +51,8 @@ namespace Business.Implementations.Organizational.Assignment
             _cardPdfService = cardPdfService;
             _cardConfigurationBusiness = cardConfigurationBusiness;
             _notify = notify;
+            _notificationBusiness = notificationBusiness;
+            _personBusiness = personBusiness;
         }
 
         /// <summary>
@@ -89,6 +100,20 @@ namespace Business.Implementations.Organizational.Assignment
 
                 // Enviar notificación
                 await SendCardAssignedNotificationAsync(saved, userData);
+
+                var person = await _personBusiness.GetById(request.PersonId);
+                // Notificación 
+                var notificationRequest = await NotificationFactory.Create(
+                    NotificationTemplateType.CardAssigned,
+                    userData.Name,                 // args[0]
+                    saved.UniqueId.ToString()      // args[1]
+                );
+
+                // Forzar userId del destinatario
+                notificationRequest.UserId = person?.UserId ?? 0;
+
+                // Enviar y registrar la notificación
+                await _notificationBusiness.CreateAndSendAsync(notificationRequest);
 
                 // === 5️⃣ Mapear de vuelta a DTO ===
                 return _mapper.Map<IssuedCardDto>(saved);

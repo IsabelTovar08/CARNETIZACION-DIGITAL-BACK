@@ -133,6 +133,18 @@ namespace Data.Classes.Specifics
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los roles asignados a un usuario.
+        /// </summary>
+        public async Task<IEnumerable<UserRoles>> GetRolesByUserIdAsync(int userId)
+        {
+            return await _context.UserRoles
+                .AsNoTracking()
+                .Where(x => x.UserId == userId && !x.IsDeleted)
+                .ToListAsync();
+        }
+
+
     }
 }
 

@@ -160,9 +160,9 @@ namespace Business.Implementations.Operational
                     MiddleName = person.MiddleName,
                     LastName = person.LastName,
                     SecondLastName = person.SecondLastName,
-                    DocumentTypeId = (DocumentType?)person.DocumentTypeId,
+                    DocumentType = (DocumentType?)person.DocumentTypeId,
                     DocumentNumber = person.DocumentNumber,
-                    BloodTypeId = (BloodType?)person.BloodTypeId,
+                    BloodType = (BloodType?)person.BloodTypeId,
                     Phone = person.Phone,
                     Email = person.Email,
                     Address = person.Address,
@@ -196,7 +196,7 @@ namespace Business.Implementations.Operational
                         {
                             if (int.TryParse(request.NewValue, out int id))
                             {
-                                personUpdateDto.DocumentTypeId = (DocumentType)id;
+                                personUpdateDto.DocumentType = (DocumentType)id;
                             }
                             break;
                         }
@@ -205,7 +205,7 @@ namespace Business.Implementations.Operational
                         {
                             if (int.TryParse(request.NewValue, out int id))
                             {
-                                personUpdateDto.BloodTypeId = (BloodType)id;
+                                personUpdateDto.BloodType = (BloodType)id;
                             }
                             break;
                         }

@@ -136,7 +136,7 @@ namespace Business.Services.Excel
             // Procesar cada fila/persona
             foreach (var row in parsed)
             {
-                var rowRes = new BulkRowResult { RowNumber = row.RowNumber, UpdatedPhoto = false };
+                var rowRes = new BulkRowResult { RowNumber = row.RowNumber };
                 int? personId = null;
                 int? pdpId = null;
                 PersonRegistrerDto? personCreated = null;
@@ -177,14 +177,24 @@ namespace Business.Services.Excel
                     pdpId = pdpSaved.Id;
 
                     //// === STEP 3: Subir foto ===
+                    // === STEP 3: Subir foto ===
                     if (row.PhotoBytes is { Length: > 0 })
                     {
                         var (ext, contentType) = ImageFormatValidator.EnsureSupported(row.PhotoBytes, row.PhotoExtension);
                         using var ms = new MemoryStream(row.PhotoBytes);
-                        var photo = await _personBusiness.UpsertPersonPhotoAsync(personId.Value, ms, contentType, $"excel-upload{ext}");
+                        var photo = await _personBusiness.UpsertPersonPhotoAsync(
+                            personId.Value,
+                            ms,
+                            contentType,
+                            $"excel-upload{ext}"
+                        );
+
                         rowRes.UpdatedPhoto = true;
-                        personCreated.Person.PhotoUrl = contentType;
+
+                        // Mantener la URL
+                        personCreated.Person.PhotoUrl = photo.PublicUrl;
                     }
+
 
 
                     await _uow.CommitAsync();
@@ -226,22 +236,33 @@ namespace Business.Services.Excel
                         IsDeleted = false
                     });
                 }
+                /// <summary>
+                /// Guardar siempre el registro del batch,
+                /// evitando romper por FK cuando la persona no existe.
+                /// </summary>
                 finally
                 {
+                    int? safePersonId = personId > 0 ? personId : null;
+                    int? safePdpId = pdpId > 0 ? pdpId : null;
+
                     await _history.AppendRowAsync(new ImportBatchRowDto
                     {
                         ImportBatchId = batchId,
                         RowNumber = row.RowNumber,
                         Success = rowRes.Success,
                         Message = rowRes.Message,
-                        PersonId = personId ,
-                        IssuedCardId = pdpId ,
+
+                        // Solo asignar si existe realmente la persona / pdp
+                        PersonId = safePersonId,
+                        IssuedCardId = safePdpId,
+
                         CardId = cardConfigId,
                         UpdatedPhoto = rowRes.UpdatedPhoto
                     });
 
                     result.Rows.Add(rowRes);
                 }
+
             }
 
             // === Completar ===

@@ -33,6 +33,10 @@ namespace Business.Services.Excel
         /// <summary>
         /// Parsea un archivo Excel de personas, validando y evitando leer columnas vacías.
         /// </summary>
+        /// <summary>
+        /// Parsea un archivo Excel de personas leyendo TipoDoc, TipoSangre y Ciudad
+        /// desde las 3 últimas columnas del archivo.
+        /// </summary>
         public async Task<IReadOnlyList<ParsedPersonRow>> ParseAsync(Stream excelStream)
         {
             var ws = _excel.OpenFirstWorksheet(excelStream);
@@ -40,19 +44,26 @@ namespace Business.Services.Excel
             const int HEADER_ROW = 1;
             const int FIRST_DATA_ROW = 2;
 
-            // Columnas utilizadas (A-L)
+            // ============================
+            // 🔥 Determinar columnas dinámicas
+            // ============================
+            int lastColumn = ws.LastColumnUsed().ColumnNumber();
+
+            int COL_DOCUMENTTYPEID = lastColumn - 1; // Tipo Doc
+            int COL_BLOODTYPEID = lastColumn - 2;    // Tipo Sangre
+            int COL_CITYID = lastColumn;             // Ciudad
+
+            int COL_PHOTO = 12;
+
+            // Columnas fijas del inicio
             const int COL_FIRSTNAME = 1;
             const int COL_MIDDLENAME = 2;
             const int COL_LASTNAME = 3;
             const int COL_SECONDLASTNAME = 4;
-            const int COL_DOCUMENTTYPEID = 5;
             const int COL_DOCUMENTNUMBER = 6;
-            const int COL_BLOODTYPEID = 7;
-            const int COL_PHONE = 8;
-            const int COL_EMAIL = 9;
+            const int COL_PHONE = 9;
+            const int COL_EMAIL = 8;
             const int COL_ADDRESS = 10;
-            const int COL_CITYID = 11;
-            const int COL_PHOTO = 12;
 
             var lastRow = _excel.GetLastUsedRow(ws);
             if (lastRow < FIRST_DATA_ROW) return Array.Empty<ParsedPersonRow>();
@@ -65,7 +76,6 @@ namespace Business.Services.Excel
             {
                 try
                 {
-                    // 🔹 Verifica si la fila tiene contenido relevante antes de leer todas las columnas.
                     if (RowIsEmpty(ws, row, COL_FIRSTNAME, COL_LASTNAME, COL_EMAIL))
                         continue;
 
@@ -75,13 +85,18 @@ namespace Business.Services.Excel
                         MiddleName = _excel.ReadNullableString(ws, row, COL_MIDDLENAME),
                         LastName = _excel.ReadString(ws, row, COL_LASTNAME),
                         SecondLastName = _excel.ReadNullableString(ws, row, COL_SECONDLASTNAME),
-                        DocumentTypeId = (Utilities.Enums.Specifics.DocumentType?)_excel.ReadNullableInt(ws, row, COL_DOCUMENTTYPEID),
+
+                        // ================================
+                        // 🔥 Campos movidos a las columnas finales
+                        // ================================
+                        DocumentType = (Utilities.Enums.Specifics.DocumentType?)_excel.ReadNullableInt(ws, row, COL_DOCUMENTTYPEID),
+                        BloodType = (Utilities.Enums.Specifics.BloodType?)_excel.ReadNullableInt(ws, row, COL_BLOODTYPEID),
+                        CityId = _excel.ReadIntOrDefault(ws, row, COL_CITYID, 0),
+
                         DocumentNumber = _excel.ReadNullableString(ws, row, COL_DOCUMENTNUMBER),
-                        BloodTypeId = (Utilities.Enums.Specifics.BloodType?)_excel.ReadNullableInt(ws, row, COL_BLOODTYPEID),
                         Phone = _excel.ReadNullableString(ws, row, COL_PHONE),
                         Email = _excel.ReadString(ws, row, COL_EMAIL),
-                        Address = _excel.ReadNullableString(ws, row, COL_ADDRESS),
-                        CityId = _excel.ReadIntOrDefault(ws, row, COL_CITYID, 0)
+                        Address = _excel.ReadNullableString(ws, row, COL_ADDRESS)
                     };
 
                     var validationError = ValidateRow(dto, emailsInFile, docsInFile);
@@ -90,7 +105,6 @@ namespace Business.Services.Excel
 
                     var tempPassword = GenerateTempPassword();
 
-                    // 🔹 Solo intenta leer la foto si hay imagen realmente en esa celda
                     var (photoBytes, photoExt) = _excel.HasPictureAtCell(ws, row, COL_PHOTO)
                         ? _excel.ReadPictureAtCell(ws, row, COL_PHOTO)
                         : (null, null);
@@ -109,6 +123,10 @@ namespace Business.Services.Excel
                     _logger.LogWarning(ex, "Error parseando fila {Row}", row);
                 }
             }
+
+            if (list.Count == 0)
+                throw new InvalidOperationException("El archivo Excel no contiene información válida para procesar.");
+
 
             return list;
         }

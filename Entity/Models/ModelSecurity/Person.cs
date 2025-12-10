@@ -34,7 +34,7 @@ namespace Entity.Models.ModelSecurity
 
         /// <summary>Tarjetas emitidas de esta persona</summary>
         public ICollection<IssuedCard> IssuedCard { get; set; } = new List<IssuedCard>();
-        public DocumentType DocumentType { get; set; }
-        public BloodType? BloodType { get; set; }
+        public DocumentType DocumentType { get; set; } 
+        public BloodType? BloodType { get; set; } 
     }
 }

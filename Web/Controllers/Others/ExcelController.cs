@@ -44,13 +44,26 @@ namespace Web.Controllers.Others
         [HttpPost("import/people")]
         public async Task<IActionResult> ImportPeople([FromForm] ImportContextCard ctx, [FromForm] UploadFile fileRequest)
         {
-            var file = fileRequest.file;
-            if (file == null || file.Length == 0) return BadRequest("Archivo Excel vacío.");
+            try
+            {
+                var file = fileRequest.file;
+                if (file == null || file.Length == 0) return BadRequest("Archivo Excel vacío.");
 
-            using var stream = file.OpenReadStream();
-            var result = await _importer.ImportAsync(stream, ctx); // IExcelBulkImporter
+                using var stream = file.OpenReadStream();
+                var result = await _importer.ImportAsync(stream, ctx); // IExcelBulkImporter
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // ⚠️ Error esperado para archivos vacíos o inválidos
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // ⚠️ Error inesperado
+                return StatusCode(500, new { message = "Error interno procesando el archivo." });
+            }
         }
     }
 }

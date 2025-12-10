@@ -48,11 +48,11 @@ namespace Business.Services.Storage
             );
 
             // 3) Eliminar archivo anterior si es distinto
-            if (!string.IsNullOrWhiteSpace(previousStoragePath) &&
-                !string.Equals(previousStoragePath, storagePath, StringComparison.OrdinalIgnoreCase))
-            {
-                await _storage.DeleteIfExistsAsync(previousStoragePath, bucket);
-            }
+            //if (!string.IsNullOrWhiteSpace(previousStoragePath) &&
+            //    !string.Equals(previousStoragePath, storagePath, StringComparison.OrdinalIgnoreCase))
+            //{
+            //    await _storage.DeleteIfExistsAsync(previousStoragePath, bucket);
+            //}
 
             return (publicUrl, storagePath);
         }

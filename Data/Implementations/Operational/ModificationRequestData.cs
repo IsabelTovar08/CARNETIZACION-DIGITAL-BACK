@@ -26,6 +26,7 @@ namespace Data.Implementations.Operational
             return await _context.Set<ModificationRequest>()
                 .Include(x => x.User)
                     .ThenInclude(u => u.Person)
+                .OrderByDescending(x => x.CreateAt)
                 .ToListAsync();
         }
 
